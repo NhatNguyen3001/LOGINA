@@ -39,11 +39,11 @@ export interface AnonClient {
 }
 
 export function liveConfig(env: Env = process.env): LiveConfig {
-  const databaseId = env.FIRESTORE_DATABASE_ID ?? 'logina-test';
-  if (databaseId === '(default)') {
-    throw new Error('Tests must never touch the (default) database. Set FIRESTORE_DATABASE_ID to logina-test.');
+  const databaseId = env.FIRESTORE_DATABASE_ID || 'logina-test';
+  if (!databaseId.startsWith('logina-test')) {
+    throw new Error(`Tests run only on logina-test databases, not ${databaseId}. Set FIRESTORE_DATABASE_ID to logina-test.`);
   }
-  return { projectId: PROJECT_ID, databaseId, bucket: env.MATERIALS_BUCKET ?? 'logina-dev-test' };
+  return { projectId: PROJECT_ID, databaseId, bucket: env.MATERIALS_BUCKET || 'logina-dev-test' };
 }
 
 /** A unique tenant for one test file, so test files can run in parallel. */

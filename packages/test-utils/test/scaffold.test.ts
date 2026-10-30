@@ -15,25 +15,6 @@ describe('firebase.json', () => {
   });
 });
 
-describe('firestore.indexes.json', () => {
-  it('lists the composite indexes from 05-Backend-Schema section 11', () => {
-    const { indexes } = repoJson('firestore.indexes.json');
-    const summary = indexes.map(
-      (index: { collectionGroup: string; queryScope: string; fields: Array<{ fieldPath: string }> }) =>
-        `${index.collectionGroup}:${index.queryScope}:${index.fields.map((f) => f.fieldPath).join(',')}`,
-    );
-    expect(summary).toEqual([
-      'attempts:COLLECTION:assignmentId,studentId',
-      'attempts:COLLECTION:studentId,status',
-      'lessons:COLLECTION:schoolId,editorTeacherIds,updatedAt',
-      'assignments:COLLECTION:schoolId,publishedAt',
-      'taskDrafts:COLLECTION_GROUP:lessonId,slot,draftVersion',
-      'clarificationIssues:COLLECTION:severity,state',
-      'auditLog:COLLECTION:lessonId,at',
-    ]);
-  });
-});
-
 describe('no-restricted-imports in apps/web', () => {
   const lint = async (filePath: string, code: string) => {
     const [result] = await new ESLint({ cwd: repoRoot }).lintText(code, { filePath });

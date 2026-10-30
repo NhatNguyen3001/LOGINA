@@ -30,6 +30,7 @@ describe('client access to the live project', () => {
   afterAll(async () => {
     await client?.close();
     await live?.db.doc(docPath).delete();
+    await live?.db.doc(`attempts/${schoolId}`).delete();
     await live?.bucket.file(objectPath).delete({ ignoreNotFound: true });
     await live?.bucket.file(`${schoolId}/y.pdf`).delete({ ignoreNotFound: true });
   });
@@ -48,8 +49,7 @@ describe('client access to the live project', () => {
 
   it('client cannot read or write any Storage path', async () => {
     const { storage } = client!;
-    // 403 comes from storage.rules once the bucket is linked to Firebase; until then Firebase Storage answers 412.
-    const refused = (error: StorageError) => [403, 412].includes(error.status);
+    const refused = (error: StorageError) => error.status === 403;
 
     await expect(getBytes(ref(storage, objectPath))).rejects.toSatisfy(refused);
     await expect(uploadString(ref(storage, `${schoolId}/y.pdf`), 'x')).rejects.toSatisfy(refused);

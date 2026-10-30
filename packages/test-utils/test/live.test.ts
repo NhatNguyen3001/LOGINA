@@ -11,12 +11,19 @@ describe('liveConfig', () => {
   });
 
   it('takes the database and bucket from env', () => {
-    const config = liveConfig({ FIRESTORE_DATABASE_ID: 'other-db', MATERIALS_BUCKET: 'other-bucket' });
-    expect(config).toMatchObject({ databaseId: 'other-db', bucket: 'other-bucket' });
+    const config = liveConfig({ FIRESTORE_DATABASE_ID: 'logina-test-2', MATERIALS_BUCKET: 'other-bucket' });
+    expect(config).toMatchObject({ databaseId: 'logina-test-2', bucket: 'other-bucket' });
   });
 
-  it('refuses the (default) database', () => {
-    expect(() => liveConfig({ FIRESTORE_DATABASE_ID: '(default)' })).toThrow(/\(default\)/);
+  it('treats empty values as unset', () => {
+    expect(liveConfig({ FIRESTORE_DATABASE_ID: '', MATERIALS_BUCKET: '' })).toMatchObject({
+      databaseId: 'logina-test',
+      bucket: 'logina-dev-test',
+    });
+  });
+
+  it.each(['(default)', 'other-db'])('refuses the %s database', (databaseId) => {
+    expect(() => liveConfig({ FIRESTORE_DATABASE_ID: databaseId })).toThrow(/logina-test/);
   });
 });
 
