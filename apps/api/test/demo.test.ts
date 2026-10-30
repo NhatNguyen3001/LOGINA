@@ -77,6 +77,35 @@ describe('demo menu', () => {
     expect(tracking.counts.started).toBe(7);
   });
 
+  const simulateLive = async (client: Client) => {
+    const [lesson] = await lessonsOf(client);
+    await h.live.db.doc(`lessons/${lesson!.id}`).update({ aiMode: 'LIVE' });
+    const [assignment] = await assignmentsOf(client);
+    expect((await client.post('/demo/simulate-class', { assignmentId: assignment!.assignmentId })).status).toBe(200);
+    const attempts = await h.live.db.collection('attempts').where('schoolId', '==', client.workspace.schoolId).get();
+    const tasks = await Promise.all(attempts.docs.map((attempt) => attempt.ref.collection('tasks').get()));
+    return tasks.flatMap((t) => t.docs.map((d) => ({ slot: d.id, ...d.data() }))) as unknown as { slot: string; initialConfidence: number; initialArtifact: { proposal: string } }[];
+  };
+
+  it('simulate class on a LIVE lesson submits 7 attempts built from its own content', async () => {
+    const live = await h.client();
+    const tasks = await simulateLive(live);
+    expect(tasks).toHaveLength(35);
+    expect(tasks.filter((t) => t.slot === 'Q5').every((t) => t.initialArtifact.proposal.length <= 120)).toBe(true);
+    const [assignment] = await assignmentsOf(live);
+    const tracking = ClassTrackingDTO.parse(await (await live.get(`/assignments/${assignment!.assignmentId}/tracking`)).json());
+    expect(tracking.counts).toEqual({ started: 7, complete: 7 });
+  });
+
+  it('simulate class on a LIVE lesson repeats for the same lesson and differs for another', async () => {
+    const [one, two] = await Promise.all([h.client(), h.client()]);
+    const confidences = (tasks: { initialConfidence: number }[]) => tasks.map((t) => t.initialConfidence).sort((x, y) => x - y);
+    const first = confidences(await simulateLive(one));
+    expect((await one.post('/demo/reset')).status).toBe(200);
+    expect(confidences(await simulateLive(one))).toEqual(first);
+    expect(confidences(await simulateLive(two))).not.toEqual(first);
+  }, 120_000);
+
   it('fail-next-rerun does not affect another workspace', async () => {
     expect((await a.post('/demo/fail-next-rerun')).status).toBe(200);
     expect((await h.live.db.doc(`schools/${a.workspace.schoolId}`).get()).data()?.failNextRerun).toBe(true);

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import type { DocumentData, DocumentReference, Firestore } from 'firebase-admin/firestore';
 
 const BATCH_SIZE = 400;
-const SNAPSHOT_COLLECTIONS = ['assignments', 'attempts', 'previewViews'];
+const SNAPSHOT_COLLECTIONS = ['assignments', 'jobs', 'attempts', 'previewViews'];
 
 export interface SnapshotDoc {
   path: string;
@@ -63,7 +63,7 @@ export async function captureSnapshot(db: Firestore, id: string, source: { schoo
     schoolId,
     teacherUid: schoolId.replace(/^wks_/, 'tch_'),
     classId: `${schoolId}_12a3`,
-    ids: [...lessons.docs, ...others[0]!.docs].map((doc) => doc.id),
+    ids: [...lessons.docs, ...others[0]!.docs, ...others[1]!.docs].map((doc) => doc.id),
     docCount: docs.length,
   });
   for (let i = 0; i < docs.length; i += BATCH_SIZE) {

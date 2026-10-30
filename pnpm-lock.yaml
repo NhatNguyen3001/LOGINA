@@ -11,6 +11,12 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0)
+      '@logina/db':
+        specifier: workspace:^
+        version: link:packages/db
+      '@logina/domain':
+        specifier: workspace:^
+        version: link:packages/domain
       '@types/node':
         specifier: '22'
         version: 22.20.5
@@ -20,6 +26,9 @@ importers:
       eslint:
         specifier: ^10.14.0
         version: 10.14.0
+      firebase-admin:
+        specifier: ^14.5.0
+        version: 14.5.0(@firebase/app-compat@0.5.20)(@firebase/app@0.16.4)
       pdfkit:
         specifier: ^0.20.2
         version: 0.20.2
