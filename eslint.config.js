@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import i18next from 'eslint-plugin-i18next';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
@@ -30,7 +31,9 @@ export default defineConfig([
   },
   {
     files: ['apps/web/src/**/*.{ts,tsx}'],
+    plugins: { i18next },
     rules: {
+      'i18next/no-literal-string': ['error', { mode: 'jsx-text-only' }],
       'no-restricted-syntax': [
         'error',
         { selector: 'Literal[value=/(^|\\s)[a-z:-]+-\\[/]', message: 'Use design tokens, not arbitrary Tailwind values.' },

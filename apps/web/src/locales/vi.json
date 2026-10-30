@@ -1,0 +1,72 @@
+{
+  "teacher": {
+    "t01": {
+      "guide": {
+        "title": "Tệp phù hợp nhất",
+        "pages": "Một bài học, tối đa 10 trang",
+        "formats": "Tệp PDF hoặc Word",
+        "languages": "Tiếng Anh hoặc tiếng Việt",
+        "content": "Có dữ kiện, số liệu hoặc bảng để học sinh suy luận"
+      },
+      "refusal": {
+        "title": "Chưa dùng được tệp này",
+        "pages": "{{count}} trang",
+        "chooseAnother": "Chọn tệp khác"
+      }
+    },
+    "t02": {
+      "liveTiming": "Học liệu mới có thể mất vài phút để đọc. Cô có thể rời trang và quay lại sau.",
+      "language": {
+        "question": "Tệp của cô có vẻ là {{detected}}. Dùng {{detected}} cho bài này?",
+        "useDetected": "Dùng {{lang}}",
+        "keepChosen": "Giữ {{lang}}"
+      }
+    },
+    "t05": {
+      "readByAiNotice": "LOGINA đã đọc tệp này bằng AI. Cô hãy đối chiếu đoạn trích và số liệu với bản gốc trước khi duyệt.",
+      "readByAi": "Đọc bằng AI",
+      "openOriginal": "Mở trang gốc",
+      "locator": {
+        "page": "Trang {{n}}",
+        "section": "Mục {{n}}"
+      }
+    }
+  },
+  "errors": {
+    "FILE_TYPE": "LOGINA đọc được tệp PDF hoặc Word.",
+    "FILE_TOO_LARGE": "Tệp này lớn hơn 20 MB.",
+    "TOO_MANY_PAGES": "Tệp dài hơn 10 trang. Cô hãy tải lên các trang của một bài thôi.",
+    "DAILY_LIMIT": "Hôm nay đã hết lượt tải tệp mới. Cô hãy thử học liệu mẫu.",
+    "UNREADABLE": "Chưa đọc được chữ nào trong tệp này.",
+    "UNSUPPORTED_LANGUAGE": "LOGINA dùng được học liệu tiếng Anh hoặc tiếng Việt.",
+    "TOO_LITTLE_CONTENT": "Nội dung chưa đủ để suy luận. Cô hãy thử một bài có dữ kiện, số liệu hoặc bảng.",
+    "generic": "Có lỗi xảy ra. Cô hãy thử lại nhé.",
+    "NOT_FOUND": "Không tìm thấy nội dung này.",
+    "VERSION_CONFLICT": "Đã có phiên bản mới hơn. Cô hãy tải lại để xem.",
+    "STALE_VERSION": "Bản nháp đã thay đổi. Cô hãy tải lại để xem bản mới nhất.",
+    "BLOCKERS_REMAIN": "Cô hãy xử lý các điểm chặn trước khi duyệt.",
+    "MATERIAL_REQUIRED": "Cô hãy thêm học liệu trước.",
+    "TASKS_NOT_APPROVED": "Cô hãy duyệt đủ năm bài trước khi giao.",
+    "TASKS_NOT_READY": "Các bài chưa sẵn sàng.",
+    "NEEDS_SOURCE_ROUTE": "Thay đổi này thêm nội dung mới nên cần kiểm tra lại học liệu.",
+    "MISSING_ALT_TEXT": "Một hình trong bài chưa có mô tả thay thế.",
+    "CLAIM_WITHOUT_LOCATOR": "Mỗi nhận định cần có vị trí trong học liệu.",
+    "NOT_FAILED": "Chỉ thử lại được khi lần kiểm tra trước bị lỗi.",
+    "ALREADY_LOCKED": "Câu trả lời này đã được chốt.",
+    "ALREADY_SUBMITTED": "Bài này đã được nộp.",
+    "ATTEMPT_INCOMPLETE": "Hãy làm xong tất cả các bài trước.",
+    "UNKNOWN_OPTION": "Lựa chọn này không thuộc bài này.",
+    "CONSENT_VERSION_STALE": "Thông tin nghiên cứu đã thay đổi. Vui lòng đọc lại."
+  },
+  "common": {
+    "lang": {
+      "en": "tiếng Anh",
+      "vi": "tiếng Việt"
+    },
+    "language": "Ngôn ngữ"
+  },
+  "demo": {
+    "jumpSampleOnly": "Chỉ cho bộ bài mẫu",
+    "resetConfirm": "Thao tác này xóa mọi bộ bài trong không gian làm việc của trình duyệt này, kể cả tệp đã tải lên. Công việc của người khác không bị ảnh hưởng."
+  }
+}

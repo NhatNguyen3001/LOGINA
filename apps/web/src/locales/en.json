@@ -1,0 +1,72 @@
+{
+  "teacher": {
+    "t01": {
+      "guide": {
+        "title": "What works best",
+        "pages": "One lesson, up to 10 pages",
+        "formats": "PDF or Word file",
+        "languages": "English or Vietnamese",
+        "content": "Facts, figures or tables students can reason about"
+      },
+      "refusal": {
+        "title": "We can't use this file yet",
+        "pages": "{{count}} pages",
+        "chooseAnother": "Choose another file"
+      }
+    },
+    "t02": {
+      "liveTiming": "New material can take a few minutes to read. You can leave and come back.",
+      "language": {
+        "question": "Your file looks like {{detected}}. Use {{detected}} for this lesson?",
+        "useDetected": "Use {{lang}}",
+        "keepChosen": "Keep {{lang}}"
+      }
+    },
+    "t05": {
+      "readByAiNotice": "LOGINA read this file with AI. Check the quoted text and figures against your original before approving.",
+      "readByAi": "Read by AI",
+      "openOriginal": "Open original page",
+      "locator": {
+        "page": "Page {{n}}",
+        "section": "Section {{n}}"
+      }
+    }
+  },
+  "errors": {
+    "FILE_TYPE": "LOGINA reads PDF or Word files.",
+    "FILE_TOO_LARGE": "This file is over 20 MB.",
+    "TOO_MANY_PAGES": "It's longer than 10 pages. Upload just the pages for one lesson.",
+    "DAILY_LIMIT": "Today's limit for new files is reached. Try the sample material.",
+    "UNREADABLE": "We couldn't read any text in this file.",
+    "UNSUPPORTED_LANGUAGE": "LOGINA works with English or Vietnamese material.",
+    "TOO_LITTLE_CONTENT": "There isn't enough to reason about here. Try a lesson with facts, figures or tables.",
+    "generic": "Something went wrong. Please try again.",
+    "NOT_FOUND": "We can't find that page or item.",
+    "VERSION_CONFLICT": "Someone else saved a newer version. Reload to see it.",
+    "STALE_VERSION": "This draft has changed. Reload to see the latest version.",
+    "BLOCKERS_REMAIN": "Resolve the blocking points before you approve.",
+    "MATERIAL_REQUIRED": "Add a material first.",
+    "TASKS_NOT_APPROVED": "Approve all five tasks before you assign.",
+    "TASKS_NOT_READY": "The tasks aren't ready yet.",
+    "NEEDS_SOURCE_ROUTE": "This change adds something new, so it goes through the source check.",
+    "MISSING_ALT_TEXT": "A figure in this task has no alt text.",
+    "CLAIM_WITHOUT_LOCATOR": "Every claim needs a location in the material.",
+    "NOT_FAILED": "Only a failed recheck can be retried.",
+    "ALREADY_LOCKED": "This answer is already locked.",
+    "ALREADY_SUBMITTED": "This task is already submitted.",
+    "ATTEMPT_INCOMPLETE": "Finish every task first.",
+    "UNKNOWN_OPTION": "That option isn't part of this task.",
+    "CONSENT_VERSION_STALE": "The research notice has changed. Please read it again."
+  },
+  "common": {
+    "lang": {
+      "en": "English",
+      "vi": "Vietnamese"
+    },
+    "language": "Language"
+  },
+  "demo": {
+    "jumpSampleOnly": "Sample lesson only",
+    "resetConfirm": "This deletes every lesson in this browser's workspace, including uploaded files. Other people's work is not affected."
+  }
+}
