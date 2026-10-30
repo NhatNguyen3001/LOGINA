@@ -198,6 +198,12 @@ export function sourceRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
       const unlocated = unlocatedClaims(claims, evidence);
       if (unlocated.length > 0) throw new AppError('CLAIM_WITHOUT_LOCATOR', 409, 'Every claim needs a location.', unlocated);
 
+      const sourceDraftRef = db.doc(`lessons/${lessonId}/sourceDrafts/current`);
+      const sourceDraft = (await sourceDraftRef.get()).data();
+      if (sourceDraft) {
+        const claim = claims.find((x) => x.id === sourceDraft.claimId);
+        if (claim) claim.wording = sourceDraft.after;
+      }
       const version = ((lesson.approvedSourceVersion as number | undefined) ?? 0) + 1;
       const snapshot = {
         version,
@@ -214,7 +220,8 @@ export function sourceRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
         excludedIds: issues.filter((i) => i.state === 'EXCLUDED').map((i) => i.id),
       };
       const sourceModelVersionId = newId('smv');
-      const job = await createJob(db, { schoolId, lessonId, type: 'GENERATE' });
+      const affectedSlots = (sourceDraft?.affectedDraftIds as string[] | undefined)?.map((id) => /_(Q[1-5])_v/.exec(id)?.[1] as string) ?? [];
+      const job = await createJob(db, { schoolId, lessonId, type: 'GENERATE', targetIds: affectedSlots });
 
       const batch = db.batch();
       batch.create(db.doc(`lessons/${lessonId}/sourceModelVersions/${sourceModelVersionId}`), {
@@ -230,8 +237,12 @@ export function sourceRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
         activeJobId: job.id,
         updatedAt: FieldValue.serverTimestamp(),
       });
+      if (sourceDraft) {
+        batch.update(db.doc(`lessons/${lessonId}/sourceClaims/${sourceDraft.claimId as string}`), { wording: sourceDraft.after });
+        batch.delete(sourceDraftRef);
+      }
       await batch.commit();
-      await enqueue({ jobId: job.id, type: 'GENERATE', lessonId, targetIds: [] });
+      await enqueue({ jobId: job.id, type: 'GENERATE', lessonId, targetIds: affectedSlots });
       return respond(c, SourceApprovalResultDTO, { sourceModelVersionId, version, jobId: job.id });
     }),
   );

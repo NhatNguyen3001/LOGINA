@@ -4,6 +4,8 @@ import { authenticate } from './middleware/auth.js';
 import { resolveSession } from './middleware/session.js';
 import { handleError } from './middleware/errors.js';
 import { rejectUnknownQuery } from './middleware/strict-query.js';
+import { approvalRoutes } from './routes/approval.js';
+import { assignmentRoutes, studentAssignmentRoutes } from './routes/assignments.js';
 import { classRoutes } from './routes/classes.js';
 import { editRoutes } from './routes/edits.js';
 import { healthRoutes } from './routes/health.js';
@@ -31,6 +33,9 @@ export function createApp(deps: AppDeps): Hono<AppEnv> {
   app.route('/api/v1/lessons', sourceRoutes(deps));
   app.route('/api/v1/lessons', taskRoutes(deps));
   app.route('/api/v1/lessons', editRoutes(deps));
+  app.route('/api/v1/lessons', approvalRoutes(deps));
+  app.route('/api/v1/lessons', assignmentRoutes(deps));
+  app.route('/api/v1/me/assignments', studentAssignmentRoutes(deps));
   app.route('/api/v1/classes', classRoutes(deps));
   app.route('/api/v1/jobs', jobRoutes(deps));
 
