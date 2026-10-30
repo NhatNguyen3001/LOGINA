@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import type { WorkerConfig } from '../config.js';
@@ -34,10 +35,11 @@ export const validatorVersion = (role: Role, config: WorkerConfig, seeded: boole
   `${role}@${config.version}+${seeded ? 'seeded' : modelFor(role, config)}`;
 
 const PROMPT_VERSION = 'v1';
+/** The bundle sits at a different depth than this source file, so the image sets PROMPT_DIR. */
+const PROMPT_DIR = process.env.PROMPT_DIR ?? fileURLToPath(new URL('../../prompts/', import.meta.url));
 
 function loadPrompt(role: Role, variables: Record<string, string>): string {
-  const path = fileURLToPath(new URL(`../../prompts/${role}.${PROMPT_VERSION}.md`, import.meta.url));
-  const template = readFileSync(path, 'utf8');
+  const template = readFileSync(join(PROMPT_DIR, `${role}.${PROMPT_VERSION}.md`), 'utf8');
   return Object.entries(variables).reduce((text, [key, value]) => text.replaceAll(`{{${key}}}`, value), template);
 }
 

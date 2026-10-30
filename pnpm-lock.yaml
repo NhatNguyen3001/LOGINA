@@ -11,6 +11,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0)
+      '@logina/contracts':
+        specifier: workspace:^
+        version: link:packages/contracts
       '@logina/db':
         specifier: workspace:^
         version: link:packages/db

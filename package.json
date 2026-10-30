@@ -15,10 +15,13 @@
     "make:material": "tsx tools/seed/make-material-pdf.ts",
     "research:flush": "tsx tools/research/flush.ts",
     "seed:start": "tsx tools/seed/start-state.ts",
-    "seed:snapshots": "tsx tools/seed/snapshots.ts"
+    "seed:snapshots": "tsx tools/seed/snapshots.ts",
+    "deploy:dev": "bash tools/deploy-dev.sh",
+    "smoke": "tsx tools/smoke.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@logina/contracts": "workspace:^",
     "@logina/db": "workspace:^",
     "@logina/domain": "workspace:^",
     "@types/node": "22",
