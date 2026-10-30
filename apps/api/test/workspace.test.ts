@@ -4,6 +4,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { getApps } from 'firebase-admin/app';
 import { anonToken, liveSetup, type AnonSession, type LiveProject } from '@logina/test-utils';
 import { createApp } from '../src/app.js';
+import { noFiles } from './helpers.js';
 import { testConfig } from '../src/config.js';
 import type { AppEnv } from '../src/context.js';
 import { ensureWorkspace, workspaceId } from '../src/services/workspace.js';
@@ -34,7 +35,7 @@ beforeAll(async () => {
   live = await liveSetup();
   [a, b] = await Promise.all([anonToken(), anonToken()]);
   const auth = getAuth(getApps().find((candidate) => candidate.name === 'logina-live-tests')!);
-  const deps = { db: live.db, auth, enqueue: async () => {} };
+  const deps = { db: live.db, auth, enqueue: async () => {}, files: noFiles, now: () => new Date() };
   app = createApp({ ...deps, config: testConfig() });
   flagOff = createApp({ ...deps, config: testConfig({ noSignIn: false }) });
   addProbes(app);

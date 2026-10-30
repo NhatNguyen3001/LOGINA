@@ -1,3 +1,4 @@
+import { ulid } from 'ulid';
 import type { DocumentData, DocumentReference, Firestore, Transaction } from 'firebase-admin/firestore';
 import { FieldValue } from 'firebase-admin/firestore';
 
@@ -17,7 +18,7 @@ export const lessonsRepo = {
       .where('editorTeacherIds', 'array-contains', teacherUid)
       .orderBy('updatedAt', 'desc')
       .get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map((doc): DocumentData => ({ id: doc.id, ...doc.data() }));
   },
 
   setActiveJob: (db: Firestore, tx: Transaction, lessonId: string, jobId: string | null) =>
@@ -38,3 +39,9 @@ export const previewViewsRepo = {
   get: (db: Firestore, schoolId: string, uid: string, draftId: string) =>
     scopedGet(previewViewRef(db, uid, draftId), schoolId),
 };
+
+export const classesRepo = {
+  get: (db: Firestore, schoolId: string, classId: string) => scopedGet(db.doc(`classes/${classId}`), schoolId),
+};
+
+export const newId = (prefix: string): string => `${prefix}_${ulid()}`;

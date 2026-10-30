@@ -4,6 +4,7 @@ import { getApps } from 'firebase-admin/app';
 import { z } from 'zod';
 import { anonToken, liveSetup, testSchoolId, type AnonSession, type LiveProject } from '@logina/test-utils';
 import { createApp } from '../src/app.js';
+import { noFiles } from './helpers.js';
 import { testConfig } from '../src/config.js';
 import { AppError } from '../src/middleware/errors.js';
 import { idempotencyDocId, withIdempotency } from '../src/middleware/idempotency.js';
@@ -37,6 +38,8 @@ beforeAll(async () => {
     auth: getAuth(getApps().find((a) => a.name === 'logina-live-tests')!),
     enqueue: async () => {},
     config: testConfig(),
+    files: noFiles,
+    now: () => new Date(),
   });
   app.get('/api/v1/test/extra', (c) => respond(c, Ok, { ok: true, secret: 1 } as never));
   app.get('/api/v1/test/boom', () => {

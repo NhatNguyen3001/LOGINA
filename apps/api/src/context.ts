@@ -10,11 +10,20 @@ export type EnqueueFn = (job: {
   targetIds: string[];
 }) => Promise<void>;
 
+export interface FileStore {
+  read: (path: string) => Promise<Buffer>;
+  remove: (path: string) => Promise<void>;
+  signWriteUrl: (path: string, contentType: string, expires: Date) => Promise<string>;
+  signReadUrl: (path: string, expires: Date) => Promise<string>;
+}
+
 export interface AppDeps {
   db: Firestore;
   auth: Auth;
   enqueue: EnqueueFn;
   config: Config;
+  files: FileStore;
+  now: () => Date;
 }
 
 /** The browser session behind the request, whichever side it is on. */

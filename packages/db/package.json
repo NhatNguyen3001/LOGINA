@@ -18,7 +18,8 @@
     "test": "vitest run --root ../.. packages/db/"
   },
   "dependencies": {
-    "firebase-admin": "^14.5.0"
+    "firebase-admin": "^14.5.0",
+    "ulid": "^3.0.2"
   },
   "devDependencies": {
     "@logina/test-utils": "workspace:^"
