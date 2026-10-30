@@ -5,13 +5,16 @@ import { MaterialViewUrlDTO, RegisterMaterialReq, UploadUrlDTO, UploadUrlReq } f
 import { AppError, lessonsRepo, newId } from '@logina/db';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
+import { enforce } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
+import { RateLimited } from '../services/limits.js';
 import { incrementLiveUsage } from '../services/live-usage.js';
 import { inspectUpload, MaterialRefusal, MAX_BYTES, PDF, sha256 } from '../services/materials.js';
 
 const SIGNED_URL_MS = 10 * 60 * 1000;
 
-export function materialRoutes({ db, files, config, now }: AppDeps): Hono<AppEnv> {
+export function materialRoutes(deps: AppDeps): Hono<AppEnv> {
+  const { db, files, config, now } = deps;
   const routes = new Hono<AppEnv>();
 
   const requireLesson = async (schoolId: string, lessonId: string) => {
@@ -89,17 +92,18 @@ export function materialRoutes({ db, files, config, now }: AppDeps): Hono<AppEnv
         try {
           return await work();
         } catch (error) {
-          if (error instanceof MaterialRefusal) await files.remove(storagePath);
+          if (error instanceof MaterialRefusal || error instanceof RateLimited) await files.remove(storagePath);
           throw error;
         }
       };
 
       return removeOnRefusal(async () => {
         const bytes = await files.read(storagePath);
-        const { mimeType, pageCount, unitKind } = await inspectUpload(bytes, fileName);
         const hash = sha256(bytes);
         const matchedLocale = Object.entries(samples).find(([, sample]) => sample === hash)?.[0];
         const aiMode = config.demoMode && matchedLocale ? 'SEEDED' : 'LIVE';
+        if (aiMode === 'LIVE') await enforce(deps, c, 'UPLOAD');
+        const { mimeType, pageCount, unitKind } = await inspectUpload(bytes, fileName);
         const seenOnLesson = !(
           await lessonRef.collection('materialVersions').where('sha256', '==', hash).limit(1).get()
         ).empty;

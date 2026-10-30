@@ -2,6 +2,7 @@ import type { MiddlewareHandler } from 'hono';
 import type { AppDeps, AppEnv } from '../context.js';
 import { ensureWorkspace } from '../services/workspace.js';
 import { AppError } from './errors.js';
+import { enforce } from './rate-limit.js';
 
 /** 02-TRD section 4: the API path decides the side, since one session can use both. */
 const STUDENT_ROUTES = [/^\/me\/assignments$/, /^\/assignments\/[^/]+\/attempts$/, /^\/attempts\/[^/]+\/tasks(\/|$)/, /^\/attempts\/[^/]+\/feedback$/];
@@ -18,13 +19,17 @@ export function sideOf(path: string): Side {
 
 const rejected = (): AppError => new AppError('UNAUTHENTICATED', 401, 'Sign-in is required.');
 
-export function resolveSession({ db, config }: AppDeps): MiddlewareHandler<AppEnv> {
+export function resolveSession(deps: AppDeps): MiddlewareHandler<AppEnv> {
+  const { db, config } = deps;
   return async (c, next) => {
     const { uid, anonymous } = c.var.session;
     if (anonymous !== config.noSignIn) throw rejected();
     if (!config.noSignIn) throw new AppError('NOT_IMPLEMENTED', 401, 'Accounts are not available in this build.');
 
-    const { schoolId, teacherUid, classId } = await ensureWorkspace(db, uid, { ...(config.readySnapshot ? { snapshotId: config.readySnapshot } : {}) });
+    const { schoolId, teacherUid, classId } = await ensureWorkspace(db, uid, {
+      ...(config.readySnapshot ? { snapshotId: config.readySnapshot } : {}),
+      beforeCreate: () => enforce(deps, c, 'SESSION'),
+    });
     const side = sideOf(c.req.path);
     if (side === 'teacher') c.set('user', { uid: teacherUid, role: 'teacher', schoolId, classIds: [classId] });
     else c.set('user', { uid, role: side === 'student' ? 'student' : 'demo', schoolId, classIds: [classId] });

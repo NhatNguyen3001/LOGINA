@@ -14,6 +14,7 @@ import { selectChallenge, type RuleBundle } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { requireBaseVersion } from '../middleware/base-version.js';
 import { withIdempotency } from '../middleware/idempotency.js';
+import { limited } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
 import { createJob, toJobDTO } from '../services/jobs.js';
 
@@ -62,7 +63,8 @@ function publicBody(body: DocumentData): DocumentData {
   return Object.fromEntries(Object.entries(body).filter(([key]) => !SERVER_ONLY_BODY.includes(key)));
 }
 
-export function taskRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
+export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
+  const { db, enqueue } = deps;
   const routes = new Hono<AppEnv>();
 
   const requireLesson = async (schoolId: string, lessonId: string): Promise<DocumentData> => {
@@ -193,7 +195,7 @@ export function taskRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
   routes.post(
     '/:id/tasks/:slot/sufficiency-choice',
     requireBaseVersion(async (c) => (await requireLesson(c.var.user.schoolId, c.req.param('id') as string)).version as number),
-    withIdempotency(db, async (c) => {
+    withIdempotency(db, limited(deps, 'AI_ACTION', async (c) => {
       const { schoolId } = c.var.user;
       const lessonId = c.req.param('id') as string;
       const slot = c.req.param('slot') as string;
@@ -205,7 +207,7 @@ export function taskRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
       await batch.commit();
       if (choice === 'REFOCUS') await enqueue({ jobId: job.id, type: 'GENERATE', lessonId, targetIds: [slot] });
       return respond(c, JobDTO, toJobDTO(job));
-    }),
+    })),
   );
 
   return routes;

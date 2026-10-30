@@ -1,3 +1,5 @@
+import { defaultLimits, limitsFromEnv, type RateLimits } from './services/limits.js';
+
 export interface Config {
   noSignIn: boolean;
   demoMode: boolean;
@@ -10,6 +12,7 @@ export interface Config {
   /** The snapshot each new workspace starts from; unset leaves a workspace empty. */
   readySnapshot?: string;
   snapshotLocale: 'en' | 'vi';
+  limits: RateLimits;
 }
 
 type Env = Record<string, string | undefined>;
@@ -26,8 +29,14 @@ export function loadConfig(env: Env = process.env): Config {
     participantType: env.PARTICIPANT_TYPE ?? 'judge',
     readySnapshot: env.READY_SNAPSHOT ?? `${env.DEMO_LOCALE ?? 'en'}_s01`,
     snapshotLocale: env.DEMO_LOCALE === 'vi' ? 'vi' : 'en',
+    limits: limitsFromEnv(env),
   };
 }
+
+/** Suites share sessions across many calls; only rate-limit.test.ts tests the real values. */
+const testLimits = Object.fromEntries(
+  Object.keys(defaultLimits).map((action) => [action, { perSession: { max: 1_000_000, seconds: 3600 }, perAddress: { max: 1_000_000, seconds: 3600 } }]),
+) as RateLimits;
 
 export const testConfig = (overrides: Partial<Config> = {}): Config => ({
   noSignIn: true,
@@ -39,5 +48,6 @@ export const testConfig = (overrides: Partial<Config> = {}): Config => ({
   researchEnabled: true,
   participantType: 'judge',
   snapshotLocale: 'en',
+  limits: testLimits,
   ...overrides,
 });

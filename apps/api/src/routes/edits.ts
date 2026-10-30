@@ -5,6 +5,7 @@ import { AppError, decodeNested, encodeNested, lessonsRepo, newId } from '@login
 import { dependencyClosure, detectNewFacts, type ClosureDraft } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
+import { limited } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
 import { createJob, toJobDTO } from '../services/jobs.js';
 
@@ -28,7 +29,8 @@ async function currentDrafts(db: Firestore, lesson: DocumentData): Promise<(Clos
   });
 }
 
-export function editRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
+export function editRoutes(deps: AppDeps): Hono<AppEnv> {
+  const { db, enqueue } = deps;
   const routes = new Hono<AppEnv>();
 
   const requireLesson = async (schoolId: string, lessonId: string): Promise<DocumentData> => {
@@ -140,7 +142,7 @@ export function editRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
 
   routes.post(
     '/:id/edits',
-    withIdempotency(db, async (c) => {
+    withIdempotency(db, limited(deps, 'AI_ACTION', async (c) => {
       const lesson = await requireLesson(c.var.user.schoolId, c.req.param('id') as string);
       const body = (await c.req.json()) as { baseVersion?: unknown };
       if (typeof body.baseVersion !== 'number') throw new AppError('BASE_VERSION_REQUIRED', 400, 'baseVersion is required.');
@@ -150,12 +152,12 @@ export function editRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
       const result =
         req.data.editScope === 'SOURCE' ? await sourceEdit(lesson, req.data, uid) : await draftEdit(lesson, req.data, uid);
       return respond(c, EditResultDTO, result);
-    }),
+    })),
   );
 
   routes.post(
     '/:id/tasks/:slot/rerun',
-    withIdempotency(db, async (c) => {
+    withIdempotency(db, limited(deps, 'AI_ACTION', async (c) => {
       const lesson = await requireLesson(c.var.user.schoolId, c.req.param('id') as string);
       const lessonId = lesson.id as string;
       const draftId = lesson.currentTaskDraftIds?.[c.req.param('slot') as string] as string | undefined;
@@ -169,7 +171,7 @@ export function editRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
       await db.doc(`lessons/${lessonId}`).update({ activeJobId: job.id });
       await enqueue({ jobId: job.id, type: 'RERUN', lessonId, targetIds: [draftId as string] });
       return respond(c, JobDTO, toJobDTO(job));
-    }),
+    })),
   );
 
   routes.get('/:id/source-draft', async (c) => {

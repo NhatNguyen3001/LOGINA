@@ -14,6 +14,8 @@ export interface WorkspaceOptions {
   snapshotId?: string | undefined;
   skipCopy?: boolean;
   pollMs?: number;
+  /** Runs once for a new workspace; throwing refuses it before anything is written. */
+  beforeCreate?: () => Promise<void>;
 }
 
 export const workspaceId = (uid: string): string => `wks_${uid}`;
@@ -40,6 +42,7 @@ export async function ensureWorkspace(
 
   const existing = (await schoolRef.get()).data();
   if (existing?.readyAt) return workspace;
+  if (!existing) await opts.beforeCreate?.();
 
   const created = await db.runTransaction(async (tx) => {
     if ((await tx.get(schoolRef)).exists) return false;

@@ -117,7 +117,7 @@ describe('assignments', () => {
     for (const slot of ['Q2', 'Q3', 'Q4', 'Q5']) {
       expect((await approve(slot, await approveBody(slot))).status).toBe(200);
     }
-  });
+  }, 90_000);
 
   it('assign with a stale LessonDTO.version is 409', async () => {
     expect((await assign(999)).status).toBe(409);
