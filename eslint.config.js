@@ -4,7 +4,7 @@ import i18next from 'eslint-plugin-i18next';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['**/dist/', '**/node_modules/', '**/coverage/', '.claude/', '.codegraph/', '.superpowers/']),
+  globalIgnores(['**/test-results/', '**/playwright-report/', '**/dist/', '**/node_modules/', '**/coverage/', '.claude/', '.codegraph/', '.superpowers/']),
   js.configs.recommended,
   tseslint.configs.recommended,
   { rules: { '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }] } },

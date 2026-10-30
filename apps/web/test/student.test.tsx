@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import type { MeDTO, StudentTaskDTO } from '@logina/contracts';
+import { Artifact, type MeDTO, type StudentTaskDTO } from '@logina/contracts';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskRunner } from '@/features/student/TaskRunner';
-import { Q2Editor, Q3Editor, Q4Editor, Q5Editor, isComplete } from '@/features/student/editors';
+import { Q2Editor, Q3Editor, Q4Editor, Q5Editor, emptyDraft, isComplete } from '@/features/student/editors';
 import { ResultSet } from '@/features/student/ResultSet';
 import * as api from '@/lib/api';
 import { renderWithI18n } from './utils';
@@ -163,6 +163,12 @@ describe('Q2 to Q5', () => {
     expect(isComplete(task, { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o' }], judgmentOptionId: 'o', tradeOffIds: [] })).toBe(false);
     expect(isComplete(task, { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o' }, { criterionId: 'c2', value: 'o' }], tradeOffIds: [] })).toBe(false);
     expect(isComplete(task, { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o' }, { criterionId: 'c2', value: 'o' }], judgmentOptionId: 'o', tradeOffIds: [] })).toBe(true);
+  });
+
+  it('a Q3 answer with no drawback ticked is still a valid artifact', () => {
+    const task = { slot: 'Q3', draftArtifact: null, taskBody: { options: [], criteria: [], constraints: [] } } as unknown as StudentTaskDTO;
+    const draft = { ...emptyDraft(task), comparisons: [{ criterionId: 'c1', value: 'o' }], judgmentOptionId: 'o' };
+    expect(Artifact.safeParse(draft).success).toBe(true);
   });
 
   it('Q3 shows options, criteria and trade-offs', async () => {

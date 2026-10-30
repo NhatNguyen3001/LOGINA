@@ -17,10 +17,13 @@
     "seed:start": "tsx tools/seed/start-state.ts",
     "seed:snapshots": "tsx tools/seed/snapshots.ts",
     "deploy:dev": "bash tools/deploy-dev.sh",
-    "smoke": "tsx tools/smoke.ts"
+    "smoke": "tsx tools/smoke.ts",
+    "dev:stack": "tsx tools/dev-stack.ts",
+    "e2e": "pnpm --filter @logina/web e2e"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@hono/node-server": "^2.1.5",
     "@logina/contracts": "workspace:^",
     "@logina/db": "workspace:^",
     "@logina/domain": "workspace:^",

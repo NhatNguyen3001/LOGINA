@@ -204,10 +204,13 @@ export function isComplete(task: StudentTaskDTO, value: DraftArtifact): value is
   return false;
 }
 
+/** Lists the request requires start empty, so a student who ticks no drawback can still lock. */
 export function emptyDraft(task: StudentTaskDTO): DraftArtifact {
-  if (task.draftArtifact) return task.draftArtifact;
-  if (task.slot === 'Q2') return { slot: 'Q2', orderedCardIds: task.taskBody.cards.map((c) => c.cardId) };
-  return { slot: task.slot };
+  const saved = task.draftArtifact;
+  if (task.slot === 'Q2') return { slot: 'Q2', orderedCardIds: task.taskBody.cards.map((c) => c.cardId), ...saved };
+  if (task.slot === 'Q3') return { slot: 'Q3', comparisons: [], tradeOffIds: [], ...saved };
+  if (task.slot === 'Q4') return { slot: 'Q4', slots: [], ...saved };
+  return saved ?? { slot: task.slot };
 }
 
 /** Compares answers, ignoring key order and array order where order means nothing. */
