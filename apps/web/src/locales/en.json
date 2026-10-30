@@ -151,7 +151,88 @@
       "COMPLETE": "Finished"
     },
     "goneAfterReset": "This set was reset.",
-    "openNewSet": "Open the new set"
+    "openNewSet": "Open the new set",
+    "answer": {
+      "chooseStatement": "1 · Choose a statement",
+      "chooseCard": "2 · Choose one card as evidence",
+      "selected": "Selected statement {{answer}} and Card {{card}}",
+      "cardLabel": "Card {{n}}."
+    },
+    "continue": "Continue →",
+    "lock": {
+      "question": "How sure are you about your answer?",
+      "hint": "Tap or drag the bar to choose your confidence.",
+      "note": "Once you lock in, this answer is saved as your first answer. In the next step you can still keep or revise it.",
+      "button": "Lock in answer",
+      "back": "← Back"
+    },
+    "think": {
+      "locked": "YOUR LOCKED-IN ANSWER",
+      "statement": "Statement",
+      "card": "Evidence card",
+      "answer": "Answer",
+      "stays": "This stays unchanged so you can compare it with your final answer.",
+      "title": "Think again",
+      "note": "This prompt helps you check again. It does not tell you whether your answer is right or wrong.",
+      "question": "Do you want to keep your answer or revise it?"
+    },
+    "keep": "Keep my answer",
+    "revise": "Revise my answer",
+    "final": {
+      "keepTitle": "You're keeping your answer",
+      "readOnly": "Read-only",
+      "unchanged": "Unchanged",
+      "changeMind": "Changed your mind? Revise my answer",
+      "confidenceNote": "A change in confidence is recorded separately and does not count as revising your answer.",
+      "reviseTitle": "Revise your answer",
+      "original": "Original {{value}}",
+      "confidence": "Final confidence",
+      "sameAsFirst": "Your answer hasn't changed from your first answer, so it will be recorded as Keep.",
+      "confirmAgain": "Tap the bar to confirm again, even if you keep the same level.",
+      "confirmHint": "Confirm your final confidence to submit",
+      "onlyRevision": "This is your only revision for {{slot}}; after you submit, you move on."
+    },
+    "submit": "Submit {{slot}}",
+    "q2": {
+      "instructions": "Put the cards in order, strongest first.",
+      "moveUp": "Move {{card}} up",
+      "moveDown": "Move {{card}} down"
+    },
+    "q3": {
+      "compare": "Compare the options on each criterion",
+      "decide": "Your decision",
+      "tradeOffs": "What drawbacks do you accept?"
+    },
+    "q4": {
+      "template": "Choose a template",
+      "choose": "Choose…",
+      "blank": "Blank {{n}}"
+    },
+    "q5": {
+      "proposal": "Your proposal",
+      "reason": "Your reason"
+    },
+    "result": {
+      "title": "You've completed all 5 tasks",
+      "summary": "After the Think-again prompt, you kept {{kept}} and revised {{revised}}.",
+      "task": "Task",
+      "after": "After Think again",
+      "change": "Change",
+      "confidence": "Confidence",
+      "noChange": "No change",
+      "changed": "Changed",
+      "details": "View details",
+      "keep": "Keep",
+      "revise": "Revise",
+      "disclaimer": "This page records what you chose and changed. It does not grade you or judge how you thought.",
+      "first": "FIRST ANSWER",
+      "think": "THINK AGAIN",
+      "final": "FINAL ANSWER",
+      "feedback": "Feedback for you",
+      "confidenceValue": "Confidence {{value}}",
+      "disclaimerShort": "This page records what you chose and changed. It does not judge how you thought.",
+      "back": "← All tasks"
+    }
   },
   "entry": {
     "headline": "LOGINA helps teachers turn their own material into five reasoning tasks.",

@@ -151,7 +151,88 @@
       "COMPLETE": "Đã xong"
     },
     "goneAfterReset": "Bộ bài này đã được đặt lại.",
-    "openNewSet": "Mở bộ bài mới"
+    "openNewSet": "Mở bộ bài mới",
+    "answer": {
+      "chooseStatement": "1 · Chọn một nhận định",
+      "chooseCard": "2 · Chọn một thẻ làm căn cứ",
+      "selected": "Đã chọn nhận định {{answer}} và Thẻ {{card}}",
+      "cardLabel": "Thẻ {{n}}."
+    },
+    "continue": "Tiếp tục →",
+    "lock": {
+      "question": "Em chắc chắn đến mức nào về câu trả lời của mình?",
+      "hint": "Chạm hoặc kéo thanh để chọn mức tự tin.",
+      "note": "Sau khi Chốt, câu trả lời này được giữ nguyên làm bản ban đầu. Ở bước sau em vẫn có thể giữ hoặc sửa.",
+      "button": "Chốt câu trả lời",
+      "back": "← Quay lại"
+    },
+    "think": {
+      "locked": "CÂU TRẢ LỜI ĐÃ CHỐT CỦA EM",
+      "statement": "Nhận định",
+      "card": "Thẻ căn cứ",
+      "answer": "Câu trả lời",
+      "stays": "Bản này được giữ nguyên để em so sánh với bản cuối.",
+      "title": "Thử nghĩ thêm",
+      "note": "Câu này giúp em kiểm tra lại, không cho biết câu trả lời đúng hay sai.",
+      "question": "Em muốn giữ câu trả lời hay sửa lại?"
+    },
+    "keep": "Giữ câu trả lời",
+    "revise": "Sửa câu trả lời",
+    "final": {
+      "keepTitle": "Em giữ câu trả lời của mình",
+      "readOnly": "Chỉ đọc",
+      "unchanged": "Giữ nguyên",
+      "changeMind": "Đổi ý: Sửa câu trả lời",
+      "confidenceNote": "Mức tự tin thay đổi được ghi riêng, không tính là sửa câu trả lời.",
+      "reviseTitle": "Sửa câu trả lời của em",
+      "original": "Ban đầu {{value}}",
+      "confidence": "Mức tự tin cuối cùng",
+      "sameAsFirst": "Câu trả lời chưa thay đổi so với bản ban đầu, nên sẽ được ghi là Giữ.",
+      "confirmAgain": "Chạm vào thanh để xác nhận lại, kể cả khi giữ mức cũ.",
+      "confirmHint": "Xác nhận mức tự tin cuối cùng để nộp",
+      "onlyRevision": "Đây là lần sửa duy nhất của {{slot}}; sau khi nộp, em chuyển sang bài tiếp theo."
+    },
+    "submit": "Nộp {{slot}}",
+    "q2": {
+      "instructions": "Xếp các thẻ theo thứ tự, thẻ mạnh nhất lên đầu.",
+      "moveUp": "Chuyển {{card}} lên",
+      "moveDown": "Chuyển {{card}} xuống"
+    },
+    "q3": {
+      "compare": "So sánh các phương án theo từng tiêu chí",
+      "decide": "Quyết định của em",
+      "tradeOffs": "Em chấp nhận những hạn chế nào?"
+    },
+    "q4": {
+      "template": "Chọn một mẫu",
+      "choose": "Chọn…",
+      "blank": "Chỗ trống {{n}}"
+    },
+    "q5": {
+      "proposal": "Đề xuất của em",
+      "reason": "Lý do của em"
+    },
+    "result": {
+      "title": "Em đã hoàn thành cả 5 nhiệm vụ",
+      "summary": "Sau câu Thử nghĩ thêm, em giữ {{kept}} và sửa {{revised}}.",
+      "task": "Nhiệm vụ",
+      "after": "Sau Thử nghĩ thêm",
+      "change": "Thay đổi",
+      "confidence": "Mức tự tin",
+      "noChange": "Không đổi",
+      "changed": "Có đổi",
+      "details": "Xem chi tiết",
+      "keep": "Giữ",
+      "revise": "Sửa",
+      "disclaimer": "Trang này ghi lại những gì em đã chọn và thay đổi. Nó không chấm điểm và không đánh giá em đã suy nghĩ thế nào.",
+      "first": "BẢN BAN ĐẦU",
+      "think": "THỬ NGHĨ THÊM",
+      "final": "BẢN CUỐI",
+      "feedback": "Nhận xét cho em",
+      "confidenceValue": "Mức tự tin {{value}}",
+      "disclaimerShort": "Trang này ghi lại những gì em đã chọn và thay đổi. Nó không đánh giá em đã suy nghĩ thế nào.",
+      "back": "← Tất cả nhiệm vụ"
+    }
   },
   "entry": {
     "headline": "LOGINA giúp giáo viên biến học liệu của mình thành năm nhiệm vụ suy luận.",

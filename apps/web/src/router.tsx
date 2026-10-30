@@ -7,7 +7,9 @@ import { LessonRedirect } from '@/features/lessons/LessonRedirect';
 import { LessonsHome } from '@/features/lessons/LessonsHome';
 import { Consent } from '@/features/student/Consent';
 import { OpenAssignment } from '@/features/student/OpenAssignment';
+import { ResultDetail, ResultSet } from '@/features/student/ResultSet';
 import { StudentHome } from '@/features/student/StudentHome';
+import { TaskRunner } from '@/features/student/TaskRunner';
 
 const rootRoute = createRootRoute({ component: Outlet });
 
@@ -44,6 +46,9 @@ const routeTree = rootRoute.addChildren([
   page('/s/thong-bao', ConsentPage),
   page('/s/assignments', StudentHome),
   page('/s/assignments/$id', OpenAssignment),
+  page('/s/attempts/$id/results', ResultSet),
+  page('/s/attempts/$id/results/$slot', ResultDetail),
+  page('/s/attempts/$id/$slot', TaskRunner),
 ]);
 
 export const router = createRouter({ routeTree });
