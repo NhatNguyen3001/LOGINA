@@ -35,6 +35,7 @@ export interface Client {
   workspace: Workspace;
   get: (path: string) => Promise<Response>;
   post: (path: string, body?: unknown, key?: string) => Promise<Response>;
+  put: (path: string, body?: unknown) => Promise<Response>;
 }
 
 /** Files live in the real test bucket; only URL signing is faked, since it needs a service account. */
@@ -82,6 +83,14 @@ export async function harness(
       session,
       workspace,
       get: (path) => Promise.resolve(app.request(`/api/v1${path}`, { headers })),
+      put: (path, body = {}) =>
+        Promise.resolve(
+          app.request('/api/v1' + path, {
+            method: 'PUT',
+            headers: { ...headers, 'Idempotency-Key': randomUUID() },
+            body: JSON.stringify(body),
+          }),
+        ),
       post: (path, body = {}, key = randomUUID()) =>
         Promise.resolve(
           app.request(`/api/v1${path}`, {
@@ -159,4 +168,25 @@ export async function seedGenerated(h: Harness, client: Client): Promise<string>
   const job = await createJob(h.live.db, { schoolId: client.workspace.schoolId, lessonId, type: 'GENERATE' });
   await h.runJob(job.id);
   return lessonId;
+}
+
+/** Runs the real teacher flow to Assign. Slow, so a suite does it once in `beforeAll`. */
+export async function seedAssigned(h: Harness, client: Client): Promise<{ lessonId: string; assignmentId: string }> {
+  const lessonId = await seedGenerated(h, client);
+  const base = `/lessons/${lessonId}`;
+  const lesson = async () => (await h.live.db.doc(`lessons/${lessonId}`).get()).data()!;
+  await client.post(`${base}/tasks/Q4/sufficiency-choice`, { choice: 'REFOCUS', baseVersion: (await lesson()).version });
+  const fix = (loadFixture('scripted-edits', 'en') as { id: string; payload: object }[]).find((e) => e.id === 'q4-tn2-fix')!;
+  await client.post(`${base}/edits`, { editScope: 'LOGIC', targetType: 'challenge', targetId: (await lesson()).currentTaskDraftIds.Q4, changedRefs: ['TN2'], baseVersion: 3, payload: fix.payload });
+
+  const tasks = async () => ((await (await client.get(`${base}/approval`)).json()) as { tasks: { slot: string; draftVersion: number; previewHash: string; candidateSetVersion: number }[] }).tasks;
+  const q1 = (await tasks()).find((t) => t.slot === 'Q1')!;
+  await client.post(`${base}/tasks/Q1/dispositions`, { gateId: 'QG3', findingCode: 'DISTRACTOR_IMPLAUSIBLE', decision: 'TEACHER_ACCEPT_WITH_REASON', reason: 'Fits this class', baseVersion: q1.draftVersion });
+  for (const task of await tasks()) {
+    const { slot, draftVersion, previewHash, candidateSetVersion } = task;
+    await client.post(`${base}/tasks/${slot}/approve`, { expectedDraftVersion: draftVersion, previewHash, candidateSetVersion, confirmed: true });
+  }
+  const response = await client.post(`${base}/assignments`, { classId: client.workspace.classId, baseVersion: (await lesson()).version });
+  const { assignmentId } = (await response.json()) as { assignmentId: string };
+  return { lessonId, assignmentId };
 }

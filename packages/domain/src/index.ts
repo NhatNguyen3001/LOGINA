@@ -11,3 +11,4 @@ export * from './shuffle.js';
 export * from './fixtures.js';
 export * from './quotes.js';
 export * from './locators.js';
+export * from './facts.js';
