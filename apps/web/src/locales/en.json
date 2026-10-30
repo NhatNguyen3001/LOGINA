@@ -12,7 +12,31 @@
         "title": "We can't use this file yet",
         "pages": "{{count}} pages",
         "chooseAnother": "Choose another file"
-      }
+      },
+      "crumb": "Create new",
+      "title": "Create a lesson set from your material",
+      "lede": "LOGINA reads your material first, asks you about anything unclear, and only then drafts 5 tasks. You approve the source once and the tasks once before assigning.",
+      "material": "1 · Material",
+      "chooseFile": "Choose file",
+      "useSample": "Use sample material",
+      "fileHint": "PDF or Word · up to 20 MB",
+      "sampleChosen": "Sample material ready",
+      "sourceTitle": "Source title",
+      "required": "(required)",
+      "requiredError": "This field is required.",
+      "language": "Material language",
+      "languageHint": "Tasks and Think-again prompts use the material's language. LOGINA does not translate material.",
+      "goalTitle": "2 · Lesson goal",
+      "goal": "Reasoning goal",
+      "lessonInfo": "3 · Lesson",
+      "lessonTitle": "Lesson set title",
+      "class": "Class",
+      "subject": "Subject",
+      "topic": "Topic",
+      "structureTitle": "The 5 tasks",
+      "structureNote": "The structure is fixed, so tasks can be compared across lessons.",
+      "analyze": "Analyze material",
+      "noMaterial": "Choose a file or use the sample material."
     },
     "t02": {
       "liveTiming": "New material can take a few minutes to read. You can leave and come back.",
@@ -20,7 +44,18 @@
         "question": "Your file looks like {{detected}}. Use {{detected}} for this lesson?",
         "useDetected": "Use {{lang}}",
         "keepChosen": "Keep {{lang}}"
-      }
+      },
+      "title": "Analyzing material…",
+      "crumb": "Analyze material",
+      "lede": "At this step LOGINA only reads and cross-checks the source; it does not write tasks yet.",
+      "progress": "Progress",
+      "steps": "{{done}}/{{total}} steps",
+      "running": "Running",
+      "timing": "Usually takes 1–2 minutes. You can leave this page; LOGINA will let you know when the analysis is done.",
+      "stop": "Stop analysis",
+      "paused": "Analysis paused",
+      "needChoice": "Your choice needed",
+      "failed": "The analysis didn't finish."
     },
     "t05": {
       "readByAiNotice": "LOGINA read this file with AI. Check the quoted text and figures against your original before approving.",
@@ -29,6 +64,29 @@
       "locator": {
         "page": "Page {{n}}",
         "section": "Section {{n}}"
+      },
+      "title": "Source review",
+      "claims": "Claims from the source",
+      "claim": "Claim",
+      "evidence": "Evidence in the source",
+      "location": "Location",
+      "status": "Status",
+      "decisions": "Your decisions",
+      "decisionsFrom": "From the Clarify material step",
+      "openLimit": "Limit: {{bounds}}",
+      "ready": "Ready to approve",
+      "blockers": "{{count}} blockers in review scope",
+      "located": "Every claim has a location in the source",
+      "approve": "Approve source (Approval 1)",
+      "note": "Only after approval does LOGINA write the 5 tasks from this source version. Editing the source later creates a new version for you to approve again.",
+      "back": "← Back to Clarify material",
+      "keepOpenTag": "Keep open",
+      "excludedTag": "Excluded",
+      "claimStatus": {
+        "VERIFIED": "Verified",
+        "CONTEXT_ONLY": "Context only",
+        "INSUFFICIENT": "Not enough evidence",
+        "EXCLUDED": "Excluded"
       }
     },
     "approvalBadge": "Approval",
@@ -51,6 +109,50 @@
       "accessibility": "Accessibility",
       "demoMenu": "Demo menu",
       "opensNewTab": "opens in a new tab"
+    },
+    "taskType": {
+      "Q1": "Q1 · Statement + evidence",
+      "Q2": "Q2 · Rank cards",
+      "Q3": "Q3 · Compare options",
+      "Q4": "Q4 · Counterargument template",
+      "Q5": "Q5 · Write a proposal"
+    },
+    "t03": {
+      "crumb": "Clarify material",
+      "title": "Clarify material",
+      "lede": "LOGINA found {{count}} points that could make an answer or the lesson goal wrong. Resolve or exclude every blocker before approving the source.",
+      "blockers": "{{count}} unresolved blockers",
+      "review": "{{count}} needs review",
+      "resolved": "{{count}} resolved",
+      "alwaysShown": "Blockers are always shown, never collapsed.",
+      "material": "Original material",
+      "unchanged": "The original material always stays unchanged. Your decisions are saved separately, with a history.",
+      "point": "Point {{n}}",
+      "severity": {
+        "BLOCKER": "BLOCKER",
+        "REVIEW": "NEEDS REVIEW"
+      },
+      "resolvedTag": "RESOLVED",
+      "current": "Current reading:",
+      "confirm": "Confirm current reading",
+      "useSuggestion": "Use selected suggestion",
+      "suggestions": "AI suggestions, with evidence from the source",
+      "adjust": "Adjust myself",
+      "or": "Or:",
+      "keepOpen": "Keep open (bounded)",
+      "exclude": "Exclude",
+      "reopen": "Reopen",
+      "save": "Save",
+      "adjustLabel": "Your wording",
+      "teacherReading": "Saved as: teacher's reading",
+      "bounds": "What the lesson may say",
+      "why": "Why it stays open",
+      "excludeReason": "Why exclude this?",
+      "excludeConfirm": "Exclude this point",
+      "resolvedBy": "Saved by {{who}} at {{when}}",
+      "continue": "Continue: Source review →",
+      "blocked": "Resolve or exclude every blocker to continue.",
+      "next": "Go to the next blocker"
     }
   },
   "errors": {

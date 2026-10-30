@@ -3,8 +3,12 @@ import type { ReactElement } from 'react';
 import { TeacherShell } from '@/components/logina/TeacherShell';
 import { EntryPage } from '@/features/entry/EntryPage';
 import { LegalPage } from '@/features/legal/LegalPage';
+import { AnalyzePage } from '@/features/lessons/AnalyzePage';
+import { CreateLesson } from '@/features/lessons/CreateLesson';
 import { LessonRedirect } from '@/features/lessons/LessonRedirect';
 import { LessonsHome } from '@/features/lessons/LessonsHome';
+import { ClarifyPage } from '@/features/source/ClarifyPage';
+import { SourcePage } from '@/features/source/SourcePage';
 import { Consent } from '@/features/student/Consent';
 import { OpenAssignment } from '@/features/student/OpenAssignment';
 import { ResultDetail, ResultSet } from '@/features/student/ResultSet';
@@ -42,7 +46,11 @@ const routeTree = rootRoute.addChildren([
   page('/accessibility', () => <LegalPage doc="accessibility" />),
   page('/tro-nang', () => <LegalPage doc="accessibility" />),
   teacher('/t/lessons', LessonsHome),
+  teacher('/t/lessons/new', () => <CreateLesson />),
   teacher('/t/lessons/$id', LessonRedirect),
+  teacher('/t/lessons/$id/analyze', AnalyzePage),
+  teacher('/t/lessons/$id/clarify', ClarifyPage),
+  teacher('/t/lessons/$id/source', SourcePage),
   page('/s/thong-bao', ConsentPage),
   page('/s/assignments', StudentHome),
   page('/s/assignments/$id', OpenAssignment),

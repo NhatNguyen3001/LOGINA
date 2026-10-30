@@ -12,7 +12,31 @@
         "title": "Chưa dùng được tệp này",
         "pages": "{{count}} trang",
         "chooseAnother": "Chọn tệp khác"
-      }
+      },
+      "crumb": "Tạo mới",
+      "title": "Tạo bộ bài từ học liệu",
+      "lede": "LOGINA đọc học liệu trước, hỏi cô những điểm chưa rõ, rồi mới soạn 5 nhiệm vụ. Cô duyệt nguồn một lần và duyệt nhiệm vụ một lần trước khi giao.",
+      "material": "1 · Học liệu",
+      "chooseFile": "Chọn tệp",
+      "useSample": "Dùng học liệu mẫu",
+      "fileHint": "PDF hoặc Word · tối đa 20 MB",
+      "sampleChosen": "Đã chọn học liệu mẫu",
+      "sourceTitle": "Tên nguồn",
+      "required": "(bắt buộc)",
+      "requiredError": "Cô hãy điền mục này.",
+      "language": "Ngôn ngữ học liệu",
+      "languageHint": "Nhiệm vụ và câu Thử nghĩ thêm dùng đúng ngôn ngữ của học liệu. LOGINA không dịch học liệu.",
+      "goalTitle": "2 · Mục tiêu bài học",
+      "goal": "Mục tiêu suy luận",
+      "lessonInfo": "3 · Bài học",
+      "lessonTitle": "Tên bộ bài",
+      "class": "Lớp",
+      "subject": "Môn",
+      "topic": "Chủ đề",
+      "structureTitle": "5 nhiệm vụ",
+      "structureNote": "Cấu trúc cố định để so sánh được giữa các bài.",
+      "analyze": "Phân tích học liệu",
+      "noMaterial": "Cô hãy chọn tệp hoặc dùng học liệu mẫu."
     },
     "t02": {
       "liveTiming": "Học liệu mới có thể mất vài phút để đọc. Cô có thể rời trang và quay lại sau.",
@@ -20,7 +44,18 @@
         "question": "Tệp của cô có vẻ là {{detected}}. Dùng {{detected}} cho bài này?",
         "useDetected": "Dùng {{lang}}",
         "keepChosen": "Giữ {{lang}}"
-      }
+      },
+      "title": "Đang phân tích học liệu…",
+      "crumb": "Phân tích học liệu",
+      "lede": "Ở bước này LOGINA chỉ đọc và đối chiếu nguồn, chưa viết nhiệm vụ.",
+      "progress": "Tiến độ",
+      "steps": "{{done}}/{{total}} bước",
+      "running": "Đang chạy",
+      "timing": "Thường mất 1–2 phút. Cô có thể rời trang này, LOGINA sẽ báo khi phân tích xong.",
+      "stop": "Dừng phân tích",
+      "paused": "Phân tích đang tạm dừng",
+      "needChoice": "Cần cô chọn",
+      "failed": "Phân tích chưa xong."
     },
     "t05": {
       "readByAiNotice": "LOGINA đã đọc tệp này bằng AI. Cô hãy đối chiếu đoạn trích và số liệu với bản gốc trước khi duyệt.",
@@ -29,6 +64,29 @@
       "locator": {
         "page": "Trang {{n}}",
         "section": "Mục {{n}}"
+      },
+      "title": "Duyệt nguồn",
+      "claims": "Khẳng định từ nguồn",
+      "claim": "Khẳng định",
+      "evidence": "Căn cứ trong nguồn",
+      "location": "Vị trí",
+      "status": "Trạng thái",
+      "decisions": "Quyết định của cô",
+      "decisionsFrom": "Từ bước Làm rõ học liệu",
+      "openLimit": "Giới hạn: {{bounds}}",
+      "ready": "Sẵn sàng duyệt",
+      "blockers": "{{count}} điểm chặn trong phạm vi xem",
+      "located": "Mọi khẳng định đều có vị trí trong nguồn",
+      "approve": "Duyệt nguồn (Duyệt 1)",
+      "note": "Chỉ sau khi duyệt, LOGINA mới viết 5 nhiệm vụ từ phiên bản nguồn này. Sửa nguồn sau đó sẽ tạo phiên bản mới để cô duyệt lại.",
+      "back": "← Quay lại Làm rõ học liệu",
+      "keepOpenTag": "Giữ mở",
+      "excludedTag": "Đã loại",
+      "claimStatus": {
+        "VERIFIED": "Đã xác minh",
+        "CONTEXT_ONLY": "Chỉ làm bối cảnh",
+        "INSUFFICIENT": "Chưa đủ căn cứ",
+        "EXCLUDED": "Đã loại"
       }
     },
     "approvalBadge": "Duyệt",
@@ -51,6 +109,50 @@
       "accessibility": "Khả năng tiếp cận",
       "demoMenu": "Menu demo",
       "opensNewTab": "mở trong thẻ mới"
+    },
+    "taskType": {
+      "Q1": "Q1 · Nhận định + căn cứ",
+      "Q2": "Q2 · Xếp thẻ",
+      "Q3": "Q3 · So sánh phương án",
+      "Q4": "Q4 · Mẫu phản biện",
+      "Q5": "Q5 · Viết đề xuất"
+    },
+    "t03": {
+      "crumb": "Làm rõ học liệu",
+      "title": "Làm rõ học liệu",
+      "lede": "LOGINA tìm thấy {{count}} điểm có thể làm sai câu trả lời hoặc mục tiêu bài học. Cô cần xử lý hoặc loại mọi điểm chặn trước khi duyệt nguồn.",
+      "blockers": "{{count}} điểm chặn chưa xử lý",
+      "review": "{{count}} cần xem lại",
+      "resolved": "{{count}} đã xử lý",
+      "alwaysShown": "Mọi điểm chặn luôn hiển thị, không bị thu gọn.",
+      "material": "Học liệu gốc",
+      "unchanged": "Học liệu gốc luôn được giữ nguyên. Quyết định của cô được lưu riêng, kèm lịch sử.",
+      "point": "Điểm {{n}}",
+      "severity": {
+        "BLOCKER": "CHẶN",
+        "REVIEW": "CẦN XEM LẠI"
+      },
+      "resolvedTag": "ĐÃ XỬ LÝ",
+      "current": "Cách hiểu hiện tại:",
+      "confirm": "Xác nhận cách hiểu hiện tại",
+      "useSuggestion": "Dùng gợi ý đã chọn",
+      "suggestions": "Gợi ý của AI, kèm căn cứ trong nguồn",
+      "adjust": "Tự điều chỉnh",
+      "or": "Hoặc:",
+      "keepOpen": "Giữ mở có giới hạn",
+      "exclude": "Loại khỏi bài",
+      "reopen": "Mở lại",
+      "save": "Lưu",
+      "adjustLabel": "Cách diễn đạt của cô",
+      "teacherReading": "Lưu là: cách hiểu của giáo viên",
+      "bounds": "Bài học được phép nói gì",
+      "why": "Vì sao để ngỏ",
+      "excludeReason": "Vì sao loại điểm này?",
+      "excludeConfirm": "Loại điểm này",
+      "resolvedBy": "{{who}} đã lưu lúc {{when}}",
+      "continue": "Tiếp tục: Duyệt nguồn →",
+      "blocked": "Cô hãy xử lý hoặc loại mọi điểm chặn để tiếp tục.",
+      "next": "Tới điểm chặn tiếp theo"
     }
   },
   "errors": {
