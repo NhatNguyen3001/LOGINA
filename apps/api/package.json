@@ -9,11 +9,24 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --root ../.. apps/api/"
   },
-  "dependencies": { "@logina/contracts": "workspace:*", "@logina/domain": "workspace:*", "@logina/db": "workspace:*" }
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "@logina/contracts": "workspace:*",
+    "@logina/db": "workspace:*",
+    "@logina/domain": "workspace:*",
+    "firebase-admin": "^14.5.0",
+    "hono": "^4.13.14",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@logina/test-utils": "workspace:^"
+  }
 }

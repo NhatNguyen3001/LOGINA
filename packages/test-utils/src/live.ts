@@ -14,7 +14,7 @@ const REFERER_HOSTS = ['identitytoolkit.googleapis.com', 'securetoken.googleapis
 
 let refererInstalled = false;
 
-type Env = Record<string, string | undefined>;
+export type Env = Record<string, string | undefined>;
 type Fetch = typeof fetch;
 type Bucket = ReturnType<ReturnType<typeof getAdminStorage>['bucket']>;
 
@@ -77,7 +77,7 @@ export async function liveSetup(env: Env = process.env): Promise<LiveProject> {
   };
 }
 
-function webApiKey(env: Env): string {
+export function webApiKey(env: Env): string {
   if (env.FIREBASE_WEB_API_KEY) return env.FIREBASE_WEB_API_KEY;
   const path = fileURLToPath(new URL('../../../apps/web/.env.production', import.meta.url));
   const match = existsSync(path) ? /^VITE_FIREBASE_API_KEY=(.+)$/m.exec(readFileSync(path, 'utf8')) : null;
