@@ -8,6 +8,7 @@ import { Note } from '@/components/logina/Note';
 import { Pick } from '@/components/logina/Pick';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
+import { RestartAnalysis } from '@/features/lessons/RestartAnalysis';
 import { errorKey } from '@/i18n';
 import { ApiError, getSourceReview, newKey, resolveIssue } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -127,6 +128,7 @@ export function ClarifyPage() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: qk.sourceReview(id) }),
   });
 
+  if (review.isError || (review.data && review.data.issues.length === 0 && review.data.material.paragraphs.length === 0)) return <RestartAnalysis lessonId={id} />;
   if (!review.data) return <p className="muted">{t('common.loading')}</p>;
 
   const { issues, material, blockersRemaining } = review.data;

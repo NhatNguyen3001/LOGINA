@@ -15,6 +15,7 @@ import { ensureWorkspace, workspaceId, type Workspace } from '../src/services/wo
 
 export const noFiles: AppDeps['files'] = {
   read: async () => Buffer.alloc(0),
+  size: async () => 0,
   remove: async () => {},
   signWriteUrl: async () => '',
   signReadUrl: async () => '',
@@ -67,6 +68,7 @@ export async function harness(
     now: () => new Date(),
     files: {
       read: async (path) => (await live.bucket.file(path).download())[0],
+      size: async (path) => Number((await live.bucket.file(path).getMetadata())[0].size),
       remove: async (path) => {
         await live.bucket.file(path).delete({ ignoreNotFound: true });
       },

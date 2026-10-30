@@ -27,6 +27,7 @@ const bucket = getStorage(firebase).bucket(config.materialsBucket);
 
 const files = {
   read: async (path: string) => (await bucket.file(path).download())[0],
+  size: async (path: string) => Number((await bucket.file(path).getMetadata())[0].size),
   remove: async (path: string) => {
     await bucket.file(path).delete({ ignoreNotFound: true });
   },

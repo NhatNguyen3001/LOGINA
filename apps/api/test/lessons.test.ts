@@ -89,6 +89,17 @@ describe('lessons', () => {
     expect((await a.post(`/lessons/${lesson.id}/analyze`)).status).toBe(409);
   });
 
+  it('a second analyze while a job runs is refused and starts nothing', async () => {
+    const lesson = await newLesson(a);
+    await a.post(`/lessons/${lesson.id}/materials`, { sample: true });
+    await a.post(`/lessons/${lesson.id}/analyze`);
+    const jobs = h.enqueued.length;
+    const second = await a.post(`/lessons/${lesson.id}/analyze`);
+    expect(second.status).toBe(409);
+    expect(await second.json()).toMatchObject({ code: 'JOB_RUNNING' });
+    expect(h.enqueued).toHaveLength(jobs);
+  });
+
   it('sample material attaches the seeded PDF in the lesson locale', async () => {
     const lesson = await newLesson(a, { contentLocale: 'vi' });
     await a.post(`/lessons/${lesson.id}/materials`, { sample: true });

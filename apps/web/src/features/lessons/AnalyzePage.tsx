@@ -8,6 +8,7 @@ import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { answerJob, cancelJob, getLesson, getSourceReview, newKey, startAnalyze } from '@/lib/api';
 import { qk, useJobPolling } from '@/lib/query';
+import { RestartAnalysis } from './RestartAnalysis';
 import { stagePath } from './stage-path';
 
 const FAILED: JobDTO['status'][] = ['FAILED', 'TIMED_OUT'];
@@ -53,6 +54,7 @@ export function AnalyzePage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.lesson(id) }),
   });
 
+  if (lesson.data?.stage === 'CREATE' && !lesson.data.activeJobId) return <RestartAnalysis lessonId={id} />;
   if (lesson.data && !lesson.data.activeJobId) return <Navigate to={stagePath(lesson.data)} replace />;
 
   const steps = job.data?.steps ?? [];
@@ -106,7 +108,7 @@ export function AnalyzePage() {
           {steps.map((step) => (
             <div key={step.label} className="row">
               <StepIcon status={step.status} />
-              <span className="m">{step.label}</span>
+              <span className="m">{t(`teacher.job.${step.label}`, { defaultValue: step.label })}</span>
             </div>
           ))}
         </div>

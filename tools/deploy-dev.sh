@@ -29,7 +29,7 @@ if [ -n "${RESEARCH_SHEET_ID:-}" ]; then
   WORKER_ENV="$WORKER_ENV,RESEARCH_SHEET_ID=$RESEARCH_SHEET_ID"
 fi
 
-API_ENV="$SHARED,NO_SIGN_IN=true,RESEARCH_ENABLED=true,PARTICIPANT_TYPE=judge,LIVE_UPLOADS_PER_DAY=100"
+API_ENV="$SHARED,NO_SIGN_IN=true,RESEARCH_ENABLED=true,PARTICIPANT_TYPE=judge,LIVE_UPLOADS_PER_DAY=100,TRUSTED_PROXY_HOPS=${TRUSTED_PROXY_HOPS:-1}"
 API_ENV="$API_ENV,TASKS_QUEUE=logina-jobs,EXPORT_QUEUE=logina-export,TASKS_LOCATION=$REGION,TASKS_INVOKER_SA=$INVOKER"
 API_ENV="$API_ENV,LIMIT_NEW_SESSIONS_ADDRESS_HOUR=300,LIMIT_UPLOAD_SESSION_HOUR=5,LIMIT_UPLOAD_ADDRESS_HOUR=30"
 API_ENV="$API_ENV,LIMIT_AI_SESSION_HOUR=50,LIMIT_AI_ADDRESS_HOUR=200,LIMIT_RESET_SESSION_5MIN=1"
@@ -40,7 +40,7 @@ gcloud builds submit --project "$PROJECT_ID" --config apps/api/cloudbuild.yaml -
 
 gcloud run deploy worker --project "$PROJECT_ID" --region "$REGION" --image "$REGISTRY/worker:$SHA" \
   --service-account "logina-worker@$PROJECT_ID.iam.gserviceaccount.com" \
-  --no-allow-unauthenticated --set-env-vars "$WORKER_ENV"
+  --no-allow-unauthenticated --timeout 900 --set-env-vars "$WORKER_ENV"
 WORKER_URL=$(gcloud run services describe worker --project "$PROJECT_ID" --region "$REGION" --format='value(status.url)')
 
 gcloud run deploy api --project "$PROJECT_ID" --region "$REGION" --image "$REGISTRY/api:$SHA" \
@@ -51,6 +51,6 @@ pnpm --filter @logina/web build
 firebase deploy --only hosting,firestore:rules,firestore:indexes,storage --project "$PROJECT_ID"
 
 if [ "$SKIP_SMOKE" != "--skip-smoke" ]; then
-  pnpm smoke --base "https://$PROJECT_ID.web.app"
+  FIREBASE_WEB_API_KEY=$(sed -n 's/^VITE_FIREBASE_API_KEY=//p' apps/web/.env.production) pnpm smoke --base "https://$PROJECT_ID.web.app"
 fi
 echo "Deployed $SHA."

@@ -199,6 +199,7 @@ describe('Q2 to Q5', () => {
 describe('results', () => {
   const row = (slot: string, changed: boolean) => ({
     slot,
+    choice: changed ? 'REVISE' : 'KEEP',
     initial: { label: 'B', text: 'x' },
     challengeMessage: 'm',
     final: { label: changed ? 'A' : 'B', text: 'y' },

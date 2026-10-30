@@ -28,7 +28,13 @@ export async function idToken(): Promise<string> {
   return auth.currentUser!.getIdToken();
 }
 
+/** A fresh token keeps the workspace. Only a session that really is gone starts a new one. */
 export async function renewSession(): Promise<void> {
-  await signOut(auth);
+  try {
+    await auth.currentUser?.getIdToken(true);
+    if (auth.currentUser) return;
+  } catch {
+    await signOut(auth);
+  }
   await ensureSession();
 }

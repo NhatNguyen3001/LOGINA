@@ -10,7 +10,7 @@ import { ApiError, getFeedback, getMe } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { errorKey } from '@/i18n';
 
-const changed = (row: StudentFeedbackDTO) => row.initial.label !== row.final.label;
+const changed = (row: StudentFeedbackDTO) => row.choice === 'REVISE';
 
 function useFeedback(attemptId: string) {
   return useQuery({ queryKey: qk.feedback(attemptId), queryFn: () => getFeedback(attemptId) });

@@ -117,6 +117,7 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
         const final = Artifact.parse(task.finalArtifact);
         return {
           slot,
+          choice: task.choice,
           initial: { label: answerLabel(initial, release, cardWord), text: artifactSummary(initial, release).answerText },
           challengeMessage: delivery.renderedMessage,
           final: { label: answerLabel(final, release, cardWord), text: artifactSummary(final, release).answerText },

@@ -2,7 +2,7 @@ import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/fi
 import { Hono } from 'hono';
 import { ApproveReq, ApproveResultDTO, DispositionReq, TaskApprovalDTO } from '@logina/contracts';
 import { AppError, auditRepo, decodeNested, encodeNested, lessonsRepo, newId, previewViewsRepo, writeOnce } from '@logina/db';
-import { assignRuntimeIds, checkApproval, type QualityGate } from '@logina/domain';
+import { assignRuntimeIds, checkApproval, type QualityGate, shuffleAvoiding } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { requireBaseVersion } from '../middleware/base-version.js';
 import { withIdempotency } from '../middleware/idempotency.js';
@@ -15,6 +15,16 @@ const iso = (value: { toDate: () => Date } | undefined): string | undefined => v
 
 const publicBody = (body: DocumentData | undefined): DocumentData | undefined =>
   body && Object.fromEntries(Object.entries(body).filter(([key]) => !SERVER_ONLY_BODY.includes(key)));
+
+/** What students get: no server-only keys, and Q2 cards out of their accepted order. */
+function studentBody(releaseId: string, body: DocumentData): DocumentData | undefined {
+  const visible = publicBody(body);
+  if (!visible?.cards) return visible;
+  const cards = visible.cards as { cardId: string }[];
+  const accepted = ((body.acceptedOrders ?? []) as (string[] | { order: string[] })[]).map((order) => (Array.isArray(order) ? order : order.order));
+  const order = shuffleAvoiding(releaseId, cards.map((card) => card.cardId), [...accepted, cards.map((card) => card.cardId)]);
+  return { ...visible, cards: order.map((id) => cards.find((card) => card.cardId === id)) };
+}
 
 async function buildRelease(db: Firestore, lessonId: string, draftId: string, draft: DocumentData, report: DocumentData, releaseId: string) {
   const draftRef = db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`);
@@ -34,7 +44,7 @@ async function buildRelease(db: Firestore, lessonId: string, draftId: string, dr
       questionStem: draft.questionStem,
       answerOptions: runtime.answers.map(({ runtimeId, answerOptionId }) => ({ id: runtimeId, text: textOf((draft.answerOptions ?? []) as DocumentData[], 'answerOptionId', answerOptionId) })),
       evidenceOptions: runtime.evidence.map(({ runtimeId, generatedEId }) => ({ evidenceId: runtimeId, text: textOf(evidence, 'generatedEId', generatedEId) })),
-      ...(draft.taskBody ? { taskBody: encodeNested(publicBody(draft.taskBody as DocumentData)) } : {}),
+      ...(draft.taskBody ? { taskBody: encodeNested(studentBody(releaseId, draft.taskBody as DocumentData)) } : {}),
     },
     answerIdMap: Object.fromEntries(runtime.answers.map((a) => [a.runtimeId, a.answerOptionId])),
     evidenceIdMap: Object.fromEntries(runtime.evidence.map((e) => [e.runtimeId, e.generatedEId])),

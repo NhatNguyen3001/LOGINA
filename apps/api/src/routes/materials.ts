@@ -98,6 +98,7 @@ export function materialRoutes(deps: AppDeps): Hono<AppEnv> {
       };
 
       return removeOnRefusal(async () => {
+        if ((await files.size(storagePath)) > MAX_BYTES) throw new MaterialRefusal({ code: 'FILE_TOO_LARGE', detail: { fileName } });
         const bytes = await files.read(storagePath);
         const hash = sha256(bytes);
         const matchedLocale = Object.entries(samples).find(([, sample]) => sample === hash)?.[0];

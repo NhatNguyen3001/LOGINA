@@ -79,11 +79,16 @@ describe('All API calls', () => {
 });
 
 describe('clientAddress', () => {
-  it('prefers the header the CDN sets, then the first forwarded address, then nothing', () => {
-    const request = (values: Record<string, string>) => ({ req: { header: (name: string) => values[name.toLowerCase()] } }) as never;
-    expect(clientAddress(request({ 'fastly-client-ip': '1.1.1.1', 'x-forwarded-for': '2.2.2.2' }))).toBe('1.1.1.1');
-    expect(clientAddress(request({ 'x-forwarded-for': '2.2.2.2, 3.3.3.3' }))).toBe('2.2.2.2');
-    expect(clientAddress(request({}))).toBeUndefined();
+  const request = (values: Record<string, string>) => ({ req: { header: (name: string) => values[name.toLowerCase()] } }) as never;
+
+  it('counts from the right, so a forged left entry changes nothing', () => {
+    expect(clientAddress(request({ 'x-forwarded-for': 'forged, 2.2.2.2' }), 1)).toBe('2.2.2.2');
+    expect(clientAddress(request({ 'x-forwarded-for': 'forged, 2.2.2.2, 3.3.3.3' }), 2)).toBe('2.2.2.2');
+    expect(clientAddress(request({ 'fastly-client-ip': 'forged', 'x-forwarded-for': '2.2.2.2' }), 1)).toBe('2.2.2.2');
+  });
+
+  it('with no header there is no address', () => {
+    expect(clientAddress(request({}), 1)).toBeUndefined();
   });
 });
 

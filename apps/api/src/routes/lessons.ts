@@ -4,6 +4,7 @@ import { CreateLessonReq, JobDTO, LessonDTO, LessonListDTO } from '@logina/contr
 import { AppError, classesRepo, lessonsRepo, newId } from '@logina/db';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
+import { limited } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
 import { createJob, toJobDTO } from '../services/jobs.js';
 
@@ -26,7 +27,8 @@ export const toLessonDTO = (lesson: DocumentData) => ({
   ...(lesson.activeJobId ? { activeJobId: lesson.activeJobId } : {}),
 });
 
-export function lessonRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
+export function lessonRoutes(deps: AppDeps): Hono<AppEnv> {
+  const { db, enqueue } = deps;
   const routes = new Hono<AppEnv>();
 
   routes.get('/', async (c) => {
@@ -101,18 +103,19 @@ export function lessonRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
 
   routes.post(
     '/:id/analyze',
-    withIdempotency(db, async (c) => {
+    withIdempotency(db, limited(deps, 'AI_ACTION', async (c) => {
       const { schoolId } = c.var.user;
       const lessonId = c.req.param('id') as string;
       const lesson = await lessonsRepo.get(db, schoolId, lessonId);
       if (!lesson) throw new AppError('NOT_FOUND', 404, 'Not found.');
       if (!lesson.currentMaterialVersionId) throw new AppError('MATERIAL_REQUIRED', 409, 'Attach material first.');
+      if (lesson.activeJobId) throw new AppError('JOB_RUNNING', 409, 'A job is already running.');
 
       const job = await createJob(db, { schoolId, lessonId, type: 'PARSE' });
       await db.doc(`lessons/${lessonId}`).update({ stage: 'CLARIFY', activeJobId: job.id });
       await enqueue({ jobId: job.id, type: 'PARSE', lessonId, targetIds: [] });
       return respond(c, JobDTO, toJobDTO(job));
-    }),
+    })),
   );
 
   return routes;

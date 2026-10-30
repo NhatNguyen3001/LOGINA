@@ -76,9 +76,14 @@ const windowEnd = (window: Window, now: Date): Date => {
   return new Date((Math.floor(now.getTime() / ms) + 1) * ms);
 };
 
-/** The forwarded client IP, hashed where it is stored. Absent, only the session limits apply. */
-export const clientAddress = (c: { req: { header: (name: string) => string | undefined } }): string | undefined =>
-  c.req.header('fastly-client-ip') ?? c.req.header('x-forwarded-for')?.split(',')[0]?.trim();
+/**
+ * Counted from the right of X-Forwarded-For, because a client can write anything on the left.
+ * `trustedHops` is how many entries our own proxies added. Absent, only the session limits apply.
+ */
+export function clientAddress(c: { req: { header: (name: string) => string | undefined } }, trustedHops: number): string | undefined {
+  const entries = c.req.header('x-forwarded-for')?.split(',').map((entry) => entry.trim()).filter(Boolean) ?? [];
+  return entries[entries.length - trustedHops] ?? entries[0];
+}
 
 export const hashAddress = (address: string): string => createHash('sha256').update(address).digest('hex');
 

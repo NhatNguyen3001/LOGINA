@@ -9,7 +9,7 @@ export function limitRoutes({ db, config, now }: AppDeps): Hono<AppEnv> {
   const routes = new Hono<AppEnv>();
 
   routes.get('/', async (c) => {
-    const keys = keysOf(c, now());
+    const keys = keysOf(c, now(), config.trustedProxyHops);
     const limits = await Promise.all(
       RateAction.options.map(async (action) => {
         const { limit, remaining, resetsAt } = await peek(db, action, config.limits[action], keys);

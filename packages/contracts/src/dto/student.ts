@@ -86,6 +86,7 @@ const FeedbackAnswer = z.object({ label: z.string(), text: z.string() }).strict(
 export const StudentFeedbackDTO = z
   .object({
     slot: Slot,
+    choice: KeepRevise,
     initial: FeedbackAnswer,
     challengeMessage: z.string(),
     final: FeedbackAnswer,

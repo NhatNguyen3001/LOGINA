@@ -20,6 +20,7 @@ export interface JobDoc {
   targetIds: string[];
   question?: JobDTO['question'];
   error?: { code: NonNullable<JobDTO['errorCode']> };
+  stepsDone?: string[];
 }
 
 export async function createJob(
@@ -39,11 +40,20 @@ export async function createJob(
   return doc;
 }
 
+/** The worker records finished labels; the step after them is the one running. */
+function stepsOf({ steps, status, stepsDone = [] }: JobDoc): JobDTO['steps'] {
+  const current = steps.find((step) => !stepsDone.includes(step.label));
+  return steps.map((step) => {
+    if (stepsDone.includes(step.label) || status === 'DONE') return { ...step, status: 'DONE' };
+    return step === current && status === 'RUNNING' ? { ...step, status: 'RUNNING' } : step;
+  });
+}
+
 export const toJobDTO = (job: JobDoc): JobDTO => ({
   id: job.id,
   type: job.type,
   status: job.status,
-  steps: job.steps,
+  steps: stepsOf(job),
   ...(job.question ? { question: job.question } : {}),
   ...(job.error ? { errorCode: job.error.code } : {}),
 });

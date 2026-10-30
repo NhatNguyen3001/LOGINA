@@ -86,9 +86,13 @@ export function artifactSummary(artifact: Artifact, release: DocumentData): { an
     };
   }
   if (artifact.slot === 'Q5') return { answerText: artifact.proposal };
-  if (artifact.slot === 'Q2') return { answerText: artifact.orderedCardIds.join(' > ') };
-  if (artifact.slot === 'Q3') return { answerText: artifact.judgmentOptionId };
-  return { answerText: artifact.templateId };
+  const body = (release.publicContent as DocumentData).taskBody as DocumentData;
+  if (artifact.slot === 'Q2') {
+    const cards = body.cards as { cardId: string; text: string }[];
+    return { answerText: artifact.orderedCardIds.map((id) => cards.find((card) => card.cardId === id)?.text ?? '').join(' > ') };
+  }
+  if (artifact.slot === 'Q3') return { answerText: (body.options as { optionId: string; text: string }[]).find((o) => o.optionId === artifact.judgmentOptionId)?.text ?? '' };
+  return { answerText: (body.templates as { templateId: string; text: string }[]).find((x) => x.templateId === artifact.templateId)?.text ?? '' };
 }
 
 const toChallengeDTO = (taskDoc: DocumentData, delivery: DocumentData, deliveryId: string, release: DocumentData): StudentChallengeDTO => ({
@@ -158,6 +162,8 @@ export async function submitTask(
   research?: ResearchSettings,
 ): Promise<SubmitResultDTO & { researchRowId?: string }> {
   const attempt = await loadAttempt(db, actor, attemptId);
+  if (finalArtifact.slot !== slot) throw new AppError('INVALID_REQUEST', 400, 'The request is not valid.');
+  toAuthoring(finalArtifact, await loadRelease(db, attempt, slot));
   const facts = research?.enabled ? await loadResearchFacts(db, attempt, slot) : null;
   const taskRef = db.doc(`attempts/${attemptId}/tasks/${slot}`);
   const attemptRef = db.doc(`attempts/${attemptId}`);

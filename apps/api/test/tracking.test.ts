@@ -1,3 +1,4 @@
+import { researchRowId } from '../src/services/research.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AttemptDTO, ClassTrackingDTO, ConsentResultDTO, MeDTO, StudentTaskDTO, TraceDTO, findRestrictedKeys } from '@logina/contracts';
 import { harness, seedAssigned, type Client, type Harness } from './helpers.js';
@@ -36,7 +37,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await h.live.db.doc(`assignments/${copyId}`).delete();
-  await Promise.all(['Q1', 'Q2', 'Q3', 'Q4', 'Q5'].map((slot) => h.live.db.doc(`researchRows/${copyAttemptId}_${slot}`).delete()));
+  await Promise.all(['Q1', 'Q2', 'Q3', 'Q4', 'Q5'].map((slot) => h.live.db.doc(`researchRows/${researchRowId(copyAttemptId, slot, 1)}`).delete()));
   await h.live.db.doc(`participants/${a.session.uid}`).delete();
   await h.close();
 });
@@ -102,6 +103,14 @@ describe('T15 trace', () => {
   });
 });
 
+describe('research row IDs', () => {
+  it('keep each run apart and carry no session ID', () => {
+    const first = researchRowId('att_uid123_asg', 'Q1', 1);
+    expect(first).not.toBe(researchRowId('att_uid123_asg', 'Q1', 2));
+    expect(first).not.toContain('uid123');
+  });
+});
+
 describe('me and consent', () => {
   it('new session has consentRequired true and the demo menu', async () => {
     const me = MeDTO.parse(await (await a.get('/me')).json());
@@ -139,7 +148,7 @@ describe('me and consent', () => {
     expect(before).toBeTruthy();
     const fresh = `${copyAttemptId}`;
     await answerQ1(a, fresh, 1, 2, 0, 0);
-    const doc = (await h.live.db.doc(`researchRows/${fresh}_Q1`).get()).data()!;
+    const doc = (await h.live.db.doc(`researchRows/${researchRowId(fresh, 'Q1', 1)}`).get()).data()!;
     expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B (A2)', first_evidence: 'Card 3 (E3)', first_relation: 'contradicts', final_answer: 'A (A1)', final_relation: 'full', first_confidence: 70, final_confidence: 82, confidence_change: 12, choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-10-v1', exportedAt: null });
     expect(JSON.stringify(doc)).not.toMatch(/Ms\. Lan|@/);
     expect(doc.seconds_to_lock).toBeGreaterThanOrEqual(0);
@@ -147,7 +156,7 @@ describe('me and consent', () => {
   });
 
   it('export is enqueued after the submit', async () => {
-    expect(h.enqueued).toContainEqual(expect.objectContaining({ type: 'EXPORT_ROW', targetIds: [`${copyAttemptId}_Q1`] }));
+    expect(h.enqueued).toContainEqual(expect.objectContaining({ type: 'EXPORT_ROW', targetIds: [researchRowId(copyAttemptId, 'Q1', 1)] }));
   });
 
   it('Q5 row carries the full text', async () => {
@@ -155,7 +164,7 @@ describe('me and consent', () => {
       await a.post(`/attempts/${copyAttemptId}/tasks/${slot}/lock`, { artifact, initialConfidence: 60 });
       await a.post(`/attempts/${copyAttemptId}/tasks/${slot}/submit`, { choice: 'KEEP', finalArtifact: artifact, finalConfidence: 60 });
     }
-    const doc = (await h.live.db.doc(`researchRows/${copyAttemptId}_Q5`).get()).data()!;
+    const doc = (await h.live.db.doc(`researchRows/${researchRowId(copyAttemptId, 'Q5', 1)}`).get()).data()!;
     expect(doc.first_answer).toContain('Open trade courses');
     expect(doc.first_answer).toContain('Many jobs need training');
     expect(doc.first_evidence).toBeNull();

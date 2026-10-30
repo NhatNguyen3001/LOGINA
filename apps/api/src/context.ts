@@ -12,6 +12,7 @@ export type EnqueueFn = (job: {
 
 export interface FileStore {
   read: (path: string) => Promise<Buffer>;
+  size: (path: string) => Promise<number>;
   remove: (path: string) => Promise<void>;
   signWriteUrl: (path: string, contentType: string, expires: Date) => Promise<string>;
   signReadUrl: (path: string, expires: Date) => Promise<string>;

@@ -13,6 +13,8 @@ export interface Config {
   readySnapshot?: string;
   snapshotLocale: 'en' | 'vi';
   limits: RateLimits;
+  /** How many X-Forwarded-For entries, from the right, our own proxies added. */
+  trustedProxyHops: number;
 }
 
 type Env = Record<string, string | undefined>;
@@ -30,6 +32,7 @@ export function loadConfig(env: Env = process.env): Config {
     readySnapshot: env.READY_SNAPSHOT ?? `${env.DEMO_LOCALE ?? 'en'}_s01`,
     snapshotLocale: env.DEMO_LOCALE === 'vi' ? 'vi' : 'en',
     limits: limitsFromEnv(env),
+    trustedProxyHops: Number(env.TRUSTED_PROXY_HOPS ?? 1),
   };
 }
 
@@ -49,5 +52,6 @@ export const testConfig = (overrides: Partial<Config> = {}): Config => ({
   participantType: 'judge',
   snapshotLocale: 'en',
   limits: testLimits,
+  trustedProxyHops: 1,
   ...overrides,
 });

@@ -6,6 +6,7 @@ import { AppError, decodeNested, lessonsRepo, newId } from '@logina/db';
 import type { AppDeps, AppEnv } from '../context.js';
 import { requireBaseVersion } from '../middleware/base-version.js';
 import { withIdempotency } from '../middleware/idempotency.js';
+import { limited } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
 import { createJob } from '../services/jobs.js';
 
@@ -47,7 +48,8 @@ const unlocatedClaims = (claims: DocumentData[], evidence: DocumentData[]): stri
     })
     .map((claim) => claim.id as string);
 
-export function sourceRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
+export function sourceRoutes(deps: AppDeps): Hono<AppEnv> {
+  const { db, enqueue } = deps;
   const routes = new Hono<AppEnv>();
 
   const requireLesson = async (schoolId: string, lessonId: string): Promise<DocumentData> => {
@@ -186,10 +188,11 @@ export function sourceRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
   routes.post(
     '/:id/source-approval',
     sourceVersion,
-    withIdempotency(db, async (c) => {
+    withIdempotency(db, limited(deps, 'AI_ACTION', async (c) => {
       const lessonId = c.req.param('id') as string;
       const { schoolId, uid } = c.var.user;
       const lesson = await requireLesson(schoolId, lessonId);
+      if (lesson.activeJobId) throw new AppError('JOB_RUNNING', 409, 'A job is already running.');
       const { units, evidence, claims, relations, issues } = await readSource(db, lessonId);
 
       const altText = missingAltText(units);
@@ -244,7 +247,7 @@ export function sourceRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
       await batch.commit();
       await enqueue({ jobId: job.id, type: 'GENERATE', lessonId, targetIds: affectedSlots });
       return respond(c, SourceApprovalResultDTO, { sourceModelVersionId, version, jobId: job.id });
-    }),
+    })),
   );
 
   return routes;

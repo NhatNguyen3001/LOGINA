@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 
+const MAX_SHUFFLE_TRIES = 50;
+
 const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex');
 
 /** Deterministic numbers in [0, 1) from a seed: the same seed always gives the same sequence. */
@@ -20,6 +22,16 @@ export function shuffleForRelease<T>(seed: string, items: T[]): T[] {
     [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
   }
   return shuffled;
+}
+
+/** Shuffles until the order is none of `avoid`: Q2's authoring order is an accepted answer. */
+export function shuffleAvoiding(seed: string, ids: string[], avoid: string[][]): string[] {
+  const avoided = new Set(avoid.map((order) => order.join()));
+  for (let attempt = 0; attempt < MAX_SHUFFLE_TRIES; attempt += 1) {
+    const shuffled = shuffleForRelease(`${seed}:${attempt}`, ids);
+    if (!avoided.has(shuffled.join())) return shuffled;
+  }
+  return ids;
 }
 
 export function applyDisplayOrder<T extends { id: string }>(items: T[], displayOrder?: string[]): T[] | null {

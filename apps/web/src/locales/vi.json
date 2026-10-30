@@ -55,7 +55,9 @@
       "stop": "Dừng phân tích",
       "paused": "Phân tích đang tạm dừng",
       "needChoice": "Cần cô chọn",
-      "failed": "Phân tích chưa xong."
+      "failed": "Phân tích chưa xong.",
+      "notAnalyzed": "Bài này chưa được phân tích",
+      "notAnalyzedNote": "Việc phân tích đã dừng hoặc chưa xong. Cô có thể chạy lại."
     },
     "t05": {
       "readByAiNotice": "LOGINA đã đọc tệp này bằng AI. Cô hãy đối chiếu đoạn trích và số liệu với bản gốc trước khi duyệt.",
@@ -349,6 +351,16 @@
       "why": "Được chọn vì: {{reason}}",
       "chose": "Học sinh chọn",
       "disclaimer": "Phần này ghi lại lựa chọn, câu Thử nghĩ thêm đã nhận và các thay đổi. Nó không cho biết vì sao học sinh đổi ý."
+    },
+    "job": {
+      "read": "Đọc học liệu và ghi lại vị trí nguồn",
+      "claims": "Tách nhận định và căn cứ trong nguồn",
+      "issues": "Tìm điểm chưa rõ, thiếu thông tin, không khớp hoặc giả định ẩn",
+      "questions": "Hỏi cô về các điểm cần quyết định",
+      "sufficiency": "Kiểm tra căn cứ cho từng nhiệm vụ",
+      "drafts": "Soạn các nhiệm vụ",
+      "checks": "Chạy kiểm tra chất lượng",
+      "recheck": "Kiểm tra lại phần đã đổi"
     }
   },
   "errors": {
@@ -375,7 +387,8 @@
     "ALREADY_SUBMITTED": "Bài này đã được nộp.",
     "ATTEMPT_INCOMPLETE": "Hãy làm xong tất cả các bài trước.",
     "UNKNOWN_OPTION": "Lựa chọn này không thuộc bài này.",
-    "CONSENT_VERSION_STALE": "Thông tin nghiên cứu đã thay đổi. Vui lòng đọc lại."
+    "CONSENT_VERSION_STALE": "Thông tin nghiên cứu đã thay đổi. Vui lòng đọc lại.",
+    "JOB_RUNNING": "LOGINA vẫn đang xử lý bài này."
   },
   "common": {
     "lang": {

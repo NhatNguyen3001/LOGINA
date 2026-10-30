@@ -1,7 +1,12 @@
+import { createHash } from 'node:crypto';
 import { FieldValue, type DocumentData, type Firestore, type Timestamp, type Transaction } from 'firebase-admin/firestore';
 import { Artifact, ResearchRow } from '@logina/contracts';
 import { decodeNested } from '@logina/db';
 import { answerColumns, buildResearchRow, materialHash, relationBucket, researchTime, type Q1Letters } from '@logina/domain';
+
+/** A Reset reuses attempt IDs, so the run number keeps each run's row. Hashed, so no uid reaches the Sheet. */
+export const researchRowId = (attemptId: string, slot: string, runNumber: number): string =>
+  `row_${createHash('sha256').update(`${attemptId}:${slot}:${runNumber}`).digest('hex').slice(0, 32)}`;
 
 export interface ResearchSettings {
   enabled: boolean;
@@ -74,7 +79,7 @@ export function writeResearchRow(
   const letters = lettersFor(release, locale);
   const lockedAt = (task.lockedAt as Timestamp).toDate();
   const openedAt = (task.openedAt as Timestamp | undefined)?.toDate() ?? lockedAt;
-  const rowId = `${attempt.id as string}_${slot}`;
+  const rowId = researchRowId(attempt.id as string, slot, runNumber);
 
   const row = ResearchRow.parse(
     buildResearchRow({

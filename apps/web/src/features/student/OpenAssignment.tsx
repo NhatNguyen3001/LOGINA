@@ -1,5 +1,6 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, useParams } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StudentShell } from '@/components/logina/StudentShell';
 import { useSessionLocale } from '@/components/logina/TeacherShell';
@@ -11,14 +12,16 @@ import { Consent } from './Consent';
 export function OpenAssignment() {
   const { t } = useTranslation();
   const { id } = useParams({ strict: false }) as { id: string };
-  const queryClient = useQueryClient();
   useSessionLocale();
 
+  /** Stays true after the choice is saved, so the participant code is on screen until they continue. */
+  const [consenting, setConsenting] = useState(false);
   const me = useQuery({ queryKey: qk.me(), queryFn: getMe });
-  const ready = me.data ? !me.data.consentRequired : false;
-  const attempt = useQuery({ queryKey: ['start-attempt', id], queryFn: () => startAttempt(id, newKey()), enabled: ready });
+  if (me.data?.consentRequired && !consenting) setConsenting(true);
+  const ready = me.data ? !me.data.consentRequired && !consenting : false;
+  const attempt = useQuery({ queryKey: ['start-attempt', id], queryFn: () => startAttempt(id, newKey()), enabled: ready, gcTime: 0 });
 
-  if (me.data?.consentRequired) return <Consent onDone={() => void queryClient.invalidateQueries({ queryKey: qk.me() })} />;
+  if (consenting) return <Consent onDone={() => setConsenting(false)} />;
 
   if (attempt.isError) {
     return (

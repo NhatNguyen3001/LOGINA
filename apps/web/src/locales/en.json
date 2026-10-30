@@ -55,7 +55,9 @@
       "stop": "Stop analysis",
       "paused": "Analysis paused",
       "needChoice": "Your choice needed",
-      "failed": "The analysis didn't finish."
+      "failed": "The analysis didn't finish.",
+      "notAnalyzed": "This lesson hasn't been analyzed",
+      "notAnalyzedNote": "The analysis was stopped or didn't finish. You can start it again."
     },
     "t05": {
       "readByAiNotice": "LOGINA read this file with AI. Check the quoted text and figures against your original before approving.",
@@ -349,6 +351,16 @@
       "why": "Chosen because: {{reason}}",
       "chose": "Student chose",
       "disclaimer": "The trace records choices, the Think-again prompt given and any changes. It does not show why the student changed their mind."
+    },
+    "job": {
+      "read": "Read the material and record source locations",
+      "claims": "Separate claims and evidence in the source",
+      "issues": "Find unclear points, missing information, mismatches or hidden assumptions",
+      "questions": "Ask you about points that need a decision",
+      "sufficiency": "Check evidence for each task",
+      "drafts": "Draft the tasks",
+      "checks": "Run the quality checks",
+      "recheck": "Recheck the changed parts"
     }
   },
   "errors": {
@@ -375,7 +387,8 @@
     "ALREADY_SUBMITTED": "This task is already submitted.",
     "ATTEMPT_INCOMPLETE": "Finish every task first.",
     "UNKNOWN_OPTION": "That option isn't part of this task.",
-    "CONSENT_VERSION_STALE": "The research notice has changed. Please read it again."
+    "CONSENT_VERSION_STALE": "The research notice has changed. Please read it again.",
+    "JOB_RUNNING": "LOGINA is still working on this lesson."
   },
   "common": {
     "lang": {

@@ -903,6 +903,7 @@ export const examples = {
 
   studentFeedback: {
     slot: 'Q1',
+    choice: 'REVISE',
     initial: {
       label: 'B · Card 3',
       text: 'Share of agriculture, forestry and fisheries rises · card says the share rises',

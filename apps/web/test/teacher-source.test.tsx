@@ -180,6 +180,21 @@ describe('T2', () => {
   });
 });
 
+describe('a lesson with no job', () => {
+  it('a lesson that never finished analysis offers to start again', async () => {
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', stage: 'CREATE' } as LessonDTO);
+    await render(<AnalyzePage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Analyze material' }));
+    await waitFor(() => expect(api.startAnalyze).toHaveBeenCalledWith('l1', expect.any(String)));
+  });
+
+  it('clarify with no analysis behind it offers the same, not a blank page', async () => {
+    vi.mocked(api.getSourceReview).mockRejectedValue(new api.ApiError(404, 'NOT_FOUND'));
+    await render(<ClarifyPage />);
+    expect(await screen.findByRole('button', { name: 'Analyze material' })).toBeInTheDocument();
+  });
+});
+
 describe('T3 and T4', () => {
   it('Confirm sends CONFIRM with the review version', async () => {
     await render(<ClarifyPage />);

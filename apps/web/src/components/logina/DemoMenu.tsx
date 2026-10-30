@@ -33,19 +33,32 @@ export function DemoMenu({ assignmentId }: { assignmentId?: string }) {
   const resetBlocked = reset ? limitState(reset) === 'reached' : false;
   const simulateBlocked = simulate ? limitState(simulate) === 'reached' : false;
 
-  const afterChange = async () => {
+  const close = () => {
     setOpen(false);
     setConfirming(false);
-    await queryClient.invalidateQueries();
   };
 
   const run = useMutation({
     mutationFn: (action: () => Promise<unknown>) => action(),
-    onSuccess: afterChange,
+    onSuccess: async () => {
+      close();
+      await queryClient.invalidateQueries();
+    },
     onError: () => queryClient.invalidateQueries({ queryKey: qk.limits() }),
   });
 
-  const leaveToLessons = () => void navigate({ to: '/t/lessons' });
+  /** The workspace was replaced, and its IDs repeat, so nothing cached may survive. */
+  const replaceWorkspace = useMutation({
+    mutationFn: (action: () => Promise<unknown>) => action(),
+    onSuccess: async () => {
+      close();
+      queryClient.clear();
+      await navigate({ to: '/t/lessons' });
+    },
+    onError: () => queryClient.invalidateQueries({ queryKey: qk.limits() }),
+  });
+
+  const pending = run.isPending || replaceWorkspace.isPending;
 
   if (!me.data?.demoMenu) return null;
 
@@ -57,20 +70,20 @@ export function DemoMenu({ assignmentId }: { assignmentId?: string }) {
       </button>
       {open ? (
         <div className="card tight absolute bottom-full left-0 z-10 w-72 shadow-card">
-          {run.isPending ? <p className="s13 muted">{t('common.loading')}</p> : null}
+          {pending ? <p className="s13 muted">{t('common.loading')}</p> : null}
           {confirming ? (
             <>
               <p className="s13">{t('demo.resetConfirm')}</p>
               <div className="row">
-                <button type="button" className="btn danger sm" onClick={() => run.mutate(() => demoReset(newKey()).then(leaveToLessons))}>{t('common.confirm')}</button>
+                <button type="button" className="btn danger sm" disabled={pending} onClick={() => replaceWorkspace.mutate(() => demoReset(newKey()))}>{t('common.confirm')}</button>
                 <button type="button" className="btn secondary sm" onClick={() => setConfirming(false)}>{t('common.cancel')}</button>
               </div>
             </>
           ) : (
             <>
-              <button type="button" className="btn secondary sm block" disabled={resetBlocked || run.isPending} onClick={() => setConfirming(true)}>{t('demo.reset')}</button>
+              <button type="button" className="btn secondary sm block" disabled={resetBlocked || pending} onClick={() => setConfirming(true)}>{t('demo.reset')}</button>
               <LimitHint limit={reset} />
-              <button type="button" className="btn secondary sm block" disabled={!target || simulateBlocked || run.isPending} onClick={() => run.mutate(() => demoSimulate(target!, newKey()))}>{t('demo.simulate')}</button>
+              <button type="button" className="btn secondary sm block" disabled={!target || simulateBlocked || pending} onClick={() => run.mutate(() => demoSimulate(target!, newKey()))}>{t('demo.simulate')}</button>
               <LimitHint limit={simulate} />
               {target ? null : <span className="small muted">{t('demo.noAssignment')}</span>}
               <button type="button" className="btn secondary sm block" onClick={() => void demoFailNextRerun(newKey()).then(() => setArmed(true))}>{t('demo.failRecheck')}</button>
@@ -78,7 +91,7 @@ export function DemoMenu({ assignmentId }: { assignmentId?: string }) {
               <span className="small b muted">{t('demo.jump')}</span>
               <span className="small muted">{t('demo.jumpSampleOnly')}</span>
               {snapshots.data?.snapshots.map(({ stepId, label }) => (
-                <button key={stepId} type="button" className="btn secondary sm block" disabled={resetBlocked || run.isPending} onClick={() => run.mutate(() => restoreSnapshot(stepId, newKey()).then(leaveToLessons))}>{label}</button>
+                <button key={stepId} type="button" className="btn secondary sm block" disabled={resetBlocked || pending} onClick={() => replaceWorkspace.mutate(() => restoreSnapshot(stepId, newKey()))}>{label}</button>
               ))}
             </>
           )}

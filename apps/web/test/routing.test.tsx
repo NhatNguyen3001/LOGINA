@@ -6,6 +6,7 @@ import { Consent } from '@/features/student/Consent';
 import { DemoMenu } from '@/components/logina/DemoMenu';
 import { EntryPage } from '@/features/entry/EntryPage';
 import { LessonsHome } from '@/features/lessons/LessonsHome';
+import { OpenAssignment } from '@/features/student/OpenAssignment';
 import { stagePath } from '@/features/lessons/stage-path';
 import { SwitchSide } from '@/components/logina/SwitchSide';
 import * as api from '@/lib/api';
@@ -15,9 +16,11 @@ const navigate = vi.fn();
 vi.mock('@tanstack/react-router', async (original) => ({
   ...(await original<object>()),
   useNavigate: () => navigate,
+  useParams: () => ({ id: 'asg1' }),
+  Navigate: ({ to }: { to: string }) => <p>{`redirect ${to}`}</p>,
   Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => <a href={to} className={className}>{children}</a>,
 }));
-vi.mock('@/lib/api', async (original) => ({ ...(await original<object>()), getLessons: vi.fn(), getLesson: vi.fn(), getMyAssignments: vi.fn(), getMe: vi.fn(), sendConsent: vi.fn(), getLimits: vi.fn(), getDemoSnapshots: vi.fn() }));
+vi.mock('@/lib/api', async (original) => ({ ...(await original<object>()), getLessons: vi.fn(), getLesson: vi.fn(), getMyAssignments: vi.fn(), getMe: vi.fn(), sendConsent: vi.fn(), getLimits: vi.fn(), getDemoSnapshots: vi.fn(), startAttempt: vi.fn(async () => ({ attemptId: 'att', status: 'NOT_STARTED', slots: [{ slot: 'Q1', phase: 'REASON' }] })) }));
 vi.mock('@/lib/auth', () => ({ ensureSession: vi.fn(async () => {}), idToken: vi.fn(async () => 't'), renewSession: vi.fn(async () => {}) }));
 
 const withQuery = (ui: React.ReactElement) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{ui}</QueryClientProvider>;
@@ -108,6 +111,21 @@ describe('demo menu', () => {
     await renderWithI18n(withQuery(<DemoMenu />));
     await waitFor(() => expect(api.getMe).toHaveBeenCalled());
     expect(screen.queryByRole('button', { name: 'Demo menu' })).toBeNull();
+  });
+});
+
+describe('opening an assignment', () => {
+  it('keeps the participant code on screen until the student continues', async () => {
+    vi.mocked(api.sendConsent).mockResolvedValue({ consent: 'AGREED', participantCode: 'P-7K2M' });
+    vi.mocked(api.getMe).mockResolvedValueOnce({ ...me, consentRequired: true }).mockResolvedValue({ ...me, consentRequired: false, participantCode: 'P-7K2M' });
+    await renderWithI18n(withQuery(<OpenAssignment />));
+    fireEvent.click(await screen.findByRole('button', { name: "I agree, and I'm 18 or older" }));
+    expect(await screen.findByText('P-7K2M')).toBeInTheDocument();
+    await waitFor(() => expect(api.getMe).toHaveBeenCalledTimes(2));
+    expect(screen.getByText('P-7K2M')).toBeInTheDocument();
+    expect(api.startAttempt).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to the tasks' }));
+    await waitFor(() => expect(api.startAttempt).toHaveBeenCalled());
   });
 });
 

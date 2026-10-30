@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyDisplayOrder, assignRuntimeIds, shuffleForRelease } from '../src/shuffle.js';
+import { applyDisplayOrder, assignRuntimeIds, shuffleForRelease, shuffleAvoiding } from '../src/shuffle.js';
 
 const answers = ['A1', 'A2', 'A3', 'A4'].map((answerOptionId) => ({ answerOptionId }));
 const evidence = ['E1', 'E2', 'E3', 'E4'].map((generatedEId) => ({ generatedEId }));
@@ -60,5 +60,22 @@ describe('assignRuntimeIds', () => {
     const one = assignRuntimeIds('rel_1', 'hash', answers, evidence);
     const two = assignRuntimeIds('rel_2', 'hash', answers, evidence);
     expect(one.answers[0]?.runtimeId).not.toBe(two.answers[0]?.runtimeId);
+  });
+});
+
+describe('shuffleAvoiding', () => {
+  const ids = ['K1', 'K2', 'K3', 'K4'];
+
+  it('never returns an avoided order, whatever the seed', () => {
+    const avoid = [ids, ['K2', 'K1', 'K3', 'K4']];
+    for (let seed = 0; seed < 200; seed += 1) {
+      const order = shuffleAvoiding(String(seed), ids, avoid);
+      expect(avoid.map((a) => a.join())).not.toContain(order.join());
+      expect([...order].sort()).toEqual(ids);
+    }
+  });
+
+  it('is the same for the same seed', () => {
+    expect(shuffleAvoiding('s', ids, [ids])).toEqual(shuffleAvoiding('s', ids, [ids]));
   });
 });

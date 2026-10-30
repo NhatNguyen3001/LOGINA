@@ -1,3 +1,4 @@
+import { decodeNested } from '@logina/db';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ApproveResultDTO, AssignResultDTO, AssignmentListDTO, TaskApprovalDTO, TeacherTaskPreviewDTO, TeacherTaskSummaryDTO, findRestrictedKeys } from '@logina/contracts';
 import { loadFixture } from '@logina/domain';
@@ -118,6 +119,19 @@ describe('assignments', () => {
       expect((await approve(slot, await approveBody(slot))).status).toBe(200);
     }
   }, 90_000);
+
+  it('a Q2 release does not open in an accepted order', async () => {
+    const { draftId, accepted } = await (async () => {
+      const lesson = (await h.live.db.doc(`lessons/${lessonId}`).get()).data()!;
+      const draft = decodeNested((await h.live.db.doc(`lessons/${lessonId}/taskDrafts/${lesson.currentTaskDraftIds.Q2}`).get()).data()!);
+      return { draftId: lesson.currentTaskDraftIds.Q2 as string, accepted: draft.taskBody.acceptedOrders as string[][] };
+    })();
+    expect(draftId).toBeTruthy();
+    expect(accepted.length).toBeGreaterThan(0);
+    const releases = await h.live.db.collection(`lessons/${lessonId}/taskReleases`).where('slot', '==', 'Q2').get();
+    const cards = decodeNested(releases.docs[0]!.data()).publicContent.taskBody.cards as { cardId: string }[];
+    expect(accepted.map((order) => order.join())).not.toContain(cards.map((card) => card.cardId).join());
+  });
 
   it('assign with a stale LessonDTO.version is 409', async () => {
     expect((await assign(999)).status).toBe(409);
