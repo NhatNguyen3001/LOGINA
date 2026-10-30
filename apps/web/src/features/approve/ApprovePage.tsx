@@ -22,15 +22,6 @@ function Decision({ lessonId, task, finding }: { lessonId: string; task: Task; f
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.approval(lessonId) }),
   });
 
-  if (!finding.overridable) {
-    return (
-      <div className="stack">
-        <StatusTag kind="block">{finding.gateId}</StatusTag>
-        <span className="s13">{finding.explanationForTeacher}</span>
-        <Link to="/t/lessons/$id/tasks/$slot" params={{ id: lessonId, slot: task.slot }} className="btn secondary sm self-start">{t('teacher.t12.openToFix')}</Link>
-      </div>
-    );
-  }
   return (
     <div className="well stack">
       <StatusTag kind="review">{finding.gateId}</StatusTag>
@@ -46,21 +37,62 @@ function Decision({ lessonId, task, finding }: { lessonId: string; task: Task; f
   );
 }
 
+const blockingGates = (task: Task) => task.gatesSummary.gates.filter((gate) => gate.status === 'BLOCKER');
+
+const BLOCKING_STATUS: Task['status'][] = ['GENERATING', 'VALIDATING', 'STALE', 'FAILED', 'BLOCKED'];
+
+function ApprovePanel({ lessonId, task }: { lessonId: string; task: Task }) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [confirmed, setConfirmed] = useState(false);
+  const approve = useMutation({
+    mutationFn: () => approveTask(lessonId, task.slot as Slot, { expectedDraftVersion: task.draftVersion, previewHash: task.previewHash, candidateSetVersion: task.candidateSetVersion, confirmed: true }, newKey()),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: qk.approval(lessonId) }),
+  });
+  const blockers = blockingGates(task).length;
+  const undecided = task.decisionsNeeded.filter((finding) => finding.overridable).length;
+  const ready = blockers === 0 && undecided === 0 && !BLOCKING_STATUS.includes(task.status);
+
+  return (
+    <div className="card sticky">
+      <div className="row">
+        <h3 className="b">{t('teacher.t12.approveSlot', { slot: task.slot })}</h3>
+        <span className="sp" />
+        <span className="s13 muted num">{`v${task.draftVersion}`}</span>
+      </div>
+      {task.changesSinceLastPreview.length > 0 ? (
+        <div className="well stack">
+          <span className="small b sec">{t('teacher.t12.changes')}</span>
+          {task.changesSinceLastPreview.map((change) => (
+            <span key={change} className="s13">{t(`teacher.t12.change.${change}`, { defaultValue: t('teacher.t12.change.PREVIEW_CHANGED') })}</span>
+          ))}
+        </div>
+      ) : null}
+      <div className="stack">
+        <div className="row"><span className={blockers === 0 ? 'ok' : 'no'}>{blockers === 0 ? '✓' : '✕'}</span><span>{t('teacher.t12.noBlockers')}</span></div>
+        <div className="row"><span className={undecided === 0 ? 'ok' : 'wait'}>{undecided === 0 ? '✓' : '…'}</span><span>{t('teacher.t12.warningsDecided')}</span></div>
+      </div>
+      <label className="row top">
+        <input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />
+        <span className="s13 grow">{t('teacher.t12.confirm', { slot: task.slot })}</span>
+      </label>
+      {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
+      <button type="button" className="btn primary block" disabled={!confirmed || !ready || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t12.approveSlot', { slot: task.slot })}</button>
+    </div>
+  );
+}
+
 export function ApprovePage() {
   const { t } = useTranslation();
   const { id } = useParams({ strict: false }) as { id: string };
-  const queryClient = useQueryClient();
   const approval = useQuery({ queryKey: qk.approval(id), queryFn: () => getApproval(id) });
-
-  const approve = useMutation({
-    mutationFn: (task: Task) => approveTask(id, task.slot as Slot, { expectedDraftVersion: task.draftVersion, previewHash: task.previewHash, candidateSetVersion: task.candidateSetVersion, confirmed: true }, newKey()),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: qk.approval(id) }),
-  });
+  const [selected, setSelected] = useState<Slot | null>(null);
 
   if (!approval.data) return <p className="muted">{t(approval.isError ? 'errors.generic' : 'common.loading')}</p>;
   const { tasks } = approval.data;
   const approved = tasks.filter((x) => x.approvedAt).length;
   const allApproved = approved === tasks.length;
+  const current = tasks.find((x) => !x.approvedAt && (selected === null || x.slot === selected)) ?? tasks.find((x) => !x.approvedAt);
 
   return (
     <>
@@ -75,7 +107,7 @@ export function ApprovePage() {
         <StatusTag kind="teacher">{t('teacher.t12.tag')}</StatusTag>
       </div>
       <p className="lede">{t('teacher.t12.lede')}</p>
-      {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
+      <div className="cols">
       <div className="card flush">
         <div className="row p-4">
           <h3 className="s15 b">{t('teacher.t06.count')}</h3>
@@ -100,7 +132,13 @@ export function ApprovePage() {
                     <div className="stack">
                       <TaskStatusTag status={task.status} />
                       {task.acceptedWarning ? <StatusTag kind="teacher">{t('teacher.t12.decided')}</StatusTag> : null}
-                      {task.decisionsNeeded.map((finding) => (
+                      {blockingGates(task).map((gate) => (
+                        <div key={gate.gateId} className="stack">
+                          <span className="s13">{`${gate.gateId} · ${gate.explanationForTeacher}`}</span>
+                          <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: task.slot }} className="btn secondary sm self-start">{t('teacher.t12.openToFix')}</Link>
+                        </div>
+                      ))}
+                      {task.decisionsNeeded.filter((finding) => finding.overridable).map((finding) => (
                         <Decision key={`${finding.gateId}-${finding.findingCode}`} lessonId={id} task={task} finding={finding} />
                       ))}
                     </div>
@@ -113,7 +151,7 @@ export function ApprovePage() {
                     {task.approvedAt ? (
                       <StatusTag kind="teacher">{task.releaseLabel}</StatusTag>
                     ) : (
-                      <button type="button" className="btn primary sm" disabled={task.decisionsNeeded.length > 0 || approve.isPending} onClick={() => approve.mutate(task)}>{t('teacher.t12.approve')}</button>
+                      <button type="button" className="btn secondary sm" aria-pressed={current?.slot === task.slot} onClick={() => setSelected(task.slot)}>{t('teacher.t12.review', { slot: task.slot })}</button>
                     )}
                   </td>
                 </tr>
@@ -122,9 +160,11 @@ export function ApprovePage() {
           </table>
         </div>
       </div>
+      {current ? <ApprovePanel key={`${current.slot}-${current.draftVersion}`} lessonId={id} task={current} /> : null}
+      </div>
       <div className="row">
         <span className="sp" />
-        {allApproved ? <Link to="/t/lessons/$id/assign" params={{ id }} className="btn primary">{t('teacher.t13.title')}</Link> : <button type="button" className="btn primary" disabled>{t('teacher.t13.title')}</button>}
+        {allApproved ? <Link to="/t/lessons/$id/assign" params={{ id }} className="btn primary">{t('teacher.t12.assignCount', { count: approved })}</Link> : <button type="button" className="btn primary" disabled>{t('teacher.t12.assignCount', { count: approved })}</button>}
       </div>
     </>
   );

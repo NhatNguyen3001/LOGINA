@@ -208,8 +208,24 @@ describe('T7, T9 and T11', () => {
     expect(screen.queryByRole('button', { name: /Quick edit/ })).toBeNull();
   });
 
+  it('a blocked task opens its prompts with an inline editor, and fallback cannot be edited', async () => {
+    params.slot = 'Q4';
+    vi.mocked(api.getPreview).mockResolvedValue({ slot: 'Q4', draftId: 'd4', draftVersion: 3, taskType: 'COUNTERARGUMENT', status: 'BLOCKED', questionStem: 'Rebut', gates: [], exampleChallenges: preview().exampleChallenges, blockers: 1, canApprove: false, taskBody: { templates: [], teacherLabels: {} } } as never);
+    vi.mocked(api.getChallenges).mockResolvedValue({ slot: 'Q4', draftVersion: 3, candidateSetVersion: 1, challenges: [
+      { challengeId: 'TN2', label: 'TN2', purpose: 'Enough', whenShown: 'x', message: 'Productivity rose.', isFallback: false, sourceAnchor: 'p. 8' },
+      { challengeId: 'FB', label: 'Fallback', purpose: 'Neutral', whenShown: 'y', message: 'Check once more.', isFallback: true, sourceAnchor: 'p. 8' },
+    ] });
+    vi.mocked(api.sendEdit).mockResolvedValue({ editId: 'e', newDraftIds: [], staleDraftIds: [], jobId: 'j' });
+    await render(<PreviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit TN2' }));
+    expect(screen.queryByRole('button', { name: 'Edit Fallback' })).toBeNull();
+    fireEvent.change(screen.getByLabelText('Edit TN2', { selector: 'textarea' }), { target: { value: 'What else would you need to know?' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save and recheck' }));
+    await waitFor(() => expect(api.sendEdit).toHaveBeenCalledWith('l1', { editScope: 'LOGIC', targetType: 'challenge', targetId: 'd4', changedRefs: ['TN2'], baseVersion: 3, payload: { challengeId: 'TN2', message: 'What else would you need to know?' } }, expect.any(String)));
+  });
+
   it('View all prompts opens the full list', async () => {
-    vi.mocked(api.getChallenges).mockResolvedValue({ slot: 'Q1', draftVersion: 3, candidateSetVersion: 1, challenges: [{ label: 'FB', purpose: 'Fallback', whenShown: 'Otherwise', message: 'Check once more.', isFallback: true, sourceAnchor: 'p. 8' }] });
+    vi.mocked(api.getChallenges).mockResolvedValue({ slot: 'Q1', draftVersion: 3, candidateSetVersion: 1, challenges: [{ challengeId: 'FB', label: 'FB', purpose: 'Fallback', whenShown: 'Otherwise', message: 'Check once more.', isFallback: true, sourceAnchor: 'p. 8' }] });
     await render(<PreviewPage />);
     fireEvent.click(await screen.findByRole('button', { name: 'View all prompts' }));
     expect(await screen.findByText('Check once more.')).toBeInTheDocument();
@@ -242,7 +258,7 @@ describe('T12 and T13', () => {
   it('a warning needs a reason, and approve waits for it', async () => {
     vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { decisionsNeeded: [finding] }), approvalTask('Q2'), approvalTask('Q3'), approvalTask('Q4'), approvalTask('Q5')], contentManifestHash: 'h', canApprove: false });
     await render(<ApprovePage />);
-    expect((await screen.findAllByRole('button', { name: 'Approve' }))[0]).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Approve Q1' })).toBeDisabled();
     const save = screen.getByRole('button', { name: 'Save decision' });
     expect(save).toBeDisabled();
     fireEvent.change(screen.getByLabelText('Accept warning, give a reason'), { target: { value: 'Fits' } });
@@ -251,16 +267,28 @@ describe('T12 and T13', () => {
   });
 
   it('a blocker cannot be accepted, only opened to fix', async () => {
-    vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { decisionsNeeded: [{ ...finding, overridable: false }] }), approvalTask('Q2'), approvalTask('Q3'), approvalTask('Q4'), approvalTask('Q5')], contentManifestHash: 'h', canApprove: false });
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { status: 'BLOCKED', gatesSummary: { aggregate: 'BLOCKED', gates: [{ gateId: 'QG5', status: 'BLOCKER', explanationForTeacher: 'Gives away the answer' }] } }), approvalTask('Q2'), approvalTask('Q3'), approvalTask('Q4'), approvalTask('Q5')], contentManifestHash: 'h', canApprove: false });
     await render(<ApprovePage />);
     expect(await screen.findByRole('link', { name: 'Open to fix' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Save decision' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Approve Q1' })).toBeDisabled();
+  });
+
+  it('approving needs the confirmation tick and sends the seen version', async () => {
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'].map((slot) => approvalTask(slot)), contentManifestHash: 'h', canApprove: true });
+    vi.mocked(api.approveTask).mockResolvedValue({ taskReleaseId: 'r', releaseLabel: 'r3' });
+    await render(<ApprovePage />);
+    const approve = await screen.findByRole('button', { name: 'Approve Q1' });
+    expect(approve).toBeDisabled();
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(approve);
+    await waitFor(() => expect(api.approveTask).toHaveBeenCalledWith('l1', 'Q1', { expectedDraftVersion: 3, previewHash: 'h', candidateSetVersion: 1, confirmed: true }, expect.any(String)));
   });
 
   it('Assign stays disabled until all five are approved', async () => {
     vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { approvedAt: '2026-10-31T00:00:00.000Z', releaseLabel: 'r4' }), approvalTask('Q2'), approvalTask('Q3'), approvalTask('Q4'), approvalTask('Q5')], contentManifestHash: 'h', canApprove: true });
     await render(<ApprovePage />);
-    expect(await screen.findByRole('button', { name: 'Assign' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Assign · 1/5' })).toBeDisabled();
     expect(screen.getByText('r4')).toBeInTheDocument();
   });
 

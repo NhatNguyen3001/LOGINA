@@ -149,7 +149,7 @@ export function ClarifyPage() {
       </div>
       <div className="row">
         {blockersRemaining > 0 ? (
-          <button type="button" className="jump" aria-label={t('teacher.t03.next')} onClick={() => document.getElementById(`point-${firstBlocker?.id}`)?.focus()}>
+          <button type="button" className="jump" title={t('teacher.t03.next')} onClick={() => document.getElementById(`point-${firstBlocker?.id}`)?.focus()}>
             <StatusTag kind="block">{t('teacher.t03.blockers', { count: blockersRemaining })}</StatusTag>
           </button>
         ) : null}

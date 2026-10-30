@@ -37,23 +37,59 @@ function Gates({ gates }: { gates: TeacherTaskPreviewDTO['gates'] }) {
   );
 }
 
-function AllPrompts({ lessonId, slot }: { lessonId: string; slot: Slot }) {
+function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, onClose }: { lessonId: string; draftId: string; draftVersion: number; challengeId: string; message: string; onClose: () => void }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const [value, setValue] = useState(message);
+  const save = useMutation({
+    mutationFn: () => sendEdit(lessonId, { editScope: 'LOGIC', targetType: 'challenge', targetId: draftId, changedRefs: [challengeId], baseVersion: draftVersion, payload: { challengeId, message: value } }, newKey()),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['lesson', lessonId] });
+      onClose();
+    },
+  });
+  return (
+    <div className="stack">
+      <label className="s13 b" htmlFor={`prompt-${challengeId}`}>{t('teacher.t07.editPrompt', { label: challengeId })}</label>
+      <textarea id={`prompt-${challengeId}`} className="textarea" value={value} onChange={(event) => setValue(event.target.value)} />
+      <LimitNote action="AI_ACTION" />
+      {save.isError ? <Note kind="err">{t(errorKey(save.error instanceof ApiError ? save.error.code : ''))}</Note> : null}
+      <div className="row">
+        <button type="button" className="btn primary sm" disabled={!value.trim() || value === message || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
+        <button type="button" className="btn secondary sm" onClick={onClose}>{t('common.cancel')}</button>
+      </div>
+    </div>
+  );
+}
+
+/** A blocked task opens this list at once: it is where Open to fix on T12 leads. */
+function AllPrompts({ lessonId, slot, draftId, draftVersion, status }: { lessonId: string; slot: Slot; draftId: string; draftVersion: number; status: string }) {
+  const { t } = useTranslation();
+  const blocked = status === 'BLOCKED';
+  const [open, setOpen] = useState(blocked);
+  const [editing, setEditing] = useState<string | null>(null);
   const list = useQuery({ queryKey: qk.challenges(lessonId, slot), queryFn: () => getChallenges(lessonId, slot), enabled: open });
   return (
     <>
       <button type="button" className="lnk jump self-start" aria-expanded={open} onClick={() => setOpen(!open)}>{t('teacher.t07.viewAll')}</button>
-      {list.data?.challenges.map((challenge) => (
-        <div key={challenge.label} className={`cand ${challenge.isFallback ? 'fb' : ''}`}>
-          <div className="row">
-            <span className="tag info">{challenge.label}</span>
-            <span className="s13 b">{challenge.purpose}</span>
-          </div>
-          <p className="msg">{challenge.message}</p>
-          <span className="small muted">{challenge.whenShown}</span>
-        </div>
-      ))}
+      {open
+        ? list.data?.challenges.map((challenge) => (
+            <div key={challenge.challengeId} className={`cand ${challenge.isFallback ? 'fb' : ''}`}>
+              <div className="row">
+                <span className="tag info">{challenge.label}</span>
+                <span className="s13 b">{challenge.purpose}</span>
+                <span className="sp" />
+                {blocked && !challenge.isFallback ? <button type="button" className="btn secondary sm" onClick={() => setEditing(challenge.challengeId)}>{t('teacher.t07.editPrompt', { label: challenge.label })}</button> : null}
+              </div>
+              {editing === challenge.challengeId ? (
+                <PromptEditor lessonId={lessonId} draftId={draftId} draftVersion={draftVersion} challengeId={challenge.challengeId} message={challenge.message} onClose={() => setEditing(null)} />
+              ) : (
+                <p className="msg">{challenge.message}</p>
+              )}
+              <span className="small muted">{challenge.whenShown}</span>
+            </div>
+          ))
+        : null}
     </>
   );
 }
@@ -366,7 +402,7 @@ export function PreviewPage() {
               <p className="msg">{challenge.message}</p>
             </div>
           ))}
-          <AllPrompts lessonId={id} slot={slot} />
+          <AllPrompts key={data.draftVersion} lessonId={id} slot={slot} draftId={data.draftId} draftVersion={data.draftVersion} status={data.status} />
           {'answers' in data ? <TryCase lessonId={id} slot={slot} preview={data} /> : null}
         </>
       ) : null}

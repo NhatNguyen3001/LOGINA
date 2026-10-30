@@ -27,11 +27,13 @@ test('the full teacher path, from the sample to tracking', async ({ page }) => {
   await expect(page).toHaveURL(/\/clarify/, { timeout: 60_000 });
   await expect(page.getByRole('heading', { name: 'Clarify material' })).toBeVisible();
   await expectAccessible(page, 'T3');
-  await page.getByRole('button', { name: 'Keep open (bounded)' }).first().click();
+  const keepOpen = page.getByRole('button', { name: 'Keep open (bounded)' });
+  const openPoints = await keepOpen.count();
+  await keepOpen.first().click();
   await page.getByLabel('What the lesson may say').fill('Shares only');
   await page.getByLabel('Why it stays open').fill('The table has no totals');
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('RESOLVED')).toHaveCount(1);
+  await expect(keepOpen).toHaveCount(openPoints - 1);
   await page.getByRole('button', { name: 'Use selected suggestion' }).first().click();
   await expect(page.getByRole('link', { name: 'Continue: Source review →' })).toBeVisible();
   await page.getByRole('link', { name: 'Continue: Source review →' }).click();
@@ -58,15 +60,40 @@ test('the full teacher path, from the sample to tracking', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Task approval' })).toBeVisible();
   await expectAccessible(page, 'T12');
 
+  await page.getByLabel('Accept warning, give a reason').fill('Fits this class');
+  await page.getByRole('button', { name: 'Save decision' }).click();
+
   await page.getByRole('link', { name: 'Open to fix' }).click();
-  await page.getByRole('link', { name: 'Q1 logic check' }).waitFor({ state: 'hidden' }).catch(() => {});
+  await expect(page).toHaveURL(new RegExp('tasks/Q4$'));
+  await page.getByRole('button', { name: 'Edit TN2' }).click();
+  await page.locator('#prompt-TN2').fill('What else would you need to know before saying that agriculture is weaker?');
+  await page.getByRole('button', { name: 'Save and recheck' }).click();
+  await expect(page.getByText('Draft v4')).toBeVisible({ timeout: 60_000 });
+
+  await page.getByRole('link', { name: /Go to Approval 2/ }).click();
+  for (const slot of ['Q1', 'Q2', 'Q3', 'Q4', 'Q5']) {
+    await page.getByRole('button', { name: `Review ${slot}` }).click();
+    await page.getByRole('checkbox').check();
+    await page.getByRole('button', { name: `Approve ${slot}` }).click();
+    await expect(page.getByRole('button', { name: `Review ${slot}` })).toHaveCount(0);
+  }
+  await page.getByRole('link', { name: 'Assign · 5/5' }).click();
+  await expect(page.getByRole('heading', { name: 'Assign', exact: true })).toBeVisible();
+  await expectAccessible(page, 'T13');
+  await page.getByRole('button', { name: 'Assign', exact: true }).click();
+
+  await expect(page).toHaveURL(/\/t\/assignments\//);
+  await expect(page.getByText('0 people started, 0 finished')).toBeVisible();
+  await page.getByRole('button', { name: 'Demo menu' }).click();
+  await page.getByRole('button', { name: 'Simulate class' }).click();
+  await expect(page.getByText('7 people started, 7 finished')).toBeVisible({ timeout: 60_000 });
 });
 
 test('tracking after Jump to T14 shows the class and a trace', async ({ page }) => {
   await page.goto('/t/lessons');
   await openDemoMenu(page);
   await page.getByRole('button', { name: /T14/ }).click();
-  await expect(page.getByRole('heading', { name: 'Lesson sets' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /T14/ })).toBeHidden({ timeout: 30_000 });
   await page.locator('a.card').first().click();
   await expect(page.getByText('8 people started, 8 finished')).toBeVisible();
   await expectAccessible(page, 'T14');

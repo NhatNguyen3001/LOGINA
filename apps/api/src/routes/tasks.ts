@@ -150,7 +150,7 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
       slot,
       draftVersion: doc.draftVersion,
       candidateSetVersion: report.candidateSetVersion,
-      challenges: candidates.map((x) => ({ ...challengePreview(x), isFallback: x.isNeutralFallback, sourceAnchor: x.sourceAnchor })),
+      challenges: candidates.map((x) => ({ ...challengePreview(x), challengeId: x.challengeId, isFallback: x.isNeutralFallback, sourceAnchor: x.sourceAnchor })),
     } as never);
   });
 

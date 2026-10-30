@@ -552,11 +552,11 @@ export const examples = {
     draftVersion: 3,
     candidateSetVersion: 3,
     challenges: [
-      { ...TN1, isFallback: false, sourceAnchor: 'Table 8.1' },
-      { ...TN2, isFallback: false, sourceAnchor: 'Table 8.1' },
-      { ...TN3, isFallback: false, sourceAnchor: 'Table 8.1' },
-      { ...TN4, isFallback: false, sourceAnchor: 'p. 9' },
-      { ...FALLBACK, isFallback: true, sourceAnchor: 'Table 8.1' },
+      { ...TN1, challengeId: 'TN1', isFallback: false, sourceAnchor: 'Table 8.1' },
+      { ...TN2, challengeId: 'TN2', isFallback: false, sourceAnchor: 'Table 8.1' },
+      { ...TN3, challengeId: 'TN3', isFallback: false, sourceAnchor: 'Table 8.1' },
+      { ...TN4, challengeId: 'TN4', isFallback: false, sourceAnchor: 'p. 9' },
+      { ...FALLBACK, challengeId: 'FB', isFallback: true, sourceAnchor: 'Table 8.1' },
     ],
   },
 

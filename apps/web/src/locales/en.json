@@ -220,7 +220,8 @@
       "version": "Draft v{{version}}",
       "question": "QUESTION",
       "thinkAgain": "Think again",
-      "oneEach": "In each attempt, a student gets exactly 1 prompt."
+      "oneEach": "In each attempt, a student gets exactly 1 prompt.",
+      "editPrompt": "Edit {{label}}"
     },
     "t08": {
       "title": "Q1 logic check",
@@ -284,7 +285,17 @@
       "saveDecision": "Save decision",
       "fix": "Fix and recheck",
       "view": "View task",
-      "approve": "Approve"
+      "approve": "Approve",
+      "approveSlot": "Approve {{slot}}",
+      "review": "Review {{slot}}",
+      "changes": "CHANGES SINCE YOUR LAST PREVIEW",
+      "noBlockers": "No blockers",
+      "warningsDecided": "Warnings have decisions",
+      "confirm": "I have reviewed {{slot}} exactly as students will receive it.",
+      "assignCount": "Assign · {{count}}/5",
+      "change": {
+        "PREVIEW_CHANGED": "This task changed since you last viewed it."
+      }
     },
     "t13": {
       "title": "Assign",

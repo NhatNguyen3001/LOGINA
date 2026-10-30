@@ -193,11 +193,11 @@ export const examplesVi = {
   challengeList: {
     ...examples.challengeList,
     challenges: [
-      { ...TN1, isFallback: false, sourceAnchor: 'Bảng 8.1' },
-      { ...TN2, isFallback: false, sourceAnchor: 'Bảng 8.1' },
-      { ...TN3, isFallback: false, sourceAnchor: 'Bảng 8.1' },
-      { ...TN4, isFallback: false, sourceAnchor: 'tr. 9' },
-      { ...FALLBACK, isFallback: true, sourceAnchor: 'Bảng 8.1' },
+      { ...TN1, challengeId: 'TN1', isFallback: false, sourceAnchor: 'Bảng 8.1' },
+      { ...TN2, challengeId: 'TN2', isFallback: false, sourceAnchor: 'Bảng 8.1' },
+      { ...TN3, challengeId: 'TN3', isFallback: false, sourceAnchor: 'Bảng 8.1' },
+      { ...TN4, challengeId: 'TN4', isFallback: false, sourceAnchor: 'tr. 9' },
+      { ...FALLBACK, challengeId: 'FB', isFallback: true, sourceAnchor: 'Bảng 8.1' },
     ],
   },
 

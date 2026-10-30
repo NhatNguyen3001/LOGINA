@@ -57,6 +57,7 @@ export function DemoMenu({ assignmentId }: { assignmentId?: string }) {
       </button>
       {open ? (
         <div className="card tight absolute bottom-full left-0 z-10 w-72 shadow-card">
+          {run.isPending ? <p className="s13 muted">{t('common.loading')}</p> : null}
           {confirming ? (
             <>
               <p className="s13">{t('demo.resetConfirm')}</p>
@@ -67,9 +68,9 @@ export function DemoMenu({ assignmentId }: { assignmentId?: string }) {
             </>
           ) : (
             <>
-              <button type="button" className="btn secondary sm block" disabled={resetBlocked} onClick={() => setConfirming(true)}>{t('demo.reset')}</button>
+              <button type="button" className="btn secondary sm block" disabled={resetBlocked || run.isPending} onClick={() => setConfirming(true)}>{t('demo.reset')}</button>
               <LimitHint limit={reset} />
-              <button type="button" className="btn secondary sm block" disabled={!target || simulateBlocked} onClick={() => run.mutate(() => demoSimulate(target!, newKey()))}>{t('demo.simulate')}</button>
+              <button type="button" className="btn secondary sm block" disabled={!target || simulateBlocked || run.isPending} onClick={() => run.mutate(() => demoSimulate(target!, newKey()))}>{t('demo.simulate')}</button>
               <LimitHint limit={simulate} />
               {target ? null : <span className="small muted">{t('demo.noAssignment')}</span>}
               <button type="button" className="btn secondary sm block" onClick={() => void demoFailNextRerun(newKey()).then(() => setArmed(true))}>{t('demo.failRecheck')}</button>
@@ -77,7 +78,7 @@ export function DemoMenu({ assignmentId }: { assignmentId?: string }) {
               <span className="small b muted">{t('demo.jump')}</span>
               <span className="small muted">{t('demo.jumpSampleOnly')}</span>
               {snapshots.data?.snapshots.map(({ stepId, label }) => (
-                <button key={stepId} type="button" className="btn secondary sm block" disabled={resetBlocked} onClick={() => run.mutate(() => restoreSnapshot(stepId, newKey()).then(leaveToLessons))}>{label}</button>
+                <button key={stepId} type="button" className="btn secondary sm block" disabled={resetBlocked || run.isPending} onClick={() => run.mutate(() => restoreSnapshot(stepId, newKey()).then(leaveToLessons))}>{label}</button>
               ))}
             </>
           )}

@@ -207,9 +207,9 @@ export function isComplete(task: StudentTaskDTO, value: DraftArtifact): value is
 /** Lists the request requires start empty, so a student who ticks no drawback can still lock. */
 export function emptyDraft(task: StudentTaskDTO): DraftArtifact {
   const saved = task.draftArtifact;
-  if (task.slot === 'Q2') return { slot: 'Q2', orderedCardIds: task.taskBody.cards.map((c) => c.cardId), ...saved };
-  if (task.slot === 'Q3') return { slot: 'Q3', comparisons: [], tradeOffIds: [], ...saved };
-  if (task.slot === 'Q4') return { slot: 'Q4', slots: [], ...saved };
+  if (task.slot === 'Q2') return { slot: 'Q2', orderedCardIds: task.taskBody.cards.map((c) => c.cardId), ...saved } as DraftArtifact;
+  if (task.slot === 'Q3') return { slot: 'Q3', comparisons: [], tradeOffIds: [], ...saved } as DraftArtifact;
+  if (task.slot === 'Q4') return { slot: 'Q4', slots: [], ...saved } as DraftArtifact;
   return saved ?? { slot: task.slot };
 }
 

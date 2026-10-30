@@ -91,3 +91,17 @@
     }
   }
 }
+
+/* The gallery frames are 900 px tall; a real window is whatever it is. */
+.app {
+  min-height: 100dvh;
+}
+
+@media (min-width: 861px) {
+  .side {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+}

@@ -327,7 +327,7 @@ export const ChallengeListDTO = z
     slot: Slot,
     draftVersion: Version,
     candidateSetVersion: Version,
-    challenges: z.array(ChallengePreview.extend({ isFallback: z.boolean(), sourceAnchor: z.string() }).strict()),
+    challenges: z.array(ChallengePreview.extend({ challengeId: z.string(), isFallback: z.boolean(), sourceAnchor: z.string() }).strict()),
   })
   .strict();
 export type ChallengeListDTO = z.infer<typeof ChallengeListDTO>;

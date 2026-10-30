@@ -220,7 +220,8 @@
       "version": "Bản nháp v{{version}}",
       "question": "CÂU HỎI",
       "thinkAgain": "Thử nghĩ thêm",
-      "oneEach": "Mỗi lượt làm, học sinh nhận đúng 1 câu."
+      "oneEach": "Mỗi lượt làm, học sinh nhận đúng 1 câu.",
+      "editPrompt": "Sửa {{label}}"
     },
     "t08": {
       "title": "Kiểm tra logic Q1",
@@ -284,7 +285,17 @@
       "saveDecision": "Lưu quyết định",
       "fix": "Sửa và kiểm tra lại",
       "view": "Xem nhiệm vụ",
-      "approve": "Duyệt"
+      "approve": "Duyệt",
+      "approveSlot": "Duyệt {{slot}}",
+      "review": "Xem {{slot}}",
+      "changes": "THAY ĐỔI TỪ LẦN XEM TRƯỚC",
+      "noBlockers": "Không có điểm chặn",
+      "warningsDecided": "Cảnh báo đã có quyết định",
+      "confirm": "Cô đã xem {{slot}} đúng như học sinh sẽ nhận.",
+      "assignCount": "Giao bài · {{count}}/5",
+      "change": {
+        "PREVIEW_CHANGED": "Nhiệm vụ này đã thay đổi từ lần cô xem trước."
+      }
     },
     "t13": {
       "title": "Giao bài",
