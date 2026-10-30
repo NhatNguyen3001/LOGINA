@@ -11,7 +11,7 @@ export function authenticate({ auth }: AppDeps): MiddlewareHandler<AppEnv> {
     const decoded = await auth.verifyIdToken(token).catch(() => {
       throw unauthenticated();
     });
-    c.set('session', { uid: decoded.uid });
+    c.set('session', { uid: decoded.uid, anonymous: decoded.firebase.sign_in_provider === 'anonymous' });
     await next();
   };
 }

@@ -9,11 +9,18 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --root ../.. packages/db/"
   },
-  "dependencies": {}
+  "dependencies": {
+    "firebase-admin": "^14.5.0"
+  },
+  "devDependencies": {
+    "@logina/test-utils": "workspace:^"
+  }
 }

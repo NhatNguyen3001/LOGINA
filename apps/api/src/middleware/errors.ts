@@ -1,18 +1,9 @@
 import type { Context } from 'hono';
-import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import { AppError } from '@logina/db';
+
+export { AppError };
 
 const GENERIC_MESSAGE = 'Something went wrong. Please try again.';
-
-export class AppError extends Error {
-  constructor(
-    readonly code: string,
-    readonly status: ContentfulStatusCode,
-    message: string,
-    readonly affectedRefs?: string[],
-  ) {
-    super(message);
-  }
-}
 
 /** Error bodies are `{ code, message, affectedRefs? }`; anything else goes to the logs only. */
 export function handleError(error: Error, c: Context): Response {

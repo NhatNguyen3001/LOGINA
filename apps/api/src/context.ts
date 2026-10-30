@@ -19,6 +19,7 @@ export interface AppDeps {
 
 /** The browser session behind the request, whichever side it is on. */
 export interface Session {
+  anonymous: boolean;
   uid: string;
 }
 
