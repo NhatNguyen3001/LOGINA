@@ -8,6 +8,7 @@ import { loadFixture, type IssuesFixture, type SourceFixture } from '@logina/dom
 import { testWorkerConfig } from '../../worker/src/config.js';
 import { createWorker } from '../../worker/src/worker.js';
 import { createApp } from '../src/app.js';
+import { createJob } from '../src/services/jobs.js';
 import { testConfig, type Config } from '../src/config.js';
 import type { AppDeps, AppEnv, EnqueueFn } from '../src/context.js';
 import { ensureWorkspace, workspaceId, type Workspace } from '../src/services/workspace.js';
@@ -25,6 +26,7 @@ export interface Harness {
   sessions: Client[];
   enqueued: Parameters<EnqueueFn>[0][];
   client: () => Promise<Client>;
+  runJob: (jobId: string) => Promise<void>;
   close: () => Promise<void>;
 }
 
@@ -109,7 +111,7 @@ export async function harness(
     }
   };
 
-  return { live, app, sessions, enqueued, client, close };
+  return { live, app, sessions, enqueued, client, close, runJob: worker.runJob };
 }
 
 /** A lesson at Clarify in one batch write, so a test doesn't pay for the whole job. */
@@ -148,3 +150,13 @@ export const minimalLesson = (classId: string) => ({
   primaryClassId: classId,
   objective: 'Weigh evidence',
 });
+
+/** A lesson past Source Approval 1 with its drafts, for suites that share one prepared lesson. */
+export async function seedGenerated(h: Harness, client: Client): Promise<string> {
+  const lessonId = await seedClarify(h, client);
+  await h.live.db.doc(`lessons/${lessonId}`).update({ stage: 'GENERATE_PREVIEW', currentSourceModelVersionId: 'smv_1', approvedSourceVersion: 1 });
+  await h.live.db.doc(`lessons/${lessonId}/sourceModelVersions/smv_1`).set({ status: 'APPROVED', version: 1 });
+  const job = await createJob(h.live.db, { schoolId: client.workspace.schoolId, lessonId, type: 'GENERATE' });
+  await h.runJob(job.id);
+  return lessonId;
+}
