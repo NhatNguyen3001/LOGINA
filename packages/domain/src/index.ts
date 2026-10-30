@@ -8,3 +8,4 @@ export * from './selector.js';
 export * from './closure.js';
 export * from './new-facts.js';
 export * from './shuffle.js';
+export * from './fixtures.js';

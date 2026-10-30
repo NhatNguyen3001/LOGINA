@@ -1,0 +1,100 @@
+[
+  {
+    "id": "iss1",
+    "pointNumber": 1,
+    "spans": [
+      {
+        "paragraphId": "p8-1",
+        "start": 0,
+        "end": 214
+      }
+    ],
+    "issueType": "MISSING",
+    "questionKind": "SOURCE",
+    "severity": "BLOCKER",
+    "sourceRef": "tr. 8 · Bảng 8.1",
+    "bubble": "Tài liệu nói tỉ trọng nông – lâm – thủy sản giảm, nhưng chưa có tổng số lao động để biết số người có giảm không. Cô muốn giữ đây là điểm học sinh phải xem xét hay bổ sung nguồn?",
+    "currentInterpretation": "chỉ kết luận về tỉ trọng, không kết luận về số người.",
+    "suggestions": [
+      {
+        "id": "sug1",
+        "text": "Giữ mở: học sinh chỉ được kết luận về tỉ trọng",
+        "sourceRef": "Căn cứ: nguồn không có tổng số lao động",
+        "rationale": "Bảng 8.1 chỉ có tỉ lệ phần trăm."
+      }
+    ],
+    "state": "UNRESOLVED"
+  },
+  {
+    "id": "iss2",
+    "pointNumber": 2,
+    "spans": [],
+    "issueType": "AMBIGUOUS",
+    "questionKind": "TEACHER_INTENT",
+    "severity": "BLOCKER",
+    "sourceRef": "Mục tiêu bài",
+    "bubble": "Với phần này, cô muốn học sinh nhận ra xu hướng chuyển dịch, hay kiểm tra một kết luận vượt quá dữ liệu?",
+    "currentInterpretation": "học sinh nhận ra xu hướng chuyển dịch.",
+    "suggestions": [
+      {
+        "id": "sug2",
+        "text": "Nhận ra xu hướng và chọn căn cứ đủ cho cả hai vế",
+        "sourceRef": "Căn cứ: Bảng 8.1 có đủ hai chiều giảm và tăng",
+        "rationale": "Bảng có đủ hai chiều."
+      },
+      {
+        "id": "sug3",
+        "text": "Kiểm tra kết luận vượt quá dữ liệu (tỉ trọng khác số người)",
+        "sourceRef": "Căn cứ: nguồn không có tổng số lao động",
+        "rationale": "Nguồn không có số người."
+      }
+    ],
+    "state": "UNRESOLVED"
+  },
+  {
+    "id": "iss3",
+    "pointNumber": 3,
+    "spans": [
+      {
+        "paragraphId": "p9-1",
+        "start": 0,
+        "end": 185
+      }
+    ],
+    "issueType": "AMBIGUOUS",
+    "questionKind": "SOURCE",
+    "severity": "REVIEW",
+    "sourceRef": "tr. 9",
+    "bubble": "“Chất lượng lao động được nâng lên” có được dùng làm căn cứ cho cơ cấu ngành không, hay chỉ là thông tin bối cảnh?",
+    "currentInterpretation": "thông tin bối cảnh, không giải thích cơ cấu tỉ trọng.",
+    "suggestions": [
+      {
+        "id": "sug4",
+        "text": "Chỉ dùng làm thông tin bối cảnh",
+        "sourceRef": "Căn cứ: tr. 9 không gắn chất lượng lao động với tỉ trọng ngành",
+        "rationale": "Đoạn này nói về đào tạo, không nói về ngành."
+      }
+    ],
+    "state": "UNRESOLVED"
+  },
+  {
+    "id": "iss4",
+    "pointNumber": 4,
+    "spans": [
+      {
+        "paragraphId": "secondary",
+        "start": 0,
+        "end": 188
+      }
+    ],
+    "issueType": "CONFLICT",
+    "questionKind": "SOURCE",
+    "severity": "REVIEW",
+    "sourceRef": "Nguồn phụ · 2015",
+    "bubble": "Số liệu 2015 ở nguồn phụ lệch năm với Bảng 8.1.",
+    "currentInterpretation": "không dùng trong bài này.",
+    "suggestions": [],
+    "state": "EXCLUDED",
+    "excludeReason": "lệch năm so với nguồn chính."
+  }
+]

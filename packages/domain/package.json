@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@logina/contracts": "workspace:^",
-    "canonicalize": "^5.1.0"
+    "canonicalize": "^5.1.0",
+    "zod": "^4.6.7"
   }
 }

@@ -1,0 +1,86 @@
+[
+  {
+    "slot": "Q1",
+    "taskType": "JUDGMENT_EVIDENCE",
+    "reasoningTarget": "1 correct statement, ruling out 3 false ones, 4 evidence cards",
+    "targetClaimIds": [
+      "c1",
+      "c2",
+      "c3",
+      "c4"
+    ],
+    "eligibleSourceEvidenceIds": [
+      "se1",
+      "se2",
+      "se3",
+      "se4"
+    ],
+    "scopeConditions": "Shares, 2010 to 2021",
+    "assessment": "SUFFICIENT",
+    "sourceRefs": "Table 8.1 · p. 8 para. 2 · p. 9",
+    "explanationForTeacher": "The source confirms one statement and rules out the others."
+  },
+  {
+    "slot": "Q2",
+    "taskType": "EVIDENCE_RANKING",
+    "reasoningTarget": "Order of influence of 4 factors on the employment shift",
+    "targetClaimIds": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "eligibleSourceEvidenceIds": [
+      "se5"
+    ],
+    "scopeConditions": "Factors named in the source",
+    "assessment": "SUFFICIENT",
+    "sourceRefs": "p. 8 · Section 2",
+    "explanationForTeacher": "The source names all four factors."
+  },
+  {
+    "slot": "Q3",
+    "taskType": "COMPARE_TRADEOFF",
+    "reasoningTarget": "Drawbacks of 2 employment options for rural workers",
+    "targetClaimIds": [],
+    "eligibleSourceEvidenceIds": [
+      "se6",
+      "se7"
+    ],
+    "scopeConditions": "The two paths in the source",
+    "assessment": "SUFFICIENT",
+    "sourceRefs": "p. 9 · paras. 2–3",
+    "explanationForTeacher": "The source gives gains and drawbacks for both paths."
+  },
+  {
+    "slot": "Q4",
+    "taskType": "COUNTERARGUMENT",
+    "reasoningTarget": "Rebut “Rural labor is shrinking, so agriculture is weakening”",
+    "targetClaimIds": [
+      "c1",
+      "c4"
+    ],
+    "eligibleSourceEvidenceIds": [
+      "se1",
+      "se3"
+    ],
+    "scopeConditions": "The source has shares, no productivity data",
+    "assessment": "UNCERTAIN",
+    "sourceRefs": "p. 8 · Table 8.1",
+    "explanationForTeacher": "Lesson 8 has no data on agricultural labor productivity, and the counterargument needs this evidence."
+  },
+  {
+    "slot": "Q5",
+    "taskType": "OPEN_PROPOSAL",
+    "reasoningTarget": "Employment context for rural youth",
+    "targetClaimIds": [],
+    "eligibleSourceEvidenceIds": [
+      "se6",
+      "se7",
+      "se8"
+    ],
+    "scopeConditions": "Proposals grounded in pp. 8–9",
+    "assessment": "SUFFICIENT",
+    "sourceRefs": "pp. 8–9",
+    "explanationForTeacher": "The source names what jobs for rural youth depend on."
+  }
+]

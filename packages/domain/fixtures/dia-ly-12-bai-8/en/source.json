@@ -1,0 +1,263 @@
+{
+  "material": {
+    "title": "Sample material · Labor and Employment",
+    "edition": "2026",
+    "author": "LOGINA team (sample written for the demo, not textbook pages)",
+    "locator": "pp. 8–9, Section 2 and Table 8.1",
+    "rights": "Written by the LOGINA team for this demo",
+    "fileName": "material.pdf"
+  },
+  "intent": {
+    "objective": "Students judge whether a statement about the shift in employment structure is fully supported by evidence.",
+    "reasoningTarget": "Judging whether evidence is sufficient for every part of a statement",
+    "learnerTask": "Choose one statement and one evidence card, then think again once",
+    "constraints": "Conclusions are about shares, not numbers of people",
+    "evaluationBasis": "Table 8.1 and the paragraphs on pp. 8–9"
+  },
+  "units": [
+    {
+      "id": "p8-1",
+      "unitType": "FACT",
+      "span": {
+        "page": 8,
+        "paragraph": 1
+      },
+      "text": "Vietnam's employment structure by economic sector has shifted in a positive direction. The share of workers in agriculture, forestry and fisheries has fallen; the share in industry and construction and in services has risen (Table 8.1)."
+    },
+    {
+      "id": "table 8.1",
+      "unitType": "FACT",
+      "span": {
+        "page": 8,
+        "table": "8.1"
+      },
+      "text": "Table 8.1. Employed workers in Vietnam by economic sector, 2010–2021 (%)\nEconomic sector | 2010 | 2021\nAgriculture, forestry and fisheries | 49.5 | 29.1\nIndustry and construction | 21.0 | 33.1\nServices | 29.5 | 37.8\nTotal | 100.0 | 100.0",
+      "figure": {
+        "altText": "Table 8.1: employment structure by sector, 2010 and 2021",
+        "dataTable": [
+          [
+            "Economic sector",
+            "2010",
+            "2021"
+          ],
+          [
+            "Agriculture, forestry and fisheries",
+            "49.5",
+            "29.1"
+          ],
+          [
+            "Industry and construction",
+            "21.0",
+            "33.1"
+          ],
+          [
+            "Services",
+            "29.5",
+            "37.8"
+          ],
+          [
+            "Total",
+            "100.0",
+            "100.0"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "p8-2",
+      "unitType": "FACT",
+      "span": {
+        "page": 8,
+        "paragraph": 2
+      },
+      "text": "Even so, agriculture, forestry and fisheries still account for a large share of workers. In 2021, nearly one in three workers was employed in this sector."
+    },
+    {
+      "id": "p8-3",
+      "unitType": "FACT",
+      "span": {
+        "page": 8,
+        "paragraph": 3
+      },
+      "text": "Several factors drive this shift. Industrialization and modernization create more jobs in industry and services. Urbanization expands cities and industrial zones, drawing workers from rural areas. International economic integration and foreign investment bring more factories and businesses into operation. Mechanization in agriculture reduces the number of workers needed for each harvest."
+    },
+    {
+      "id": "p9-1",
+      "unitType": "CONTEXT",
+      "span": {
+        "page": 9,
+        "paragraph": 1
+      },
+      "text": "Workforce quality keeps improving thanks to achievements in education and training. The share of trained workers is rising, but it is still low compared with what many new industries need."
+    },
+    {
+      "id": "p9-2",
+      "unitType": "FACT",
+      "span": {
+        "page": 9,
+        "paragraph": 2
+      },
+      "text": "For rural workers, especially young people, there are two common paths to a job. The first is to move to a city or an industrial zone to work in a factory. This path pays more steadily than farming, but workers live far from their families, living costs are high, and many jobs require skills they have not been trained for."
+    },
+    {
+      "id": "p9-3",
+      "unitType": "FACT",
+      "span": {
+        "page": 9,
+        "paragraph": 3
+      },
+      "text": "The second is to stay in their home area and work in services, a craft village, or farming combined with a side job. This path keeps them close to family and community, but income is often lower and irregular, with fewer chances to learn a trade or move up."
+    },
+    {
+      "id": "p9-4",
+      "unitType": "FACT",
+      "span": {
+        "page": 9,
+        "paragraph": 4
+      },
+      "text": "Creating suitable jobs for rural youth therefore depends on vocational training, growing local businesses, and better living conditions in both rural and urban areas."
+    },
+    {
+      "id": "secondary",
+      "unitType": "CONTEXT",
+      "span": {
+        "page": 9
+      },
+      "text": "Further reading (secondary source, 2015). A 2015 report put the share of workers at about 44.0% in agriculture, forestry and fisheries, 22.8% in industry and construction, and 33.2% in services."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "se1",
+      "sourceUnitId": "table 8.1",
+      "text": "…the share of workers in agriculture, forestry and fisheries fell…",
+      "locator": "p. 8 · Table 8.1"
+    },
+    {
+      "id": "se2",
+      "sourceUnitId": "table 8.1",
+      "text": "…industry and construction and services rose…",
+      "locator": "p. 8 · Table 8.1"
+    },
+    {
+      "id": "se3",
+      "sourceUnitId": "p8-2",
+      "text": "…still account for a large share.",
+      "locator": "p. 8 · para. 2"
+    },
+    {
+      "id": "se4",
+      "sourceUnitId": "p9-1",
+      "text": "…thanks to achievements in education and training.",
+      "locator": "p. 9 · para. 1"
+    },
+    {
+      "id": "se5",
+      "sourceUnitId": "p8-3",
+      "text": "Several factors drive this shift. Industrialization and modernization create more jobs in industry and services. Urbanization expands cities and industrial zones, drawing workers from rural areas. International economic integration and foreign investment bring more factories and businesses into operation. Mechanization in agriculture reduces the number of workers needed for each harvest.",
+      "locator": "p. 8 · Section 2"
+    },
+    {
+      "id": "se6",
+      "sourceUnitId": "p9-2",
+      "text": "For rural workers, especially young people, there are two common paths to a job. The first is to move to a city or an industrial zone to work in a factory. This path pays more steadily than farming, but workers live far from their families, living costs are high, and many jobs require skills they have not been trained for.",
+      "locator": "p. 9 · para. 2"
+    },
+    {
+      "id": "se7",
+      "sourceUnitId": "p9-3",
+      "text": "The second is to stay in their home area and work in services, a craft village, or farming combined with a side job. This path keeps them close to family and community, but income is often lower and irregular, with fewer chances to learn a trade or move up.",
+      "locator": "p. 9 · para. 3"
+    },
+    {
+      "id": "se8",
+      "sourceUnitId": "p9-4",
+      "text": "Creating suitable jobs for rural youth therefore depends on vocational training, growing local businesses, and better living conditions in both rural and urban areas.",
+      "locator": "p. 9 · para. 4"
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "wording": "The share of workers in agriculture, forestry and fisheries fell.",
+      "sourceEvidenceIds": [
+        "se1"
+      ],
+      "acceptedStatus": "VERIFIED"
+    },
+    {
+      "id": "c2",
+      "wording": "The share of workers in industry and construction rose.",
+      "sourceEvidenceIds": [
+        "se2"
+      ],
+      "acceptedStatus": "VERIFIED"
+    },
+    {
+      "id": "c3",
+      "wording": "The share of workers in services rose.",
+      "sourceEvidenceIds": [
+        "se2"
+      ],
+      "acceptedStatus": "VERIFIED"
+    },
+    {
+      "id": "c4",
+      "wording": "At the end of the period there were still workers in agriculture, forestry and fisheries.",
+      "sourceEvidenceIds": [
+        "se3"
+      ],
+      "acceptedStatus": "VERIFIED"
+    },
+    {
+      "id": "c5",
+      "wording": "Workforce quality has improved (background).",
+      "sourceEvidenceIds": [
+        "se4"
+      ],
+      "acceptedStatus": "VERIFIED"
+    }
+  ],
+  "relations": [
+    {
+      "id": "rel1",
+      "sourceClaimId": "c1",
+      "sourceEvidenceIds": [
+        "se1"
+      ],
+      "relationType": "SUPPORTS",
+      "scope": "2010 to 2021, shares only",
+      "explanation": "The quoted passage states this claim."
+    },
+    {
+      "id": "rel2",
+      "sourceClaimId": "c2",
+      "sourceEvidenceIds": [
+        "se2"
+      ],
+      "relationType": "SUPPORTS",
+      "scope": "2010 to 2021, shares only",
+      "explanation": "The quoted passage states this claim."
+    },
+    {
+      "id": "rel3",
+      "sourceClaimId": "c3",
+      "sourceEvidenceIds": [
+        "se2"
+      ],
+      "relationType": "SUPPORTS",
+      "scope": "2010 to 2021, shares only",
+      "explanation": "The quoted passage states this claim."
+    },
+    {
+      "id": "rel4",
+      "sourceClaimId": "c4",
+      "sourceEvidenceIds": [
+        "se3"
+      ],
+      "relationType": "SUPPORTS",
+      "scope": "2010 to 2021, shares only",
+      "explanation": "The quoted passage states this claim."
+    }
+  ]
+}

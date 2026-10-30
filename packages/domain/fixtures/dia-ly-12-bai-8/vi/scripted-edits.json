@@ -1,0 +1,26 @@
+[
+  {
+    "id": "q1-a4-reword",
+    "slot": "Q1",
+    "editScope": "CONTENT",
+    "fromDraftVersion": 3,
+    "payload": {
+      "optionId": "A4",
+      "text": "Tỉ trọng lao động dịch vụ giảm, nhường chỗ cho công nghiệp – xây dựng."
+    },
+    "resultDraftFixture": "q1-v4",
+    "resultReportFixture": "reports/q1-v4"
+  },
+  {
+    "id": "q4-tn2-fix",
+    "slot": "Q4",
+    "editScope": "LOGIC",
+    "fromDraftVersion": 3,
+    "payload": {
+      "challengeId": "TN2",
+      "message": "Em cần biết thêm điều gì trước khi nói nông nghiệp suy yếu?"
+    },
+    "resultDraftFixture": "q4-v4",
+    "resultReportFixture": "reports/q4-v4"
+  }
+]

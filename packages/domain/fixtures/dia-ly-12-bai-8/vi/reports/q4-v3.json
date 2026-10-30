@@ -1,0 +1,84 @@
+{
+  "deterministic": [
+    {
+      "checkId": "STRUCT",
+      "label": "Cấu trúc nhiệm vụ hợp lệ",
+      "status": "PASS",
+      "affectedIds": []
+    },
+    {
+      "checkId": "COVERAGE",
+      "label": "Mọi lựa chọn nhận đúng 1 câu Thử nghĩ thêm",
+      "status": "PASS",
+      "affectedIds": []
+    },
+    {
+      "checkId": "ANCHORS",
+      "label": "Mọi nội dung có vị trí nguồn",
+      "status": "PASS",
+      "affectedIds": []
+    }
+  ],
+  "gates": [
+    {
+      "gateId": "QG1",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "Câu hỏi buộc học sinh đối chiếu căn cứ, đúng mục tiêu đã chọn.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG2",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "Nguồn đủ cho nhiệm vụ này.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG3",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "Các phương án sai cần đối chiếu nguồn mới loại được.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG4",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "Các căn cứ có vai trò khác nhau, không trùng nghĩa.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG5",
+      "status": "BLOCKER",
+      "findingCodes": [
+        "ANSWER_LEAKAGE"
+      ],
+      "sourceRefs": [],
+      "affectedArtifactIds": [
+        "TN2"
+      ],
+      "explanationForTeacher": "Câu TN2 nêu thẳng ý cần điền (“năng suất lao động tăng”).",
+      "overridable": false
+    },
+    {
+      "gateId": "QG6",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "Câu hỏi, phương án và nguồn cùng một giai đoạn.",
+      "overridable": false
+    }
+  ],
+  "aggregate": "BLOCKED",
+  "candidateSetVersion": 1
+}

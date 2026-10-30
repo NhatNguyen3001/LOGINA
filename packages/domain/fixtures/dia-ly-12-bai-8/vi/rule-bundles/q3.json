@@ -1,0 +1,82 @@
+{
+  "slot": "Q3",
+  "version": 1,
+  "fallbackChallengeId": "FB",
+  "candidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "priorityOrder": 1,
+      "when": {
+        "all": [
+          {
+            "field": "q3.tradeOffCount",
+            "op": "eq",
+            "value": "0"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN1"
+      }
+    },
+    {
+      "challengeId": "TN4",
+      "label": "TN4",
+      "priorityOrder": 2,
+      "when": {
+        "all": [
+          {
+            "field": "q3.tradeOffCount",
+            "op": "in",
+            "value": [
+              "3",
+              "4"
+            ]
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN4"
+      }
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "priorityOrder": 3,
+      "when": {
+        "all": [
+          {
+            "field": "q3.judgmentOptionId",
+            "op": "eq",
+            "value": "O1"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN2"
+      }
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "priorityOrder": 4,
+      "when": {
+        "all": [
+          {
+            "field": "q3.judgmentOptionId",
+            "op": "eq",
+            "value": "O2"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN3"
+      }
+    }
+  ]
+}

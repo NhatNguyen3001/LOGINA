@@ -8,7 +8,9 @@ export type FactField =
   | 'pairAlignment'
   | 'q2.firstCardId'
   | 'q3.judgmentOptionId'
+  | 'q3.tradeOffCount'
   | 'q4.templateId'
+  | 'q4.firstChoiceId'
   | 'q5.keywordPartition';
 
 export interface Condition {

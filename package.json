@@ -11,13 +11,17 @@
     "test": "vitest run",
     "lint": "eslint .",
     "typecheck": "pnpm -r typecheck",
-    "check": "pnpm -r build && pnpm lint && pnpm typecheck && pnpm test"
+    "check": "pnpm -r build && pnpm lint && pnpm typecheck && pnpm test",
+    "make:material": "tsx tools/seed/make-material-pdf.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "22",
+    "@types/pdfkit": "^0.17.7",
     "eslint": "^10.14.0",
+    "pdfkit": "^0.20.2",
     "tsup": "^9.0.0",
+    "tsx": "^4.23.15",
     "typescript": "~6.0",
     "typescript-eslint": "^8.72.1",
     "vitest": "^5.0.5"

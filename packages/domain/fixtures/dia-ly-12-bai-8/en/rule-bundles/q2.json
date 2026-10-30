@@ -1,0 +1,64 @@
+{
+  "slot": "Q2",
+  "version": 1,
+  "fallbackChallengeId": "FB",
+  "candidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "priorityOrder": 1,
+      "when": {
+        "all": [
+          {
+            "field": "q2.firstCardId",
+            "op": "eq",
+            "value": "K4"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN1"
+      }
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "priorityOrder": 2,
+      "when": {
+        "all": [
+          {
+            "field": "q2.firstCardId",
+            "op": "eq",
+            "value": "K3"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN2"
+      }
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "priorityOrder": 3,
+      "when": {
+        "all": [
+          {
+            "field": "q2.firstCardId",
+            "op": "in",
+            "value": [
+              "K1",
+              "K2"
+            ]
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN3"
+      }
+    }
+  ]
+}
