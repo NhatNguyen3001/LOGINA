@@ -6,6 +6,8 @@ import { buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const LETTERS = 'ABCD';
 
+import { loadResearchFacts, writeResearchRow, type ResearchSettings } from './research.js';
+
 export interface Actor {
   schoolId: string;
   uid: string;
@@ -15,6 +17,7 @@ const notFound = (): AppError => new AppError('NOT_FOUND', 404, 'Not found.');
 const attemptIdFor = (studentId: string, assignmentId: string): string => `att_${studentId}_${assignmentId}`;
 
 export async function startAttempt(db: Firestore, actor: Actor, assignmentId: string, extra: DocumentData = {}): Promise<AttemptDTO> {
+  const participant = (await db.doc(`participants/${actor.uid}`).get()).data();
   const assignment = await scopedGet(db.doc(`assignments/${assignmentId}`), actor.schoolId);
   if (!assignment) throw notFound();
 
@@ -23,6 +26,7 @@ export async function startAttempt(db: Firestore, actor: Actor, assignmentId: st
   await db.runTransaction(async (tx) => {
     if ((await tx.get(ref)).exists) return;
     tx.create(ref, {
+      ...(participant?.consent === 'AGREED' ? { participantCode: participant.participantCode } : {}),
       ...extra,
       schoolId: actor.schoolId,
       assignmentId,
@@ -151,14 +155,17 @@ export async function submitTask(
   attemptId: string,
   slot: string,
   { choice, finalArtifact, finalConfidence }: { choice: 'KEEP' | 'REVISE'; finalArtifact: Artifact; finalConfidence: number },
-): Promise<SubmitResultDTO> {
+  research?: ResearchSettings,
+): Promise<SubmitResultDTO & { researchRowId?: string }> {
   const attempt = await loadAttempt(db, actor, attemptId);
+  const facts = research?.enabled ? await loadResearchFacts(db, attempt, slot) : null;
   const taskRef = db.doc(`attempts/${attemptId}/tasks/${slot}`);
   const attemptRef = db.doc(`attempts/${attemptId}`);
 
   return db.runTransaction(async (tx) => {
     const task = (await tx.get(taskRef)).data()!;
     const current = (await tx.get(attemptRef)).data()!;
+    const participant = (await tx.get(db.doc(`participants/${attempt.studentId as string}`))).data();
     if (!task.lockedAt) throw new AppError('NOT_LOCKED', 409, 'Lock in the answer first.');
     if (task.submittedAt) throw new AppError('ALREADY_SUBMITTED', 409, 'This task was already submitted.');
 
@@ -166,6 +173,7 @@ export async function submitTask(
     const final = choice === 'KEEP' ? initial : finalArtifact;
     const { revised, changedElements } = compareArtifacts(initial, final);
     const recordedChoice = revised ? 'REVISE' : 'KEEP';
+    const delivery = task.deliveryId ? (await tx.get(taskRef.collection('deliveries').doc(task.deliveryId as string))).data() : undefined;
     const submittedCount = (current.submittedCount as number) + 1;
     const attemptStatus = submittedCount === SLOTS.length ? 'COMPLETE' : 'IN_PROGRESS';
 
@@ -184,8 +192,13 @@ export async function submitTask(
       ...(attemptStatus === 'COMPLETE' ? { completedAt: FieldValue.serverTimestamp() } : {}),
     });
 
+    const researchRowId =
+      facts && research && participant?.consent === 'AGREED' && delivery
+        ? writeResearchRow(db, tx, { facts, participant, settings: research, slot, task, delivery, final, finalConfidence, choice: recordedChoice, changedElements, now: new Date() })
+        : undefined;
+
     const next = SLOTS[SLOTS.indexOf(slot as (typeof SLOTS)[number]) + 1];
-    return { slot: slot as SubmitResultDTO['slot'], recordedChoice, attemptStatus, ...(attemptStatus !== 'COMPLETE' && next ? { nextSlot: next } : {}) };
+    return { ...(researchRowId ? { researchRowId } : {}), slot: slot as SubmitResultDTO['slot'], recordedChoice, attemptStatus, ...(attemptStatus !== 'COMPLETE' && next ? { nextSlot: next } : {}) };
   });
 }
 

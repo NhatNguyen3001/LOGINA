@@ -36,6 +36,7 @@ export interface Client {
   get: (path: string) => Promise<Response>;
   post: (path: string, body?: unknown, key?: string) => Promise<Response>;
   put: (path: string, body?: unknown) => Promise<Response>;
+  patch: (path: string, body?: unknown) => Promise<Response>;
 }
 
 /** Files live in the real test bucket; only URL signing is faked, since it needs a service account. */
@@ -83,6 +84,14 @@ export async function harness(
       session,
       workspace,
       get: (path) => Promise.resolve(app.request(`/api/v1${path}`, { headers })),
+      patch: (path, body = {}) =>
+        Promise.resolve(
+          app.request('/api/v1' + path, {
+            method: 'PATCH',
+            headers: { ...headers, 'Idempotency-Key': randomUUID() },
+            body: JSON.stringify(body),
+          }),
+        ),
       put: (path, body = {}) =>
         Promise.resolve(
           app.request('/api/v1' + path, {

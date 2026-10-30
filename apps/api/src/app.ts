@@ -12,9 +12,11 @@ import { healthRoutes } from './routes/health.js';
 import { jobRoutes } from './routes/jobs.js';
 import { lessonRoutes } from './routes/lessons.js';
 import { materialRoutes } from './routes/materials.js';
+import { meRoutes } from './routes/me.js';
 import { sourceRoutes } from './routes/source.js';
 import { studentRoutes } from './routes/student.js';
 import { taskRoutes } from './routes/tasks.js';
+import { trackingRoutes } from './routes/tracking.js';
 
 export function createApp(deps: AppDeps): Hono<AppEnv> {
   const app = new Hono<AppEnv>();
@@ -37,7 +39,9 @@ export function createApp(deps: AppDeps): Hono<AppEnv> {
   app.route('/api/v1/lessons', approvalRoutes(deps));
   app.route('/api/v1/lessons', assignmentRoutes(deps));
   app.route('/api/v1/me/assignments', studentAssignmentRoutes(deps));
+  app.route('/api/v1/me', meRoutes(deps));
   app.route('/api/v1', studentRoutes(deps));
+  app.route('/api/v1', trackingRoutes(deps));
   app.route('/api/v1/classes', classRoutes(deps));
   app.route('/api/v1/jobs', jobRoutes(deps));
 

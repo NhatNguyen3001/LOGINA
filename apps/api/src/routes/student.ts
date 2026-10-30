@@ -12,7 +12,7 @@ import { answerLabel, artifactSummary, loadAttempt, loadRelease, lockTask, start
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const CARD_WORD = { en: 'Card', vi: 'Thẻ' };
 
-export function studentRoutes({ db }: AppDeps): Hono<AppEnv> {
+export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
   const routes = new Hono<AppEnv>();
 
   const body = async <S extends z.ZodType>(raw: unknown, schema: S): Promise<z.infer<S>> => {
@@ -90,7 +90,12 @@ export function studentRoutes({ db }: AppDeps): Hono<AppEnv> {
     '/attempts/:id/tasks/:slot/submit',
     withIdempotency(db, async (c) => {
       const request = await body(await c.req.json(), SubmitReq);
-      const result = await submitTask(db, c.var.user, c.req.param('id') as string, c.req.param('slot') as string, request);
+      const research = { enabled: config.researchEnabled, participantType: config.participantType };
+      const { researchRowId, ...result } = await submitTask(db, c.var.user, c.req.param('id') as string, c.req.param('slot') as string, request, research);
+      if (researchRowId) {
+        // The Sheet can wait: a failed enqueue never reaches the student, and research:flush resends the row.
+        await enqueue({ jobId: researchRowId, type: 'EXPORT_ROW', targetIds: [researchRowId] }).catch((error: unknown) => console.error(error));
+      }
       return respond(c, SubmitResultDTO, result);
     }),
   );
