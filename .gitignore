@@ -2,6 +2,8 @@
 .claude/
 .codegraph/
 .superpowers/
+AGENTS.md
+CLAUDE.md
 
 # Secrets: never commit
 **/.env
