@@ -67,3 +67,14 @@ test('a Vietnamese judge stays in Vietnamese and sees no raw keys', async ({ pag
   await expect(page.getByRole('button', { name: 'Tiếp tục →' })).toBeVisible();
   await expect(page.locator('body')).not.toContainText(/student\.|teacher\.|common\./);
 });
+
+test('agreeing shows the participant code before the tasks and on the results', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Try as student' }).click();
+  await page.getByRole('button', { name: "I agree, and I'm 18 or older" }).click();
+  await expect(page.getByText('PARTICIPANT CODE')).toBeVisible();
+  await page.waitForTimeout(1500);
+  await expect(page.getByText('PARTICIPANT CODE')).toBeVisible();
+  await page.getByRole('button', { name: 'Continue to the tasks' }).click();
+  await expect(page).toHaveURL(/\/Q1/);
+});
