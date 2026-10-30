@@ -7,6 +7,9 @@ export interface Config {
   liveUploadsPerDay: number;
   researchEnabled: boolean;
   participantType: string;
+  /** The snapshot each new workspace starts from; unset leaves a workspace empty. */
+  readySnapshot?: string;
+  snapshotLocale: 'en' | 'vi';
 }
 
 type Env = Record<string, string | undefined>;
@@ -21,6 +24,8 @@ export function loadConfig(env: Env = process.env): Config {
     liveUploadsPerDay: Number(env.LIVE_UPLOADS_PER_DAY ?? 100),
     researchEnabled: env.RESEARCH_ENABLED !== 'false',
     participantType: env.PARTICIPANT_TYPE ?? 'judge',
+    readySnapshot: env.READY_SNAPSHOT ?? `${env.DEMO_LOCALE ?? 'en'}_s01`,
+    snapshotLocale: env.DEMO_LOCALE === 'vi' ? 'vi' : 'en',
   };
 }
 
@@ -33,5 +38,6 @@ export const testConfig = (overrides: Partial<Config> = {}): Config => ({
   liveUploadsPerDay: 100,
   researchEnabled: true,
   participantType: 'judge',
+  snapshotLocale: 'en',
   ...overrides,
 });

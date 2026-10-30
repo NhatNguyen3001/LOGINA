@@ -3,12 +3,17 @@ import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { copySnapshotIntoWorkspace } from '@logina/db';
 
 const RESUME_AFTER_MS = 30_000;
-const READY_SNAPSHOT = 'en_s01';
 
 export interface Workspace {
   schoolId: string;
   teacherUid: string;
   classId: string;
+}
+
+export interface WorkspaceOptions {
+  snapshotId?: string | undefined;
+  skipCopy?: boolean;
+  pollMs?: number;
 }
 
 export const workspaceId = (uid: string): string => `wks_${uid}`;
@@ -18,8 +23,8 @@ const workspaceOf = (uid: string): Workspace => {
   return { schoolId, teacherUid: `tch_${uid}`, classId: `${schoolId}_12a3` };
 };
 
-async function finishCopy(db: Firestore, { schoolId }: Workspace, skipCopy: boolean): Promise<void> {
-  if (!skipCopy) await copySnapshotIntoWorkspace(db, READY_SNAPSHOT, schoolId);
+async function finishCopy(db: Firestore, { schoolId, teacherUid, classId }: Workspace, opts: WorkspaceOptions): Promise<void> {
+  if (opts.snapshotId && !opts.skipCopy) await copySnapshotIntoWorkspace(db, opts.snapshotId, { schoolId, teacherUid, classId });
   await db.doc(`schools/${schoolId}`).update({ readyAt: FieldValue.serverTimestamp() });
 }
 
@@ -27,7 +32,7 @@ async function finishCopy(db: Firestore, { schoolId }: Workspace, skipCopy: bool
 export async function ensureWorkspace(
   db: Firestore,
   uid: string,
-  opts: { skipCopy?: boolean; pollMs?: number } = {},
+  opts: WorkspaceOptions = {},
 ): Promise<Workspace> {
   const workspace = workspaceOf(uid);
   const { schoolId, teacherUid, classId } = workspace;
@@ -63,7 +68,7 @@ export async function ensureWorkspace(
     return true;
   });
   if (created) {
-    await finishCopy(db, workspace, opts.skipCopy ?? false);
+    await finishCopy(db, workspace, opts);
     return workspace;
   }
 
@@ -73,7 +78,7 @@ export async function ensureWorkspace(
     const startedAt = (school?.copyStartedAt as Timestamp | undefined)?.toDate().getTime() ?? 0;
     if (Date.now() - startedAt > RESUME_AFTER_MS) {
       await schoolRef.update({ copyStartedAt: FieldValue.serverTimestamp() });
-      await finishCopy(db, workspace, opts.skipCopy ?? false);
+      await finishCopy(db, workspace, opts);
       return workspace;
     }
     await new Promise((resolve) => setTimeout(resolve, opts.pollMs ?? 200));

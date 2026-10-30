@@ -25,7 +25,7 @@ export interface Harness {
   app: Hono<AppEnv>;
   sessions: Client[];
   enqueued: Parameters<EnqueueFn>[0][];
-  client: () => Promise<Client>;
+  client: (opts?: { skipCopy?: boolean }) => Promise<Client>;
   runJob: (jobId: string) => Promise<void>;
   close: () => Promise<void>;
 }
@@ -76,9 +76,10 @@ export async function harness(
     ...deps,
   });
 
-  const client = async (): Promise<Client> => {
+  const client = async (opts: { skipCopy?: boolean } = {}): Promise<Client> => {
     const session = await anonToken();
-    const workspace = await ensureWorkspace(live.db, session.uid);
+    const copy = { snapshotId: testConfig(config).readySnapshot, ...opts };
+    const workspace = await ensureWorkspace(live.db, session.uid, copy);
     const headers = { Authorization: `Bearer ${session.idToken}`, 'Content-Type': 'application/json' };
     const made: Client = {
       session,

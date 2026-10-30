@@ -7,6 +7,7 @@ import { rejectUnknownQuery } from './middleware/strict-query.js';
 import { approvalRoutes } from './routes/approval.js';
 import { assignmentRoutes, studentAssignmentRoutes } from './routes/assignments.js';
 import { classRoutes } from './routes/classes.js';
+import { demoRoutes } from './routes/demo.js';
 import { editRoutes } from './routes/edits.js';
 import { healthRoutes } from './routes/health.js';
 import { jobRoutes } from './routes/jobs.js';
@@ -39,6 +40,7 @@ export function createApp(deps: AppDeps): Hono<AppEnv> {
   app.route('/api/v1/lessons', approvalRoutes(deps));
   app.route('/api/v1/lessons', assignmentRoutes(deps));
   app.route('/api/v1/me/assignments', studentAssignmentRoutes(deps));
+  if (deps.config.demoMode) app.route('/api/v1/demo', demoRoutes(deps));
   app.route('/api/v1/me', meRoutes(deps));
   app.route('/api/v1', studentRoutes(deps));
   app.route('/api/v1', trackingRoutes(deps));

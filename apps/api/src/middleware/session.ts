@@ -24,7 +24,7 @@ export function resolveSession({ db, config }: AppDeps): MiddlewareHandler<AppEn
     if (anonymous !== config.noSignIn) throw rejected();
     if (!config.noSignIn) throw new AppError('NOT_IMPLEMENTED', 401, 'Accounts are not available in this build.');
 
-    const { schoolId, teacherUid, classId } = await ensureWorkspace(db, uid);
+    const { schoolId, teacherUid, classId } = await ensureWorkspace(db, uid, { ...(config.readySnapshot ? { snapshotId: config.readySnapshot } : {}) });
     const side = sideOf(c.req.path);
     if (side === 'teacher') c.set('user', { uid: teacherUid, role: 'teacher', schoolId, classIds: [classId] });
     else c.set('user', { uid, role: side === 'student' ? 'student' : 'demo', schoolId, classIds: [classId] });
