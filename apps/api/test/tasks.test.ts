@@ -120,6 +120,13 @@ describe('challenges, try-case and logic review', () => {
 describe('sufficiency choice', () => {
   const version = async () => ((await (await a.get(`/lessons/${lessonId}`)).json()) as { version: number }).version;
 
+  it('a choice that regenerates nothing leaves no job running', async () => {
+    const version = (await h.live.db.doc(`lessons/${lessonId}`).get()).data()?.version as number;
+    const response = await a.post(`${base()}/Q4/sufficiency-choice`, { choice: 'LEAVE_EMPTY', baseVersion: version });
+    expect(JobDTO.parse(await response.json()).status).toBe('DONE');
+    expect((await h.live.db.doc(`lessons/${lessonId}`).get()).data()?.activeJobId).toBeUndefined();
+  });
+
   it('sufficiency-choice with a stale LessonDTO.version is 409', async () => {
     expect((await a.post(`${base()}/Q4/sufficiency-choice`, { choice: 'REFOCUS', baseVersion: 999 })).status).toBe(409);
   });

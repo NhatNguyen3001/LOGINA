@@ -153,6 +153,191 @@
       "continue": "Tiếp tục: Duyệt nguồn →",
       "blocked": "Cô hãy xử lý hoặc loại mọi điểm chặn để tiếp tục.",
       "next": "Tới điểm chặn tiếp theo"
+    },
+    "goApproval": "Đến Duyệt 2",
+    "status": {
+      "NONE": "Chưa có bản nháp",
+      "GENERATING": "Đang soạn",
+      "VALIDATING": "Đang kiểm tra lại",
+      "STALE": "Đã cũ",
+      "BLOCKED": "Chặn",
+      "REVIEW_REQUIRED": "Cần xem lại",
+      "MACHINE_PASS": "Đạt kiểm tra máy",
+      "APPROVED": "Đã duyệt",
+      "FAILED": "Kiểm tra lỗi",
+      "SUPERSEDED": "Đã thay thế"
+    },
+    "gate": {
+      "PASS": "Đạt",
+      "REVIEW_REQUIRED": "Cần xem lại",
+      "BLOCKER": "Chặn"
+    },
+    "t06": {
+      "title": "Đủ căn cứ và tạo nhiệm vụ",
+      "lede": "Mỗi nhiệm vụ được kiểm tra riêng: nguồn có hỗ trợ đáp án đúng, loại trừ phương án sai và câu Thử nghĩ thêm không?",
+      "count": "5 nhiệm vụ",
+      "ready": "{{ready}}/{{total}} bản nháp sẵn sàng",
+      "enough": "Đủ căn cứ",
+      "draft": "Bản nháp",
+      "paused": "Tạm dừng, chờ cô",
+      "drafting": "Đang soạn…",
+      "sufficiency": {
+        "SUFFICIENT": "Đủ",
+        "UNCERTAIN": "Chưa chắc",
+        "INSUFFICIENT": "Chưa đủ"
+      },
+      "needsDecision": "{{slot}} cần cô quyết định",
+      "othersContinue": "Các nhiệm vụ khác vẫn đang được soạn",
+      "choice": {
+        "REFOCUS": "Đổi trọng tâm phản biện",
+        "ADD_SOURCE": "Bổ sung nguồn về năng suất lao động",
+        "LEAVE_EMPTY": "Để Q4 trống trong bộ này"
+      },
+      "choiceNote": {
+        "REFOCUS": "Dùng những gì nguồn đã có.",
+        "ADD_SOURCE": "Quay lại bước nguồn; cần duyệt nguồn lại.",
+        "LEAVE_EMPTY": "Bộ bài chưa đủ 5 nhiệm vụ nên chưa giao được."
+      },
+      "regenerate": "Tạo lại {{slot}} theo lựa chọn này"
+    },
+    "t07": {
+      "gates": "KIỂM TRA CHẤT LƯỢNG",
+      "structure": "KIỂM TRA CẤU TRÚC",
+      "checks": "Kiểm tra {{slot}}",
+      "viewAll": "Xem tất cả câu Thử nghĩ thêm",
+      "readOnly": "Nhiệm vụ này chỉ xem ở đây.",
+      "tryCase": "Thử một trường hợp",
+      "tryHint": "Chọn như một học sinh để xem câu Thử nghĩ thêm sẽ hiện",
+      "statement": "NHẬN ĐỊNH",
+      "card": "THẺ CĂN CỨ",
+      "tryRun": "Xem câu gợi ý",
+      "willGet": "Học sinh sẽ nhận:",
+      "tryNote": "Chỉ hiển thị câu học sinh nhận được, không hiển thị quy tắc chọn.",
+      "quickEdit": "Sửa nhanh {{option}}",
+      "saveRecheck": "Lưu và kiểm tra lại",
+      "statements": "{{count}} nhận định",
+      "cards": "{{count}} thẻ căn cứ",
+      "version": "Bản nháp v{{version}}",
+      "question": "CÂU HỎI",
+      "thinkAgain": "Thử nghĩ thêm",
+      "oneEach": "Mỗi lượt làm, học sinh nhận đúng 1 câu."
+    },
+    "t08": {
+      "title": "Kiểm tra logic Q1",
+      "back": "← Matching Preview",
+      "advanced": "Nâng cao · không bắt buộc",
+      "tab": {
+        "pairs": "Đánh giá 16 cặp",
+        "prompts": "Thử nghĩ thêm (4 + dự phòng)",
+        "adjust": "Điều chỉnh logic"
+      },
+      "which": "Câu nào",
+      "message": "Cách viết mới",
+      "invalidates": "Lưu sẽ tạo bản nháp mới, đánh dấu bản xem trước đã cũ và kiểm tra lại các cặp và câu liên quan."
+    },
+    "t09": {
+      "title": "Bản xem trước đã cũ vì cô vừa sửa.",
+      "body": "LOGINA đang kiểm tra lại phần liên quan. Q2 đến Q5 giữ nguyên trạng thái, nguồn đã duyệt không đổi."
+    },
+    "t10": {
+      "title": "Sửa nguồn",
+      "tag": "Duyệt 1 lại · nguồn v{{version}}",
+      "lede": "Sửa ở đây sẽ tạo phiên bản nguồn mới. Phiên bản trước và bài đã giao giữ nguyên.",
+      "claim": "Khẳng định đang sửa",
+      "impact": "Ảnh hưởng của thay đổi",
+      "uses": "Dùng khẳng định này?",
+      "after": "Sau khi duyệt",
+      "yes": "Có · {{refs}}",
+      "no": "Không",
+      "regenerate": "Soạn lại, kiểm tra lại, Duyệt 2 lại",
+      "keeps": "Giữ nguyên",
+      "assigned": "Các bản đã giao không đổi: {{releases}}.",
+      "approve": "Duyệt nguồn v{{version}}",
+      "cancel": "Hủy, giữ nguồn hiện tại"
+    },
+    "t11": {
+      "refusedTitle": "Không lưu được Sửa nhanh",
+      "refused": "Câu mới có nội dung không có trong nguồn đã duyệt. Sửa nhanh chỉ để sửa cách viết, không để thêm dữ kiện mới.",
+      "keepWording": "Bỏ số liệu, giữ câu chữ",
+      "editSource": "Sửa nguồn (Duyệt 1 lại)",
+      "revert": "Quay lại cách viết cũ",
+      "conflictTitle": "Có người khác đã lưu trước",
+      "conflict": "Có người khác đã lưu trước. Thay đổi của cô chưa được lưu để không ghi đè phiên bản đó.",
+      "openNew": "Mở phiên bản mới",
+      "copy": "Sao chép câu của cô",
+      "failedTitle": "Kiểm tra lại không hoàn tất",
+      "failed": "LOGINA chưa kiểm tra xong phiên bản này. Kết quả Đạt trước đó không được dùng lại.",
+      "cantApprove": "{{slot}} chưa duyệt được"
+    },
+    "t12": {
+      "title": "Duyệt nhiệm vụ",
+      "tag": "Duyệt 2 / 2",
+      "lede": "Duyệt từng nhiệm vụ đúng như học sinh sẽ nhận. Điểm chặn phải sửa. Cảnh báo sư phạm có thể sửa hoặc chấp nhận kèm lý do.",
+      "approved": "{{count}}/5 đã duyệt",
+      "results": "Kết quả kiểm định",
+      "preview": "Bản xem trước",
+      "approval": "Duyệt",
+      "decided": "Đã có quyết định",
+      "openToFix": "Mở để sửa",
+      "acceptWarning": "Chấp nhận cảnh báo, ghi lý do",
+      "stillSays": "Kết quả máy vẫn ghi “Cần xem lại”, không đổi thành “Đạt”. Quyết định được lưu kèm tên và thời gian.",
+      "saveDecision": "Lưu quyết định",
+      "fix": "Sửa và kiểm tra lại",
+      "view": "Xem nhiệm vụ",
+      "approve": "Duyệt"
+    },
+    "t13": {
+      "title": "Giao bài",
+      "lede": "Cả 5 nhiệm vụ đã được duyệt. Giao bài chỉ gửi bản đã khóa tới học sinh, không phải một lần duyệt nội dung nữa.",
+      "due": "Hạn nộp (không bắt buộc)",
+      "noTimer": "Học sinh chỉ thấy ngày hạn, không có đồng hồ đếm ngược.",
+      "message": "Lời nhắn cho học sinh (không bắt buộc)",
+      "version": "Bản sẽ giao",
+      "withReason": "Có lý do",
+      "pinned": "Lượt làm của học sinh luôn dùng đúng các phiên bản này."
+    },
+    "t14": {
+      "title": "Theo dõi lượt làm",
+      "lede": "Các số liệu cho thấy học sinh đã chọn và thay đổi gì, theo đúng bản đã giao ({{releases}}).",
+      "attempts": "LƯỢT LÀM",
+      "counts": "{{started}} người đã bắt đầu, {{finished}} người đã xong",
+      "afterThink": "SAU THỬ NGHĨ THÊM",
+      "keepRevise": "Giữ {{keep}} · Sửa {{revise}} trong {{total}} bài đã nộp",
+      "byTask": "Theo nhiệm vụ",
+      "submitted": "Đã nộp",
+      "keepOrRevise": "Giữ / Sửa",
+      "avgConfidence": "Tự tin TB trước → sau",
+      "prompts": "Câu Thử nghĩ thêm đã giao",
+      "relations": "Q1 · quan hệ giữa nhận định và thẻ đã chọn",
+      "relationsNote": "{{count}} lượt đã nộp · bản {{release}}",
+      "first": "Ban đầu",
+      "final": "Bản cuối",
+      "relation": {
+        "full": "Đầy đủ",
+        "partial": "Một phần",
+        "irrelevant": "Không liên quan",
+        "contradicts": "Mâu thuẫn hoặc bị bác bỏ"
+      },
+      "disclaimer": "Tỉ lệ Sửa, tự tin tăng hay chọn đúng không đủ để kết luận học sinh học tốt hơn. Cần thiết kế đánh giá riêng.",
+      "participants": "Người tham gia",
+      "code": "Mã người tham gia",
+      "progress": "Tiến độ",
+      "notInResearch": "Không tham gia nghiên cứu",
+      "simulated": "Mô phỏng",
+      "trace": "Xem chi tiết"
+    },
+    "t15": {
+      "changed": "Đổi",
+      "completed": "Hoàn thành {{time}}",
+      "release": "{{slot}} bản {{release}}",
+      "first": "1 · BẢN BAN ĐẦU",
+      "think": "2 · THỬ NGHĨ THÊM",
+      "final": "3 · BẢN CUỐI",
+      "locked": "Chốt {{time}}",
+      "submitted": "Nộp {{time}}",
+      "why": "Được chọn vì: {{reason}}",
+      "chose": "Học sinh chọn",
+      "disclaimer": "Phần này ghi lại lựa chọn, câu Thử nghĩ thêm đã nhận và các thay đổi. Nó không cho biết vì sao học sinh đổi ý."
     }
   },
   "errors": {

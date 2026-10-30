@@ -200,13 +200,16 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
       const lessonId = c.req.param('id') as string;
       const slot = c.req.param('slot') as string;
       const { choice } = (await c.req.json()) as { choice: string };
+      const regenerates = choice === 'REFOCUS';
       const job = await createJob(db, { schoolId, lessonId, type: 'GENERATE', targetIds: [slot] });
       const batch = db.batch();
       batch.update(db.doc(`lessons/${lessonId}/taskSufficiency/${slot}`), { teacherChoice: choice });
-      batch.update(db.doc(`lessons/${lessonId}`), { version: FieldValue.increment(1), activeJobId: job.id });
+      batch.update(db.doc(`lessons/${lessonId}`), { version: FieldValue.increment(1), ...(regenerates ? { activeJobId: job.id } : {}) });
+      /** Only Refocus has work to do; any other choice must not leave a job that never runs. */
+      if (!regenerates) batch.update(db.doc(`jobs/${job.id}`), { status: 'DONE' });
       await batch.commit();
-      if (choice === 'REFOCUS') await enqueue({ jobId: job.id, type: 'GENERATE', lessonId, targetIds: [slot] });
-      return respond(c, JobDTO, toJobDTO(job));
+      if (regenerates) await enqueue({ jobId: job.id, type: 'GENERATE', lessonId, targetIds: [slot] });
+      return respond(c, JobDTO, toJobDTO({ ...job, ...(regenerates ? {} : { status: 'DONE' }) }));
     })),
   );
 

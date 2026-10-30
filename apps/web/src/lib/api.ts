@@ -166,7 +166,7 @@ export const sendDisposition = (id: string, slot: Slot, req: DispositionReq, key
 export const getApproval = (id: string) => get(`${lessonPath(id)}/approval`, TaskApprovalDTO);
 export const approveTask = (id: string, slot: Slot, req: { expectedDraftVersion: number; previewHash: string; candidateSetVersion: number; confirmed: true }, key: string) =>
   post(`${taskPath(id, slot)}/approve`, ApproveResultDTO, req, key);
-export const assignLesson = (id: string, req: { classId: string; baseVersion: number; dueAt?: string; message?: string }, key: string) => post(`${lessonPath(id)}/assignments`, AssignResultDTO, req, key);
+export const assignLesson = (id: string, req: { classId: string; baseVersion: number; dueAt?: string; messageToStudents?: string }, key: string) => post(`${lessonPath(id)}/assignments`, AssignResultDTO, req, key);
 
 export const getTracking = (assignmentId: string) => get(`/assignments/${assignmentId}/tracking`, ClassTrackingDTO);
 export const getTrace = (attemptId: string, slot: Slot) => get(`/attempts/${attemptId}/trace/${slot}`, TraceDTO);

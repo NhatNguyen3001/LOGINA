@@ -153,6 +153,191 @@
       "continue": "Continue: Source review →",
       "blocked": "Resolve or exclude every blocker to continue.",
       "next": "Go to the next blocker"
+    },
+    "goApproval": "Go to Approval 2",
+    "status": {
+      "NONE": "Not drafted",
+      "GENERATING": "Drafting",
+      "VALIDATING": "Rechecking",
+      "STALE": "Outdated",
+      "BLOCKED": "Blocked",
+      "REVIEW_REQUIRED": "Needs review",
+      "MACHINE_PASS": "Passed machine checks",
+      "APPROVED": "Approved",
+      "FAILED": "Check failed",
+      "SUPERSEDED": "Replaced"
+    },
+    "gate": {
+      "PASS": "Pass",
+      "REVIEW_REQUIRED": "Needs review",
+      "BLOCKER": "Blocked"
+    },
+    "t06": {
+      "title": "Evidence sufficiency and task generation",
+      "lede": "Each task is checked on its own: does the source support the correct answer, ruling out the wrong options, and the Think-again prompt?",
+      "count": "5 tasks",
+      "ready": "{{ready}}/{{total}} drafts ready",
+      "enough": "Enough evidence",
+      "draft": "Draft",
+      "paused": "Paused, waiting for you",
+      "drafting": "Drafting…",
+      "sufficiency": {
+        "SUFFICIENT": "Enough",
+        "UNCERTAIN": "Uncertain",
+        "INSUFFICIENT": "Not enough"
+      },
+      "needsDecision": "{{slot}} needs your decision",
+      "othersContinue": "Other tasks are still being drafted",
+      "choice": {
+        "REFOCUS": "Change the rebuttal focus",
+        "ADD_SOURCE": "Add a source on labor productivity",
+        "LEAVE_EMPTY": "Leave Q4 empty in this set"
+      },
+      "choiceNote": {
+        "REFOCUS": "Use what the source already has.",
+        "ADD_SOURCE": "Go back to the source step; Source review is needed again.",
+        "LEAVE_EMPTY": "The lesson set won't have 5 tasks, so it can't be assigned yet."
+      },
+      "regenerate": "Regenerate {{slot}} with this choice"
+    },
+    "t07": {
+      "gates": "QUALITY CHECKS",
+      "structure": "STRUCTURE CHECKS",
+      "checks": "{{slot}} checks",
+      "viewAll": "View all prompts",
+      "readOnly": "This task is read-only here.",
+      "tryCase": "Try a case",
+      "tryHint": "Choose as a student would to see which Think-again prompt appears",
+      "statement": "STATEMENT",
+      "card": "EVIDENCE CARD",
+      "tryRun": "Show the prompt",
+      "willGet": "The student will get:",
+      "tryNote": "Shows only the prompt the student gets, not the selection rules.",
+      "quickEdit": "Quick edit {{option}}",
+      "saveRecheck": "Save and recheck",
+      "statements": "{{count}} statements",
+      "cards": "{{count}} evidence cards",
+      "version": "Draft v{{version}}",
+      "question": "QUESTION",
+      "thinkAgain": "Think again",
+      "oneEach": "In each attempt, a student gets exactly 1 prompt."
+    },
+    "t08": {
+      "title": "Q1 logic check",
+      "back": "← Matching Preview",
+      "advanced": "Advanced · optional",
+      "tab": {
+        "pairs": "16-pair evaluation",
+        "prompts": "Think again (4 + fallback)",
+        "adjust": "Adjust logic"
+      },
+      "which": "Which prompt",
+      "message": "New wording",
+      "invalidates": "Saving creates a new draft, marks the preview as outdated, and rechecks the affected pairs and prompts."
+    },
+    "t09": {
+      "title": "The preview is outdated because you just edited it.",
+      "body": "LOGINA is rechecking the affected parts. Q2 to Q5 keep their status, and the approved source stays the same."
+    },
+    "t10": {
+      "title": "Edit source",
+      "tag": "Approval 1 again · source v{{version}}",
+      "lede": "Editing here creates a new source version. The earlier version and assigned tasks stay as they are.",
+      "claim": "Claim being edited",
+      "impact": "Impact of the change",
+      "uses": "Uses this claim?",
+      "after": "After approval",
+      "yes": "Yes · {{refs}}",
+      "no": "No",
+      "regenerate": "Regenerate, recheck, Approval 2 again",
+      "keeps": "Stays as it is",
+      "assigned": "Assigned versions do not change: {{releases}}.",
+      "approve": "Approve source v{{version}}",
+      "cancel": "Cancel and keep the current source"
+    },
+    "t11": {
+      "refusedTitle": "Couldn't save Quick edit",
+      "refused": "The new sentence includes something that isn't in the approved source. Quick edit is for wording only, not for adding new facts.",
+      "keepWording": "Remove the figure, keep the wording",
+      "editSource": "Edit source (Approval 1 again)",
+      "revert": "Revert to the previous wording",
+      "conflictTitle": "Someone else saved first",
+      "conflict": "Someone else saved changes first. Your changes weren't saved so they don't overwrite that version.",
+      "openNew": "Open the new version",
+      "copy": "Copy your wording",
+      "failedTitle": "Recheck didn't finish",
+      "failed": "LOGINA couldn't finish checking this version. An earlier Pass isn't reused.",
+      "cantApprove": "{{slot}} can't be approved yet"
+    },
+    "t12": {
+      "title": "Task approval",
+      "tag": "Approval 2 / 2",
+      "lede": "Approve each task exactly as students will receive it. Blockers must be fixed. Teaching warnings can be fixed or accepted with a reason.",
+      "approved": "{{count}}/5 approved",
+      "results": "Check results",
+      "preview": "Preview",
+      "approval": "Approval",
+      "decided": "Decided",
+      "openToFix": "Open to fix",
+      "acceptWarning": "Accept warning, give a reason",
+      "stillSays": "The machine result still says “Needs review”, not “Pass”. The decision is saved with your name and the time.",
+      "saveDecision": "Save decision",
+      "fix": "Fix and recheck",
+      "view": "View task",
+      "approve": "Approve"
+    },
+    "t13": {
+      "title": "Assign",
+      "lede": "All 5 tasks are approved. Assigning only sends the locked version to students; it is not another content approval.",
+      "due": "Due date (optional)",
+      "noTimer": "Students only see the due date. There is no countdown timer.",
+      "message": "Message to students (optional)",
+      "version": "Version to assign",
+      "withReason": "With reason",
+      "pinned": "Student attempts always use exactly these versions."
+    },
+    "t14": {
+      "title": "Attempt tracking",
+      "lede": "These figures show what students chose and changed, based on the exact releases assigned ({{releases}}).",
+      "attempts": "ATTEMPTS",
+      "counts": "{{started}} people started, {{finished}} finished",
+      "afterThink": "AFTER THINK AGAIN",
+      "keepRevise": "Keep {{keep}} · Revise {{revise}} of {{total}} submitted tasks",
+      "byTask": "By task",
+      "submitted": "Submitted",
+      "keepOrRevise": "Keep / Revise",
+      "avgConfidence": "Avg. confidence before → after",
+      "prompts": "Think-again prompts given",
+      "relations": "Q1 · how the chosen statement and card relate",
+      "relationsNote": "{{count}} submitted attempts · release {{release}}",
+      "first": "First answer",
+      "final": "Final answer",
+      "relation": {
+        "full": "Full",
+        "partial": "Partial",
+        "irrelevant": "Irrelevant",
+        "contradicts": "Contradicts or refuted"
+      },
+      "disclaimer": "Revision rates, rising confidence or correct choices are not enough to conclude that students learned better. That needs a separate evaluation design.",
+      "participants": "Participants",
+      "code": "Participant code",
+      "progress": "Progress",
+      "notInResearch": "Not in research",
+      "simulated": "Simulated",
+      "trace": "View trace"
+    },
+    "t15": {
+      "changed": "Changed",
+      "completed": "Completed {{time}}",
+      "release": "{{slot}} release {{release}}",
+      "first": "1 · FIRST ANSWER",
+      "think": "2 · THINK AGAIN",
+      "final": "3 · FINAL ANSWER",
+      "locked": "Locked in {{time}}",
+      "submitted": "Submitted {{time}}",
+      "why": "Chosen because: {{reason}}",
+      "chose": "Student chose",
+      "disclaimer": "The trace records choices, the Think-again prompt given and any changes. It does not show why the student changed their mind."
     }
   },
   "errors": {
