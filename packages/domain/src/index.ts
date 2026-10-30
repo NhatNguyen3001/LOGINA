@@ -9,3 +9,5 @@ export * from './closure.js';
 export * from './new-facts.js';
 export * from './shuffle.js';
 export * from './fixtures.js';
+export * from './quotes.js';
+export * from './locators.js';

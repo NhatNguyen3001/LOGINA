@@ -1,0 +1,68 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { z } from 'zod';
+import type { WorkerConfig } from '../config.js';
+import { JobFailure } from '../errors.js';
+
+export type Role = 'reader' | 'analyzer' | 'generator' | 'xreason';
+export type Part = { text: string } | { fileData: { fileUri: string; mimeType: string } };
+
+export interface GenerateRequest {
+  role: Role;
+  model: string;
+  parts: Part[];
+  responseSchema: unknown;
+}
+
+/** Injected so tests never reach Vertex AI. */
+export interface GenaiClient {
+  generate: (request: GenerateRequest) => Promise<string>;
+}
+
+export interface StructuredRequest<S extends z.ZodType> {
+  role: Role;
+  schema: S;
+  variables?: Record<string, string>;
+  files?: { gcsUri: string; mimeType: string }[];
+  text?: string;
+}
+
+export const modelFor = (role: Role, config: WorkerConfig): string =>
+  ({ reader: config.readerModel, generator: config.generatorModel, analyzer: config.xreasonModel, xreason: config.xreasonModel })[role];
+
+export const validatorVersion = (role: Role, config: WorkerConfig, seeded: boolean): string =>
+  `${role}@${config.version}+${seeded ? 'seeded' : modelFor(role, config)}`;
+
+const PROMPT_VERSION = 'v1';
+
+function loadPrompt(role: Role, variables: Record<string, string>): string {
+  const path = fileURLToPath(new URL(`../../prompts/${role}.${PROMPT_VERSION}.md`, import.meta.url));
+  const template = readFileSync(path, 'utf8');
+  return Object.entries(variables).reduce((text, [key, value]) => text.replaceAll(`{{${key}}}`, value), template);
+}
+
+/** Parsed with the same schema it was asked for; one retry, then the job fails. */
+export async function generateStructured<S extends z.ZodType>(
+  genai: GenaiClient,
+  config: WorkerConfig,
+  { role, schema, variables = {}, files = [], text }: StructuredRequest<S>,
+): Promise<z.infer<S>> {
+  const parts: Part[] = [
+    { text: loadPrompt(role, variables) },
+    ...files.map(({ gcsUri, mimeType }) => ({ fileData: { fileUri: gcsUri, mimeType } })),
+    ...(text ? [{ text }] : []),
+  ];
+  const request: GenerateRequest = { role, model: modelFor(role, config), parts, responseSchema: z.toJSONSchema(schema) };
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const raw = await genai.generate(request).catch(() => null);
+    if (raw === null) continue;
+    try {
+      const parsed = schema.safeParse(JSON.parse(raw));
+      if (parsed.success) return parsed.data;
+    } catch {
+      continue;
+    }
+  }
+  throw new JobFailure('AI_FAILED');
+}
