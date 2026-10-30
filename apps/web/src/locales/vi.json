@@ -398,7 +398,8 @@
     "confirm": "Xác nhận",
     "retry": "Thử lại",
     "policies": "Chính sách",
-    "backHome": "Về trang đầu"
+    "backHome": "Về trang đầu",
+    "draft": "Bản nháp"
   },
   "demo": {
     "jumpSampleOnly": "Chỉ cho bộ bài mẫu",

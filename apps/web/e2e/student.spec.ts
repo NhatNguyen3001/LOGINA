@@ -57,3 +57,13 @@ test('the student screens fit a phone with no sideways scrolling', async ({ page
   await page.getByRole('radiogroup').nth(0).waitFor();
   await expectNoSideScroll(page);
 });
+
+test('a Vietnamese judge stays in Vietnamese and sees no raw keys', async ({ page }) => {
+  await page.goto('/?lang=vi');
+  await page.getByRole('button', { name: 'Dùng thử với vai trò học sinh' }).click();
+  await expect(page.getByRole('heading', { name: 'Tham gia nghiên cứu' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
+  await page.getByRole('button', { name: 'Không, em chỉ dùng thử' }).click();
+  await expect(page.getByRole('button', { name: 'Tiếp tục →' })).toBeVisible();
+  await expect(page.locator('body')).not.toContainText(/student\.|teacher\.|common\./);
+});

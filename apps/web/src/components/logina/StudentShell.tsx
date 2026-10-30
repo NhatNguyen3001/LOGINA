@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { LangSwitch } from './LangSwitch';
+import { LegalFooter } from './LegalFooter';
 
 interface StudentShellProps {
   title: string;
@@ -29,6 +30,7 @@ export function StudentShell({ title, progress, actions, footer, children }: Stu
           <div className="stu-in row">{footer}</div>
         </footer>
       ) : null}
+      <LegalFooter />
     </div>
   );
 }

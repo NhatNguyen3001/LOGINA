@@ -3,6 +3,7 @@ import { Fragment, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LangSwitch } from '@/components/logina/LangSwitch';
 import { Logo } from '@/components/logina/Logo';
+import { StatusTag } from '@/components/logina/StatusTag';
 import accessibility from '@/legal/accessibility-statement.md?raw';
 import privacy from '@/legal/privacy-policy.md?raw';
 import terms from '@/legal/terms-of-use.md?raw';
@@ -42,6 +43,7 @@ function render(markdown: string): ReactNode[] {
 
 export function LegalPage({ doc }: { doc: keyof typeof DOCS }) {
   const { t, i18n } = useTranslation();
+  const section = sectionFor(DOCS[doc], i18n.language);
   return (
     <div className="min-h-dvh bg-page">
       <div className="pol-top">
@@ -52,7 +54,10 @@ export function LegalPage({ doc }: { doc: keyof typeof DOCS }) {
           <Link to="/" className="lnk">{t('common.backHome')}</Link>
         </div>
       </div>
-      <main className="pol-in policy">{render(sectionFor(DOCS[doc], i18n.language))}</main>
+      <main className="pol-in policy">
+        {/((bản nháp|draft))/i.test(section) ? <StatusTag kind="review">{t('common.draft')}</StatusTag> : null}
+        {render(section)}
+      </main>
     </div>
   );
 }

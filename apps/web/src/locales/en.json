@@ -398,7 +398,8 @@
     "confirm": "Confirm",
     "retry": "Try again",
     "policies": "Policies",
-    "backHome": "Back to the start"
+    "backHome": "Back to the start",
+    "draft": "Draft"
   },
   "demo": {
     "jumpSampleOnly": "Sample lesson only",
