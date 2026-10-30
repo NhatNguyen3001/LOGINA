@@ -90,11 +90,31 @@
     "saved": "Đã lưu",
     "exit": "‹ Thoát",
     "lessonSets": "Bộ bài",
-    "brand": "logina"
+    "brand": "logina",
+    "openStudentView": "Mở giao diện học sinh",
+    "openTeacherView": "Mở giao diện giáo viên",
+    "openStudentViewFull": "Mở giao diện học sinh (mở trong thẻ mới)",
+    "openTeacherViewFull": "Mở giao diện giáo viên (mở trong thẻ mới)",
+    "loading": "Đang tải…",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "retry": "Thử lại",
+    "policies": "Chính sách",
+    "backHome": "Về trang đầu"
   },
   "demo": {
     "jumpSampleOnly": "Chỉ cho bộ bài mẫu",
-    "resetConfirm": "Thao tác này xóa mọi bộ bài trong không gian làm việc của trình duyệt này, kể cả tệp đã tải lên. Công việc của người khác không bị ảnh hưởng."
+    "resetConfirm": "Thao tác này xóa mọi bộ bài trong không gian làm việc của trình duyệt này, kể cả tệp đã tải lên. Công việc của người khác không bị ảnh hưởng.",
+    "title": "Menu demo",
+    "reset": "Đặt lại demo",
+    "simulate": "Mô phỏng lớp học",
+    "jump": "Nhảy tới bước…",
+    "failRecheck": "Lần kiểm tra lại tiếp theo sẽ lỗi",
+    "availableIn": "Dùng được sau {{minutes}} phút",
+    "leftThisHour": "Còn {{count}} lượt trong giờ này",
+    "armed": "Lần kiểm tra lại tiếp theo sẽ lỗi.",
+    "noAssignment": "Cô hãy giao bài trước.",
+    "avatar": "L"
   },
   "student": {
     "new": "Mới",
@@ -117,6 +137,78 @@
       "submit": "Nộp bài",
       "answer": "Tự trả lời",
       "lock": "Chốt"
-    }
+    },
+    "home": {
+      "title": "Bộ bài của em",
+      "empty": "Chưa có bộ bài nào được giao.",
+      "open": "Mở",
+      "from": "Từ {{name}}",
+      "due": "Hạn {{date}}"
+    },
+    "status": {
+      "NOT_STARTED": "Chưa bắt đầu",
+      "IN_PROGRESS": "Đang làm",
+      "COMPLETE": "Đã xong"
+    },
+    "goneAfterReset": "Bộ bài này đã được đặt lại.",
+    "openNewSet": "Mở bộ bài mới"
+  },
+  "entry": {
+    "headline": "LOGINA giúp giáo viên biến học liệu của mình thành năm nhiệm vụ suy luận.",
+    "title": "Dùng thử LOGINA",
+    "teacher": "Dùng thử với vai trò giáo viên",
+    "student": "Dùng thử với vai trò học sinh",
+    "demoLine": "Đây là bản dùng thử, không cần tài khoản. Lớp học thật sẽ có tài khoản."
+  },
+  "lessons": {
+    "title": "Bộ bài",
+    "new": "Tạo bộ bài",
+    "empty": "Chưa có bộ bài nào.",
+    "stage": {
+      "CREATE": "Tạo & tải lên",
+      "CLARIFY": "Làm rõ học liệu",
+      "SOURCE_REVIEW": "Duyệt nguồn",
+      "GENERATE_PREVIEW": "Tạo & xem trước",
+      "APPROVE_ASSIGN": "Duyệt 2 & giao",
+      "ASSIGNED": "Đã giao"
+    },
+    "uploaded": "Tệp của cô"
+  },
+  "consent": {
+    "title": "Tham gia nghiên cứu",
+    "aboutTitle": "Nghiên cứu tìm hiểu gì",
+    "about": "Chúng tôi muốn hiểu cách mọi người nghĩ lại về câu trả lời và mức tự tin của mình sau một gợi ý ngắn.",
+    "recordTitle": "Chúng tôi ghi lại gì",
+    "record": "Chúng tôi ghi lại lựa chọn của em trước và sau gợi ý, mức tự tin, thời điểm chốt và nộp, và câu trả lời em viết ở Q5.",
+    "namesTitle": "Không ghi tên",
+    "names": "Chúng tôi không hỏi tên hay email của em. Em đừng gõ thông tin cá nhân vào câu trả lời viết.",
+    "dataTitle": "Dữ liệu đi đâu",
+    "data": "Dữ liệu được chép vào một Google Sheet mà nhóm có thể đọc, và có thể được dùng trong một bài báo nghiên cứu. Kết quả chỉ mô tả nhóm, không nói về một cá nhân nào.",
+    "limit": "Dữ liệu không cho biết vì sao một người đổi ý và không chứng minh ai học tốt hơn.",
+    "whoTitle": "Ai thực hiện",
+    "who": "Nhóm LOGINA thực hiện nghiên cứu này. Liên hệ: logina.edu@gmail.com.",
+    "keptTitle": "Giữ trong bao lâu",
+    "kept": "Dữ liệu được giữ đến khi bài báo được công bố, và không quá 2 năm kể từ lúc thu thập. Sau đó chúng tôi xóa.",
+    "choiceTitle": "Tùy em",
+    "choice": "Em tham gia hay không là tùy em. Các nhiệm vụ vẫn chạy như nhau.",
+    "withdraw": "Muốn rút lại, em gửi mã người tham gia tới logina.edu@gmail.com. Chúng tôi sẽ xóa các dòng của em.",
+    "privacyLink": "Đọc chính sách quyền riêng tư đầy đủ →",
+    "agree": "Em đồng ý, và em từ 18 tuổi trở lên",
+    "decline": "Không, em chỉ dùng thử",
+    "once": "Em chỉ chọn một lần cho phiên này.",
+    "version": "Phiên bản {{version}}",
+    "thanks": "Cảm ơn em đã tham gia",
+    "code": "MÃ NGƯỜI THAM GIA",
+    "keepCode": "Em nên lưu lại mã này. Mã cũng hiện lại ở trang kết quả.",
+    "continue": "Tiếp tục làm bài"
+  },
+  "limits": {
+    "uploadAlmost": "Cô còn {{count}} lượt tải lên trong giờ này. Có thêm lượt lúc {{time}}.",
+    "uploadReached": "Cô đã dùng hết lượt tải lên của giờ này. Cô có thể tải lên lại lúc {{time}}, hoặc dùng học liệu mẫu để tiếp tục ngay.",
+    "aiAlmost": "Cô còn {{count}} lượt kiểm tra lại trong giờ này. Có thêm lượt lúc {{time}}.",
+    "aiReached": "Việc kiểm tra lại tạm dừng {{minutes}} phút. Phần cô vừa sửa vẫn ở trên trang này nhưng chưa được lưu. Duyệt sẽ dùng bản đã lưu gần nhất.",
+    "wait": "Chờ {{minutes}} phút",
+    "busyStudent": "LOGINA đang bận. Lựa chọn của em vẫn an toàn trên trang này và sẽ tự được lưu. Em không cần làm gì.",
+    "busyTeacher": "LOGINA đang bận. Phần cô làm vẫn an toàn trên trang này và sẽ tự được lưu. Cô không cần làm gì."
   }
 }

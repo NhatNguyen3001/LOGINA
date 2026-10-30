@@ -45,6 +45,7 @@ import {
 } from '@logina/contracts';
 import { z } from 'zod';
 import { ensureSession, idToken, renewSession } from './auth';
+import { setBusy } from './busy';
 
 export const newKey = (): string => crypto.randomUUID();
 
@@ -83,12 +84,38 @@ async function toError(response: Response): Promise<ApiError> {
   return new ApiError(response.status, body.code ?? 'INTERNAL', body.message, body.affectedRefs, body.detail, rateLimit);
 }
 
+const TEACHER_BUSY_RETRIES = 3;
+const MS_PER_SECOND = 1000;
+const STUDENT_CALL = /^\/(me\/assignments|assignments\/[^/]+\/attempts|attempts\/[^/]+\/(tasks|feedback))/;
+
+const isBusy = ({ rateLimit }: ApiError): boolean => rateLimit?.action === 'API' || rateLimit?.action === 'SESSION';
+const wait = (seconds: number) => new Promise((resolve) => setTimeout(resolve, seconds * MS_PER_SECOND));
+
+/** A student never loses an answer to a busy server, so their calls retry without a cap. */
+async function sendPatiently(path: string, options: RequestOptions): Promise<Response> {
+  const unlimited = STUDENT_CALL.test(path);
+  for (let retries = 0; ; retries += 1) {
+    const response = await send(path, options);
+    if (response.status !== 429) {
+      setBusy(false);
+      return response;
+    }
+    const error = await toError(response.clone());
+    if (!isBusy(error) || (!unlimited && retries >= TEACHER_BUSY_RETRIES)) {
+      setBusy(false);
+      return response;
+    }
+    setBusy(true);
+    await wait(error.rateLimit?.retryAfterSeconds ?? 1);
+  }
+}
+
 export async function request<S extends z.ZodType>(path: string, schema: S, options: RequestOptions): Promise<z.infer<S>> {
   await ensureSession();
-  let response = await send(path, options);
+  let response = await sendPatiently(path, options);
   if (response.status === 401) {
     await renewSession();
-    response = await send(path, options);
+    response = await sendPatiently(path, options);
   }
   if (!response.ok) throw await toError(response);
   const parsed = schema.safeParse(await response.json());

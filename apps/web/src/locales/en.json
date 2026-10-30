@@ -90,11 +90,31 @@
     "saved": "Saved",
     "exit": "‹ Exit",
     "lessonSets": "Lesson sets",
-    "brand": "logina"
+    "brand": "logina",
+    "openStudentView": "Open student view",
+    "openTeacherView": "Open teacher view",
+    "openStudentViewFull": "Open student view (opens in a new tab)",
+    "openTeacherViewFull": "Open teacher view (opens in a new tab)",
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "retry": "Try again",
+    "policies": "Policies",
+    "backHome": "Back to the start"
   },
   "demo": {
     "jumpSampleOnly": "Sample lesson only",
-    "resetConfirm": "This deletes every lesson in this browser's workspace, including uploaded files. Other people's work is not affected."
+    "resetConfirm": "This deletes every lesson in this browser's workspace, including uploaded files. Other people's work is not affected.",
+    "title": "Demo menu",
+    "reset": "Reset demo",
+    "simulate": "Simulate class",
+    "jump": "Jump to step…",
+    "failRecheck": "Make the next recheck fail",
+    "availableIn": "Available in {{minutes}} min",
+    "leftThisHour": "{{count}} left this hour",
+    "armed": "The next recheck will fail.",
+    "noAssignment": "Assign a lesson first.",
+    "avatar": "L"
   },
   "student": {
     "new": "New",
@@ -117,6 +137,78 @@
       "submit": "Submit",
       "answer": "Answer on your own",
       "lock": "Lock in"
-    }
+    },
+    "home": {
+      "title": "Your lesson sets",
+      "empty": "Nothing assigned yet.",
+      "open": "Open",
+      "from": "From {{name}}",
+      "due": "Due {{date}}"
+    },
+    "status": {
+      "NOT_STARTED": "Not started",
+      "IN_PROGRESS": "In progress",
+      "COMPLETE": "Finished"
+    },
+    "goneAfterReset": "This set was reset.",
+    "openNewSet": "Open the new set"
+  },
+  "entry": {
+    "headline": "LOGINA helps teachers turn their own material into five reasoning tasks.",
+    "title": "Try LOGINA",
+    "teacher": "Try as teacher",
+    "student": "Try as student",
+    "demoLine": "This is a demo without accounts. Real classes would have accounts."
+  },
+  "lessons": {
+    "title": "Lesson sets",
+    "new": "New lesson set",
+    "empty": "No lesson sets yet.",
+    "stage": {
+      "CREATE": "Create & upload",
+      "CLARIFY": "Clarify material",
+      "SOURCE_REVIEW": "Source review",
+      "GENERATE_PREVIEW": "Generate & preview",
+      "APPROVE_ASSIGN": "Approval 2 & assign",
+      "ASSIGNED": "Assigned"
+    },
+    "uploaded": "Your file"
+  },
+  "consent": {
+    "title": "Taking part in research",
+    "aboutTitle": "What the study is about",
+    "about": "We want to understand how people think again about their answers and their confidence after a short prompt.",
+    "recordTitle": "What we record",
+    "record": "We record your choices before and after the prompt, your confidence, when you lock in and submit, and what you write in Q5.",
+    "namesTitle": "No names",
+    "names": "We don't ask for your name or email. Please don't type personal details in your written answer.",
+    "dataTitle": "Where the data goes",
+    "data": "The data is copied to a Google Sheet the team can read, and may be used in a research paper. Results describe groups only, never one person.",
+    "limit": "The data doesn't show why anyone changed their mind, and doesn't prove anyone learned more.",
+    "whoTitle": "Who runs it",
+    "who": "The LOGINA team runs this study. Contact: logina.edu@gmail.com.",
+    "keptTitle": "How long it is kept",
+    "kept": "The data is kept until the paper is published, and for no more than 2 years from collection. Then we delete it.",
+    "choiceTitle": "Your choice",
+    "choice": "Taking part is your choice. The tasks work the same either way.",
+    "withdraw": "To withdraw, email your participant code to logina.edu@gmail.com. We will delete your rows.",
+    "privacyLink": "Read the full privacy policy →",
+    "agree": "I agree, and I'm 18 or older",
+    "decline": "No thanks, just try it",
+    "once": "You choose once for this session.",
+    "version": "Version {{version}}",
+    "thanks": "Thanks for taking part",
+    "code": "PARTICIPANT CODE",
+    "keepCode": "Keep this code. It also appears on your results page.",
+    "continue": "Continue to the tasks"
+  },
+  "limits": {
+    "uploadAlmost": "{{count}} uploads left this hour. Resets at {{time}}.",
+    "uploadReached": "You've reached the upload limit for this hour. You can upload again at {{time}}, or keep going now with the sample material.",
+    "aiAlmost": "{{count}} rechecks left this hour. Resets at {{time}}.",
+    "aiReached": "Rechecks are paused for {{minutes}} minutes. Your edit is still on this page, not saved yet. Approval uses the last saved version.",
+    "wait": "Wait {{minutes}} min",
+    "busyStudent": "LOGINA is busy right now. Your choices are safe on this page and will save by themselves. You don't need to do anything.",
+    "busyTeacher": "LOGINA is busy right now. Your choices are safe on this page and will save by themselves. You don't need to do anything."
   }
 }
