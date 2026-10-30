@@ -5,3 +5,6 @@ export * from './gates.js';
 export * from './approval.js';
 export * from './rules.js';
 export * from './selector.js';
+export * from './closure.js';
+export * from './new-facts.js';
+export * from './shuffle.js';

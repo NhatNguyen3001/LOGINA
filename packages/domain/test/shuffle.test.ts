@@ -45,7 +45,6 @@ describe('assignRuntimeIds', () => {
   ])('runtime IDs never reveal authoring IDs %s displayOrder', (_, order) => {
     const result = assignRuntimeIds('rel_1', 'hash', answers, evidence, order);
     const ids = [...result.answers.map((a) => a.runtimeId), ...result.evidence.map((e) => e.runtimeId)];
-    expect(ids.every((id) => !/A\d|E\d/.test(id.slice(id.indexOf('_') + 1).toUpperCase().replace(/[^AE\d]/g, '_')) || true)).toBe(true);
     expect(ids.every((id) => !id.includes('A1') && !id.includes('E1'))).toBe(true);
     expect(result.answers.every((a) => /^opt_[0-9a-f]{10}$/.test(a.runtimeId))).toBe(true);
     expect(result.evidence.every((e) => /^ev_[0-9a-f]{10}$/.test(e.runtimeId))).toBe(true);

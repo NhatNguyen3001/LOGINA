@@ -21,5 +21,8 @@
     "@logina/contracts": "workspace:^",
     "firebase": "^13.1.0",
     "firebase-admin": "^14.5.0"
+  },
+  "devDependencies": {
+    "zod": "^4.6.7"
   }
 }

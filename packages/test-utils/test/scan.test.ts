@@ -1,8 +1,9 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { RESTRICTED_KEYS, findRestrictedKeys, type dtoSchemas } from '@logina/contracts';
+import { RESTRICTED_KEYS, dtoSchemas, findRestrictedKeys } from '@logina/contracts';
 import { exampleVariants, examples, examplesVi } from '@logina/contracts/examples';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 import { expectNoRestrictedKeys, lockedFieldNames } from '../src/scan.js';
 
 const SCHEMA_DOC = fileURLToPath(new URL('../../../.claude/docs/05-Backend-Schema.md', import.meta.url));
@@ -120,5 +121,29 @@ describe('lockedFieldNames', () => {
 
     const patterns = [...RESTRICTED_KEYS.all, ...RESTRICTED_KEYS.student];
     expect(names.filter((name) => !patterns.some((pattern) => pattern.test(name)))).toEqual([]);
+  });
+});
+
+const fieldNames = (schema: z.ZodType): string[] => {
+  const walk = (node: unknown): string[] => {
+    if (Array.isArray(node)) return node.flatMap(walk);
+    if (typeof node !== 'object' || node === null) return [];
+    const { properties } = node as { properties?: Record<string, unknown> };
+    return [...Object.keys(properties ?? {}), ...Object.values(node).flatMap(walk)];
+  };
+  return walk(z.toJSONSchema(schema, { unrepresentable: 'any' }));
+};
+
+const restrictedFields = (schema: z.ZodType): string[] =>
+  fieldNames(schema).filter((name) => findRestrictedKeys({ [name]: 1 }, 'student').length > 0);
+
+describe('student schemas', () => {
+  it('finds a restricted field nested in a schema', () => {
+    const nested = z.object({ items: z.array(z.object({ teacherLabel: z.string() })) });
+    expect(restrictedFields(nested)).toEqual(['teacherLabel']);
+  });
+
+  it.each(STUDENT_VISIBLE)('%s declares no restricted field', (name) => {
+    expect(restrictedFields(dtoSchemas[name])).toEqual([]);
   });
 });
