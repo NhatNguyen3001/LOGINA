@@ -81,7 +81,7 @@ export async function runRerun(context: JobContext): Promise<void> {
         const next = loadFixture(scripted.resultDraftFixture, locale) as DraftFixture;
         const report = loadFixture(scripted.resultReportFixture, locale) as ReportFixture;
         const saved = await saveDraft(db, lesson, next, bundleDoc, 'teacher', draftId);
-        await draftRef.update({ status: 'SUPERSEDED' });
+        if (saved.draftId !== draftId) await draftRef.update({ status: 'SUPERSEDED' });
         await saveReport(db, lessonId, saved, next, deterministicChecks(next, bundleDoc, []), report.gates, report.candidateSetVersion, validatorVersion('xreason', config, true));
         continue;
       }
