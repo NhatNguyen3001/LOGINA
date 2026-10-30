@@ -1,4 +1,5 @@
-import { ErrorDTO, MeDTO } from './common.js';
+import { ConsentResultDTO } from '../consent.js';
+import { ErrorDTO, LimitsDTO, MeDTO, RateLimitDTO } from './common.js';
 import { DemoSnapshotsDTO } from './demo.js';
 import {
   AssignmentListDTO,
@@ -64,6 +65,9 @@ export const dtoSchemas = {
   submitResult: SubmitResultDTO,
   studentFeedback: StudentFeedbackDTO,
   me: MeDTO,
+  consentResult: ConsentResultDTO,
+  limits: LimitsDTO,
+  rateLimit: RateLimitDTO,
   error: ErrorDTO,
   demoSnapshots: DemoSnapshotsDTO,
 };

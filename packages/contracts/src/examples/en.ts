@@ -942,6 +942,24 @@ export const examples = {
     participantCode: 'P-7K2M',
   },
 
+  consentResult: { consent: 'AGREED', participantCode: 'P-7K2M' },
+
+  limits: {
+    limits: [
+      { action: 'UPLOAD', limit: 5, remaining: 1, resetsAt: '2026-11-05T08:40:00.000Z' },
+      { action: 'AI_ACTION', limit: 50, remaining: 38, resetsAt: '2026-11-05T08:40:00.000Z' },
+      { action: 'SIMULATE_CLASS', limit: 10, remaining: 2, resetsAt: '2026-11-05T08:40:00.000Z' },
+      { action: 'RESET', limit: 1, remaining: 1, resetsAt: '2026-11-05T08:40:00.000Z' },
+    ],
+  },
+
+  rateLimit: {
+    code: 'RATE_LIMITED',
+    action: 'AI_ACTION',
+    retryAfterSeconds: 720,
+    resetsAt: '2026-11-05T08:40:00.000Z',
+  },
+
   error: {
     code: 'MISSING_ALT_TEXT',
     message: 'A figure in this task has no alt text.',

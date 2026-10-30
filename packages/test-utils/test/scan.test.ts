@@ -16,6 +16,9 @@ const STUDENT_VISIBLE: (keyof typeof dtoSchemas)[] = [
   'submitResult',
   'studentFeedback',
   'me',
+  'consentResult',
+  'limits',
+  'rateLimit',
   'error',
 ];
 const audienceOf = (name: string) =>

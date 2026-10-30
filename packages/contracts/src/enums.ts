@@ -102,7 +102,7 @@ export type EditScope = z.infer<typeof EditScope>;
 export const KeepRevise = z.enum(['KEEP', 'REVISE']);
 export type KeepRevise = z.infer<typeof KeepRevise>;
 
-export const JobType = z.enum(['PARSE', 'ANALYZE', 'GENERATE', 'VALIDATE', 'RERUN']);
+export const JobType = z.enum(['PARSE', 'ANALYZE', 'GENERATE', 'VALIDATE', 'RERUN', 'EXPORT_ROW']);
 export type JobType = z.infer<typeof JobType>;
 
 export const JobStatus = z.enum(['QUEUED', 'RUNNING', 'NEEDS_INPUT', 'DONE', 'FAILED', 'TIMED_OUT', 'CANCELLED']);
@@ -135,6 +135,10 @@ export const ChallengeTarget = z.enum([
   'CLARIFY_MISSING',
 ]);
 export type ChallengeTarget = z.infer<typeof ChallengeTarget>;
+
+/** Limits a caller can see in `LimitsDTO`. `API` and `SESSION` are 429 values only (RateLimitDTO). */
+export const RateAction = z.enum(['UPLOAD', 'AI_ACTION', 'SIMULATE_CLASS', 'RESET']);
+export type RateAction = z.infer<typeof RateAction>;
 
 export const AiMode = z.enum(['SEEDED', 'LIVE']);
 export type AiMode = z.infer<typeof AiMode>;

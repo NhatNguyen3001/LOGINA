@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Locale, Role } from '../enums.js';
+import { Locale, RateAction, Role } from '../enums.js';
 
 /** Shared field schemas, and the DTOs any session can receive. */
 
@@ -24,6 +24,33 @@ export const ErrorDTO = z
   })
   .strict();
 export type ErrorDTO = z.infer<typeof ErrorDTO>;
+
+export const LimitsDTO = z
+  .object({
+    limits: z.array(
+      z
+        .object({
+          action: RateAction,
+          limit: z.number().int().nonnegative(),
+          remaining: z.number().int().nonnegative(),
+          resetsAt: Timestamp,
+        })
+        .strict(),
+    ),
+  })
+  .strict();
+export type LimitsDTO = z.infer<typeof LimitsDTO>;
+
+/** The 429 body. A whole-app `DAILY_LIMIT` stays a MaterialRefusalDTO code. */
+export const RateLimitDTO = z
+  .object({
+    code: z.literal('RATE_LIMITED'),
+    action: z.union([RateAction, z.literal('API'), z.literal('SESSION')]),
+    retryAfterSeconds: z.number().int().nonnegative(),
+    resetsAt: Timestamp,
+  })
+  .strict();
+export type RateLimitDTO = z.infer<typeof RateLimitDTO>;
 
 export const MeDTO = z
   .object({
