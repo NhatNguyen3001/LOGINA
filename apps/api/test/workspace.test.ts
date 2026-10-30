@@ -19,7 +19,7 @@ const whoami = (router: Hono<AppEnv>, path: string, token: string) =>
   router.request(`/api/v1${path}`, { headers: { Authorization: `Bearer ${token}` } });
 
 const addProbes = (target: Hono<AppEnv>) => {
-  for (const path of ['/lessons/probe', '/me/assignments', '/me']) {
+  for (const path of ['/demo/probe', '/me/assignments', '/me']) {
     target.get(`/api/v1${path}`, (c) => c.json(c.var.user));
   }
 };
@@ -49,14 +49,14 @@ afterAll(async () => {
 
 describe('anonymous sessions', () => {
   it('flag on: anonymous token reaches teacher and student routes', async () => {
-    const teacher = await (await whoami(app, '/lessons/probe', a.idToken)).json();
+    const teacher = await (await whoami(app, '/demo/probe', a.idToken)).json();
     const student = await (await whoami(app, '/me/assignments', a.idToken)).json();
     expect(teacher).toMatchObject({ uid: `tch_${a.uid}`, role: 'teacher', schoolId: `wks_${a.uid}` });
     expect(student).toMatchObject({ uid: a.uid, role: 'student', schoolId: `wks_${a.uid}` });
   });
 
   it('flag off: anonymous token is 401 on every route', async () => {
-    for (const path of ['/lessons/probe', '/me/assignments', '/me']) {
+    for (const path of ['/demo/probe', '/me/assignments', '/me']) {
       expect((await whoami(flagOff, path, a.idToken)).status).toBe(401);
     }
   });
