@@ -13,9 +13,28 @@ export default defineConfig([
       'no-restricted-imports': [
         'error',
         {
-          paths: ['firebase/firestore', 'firebase/storage', 'firebase-admin'],
-          patterns: ['firebase/firestore/*', 'firebase/storage/*', 'firebase-admin/*', '@google-cloud/*'],
+          paths: ['firebase/firestore', 'firebase/storage', 'firebase-admin', 'firebase/analytics', '@vercel/analytics', 'posthog-js'],
+          patterns: [
+            'firebase/firestore/*',
+            'firebase/storage/*',
+            'firebase-admin/*',
+            '@google-cloud/*',
+            'react-ga*',
+            '@sentry/*',
+            '**/packages/domain/fixtures/*',
+            '@logina/domain',
+          ],
         },
+      ],
+    },
+  },
+  {
+    files: ['apps/web/src/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        { selector: 'Literal[value=/(^|\\s)[a-z:-]+-\\[/]', message: 'Use design tokens, not arbitrary Tailwind values.' },
+        { selector: 'TemplateElement[value.raw=/(^|\\s)[a-z:-]+-\\[/]', message: 'Use design tokens, not arbitrary Tailwind values.' },
       ],
     },
   },

@@ -1,0 +1,38 @@
+/* Copied verbatim from the design gallery. Change the gallery first. */
+:root{
+  --canvas:#E9ECF1; --page:#F5F6F8; --surface:#FFFFFF; --subtle:#F7F8FA; --gray:#EEF0F3;
+  --line:#D8DDE4; --line-strong:#C3CAD4; --control:#848D9C;
+  --ink:#18212F; --ink-2:#4B5563; --ink-3:#5B6472; --on-accent:#FFFFFF;
+  --accent:#1B3F8F; --navy:#1B3F8F; --navy-bg:#EAF0FB; --navy-line:#C9D6EE;
+  --green:#1B6B43; --green-bg:#E7F4EC; --green-line:#B9DCC6;
+  --orange:#9A3F0A; --orange-bg:#FDF1E6; --orange-line:#E8A06A;
+  --red:#B42318; --red-bg:#FDECEC; --red-line:#F2B8B5;
+  --purple:#5B3FA8; --purple-bg:#F1EDFB; --purple-line:#D3C8F0;
+  --shadow:0 1px 2px rgba(24,33,47,.06),0 8px 24px rgba(24,33,47,.06);
+  --logo-navy:#0E3A7E; --logo-teal:#12B5C6; --logo-gap:var(--surface);
+  --font:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --canvas:#0B0F15; --page:#10151D; --surface:#171D27; --subtle:#1C2330; --gray:#242C39;
+  --line:#2D3646; --line-strong:#3B4659; --control:#6B778A;
+  --ink:#E7EBF1; --ink-2:#AAB4C3; --ink-3:#96A0AF; --on-accent:#FFFFFF;
+  --accent:#3A63C4; --navy:#9DB8F2; --navy-bg:#1A2640; --navy-line:#2F4472;
+  --green:#6FCB98; --green-bg:#13281E; --green-line:#25523B;
+  --orange:#F2A866; --orange-bg:#2D1E11; --orange-line:#6E4421;
+  --red:#F28B82; --red-bg:#2E1615; --red-line:#702C28;
+  --purple:#BBA9F3; --purple-bg:#221C39; --purple-line:#463A72;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  --logo-navy:#9DB8F2; --logo-teal:#3CCAD8; --logo-gap:var(--surface);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --canvas:#0B0F15; --page:#10151D; --surface:#171D27; --subtle:#1C2330; --gray:#242C39;
+  --line:#2D3646; --line-strong:#3B4659; --control:#6B778A;
+  --ink:#E7EBF1; --ink-2:#AAB4C3; --ink-3:#96A0AF; --on-accent:#FFFFFF;
+  --accent:#3A63C4; --navy:#9DB8F2; --navy-bg:#1A2640; --navy-line:#2F4472;
+  --green:#6FCB98; --green-bg:#13281E; --green-line:#25523B;
+  --orange:#F2A866; --orange-bg:#2D1E11; --orange-line:#6E4421;
+  --red:#F28B82; --red-bg:#2E1615; --red-line:#702C28;
+  --purple:#BBA9F3; --purple-bg:#221C39; --purple-line:#463A72;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  --logo-navy:#9DB8F2; --logo-teal:#3CCAD8; --logo-gap:var(--surface);
+  color-scheme:dark}
