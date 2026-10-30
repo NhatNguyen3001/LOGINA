@@ -9,11 +9,16 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --root ../.. packages/domain/"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@logina/contracts": "workspace:^",
+    "canonicalize": "^5.1.0"
+  }
 }

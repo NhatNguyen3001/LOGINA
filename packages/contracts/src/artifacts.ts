@@ -34,6 +34,7 @@ export const Q4Artifact = z
     slot: z.literal('Q4'),
     templateId: z.string(),
     slots: z.array(z.object({ slotId: z.string(), choiceId: z.string() }).strict()),
+    activeSlotIds: z.array(z.string()).optional(),
   })
   .strict();
 export type Q4Artifact = z.infer<typeof Q4Artifact>;
