@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "typecheck": "pnpm -r typecheck",
     "check": "pnpm -r build && pnpm lint && pnpm typecheck && pnpm test",
-    "make:material": "tsx tools/seed/make-material-pdf.ts"
+    "make:material": "tsx tools/seed/make-material-pdf.ts",
+    "research:flush": "tsx tools/research/flush.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

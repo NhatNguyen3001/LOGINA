@@ -15,7 +15,7 @@ export function cloudTasksEnqueue(env: Env): EnqueueFn {
           httpMethod: 'POST',
           url: `${env.WORKER_URL}/jobs/run`,
           headers: { 'Content-Type': 'application/json' },
-          body: Buffer.from(JSON.stringify({ jobId: job.jobId })).toString('base64'),
+          body: Buffer.from(JSON.stringify({ jobId: job.jobId, type: job.type })).toString('base64'),
           oidcToken: { serviceAccountEmail: env.TASKS_INVOKER_SA!, audience: env.WORKER_URL! },
         },
       },
