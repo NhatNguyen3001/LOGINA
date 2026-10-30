@@ -18,6 +18,7 @@
     "test": "vitest run --root ../.. packages/test-utils/"
   },
   "dependencies": {
+    "@logina/contracts": "workspace:^",
     "firebase": "^13.1.0",
     "firebase-admin": "^14.5.0"
   }
