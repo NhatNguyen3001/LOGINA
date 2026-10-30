@@ -30,6 +30,27 @@
         "page": "Page {{n}}",
         "section": "Section {{n}}"
       }
+    },
+    "approvalBadge": "Approval",
+    "stepper": {
+      "0": "Create & upload",
+      "1": "Clarify material",
+      "2": "Source review · Approval 1",
+      "3": "Generate & preview",
+      "4": "Approval 2 & assign"
+    },
+    "pairs": {
+      "corner": "Statement x Card"
+    },
+    "shell": {
+      "lessons": "Lesson sets",
+      "collapse": "Collapse sidebar",
+      "openStudentView": "Open student view",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "accessibility": "Accessibility",
+      "demoMenu": "Demo menu",
+      "opensNewTab": "opens in a new tab"
     }
   },
   "errors": {
@@ -63,10 +84,39 @@
       "en": "English",
       "vi": "Vietnamese"
     },
-    "language": "Language"
+    "language": "Language",
+    "done": "Done",
+    "tasks": "TASKS",
+    "saved": "Saved",
+    "exit": "‹ Exit",
+    "lessonSets": "Lesson sets",
+    "brand": "logina"
   },
   "demo": {
     "jumpSampleOnly": "Sample lesson only",
     "resetConfirm": "This deletes every lesson in this browser's workspace, including uploaded files. Other people's work is not affected."
+  },
+  "student": {
+    "new": "New",
+    "original": "original",
+    "confidence": {
+      "low": "0 · Not sure",
+      "high": "Very sure · 100",
+      "label": "How sure are you?"
+    },
+    "progress": {
+      "Q1": "Q1 Statement",
+      "Q2": "Q2 Rank cards",
+      "Q3": "Q3 Compare",
+      "Q4": "Q4 Counterargument",
+      "Q5": "Q5 Proposal"
+    },
+    "phase": {
+      "think": "Think again",
+      "final": "Final answer",
+      "submit": "Submit",
+      "answer": "Answer on your own",
+      "lock": "Lock in"
+    }
   }
 }
