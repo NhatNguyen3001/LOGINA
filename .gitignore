@@ -41,3 +41,6 @@ emulator-data/
 Thumbs.db
 .vscode/
 .idea/
+
+# Plans and designs stay local
+docs/superpowers/

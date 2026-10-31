@@ -48,7 +48,7 @@ LOGINA turns a lesson source into a set of five reasoning tasks. AI reads the ma
 
 1. **Upload** a PDF or DOCX, up to 20 MB and 10 pages, or use the sample material.
 2. **Review the source.** AI reads the material, and the teacher resolves anything it flags. This ends in Approval 1.
-3. **Review the tasks.** AI drafts tasks Q1 to Q5, each with its student prompts, and every evidence quote is checked word for word against the approved source. This ends in Approval 2.
+3. **Review the tasks.** AI drafts tasks Q1 to Q5, each with its student prompts, and every evidence quote is checked word for word against the approved source. AI also translates each task into the other language, English or Vietnamese, and a separate check compares the two versions. The teacher reviews both languages side by side. This ends in Approval 2.
 4. **Assign** the set to a class. Assigning distributes the tasks; it approves nothing.
 5. **Track** how students answered, with per-student traces and class summaries.
 
@@ -68,6 +68,8 @@ Each of the five tasks follows the same steps:
 | Q3 | Compare | Compares options on each criterion, decides, and names the drawbacks accepted |
 | Q4 | Counterargument | Builds an argument from a template |
 | Q5 | Proposal | Writes a short proposal and the reason for it |
+
+Students can switch language at any time. All task content changes with it, and their answers stay the same. A translation only reaches students after a teacher approves it.
 
 LOGINA does not grade or rank students, and it makes no claims about learning gains from click data.
 
@@ -95,6 +97,7 @@ Open [`docs/architecture/logina-architecture.html`](docs/architecture/logina-arc
 - **Sessions.** Each browser signs in anonymously and becomes its own tenant, so workspaces never mix. The request path decides whether a session acts as a teacher or a student.
 - **Background jobs.** Parsing, analysis, generation and reruns run in the worker. The API creates one Cloud Task per job, and Cloud Tasks calls the private worker with an OIDC token.
 - **AI paths.** The sample material takes a seeded path with no AI calls. Any other upload is read by Gemini on Vertex AI, using the worker's service account rather than an API key.
+- **Translation.** Each uploaded task is translated and checked inside the same job, then stored as pairs of original and translated text. Approval copies the pairs into the release, and the API swaps the wording when a student reads the task. AI never runs at student time.
 - **Research export.** Consented rows are written to Firestore in the same transaction as the submission, then sent to Google Sheets on a separate throttled queue.
 
 ## Tech stack

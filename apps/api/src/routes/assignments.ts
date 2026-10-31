@@ -34,6 +34,8 @@ export function assignmentRoutes({ db }: AppDeps): Hono<AppEnv> {
       const draftIds = lesson.currentTaskDraftIds as Record<string, string>;
       const current = SLOTS.map((slot) => releases.find((r) => r.taskDraftId === draftIds[slot]));
       if (current.some((release) => !release)) throw new AppError('TASKS_NOT_APPROVED', 409, 'Approve all five tasks first.');
+      const translated = current.filter((release) => release?.translations).length;
+      if (translated > 0 && translated < current.length) throw new AppError('TRANSLATION_MIXED', 409, 'Some tasks have no approved translation.');
 
       const earlier = await db.collection('assignments').where('schoolId', '==', schoolId).where('lessonId', '==', lessonId).get();
       const revision = earlier.size + 1;

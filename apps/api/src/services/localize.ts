@@ -12,7 +12,7 @@ export function textsFor(lesson: DocumentData | undefined, locale: Locale, relea
   const original = (lesson?.contentLocale ?? 'en') as Locale;
   if (locale === original) return [];
   const stored = release?.translations?.[locale] as TextPair[] | undefined;
-  if (stored) return stored;
+  if (stored?.length) return stored;
   return lesson?.aiMode === 'SEEDED' ? sampleTexts(original, locale) : [];
 }
 

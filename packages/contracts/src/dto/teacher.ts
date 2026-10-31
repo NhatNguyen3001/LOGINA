@@ -27,6 +27,7 @@ import {
   Sufficiency,
   TaskStatus,
   TaskType,
+  TranslationStatus,
   UnitKind,
 } from '../enums.js';
 import { Confidence, ReleaseLabels, Timestamp, Version } from './common.js';
@@ -82,6 +83,8 @@ export const JobDTO = z
     type: JobType,
     status: JobStatus,
     steps: z.array(z.object({ label: z.string(), status: JobStepStatus }).strict()),
+    /** Lets a screen show the time so far, even after a reload. */
+    startedAt: Timestamp.optional(),
     question: z.object({ kind: z.literal('LANGUAGE_MISMATCH'), detected: Locale, chosen: Locale }).strict().optional(),
     errorCode: JobErrorCode.optional(),
   })
@@ -313,6 +316,7 @@ export const TasksOverviewDTO = z
           sufficiency: Sufficiency.nullable(),
           sufficiencyNote: z.string(),
           sourceRefs: z.array(z.string()),
+          progress: z.enum(['DRAFTING', 'CHECKING', 'TRANSLATING', 'READY', 'FAILED']),
           /** Null until a draft exists for the slot. */
           draftStatus: TaskStatus.nullable(),
           draftId: z.string().optional(),
@@ -378,6 +382,20 @@ export const TaskApprovalDTO = z
             approvedAt: Timestamp.optional(),
             releaseLabel: z.string().optional(),
             acceptedWarning: z.boolean(),
+            /** Absent on the sample lesson, which is written in both languages. */
+            translation: z
+              .object({
+                status: TranslationStatus,
+                /** Still WORKING long after any job could be running, so a retry is the way out. */
+                stuck: z.boolean(),
+                locale: Locale,
+                version: Version,
+                texts: z.array(z.object({ from: z.string(), to: z.string() }).strict()),
+                keywords: z.record(z.string(), z.array(z.string())),
+                findings: z.array(z.object({ status: GateStatus, findingCode: z.string(), text: z.string(), explanationForTeacher: z.string() }).strict()),
+              })
+              .strict()
+              .optional(),
           })
           .strict(),
       )

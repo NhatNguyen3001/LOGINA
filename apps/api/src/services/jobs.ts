@@ -21,6 +21,7 @@ export interface JobDoc {
   question?: JobDTO['question'];
   error?: { code: NonNullable<JobDTO['errorCode']> };
   stepsDone?: string[];
+  startedAt?: { toDate: () => Date };
 }
 
 export async function createJob(
@@ -54,6 +55,7 @@ export const toJobDTO = (job: JobDoc): JobDTO => ({
   type: job.type,
   status: job.status,
   steps: stepsOf(job),
+  ...(job.startedAt ? { startedAt: job.startedAt.toDate().toISOString() } : {}),
   ...(job.question ? { question: job.question } : {}),
   ...(job.error ? { errorCode: job.error.code } : {}),
 });

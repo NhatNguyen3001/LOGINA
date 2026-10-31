@@ -4,9 +4,12 @@ export interface WorkerConfig {
   readerModel: string;
   generatorModel: string;
   xreasonModel: string;
+  translatorModel: string;
   version: string;
   stepDelayMs: number;
   deadlineMs: number;
+  aiCallTimeoutMs: number;
+  aiRetryDelayMs: number;
   materialsBucket: string;
 }
 
@@ -18,10 +21,14 @@ export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
   readerModel: env.READER_MODEL ?? 'gemini-4-argon',
   generatorModel: env.GENERATOR_MODEL ?? 'gemini-4-argon',
   xreasonModel: env.XREASON_MODEL ?? 'gemini-4-argon',
+  translatorModel: env.TRANSLATOR_MODEL ?? 'gemini-4-argon',
   version: '0.1.0',
   stepDelayMs: Number(env.SEEDED_STEP_DELAY_MS ?? 5000),
   /** Stays under the 30 minute dispatch deadline in apps/api/src/jobs/enqueue.ts. */
   deadlineMs: 25 * 60 * 1000,
+  aiCallTimeoutMs: 5 * 60 * 1000,
+  /** Tasks draft at the same time, so a rate limit hits several at once. */
+  aiRetryDelayMs: 15 * 1000,
   materialsBucket: env.MATERIALS_BUCKET ?? 'logina-dev-materials',
 });
 
@@ -29,5 +36,6 @@ export const testWorkerConfig = (overrides: Partial<WorkerConfig> = {}): WorkerC
   ...loadWorkerConfig({}),
   materialsBucket: 'logina-dev-test',
   stepDelayMs: 0,
+  aiRetryDelayMs: 0,
   ...overrides,
 });

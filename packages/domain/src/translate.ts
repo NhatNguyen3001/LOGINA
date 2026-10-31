@@ -1,4 +1,4 @@
-import { loadFixture, type FixtureName } from './fixtures.js';
+import { loadFixture, type DraftFixture, type FixtureName } from './fixtures.js';
 
 type Locale = 'en' | 'vi';
 
@@ -28,6 +28,31 @@ export function applyTexts<T>(value: T, pairs: TextPair[]): T {
     return item;
   };
   return walk(value) as T;
+}
+
+const SERVER_ONLY = ['acceptedOrders', 'priorities', 'keywordPartitions'];
+
+function bodyStrings(value: unknown): string[] {
+  if (typeof value === 'string') return [value];
+  if (Array.isArray(value)) return value.flatMap(bodyStrings);
+  if (value && typeof value === 'object') {
+    return Object.entries(value).flatMap(([key, field]) => (SERVER_ONLY.includes(key) || /id$/i.test(key) ? [] : bodyStrings(field)));
+  }
+  return [];
+}
+
+/** Everything a student reads in a task, once each. Scoring data and IDs stay out. */
+export function studentTexts(draft: DraftFixture): string[] {
+  return [
+    ...new Set([
+      draft.questionStem,
+      ...(draft.answerOptions ?? []).map((option) => option.text),
+      ...(draft.generatedE ?? []).map((card) => card.text),
+      ...bodyStrings(draft.taskBody),
+      ...draft.challengeCandidates.map((candidate) => candidate.message),
+      ...draft.feedback.flatMap((item) => [item.text, item.relationLabel]),
+    ]),
+  ];
 }
 
 const SAMPLE_DRAFTS: FixtureName[] = ['q1-v3', 'q1-v4', 'q2', 'q3', 'q4-v3', 'q4-v4', 'q5'];

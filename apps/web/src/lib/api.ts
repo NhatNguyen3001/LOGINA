@@ -163,8 +163,10 @@ export const sendEdit = (id: string, req: EditReq, key: string) => post(`${lesso
 export const rerunTask = (id: string, slot: Slot, key: string) => post(`${taskPath(id, slot)}/rerun`, JobDTO, {}, key);
 export const sendDisposition = (id: string, slot: Slot, req: DispositionReq, key: string) => post(`${taskPath(id, slot)}/dispositions`, Ok, req, key);
 export const getApproval = (id: string) => get(`${lessonPath(id)}/approval`, TaskApprovalDTO);
-export const approveTask = (id: string, slot: Slot, req: { expectedDraftVersion: number; previewHash: string; candidateSetVersion: number; confirmed: true }, key: string) =>
+export const approveTask = (id: string, slot: Slot, req: { expectedDraftVersion: number; previewHash: string; candidateSetVersion: number; confirmed: true; translationVersion?: number }, key: string) =>
   post(`${taskPath(id, slot)}/approve`, ApproveResultDTO, req, key);
+export const editTranslation = (id: string, slot: Slot, req: { from: string; to: string; translationVersion: number }, key: string) => post(`${taskPath(id, slot)}/translation`, JobDTO, req, key);
+export const retryTranslation = (id: string, slot: Slot, key: string) => post(`${taskPath(id, slot)}/translation/retry`, JobDTO, {}, key);
 export const assignLesson = (id: string, req: { classId: string; baseVersion: number; dueAt?: string; messageToStudents?: string }, key: string) => post(`${lessonPath(id)}/assignments`, AssignResultDTO, req, key);
 
 export const getTracking = (assignmentId: string) => get(`/assignments/${assignmentId}/tracking`, ClassTrackingDTO);

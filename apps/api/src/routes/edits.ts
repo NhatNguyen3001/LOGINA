@@ -143,6 +143,8 @@ export function editRoutes(deps: AppDeps): Hono<AppEnv> {
     '/:id/edits',
     withIdempotency(db, async (c) => {
       const lesson = await requireLesson(c.var.user.schoolId, c.req.param('id') as string);
+      /** Drafting runs for minutes on an upload, and an edit would race it. */
+      if (lesson.aiMode === 'LIVE' && lesson.activeJobId) throw new AppError('JOB_RUNNING', 409, 'A job is already running.');
       const body = (await c.req.json()) as { baseVersion?: unknown };
       if (typeof body.baseVersion !== 'number') throw new AppError('BASE_VERSION_REQUIRED', 400, 'baseVersion is required.');
       const req = EditReq.safeParse(body);

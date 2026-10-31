@@ -67,8 +67,11 @@ export type ClaimStatus = z.infer<typeof ClaimStatus>;
 export const Sufficiency = z.enum(['SUFFICIENT', 'INSUFFICIENT', 'UNCERTAIN']);
 export type Sufficiency = z.infer<typeof Sufficiency>;
 
-export const GateId = z.enum(['QG1', 'QG2', 'QG3', 'QG4', 'QG5', 'QG6']);
+export const GateId = z.enum(['QG1', 'QG2', 'QG3', 'QG4', 'QG5', 'QG6', 'TRANSLATION']);
 export type GateId = z.infer<typeof GateId>;
+
+export const TranslationStatus = z.enum(['WORKING', 'READY', 'NEEDS_REVIEW', 'BLOCKED', 'FAILED']);
+export type TranslationStatus = z.infer<typeof TranslationStatus>;
 
 export const GateStatus = z.enum(['PASS', 'REVIEW_REQUIRED', 'BLOCKER']);
 export type GateStatus = z.infer<typeof GateStatus>;
@@ -102,7 +105,7 @@ export type EditScope = z.infer<typeof EditScope>;
 export const KeepRevise = z.enum(['KEEP', 'REVISE']);
 export type KeepRevise = z.infer<typeof KeepRevise>;
 
-export const JobType = z.enum(['PARSE', 'ANALYZE', 'GENERATE', 'VALIDATE', 'RERUN', 'EXPORT_ROW']);
+export const JobType = z.enum(['PARSE', 'ANALYZE', 'GENERATE', 'VALIDATE', 'RERUN', 'TRANSLATE', 'EXPORT_ROW']);
 export type JobType = z.infer<typeof JobType>;
 
 export const JobStatus = z.enum(['QUEUED', 'RUNNING', 'NEEDS_INPUT', 'DONE', 'FAILED', 'TIMED_OUT', 'CANCELLED']);

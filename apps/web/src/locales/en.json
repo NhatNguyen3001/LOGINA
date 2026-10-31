@@ -51,7 +51,7 @@
       "progress": "Progress",
       "steps": "{{done}}/{{total}} steps",
       "running": "Running",
-      "timing": "Usually takes 1–2 minutes. You can leave this page; LOGINA will let you know when the analysis is done.",
+      "timing": "An uploaded file can take up to 6 minutes. You can close this tab and come back; it keeps running.",
       "stop": "Stop analysis",
       "paused": "Analysis paused",
       "needChoice": "Your choice needed",
@@ -184,7 +184,9 @@
       "drafting": "Drafting…",
       "checking": "Checking…",
       "notChecked": "Not checked",
-      "wait": "Drafting from your own file can take up to 15 minutes. Keep this page open; finished drafts appear here as they're ready.",
+      "wait": "Drafting and translating from your own file can take up to 15 minutes. You can close this tab and come back; it keeps running, and finished drafts appear here as they're ready.",
+      "elapsed": "Running for {{minutes}} min {{seconds}} s",
+      "progress": {"DRAFTING":"Drafting…","CHECKING":"Checking…","TRANSLATING":"Translating…","FAILED":"Could not finish","READY":"Ready"},
       "sufficiency": {
         "SUFFICIENT": "Enough",
         "UNCERTAIN": "Uncertain",
@@ -300,7 +302,23 @@
       "change": {
         "PREVIEW_CHANGED": "This task changed since you last viewed it."
       },
+      "translation": {
+        "title": "{{slot}}: both languages",
+        "save": "Save and recheck",
+        "edit": "Edit translation",
+        "retry": "Retry translation",
+        "missing": "This task has no translation yet.",
+        "keywords": "Keywords that choose the Think again prompt",
+        "status": {
+          "WORKING": "Translating…",
+          "READY": "Checked",
+          "NEEDS_REVIEW": "Needs your review",
+          "BLOCKED": "Must be fixed",
+          "FAILED": "Failed"
+        }
+      },
       "why": {
+        "translation": "Wait for the translation, or fix it, before you approve.",
         "blockers": "Fix the blockers before you approve.",
         "warnings": "Decide on the warnings before you approve.",
         "status": "Wait for the checks to finish.",
@@ -397,6 +415,10 @@
     "UNSUPPORTED_LANGUAGE": "LOGINA works with English or Vietnamese material.",
     "TOO_LITTLE_CONTENT": "There isn't enough to reason about here. Try a lesson with facts, figures or tables.",
     "generic": "Something went wrong. Please try again.",
+    "TRANSLATION_NOT_READY": "The translation for this task isn't ready to approve yet.",
+    "TRANSLATION_MIXED": "Some tasks have no approved translation. Approve the translation for every task first.",
+    "NOT_AN_UPLOAD": "The sample lesson already comes in both languages.",
+    "TRANSLATION_NOT_RETRYABLE": "This translation doesn't need a retry.",
     "TIMED_OUT": "This took too long, so it stopped. Finished drafts are saved. Choose an option below to draft the rest.",
     "AI_FAILED": "Some tasks couldn't be drafted. Finished drafts are saved. Choose an option below to try again.",
     "NOT_FOUND": "We can't find that page or item.",

@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { loadFixture, type DraftFixture } from '@logina/domain';
+import { loadFixture, studentTexts, type DraftFixture } from '@logina/domain';
 import { liveSetup, testSchoolId, type LiveProject } from '@logina/test-utils';
 import { z } from 'zod';
 import { generateStructured, modelFor } from '../src/ai/model.js';
+import { translateTask } from '../src/jobs/translate.js';
 import { testWorkerConfig } from '../src/config.js';
 import { createWorker, type WorkerDeps } from '../src/worker.js';
 import * as docx from '../src/live/docx.js';
@@ -21,6 +22,7 @@ const claim = (id: string, quote = '49.5 percent') => ({ id, wording: `Claim ${i
 const analysis = { claims: [claim('c1'), claim('c2'), claim('c3')], issues: [] };
 
 let n = 0;
+let cancelledJob = '';
 async function setup(fields: object = {}, material: object = {}): Promise<{ lessonId: string; jobId: string }> {
   n += 1;
   const lessonId = `les_${schoolId}_${n}`;
@@ -200,6 +202,179 @@ describe('live ANALYZE', () => {
   });
 });
 
+describe('translateTask', () => {
+  const q5 = loadFixture('q5', 'en') as DraftFixture;
+  const texts = studentTexts(q5);
+  const keywords = { training: ['đào tạo'] };
+  const translator = { texts: texts.map((text) => `vi ${text}`), keywords };
+  const run = async (genai: StubGenai, contentLocale = 'en') => {
+    n += 1;
+    const id = `les_${schoolId}_t${n}`;
+    lessons.push(id);
+    const deps = { db: live.db, bucket: live.bucket, genai, config: testWorkerConfig(), loadFixture };
+    await translateTask({ deps, lesson: { id, contentLocale } }, q5, 'tdr_1');
+    return (await live.db.doc(`lessons/${id}/taskTranslations/Q5`).get()).data()!;
+  };
+
+  it('stores pairs and keywords, translator then check', async () => {
+    const genai = stubGenai({ translator, translationCheck: { findings: [] } });
+    const saved = await run(genai);
+    expect(genai.calls.map((c) => c.role)).toEqual(['translator', 'translationCheck']);
+    expect(saved).toMatchObject({ slot: 'Q5', draftId: 'tdr_1', locale: 'vi', status: 'READY', keywords, version: 1 });
+    expect(saved.texts[0]).toEqual({ from: texts[0], to: `vi ${texts[0]}` });
+  });
+
+  it('a Vietnamese lesson translates into English', async () => {
+    expect((await run(stubGenai({ translator, translationCheck: { findings: [] } }), 'vi')).locale).toBe('en');
+  });
+
+  it('a reply with the wrong number of strings stores FAILED and no pairs', async () => {
+    const saved = await run(stubGenai({ translator: { texts: ['one'], keywords }, translationCheck: { findings: [] } }));
+    expect(saved).toMatchObject({ status: 'FAILED', texts: [] });
+  });
+
+  it('a blocker finding stores BLOCKED, a review finding NEEDS_REVIEW', async () => {
+    const finding = (status: string) => ({ findings: [{ status, findingCode: 'NUMBER_CHANGED', text: texts[0], explanationForTeacher: 'x' }] });
+    expect((await run(stubGenai({ translator, translationCheck: finding('BLOCKER') }))).status).toBe('BLOCKED');
+    expect((await run(stubGenai({ translator, translationCheck: finding('REVIEW_REQUIRED') }))).status).toBe('NEEDS_REVIEW');
+  });
+
+  it('every write raises the version', async () => {
+    n += 1;
+    const id = `les_${schoolId}_t${n}`;
+    lessons.push(id);
+    const deps = { db: live.db, bucket: live.bucket, genai: stubGenai({ translator, translationCheck: { findings: [] } }), config: testWorkerConfig(), loadFixture };
+    await translateTask({ deps, lesson: { id, contentLocale: 'en' } }, q5, 'tdr_1');
+    await translateTask({ deps, lesson: { id, contentLocale: 'en' } }, q5, 'tdr_1');
+    expect((await live.db.doc(`lessons/${id}/taskTranslations/Q5`).get()).data()?.version).toBe(2);
+  });
+
+  it('a late result for a replaced draft is dropped', async () => {
+    n += 1;
+    const id = `les_${schoolId}_t${n}`;
+    lessons.push(id);
+    await live.db.doc(`lessons/${id}`).set({ schoolId, currentTaskDraftIds: { Q5: 'tdr_2' } });
+    const deps = { db: live.db, bucket: live.bucket, genai: stubGenai({ translator, translationCheck: { findings: [] } }), config: testWorkerConfig(), loadFixture };
+    await translateTask({ deps, lesson: { id, contentLocale: 'en' } }, q5, 'tdr_1');
+    expect((await live.db.doc(`lessons/${id}/taskTranslations/Q5`).get()).exists).toBe(false);
+  });
+
+  it('a late result is dropped if a teacher changed the translation meanwhile', async () => {
+    n += 1;
+    const id = `les_${schoolId}_t${n}`;
+    lessons.push(id);
+    const ref = live.db.doc(`lessons/${id}/taskTranslations/Q5`);
+    await ref.set({ slot: 'Q5', draftId: 'tdr_1', version: 1, status: 'WORKING', texts: [{ from: 'x', to: 'lời cô' }], keywords: {}, findings: [] });
+    const genai = stubGenai({ translator, translationCheck: () => { void ref.update({ version: 5 }); return { findings: [] }; } });
+    const deps = { db: live.db, bucket: live.bucket, genai, config: testWorkerConfig(), loadFixture };
+    await translateTask({ deps, lesson: { id, contentLocale: 'en' } }, q5, 'tdr_1');
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect((await ref.get()).data()?.texts).toEqual([{ from: 'x', to: 'lời cô' }]);
+  });
+
+  it('findings get a code unique to this version, so an old acceptance cannot clear them', async () => {
+    const finding = { status: 'REVIEW_REQUIRED', findingCode: 'SHIFT', text: 'a', explanationForTeacher: 'x' };
+    const saved = await run(stubGenai({ translator, translationCheck: { findings: [finding, finding] } }));
+    expect(new Set(saved.findings.map((f: { findingCode: string }) => f.findingCode)).size).toBe(2);
+    expect(saved.findings[0].findingCode).toContain('v1');
+  });
+
+  it('a changed template token is a blocker', async () => {
+    const q4 = { ...q5, slot: 'Q4', questionStem: 'Choose [shown] now', challengeCandidates: q5.challengeCandidates, feedback: [], taskBody: {} } as DraftFixture;
+    n += 1;
+    const id = `les_${schoolId}_t${n}`;
+    lessons.push(id);
+    const genai = stubGenai({ translator: { texts: studentTexts(q4).map((text) => text.replace('[shown]', '[hiện]')), keywords: {} }, translationCheck: { findings: [] } });
+    await translateTask({ deps: { db: live.db, bucket: live.bucket, genai, config: testWorkerConfig(), loadFixture }, lesson: { id, contentLocale: 'en' } }, q4, 'tdr_1');
+    expect((await live.db.doc(`lessons/${id}/taskTranslations/Q4`).get()).data()?.status).toBe('BLOCKED');
+  });
+
+  it('a failed recheck keeps the teacher wording', async () => {
+    n += 1;
+    const id = `les_${schoolId}_t${n}`;
+    lessons.push(id);
+    const genai = stubGenai({ translator, translationCheck: () => { throw new Error('down'); } });
+    const texts = studentTexts(q5).map((from) => ({ from, to: 'lời cô' }));
+    await translateTask({ deps: { db: live.db, bucket: live.bucket, genai, config: testWorkerConfig(), loadFixture }, lesson: { id, contentLocale: 'en' } }, q5, 'tdr_1', { texts, keywords });
+    expect((await live.db.doc(`lessons/${id}/taskTranslations/Q5`).get()).data()).toMatchObject({ status: 'FAILED', texts, keywords });
+  });
+
+  it('a blank translated keyword is refused, because it would match every answer', async () => {
+    const saved = await run(stubGenai({ translator: { texts: translator.texts, keywords: { training: [''] } }, translationCheck: { findings: [] } }));
+    expect(saved.status).toBe('FAILED');
+  });
+
+  it('a failed check stores FAILED, so an unchecked translation cannot be approved', async () => {
+    const saved = await run(stubGenai({ translator, translationCheck: () => { throw new Error('down'); } }));
+    expect(saved).toMatchObject({ status: 'FAILED', texts: [] });
+  });
+});
+
+describe('TRANSLATE jobs', () => {
+  const q1 = loadFixture('q1-v4', 'en') as DraftFixture;
+  const bundle = loadFixture('rule-bundles/q1', 'en');
+  const pass = ['QG1', 'QG2', 'QG3', 'QG4', 'QG5', 'QG6'].map((gateId) => ({ gateId, status: 'PASS', findingCodes: [], sourceRefs: [], affectedArtifactIds: [], explanationForTeacher: 'x', overridable: false }));
+  const translated = () => ({ texts: studentTexts(q1).map((text) => `vi ${text}`), keywords: {} });
+
+  const drafted = async () => {
+    const context = await setup({ stage: 'GENERATE_PREVIEW' });
+    await live.db.doc(`lessons/${context.lessonId}/sourceUnits/p1-1`).set({ text: q1.answerOptions!.map((a) => a.text).join(' ') + q1.generatedE!.map((e) => e.text).join(' ') });
+    await live.db.doc(`jobs/${context.jobId}`).update({ type: 'GENERATE', targetIds: ['Q1'] });
+    await worker(stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: pass }, translator: translated(), translationCheck: { findings: [] } })).runJob(context.jobId);
+    const translateId = `${context.jobId}_t`;
+    jobs.push(translateId);
+    return { ...context, translateId };
+  };
+
+  it('a job that dies while translating leaves FAILED, not WORKING', async () => {
+    const { lessonId, translateId } = await drafted();
+    const ref = live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`);
+    await ref.update({ status: 'WORKING' });
+    await live.db.doc(`jobs/${translateId}`).set({ schoolId, lessonId, type: 'TRANSLATE', status: 'QUEUED', steps: [], targetIds: ['Q1'] });
+    await worker(stubGenai(), { config: testWorkerConfig({ deadlineMs: -1 }) }).runJob(translateId);
+    expect((await ref.get()).data()?.status).toBe('FAILED');
+  });
+
+  it('a seeded lesson never runs a translation job', async () => {
+    const { lessonId, translateId } = await drafted();
+    await live.db.doc(`lessons/${lessonId}`).update({ aiMode: 'SEEDED' });
+    await live.db.doc(`jobs/${translateId}`).set({ schoolId, lessonId, type: 'TRANSLATE', status: 'QUEUED', steps: [], targetIds: ['Q1'] });
+    const genai = stubGenai();
+    await worker(genai).runJob(translateId);
+    expect(genai.calls).toEqual([]);
+  });
+
+  it('a retry translates the task again', async () => {
+    const { lessonId, translateId } = await drafted();
+    await live.db.doc(`jobs/${translateId}`).set({ schoolId, lessonId, type: 'TRANSLATE', status: 'QUEUED', steps: [], targetIds: ['Q1'] });
+    const genai = stubGenai({ translator: translated(), translationCheck: { findings: [] } });
+    await worker(genai).runJob(translateId);
+    expect(genai.calls.map((c) => c.role)).toEqual(['translationCheck']);
+  });
+
+  it('a retry on a blocked translation starts over', async () => {
+    const { lessonId, translateId } = await drafted();
+    await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).update({ status: 'WORKING' });
+    await live.db.doc(`jobs/${translateId}`).set({ schoolId, lessonId, type: 'TRANSLATE', status: 'QUEUED', steps: [], targetIds: ['Q1'], fresh: true });
+    const genai = stubGenai({ translator: translated(), translationCheck: { findings: [] } });
+    await worker(genai).runJob(translateId);
+    expect(genai.calls.map((c) => c.role)).toEqual(['translator', 'translationCheck']);
+  });
+
+  it('a recheck keeps the teacher wording and calls only the check', async () => {
+    const { lessonId, translateId } = await drafted();
+    const ref = live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`);
+    const texts = (await ref.get()).data()!.texts as { from: string; to: string }[];
+    await ref.update({ texts: texts.map((pair, index) => (index === 0 ? { ...pair, to: 'Lời của cô' } : pair)), status: 'WORKING' });
+    await live.db.doc(`jobs/${translateId}`).set({ schoolId, lessonId, type: 'TRANSLATE', status: 'QUEUED', steps: [], targetIds: ['Q1'], recheck: true });
+    const genai = stubGenai({ translationCheck: { findings: [] } });
+    await worker(genai).runJob(translateId);
+    expect(genai.calls.map((c) => c.role)).toEqual(['translationCheck']);
+    expect((await ref.get()).data()).toMatchObject({ status: 'READY' });
+    expect((await ref.get()).data()!.texts[0].to).toBe('Lời của cô');
+  });
+});
+
 describe('live GENERATE and RERUN', () => {
   const q1 = loadFixture('q1-v4', 'en') as DraftFixture;
   const bundle = loadFixture('rule-bundles/q1', 'en');
@@ -218,7 +393,7 @@ describe('live GENERATE and RERUN', () => {
     await worker(genai).runJob(jobId);
     const draftId = (await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds.Q1;
     expect((await live.db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`).get()).data()?.status).toBe('MACHINE_PASS');
-    expect(genai.calls.map((c) => c.role)).toEqual(['generator', 'xreason']);
+    expect(genai.calls.map((c) => c.role).slice(0, 2)).toEqual(['generator', 'xreason']);
     expect(textOf(roleCalls(genai, 'xreason')[0]!)).not.toContain('supportExtentRationaleX');
   });
 
@@ -230,20 +405,123 @@ describe('live GENERATE and RERUN', () => {
   });
 
   it('a task the AI cannot draft does not stop the next one', async () => {
-    let calls = 0;
-    const generator = () => {
-      calls += 1;
-      if (calls <= 2) throw new Error('down');
-      return { draft: q1, ruleBundle: bundle };
+    const inner = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') } });
+    const genai: StubGenai = {
+      ...inner,
+      generate: async (request) => {
+        if (request.role === 'generator' && JSON.stringify(request.parts).includes('Task slot: Q1')) throw new Error('down');
+        return inner.generate(request);
+      },
     };
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { lessonId, jobId } = await setupGenerate();
     await live.db.doc(`jobs/${jobId}`).update({ targetIds: ['Q1', 'Q2'] });
-    await worker(stubGenai({ generator, xreason: { gates: gates('PASS') } })).runJob(jobId);
+    await worker(genai).runJob(jobId);
     expect(await job(jobId)).toMatchObject({ status: 'FAILED', error: { code: 'AI_FAILED' } });
     expect(Object.keys((await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds)).toEqual(['Q2']);
     expect(warn).toHaveBeenCalledWith(JSON.stringify({ event: 'AI_ATTEMPT_FAILED', role: 'generator', attempt: 2, failure: 'CALL_FAILED' }));
     warn.mockRestore();
+  });
+
+  const translated = () => ({ texts: studentTexts(q1).map((text) => `vi ${text}`), keywords: {} });
+
+  it('LIVE GENERATE translates each task it drafts', async () => {
+    const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    const { lessonId, jobId } = await setupGenerate();
+    await worker(genai).runJob(jobId);
+    expect((await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).get()).data()).toMatchObject({ status: 'READY', locale: 'vi' });
+    expect(await job(jobId)).toMatchObject({ status: 'DONE' });
+  });
+
+  it('a failed translation leaves the draft and the job done, ready to retry', async () => {
+    const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: () => { throw new Error('down'); } });
+    const { lessonId, jobId } = await setupGenerate();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await worker(genai).runJob(jobId);
+    warn.mockRestore();
+    expect((await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).get()).data()).toMatchObject({ status: 'FAILED' });
+    expect((await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds.Q1).toBeDefined();
+    expect(await job(jobId)).toMatchObject({ status: 'DONE' });
+  });
+
+  it('the translation is marked as working before the draft can be approved', async () => {
+    const statuses: unknown[] = [];
+    const { lessonId, jobId } = await setupGenerate();
+    const inner = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    const genai: StubGenai = {
+      ...inner,
+      generate: async (request) => {
+        if (request.role === 'xreason') statuses.push((await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).get()).data()?.status);
+        return inner.generate(request);
+      },
+    };
+    await worker(genai).runJob(jobId);
+    expect(statuses).toEqual(['WORKING']);
+  });
+
+  it('a job over its limit stops between AI calls', async () => {
+    const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') } });
+    const { lessonId, jobId } = await setupGenerate();
+    let checks = 0;
+    await worker(genai, { beforeStep: async () => { checks += 1; if (checks > 1) await new Promise((resolve) => setTimeout(resolve, 30)); } , config: testWorkerConfig({ deadlineMs: 0 }) }).runJob(jobId);
+    expect(await job(jobId)).toMatchObject({ status: 'TIMED_OUT' });
+    expect(roleCalls(genai, 'xreason')).toHaveLength(0);
+    expect((await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).get()).data()?.status ?? 'FAILED').toBe('FAILED');
+  });
+
+  it('a cancelled job stays cancelled', async () => {
+    const genai = stubGenai({ generator: () => { void live.db.doc(`jobs/${cancelledJob}`).update({ status: 'CANCELLED' }); return { draft: q1, ruleBundle: bundle }; }, xreason: { gates: gates('PASS') } });
+    const { jobId } = await setupGenerate();
+    cancelledJob = jobId;
+    await worker(genai).runJob(jobId);
+    expect((await job(jobId)).status).toBe('CANCELLED');
+  });
+
+  it('a hung AI call counts as failed', async () => {
+    const genai: StubGenai = { calls: [], generate: () => new Promise(() => {}) };
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await expect(generateStructured(genai, testWorkerConfig({ aiCallTimeoutMs: 5 }), { role: 'xreason', schema: z.object({}) })).rejects.toThrow('AI_FAILED');
+    warn.mockRestore();
+  });
+
+  it('tasks are drafted at the same time, not one after another', async () => {
+    let started = 0;
+    let release!: () => void;
+    const both = new Promise<void>((resolve) => { release = resolve; });
+    const inner = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    const genai: StubGenai = {
+      ...inner,
+      generate: async (request) => {
+        if (request.role === 'generator') {
+          started += 1;
+          if (started === 2) release();
+          await both;
+        }
+        return inner.generate(request);
+      },
+    };
+    const { jobId } = await setupGenerate();
+    await live.db.doc(`jobs/${jobId}`).update({ targetIds: ['Q1', 'Q2'] });
+    await worker(genai).runJob(jobId);
+    expect(started).toBe(2);
+  }, 20_000);
+
+  it('an edit retranslates only new wording and keeps the other pairs', async () => {
+    const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    const { lessonId, jobId } = await setupGenerate();
+    await worker(genai).runJob(jobId);
+    const draftId = (await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds.Q1 as string;
+    const ref = live.db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`);
+    await ref.update({ questionStem: 'A rewritten question' });
+    const rerunId = `${jobId}_e`;
+    jobs.push(rerunId);
+    await live.db.doc(`jobs/${rerunId}`).set({ schoolId, lessonId, type: 'RERUN', status: 'QUEUED', steps: [], targetIds: [draftId] });
+    const again = stubGenai({ xreason: { gates: gates('PASS') }, translator: { texts: ['vi rewritten'], keywords: {} }, translationCheck: { findings: [] } });
+    await worker(again).runJob(rerunId);
+    expect(textOf(roleCalls(again, 'translator')[0]!)).toContain('{"texts":["A rewritten question"]');
+    const saved = (await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).get()).data()!;
+    expect(saved.texts).toContainEqual({ from: 'A rewritten question', to: 'vi rewritten' });
+    expect(saved.texts).toContainEqual({ from: q1.answerOptions![0]!.text, to: `vi ${q1.answerOptions![0]!.text}` });
   });
 
   it('LIVE VALIDATE keeps an uncertain gate REVIEW_REQUIRED', async () => {

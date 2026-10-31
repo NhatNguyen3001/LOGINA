@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyTexts, loadFixture, sampleTexts, textPairs, type DraftFixture } from '../src/index.js';
+import { applyTexts, loadFixture, sampleTexts, studentTexts, textPairs, type DraftFixture } from '../src/index.js';
 
 describe('text pairs', () => {
   it('pairs the strings of two copies of the same content, in step', () => {
@@ -15,6 +15,29 @@ describe('text pairs', () => {
   it('with no pairs, returns the same value', () => {
     const value = { text: 'One' };
     expect(applyTexts(value, [])).toBe(value);
+  });
+});
+
+describe('studentTexts', () => {
+  const q5 = loadFixture('q5', 'en') as DraftFixture;
+
+  it('lists what a student reads, with no IDs and no scoring data', () => {
+    const texts = studentTexts(q5);
+    expect(texts).toContain(q5.questionStem);
+    expect(texts).toContain((q5.taskBody as { instructions: string }).instructions);
+    expect(texts).toContain(q5.challengeCandidates[0]!.message);
+    expect(texts).not.toContain('training');
+    expect(texts).not.toContain(q5.challengeCandidates[0]!.challengeId);
+  });
+
+  it('includes the feedback labels a student reads on the results page', () => {
+    expect(studentTexts(q5)).toContain(q5.feedback[0]!.relationLabel);
+  });
+
+  it('lists a repeated string once', () => {
+    const repeated = { ...q5, questionStem: q5.challengeCandidates[0]!.message };
+    const texts = studentTexts(repeated);
+    expect(texts.filter((text) => text === repeated.questionStem)).toHaveLength(1);
   });
 });
 

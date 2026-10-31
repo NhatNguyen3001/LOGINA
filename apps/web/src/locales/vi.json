@@ -51,7 +51,7 @@
       "progress": "Tiến độ",
       "steps": "{{done}}/{{total}} bước",
       "running": "Đang chạy",
-      "timing": "Thường mất 1–2 phút. Cô có thể rời trang này, LOGINA sẽ báo khi phân tích xong.",
+      "timing": "Tài liệu tải lên có thể mất tới 6 phút. Cô có thể đóng thẻ này rồi quay lại; việc đọc vẫn tiếp tục.",
       "stop": "Dừng phân tích",
       "paused": "Phân tích đang tạm dừng",
       "needChoice": "Cần cô chọn",
@@ -184,7 +184,9 @@
       "drafting": "Đang soạn…",
       "checking": "Đang kiểm tra…",
       "notChecked": "Chưa kiểm tra",
-      "wait": "Soạn nhiệm vụ từ tài liệu của cô có thể mất tới 15 phút. Cô cứ để trang này mở; bản nháp nào xong sẽ hiện ở đây.",
+      "wait": "Soạn và dịch từ tài liệu của cô có thể mất tới 15 phút. Cô có thể đóng thẻ này rồi quay lại; việc soạn vẫn tiếp tục, bản nháp nào xong sẽ hiện ở đây.",
+      "elapsed": "Đã chạy {{minutes}} phút {{seconds}} giây",
+      "progress": {"DRAFTING":"Đang soạn…","CHECKING":"Đang kiểm tra…","TRANSLATING":"Đang dịch…","FAILED":"Chưa hoàn thành","READY":"Sẵn sàng"},
       "sufficiency": {
         "SUFFICIENT": "Đủ",
         "UNCERTAIN": "Chưa chắc",
@@ -300,7 +302,23 @@
       "change": {
         "PREVIEW_CHANGED": "Nhiệm vụ này đã thay đổi từ lần cô xem trước."
       },
+      "translation": {
+        "title": "{{slot}}: hai ngôn ngữ",
+        "save": "Lưu và kiểm tra lại",
+        "edit": "Sửa bản dịch",
+        "retry": "Dịch lại",
+        "missing": "Nhiệm vụ này chưa có bản dịch.",
+        "keywords": "Từ khóa chọn câu hỏi Thử nghĩ thêm",
+        "status": {
+          "WORKING": "Đang dịch…",
+          "READY": "Đã kiểm tra",
+          "NEEDS_REVIEW": "Cần cô xem lại",
+          "BLOCKED": "Phải sửa",
+          "FAILED": "Thất bại"
+        }
+      },
       "why": {
+        "translation": "Hãy chờ bản dịch, hoặc sửa bản dịch, trước khi duyệt.",
         "blockers": "Hãy xử lý các điểm chặn trước khi duyệt.",
         "warnings": "Hãy quyết định về các cảnh báo trước khi duyệt.",
         "status": "Hãy chờ kiểm tra xong.",
@@ -397,6 +415,10 @@
     "UNSUPPORTED_LANGUAGE": "LOGINA dùng được học liệu tiếng Anh hoặc tiếng Việt.",
     "TOO_LITTLE_CONTENT": "Nội dung chưa đủ để suy luận. Cô hãy thử một bài có dữ kiện, số liệu hoặc bảng.",
     "generic": "Có lỗi xảy ra. Cô hãy thử lại nhé.",
+    "TRANSLATION_NOT_READY": "Bản dịch của nhiệm vụ này chưa sẵn sàng để phê duyệt.",
+    "TRANSLATION_MIXED": "Có nhiệm vụ chưa có bản dịch được duyệt. Cô hãy duyệt bản dịch của mọi nhiệm vụ trước.",
+    "NOT_AN_UPLOAD": "Bài mẫu đã có sẵn hai ngôn ngữ.",
+    "TRANSLATION_NOT_RETRYABLE": "Bản dịch này không cần dịch lại.",
     "TIMED_OUT": "Việc này mất quá lâu nên đã dừng lại. Các bản nháp đã xong vẫn được lưu. Cô hãy chọn một mục bên dưới để soạn tiếp.",
     "AI_FAILED": "Có nhiệm vụ chưa soạn được. Các bản nháp đã xong vẫn được lưu. Cô hãy chọn một mục bên dưới để thử lại.",
     "NOT_FOUND": "Không tìm thấy nội dung này.",
