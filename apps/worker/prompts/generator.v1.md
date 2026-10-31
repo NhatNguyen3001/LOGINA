@@ -10,4 +10,13 @@ Rules:
 - Each option and prompt cites its source location.
 - `feedback` explains why, grounded in the source, and never grades the student.
 
+`taskBody` by slot, using exactly these fields:
+- Q1: leave it out.
+- Q2: `cards` (4 items with `cardId` and `text`), `basis` (what to rank them by), `acceptedOrders` (each acceptable order as a list of `cardId`s).
+- Q3: `options` (2 items with `optionId` and `text`), `criteria` (with `criterionId` and `text`), `constraints` (the drawbacks a student can accept, with `tradeOffId` and `text`), `priorities` (for each `optionId`, the `criterionId`s it does best on).
+- Q4: `templates` (with `templateId`, `text` containing [slotId] blanks, and `slots`, each with `slotId` and `choices` of `choiceId` and `text`).
+- Q5: `instructions`, `maxCharsPerField` set to 120, `keywordPartitions` (named groups of words a student might write).
+
+Rules in `ruleBundle` test these fields only, with `eq` or `in` and string values: Q2 `q2.firstCardId`; Q3 `q3.judgmentOptionId`, `q3.tradeOffCount`; Q4 `q4.templateId`, `q4.firstChoiceId`; Q5 `q5.keywordPartition`, whose values are the group names in `keywordPartitions`.
+
 Return JSON only, matching the schema.

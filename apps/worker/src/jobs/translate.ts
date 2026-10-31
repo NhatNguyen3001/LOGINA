@@ -96,7 +96,10 @@ export async function translateTask(context: Pick<JobContext, 'deps' | 'lesson'>
             variables,
             text: JSON.stringify({ texts: pending, keywords }),
           });
-    if (translated.texts.length !== pending.length) throw new JobFailure('AI_FAILED');
+    if (translated.texts.length !== pending.length) {
+      console.warn(JSON.stringify({ event: 'TRANSLATION_COUNT_MISMATCH', slot: draft.slot, expected: pending.length, received: translated.texts.length }));
+      throw new JobFailure('AI_FAILED');
+    }
     const pairs = [...keep, ...pending.map((from, index) => ({ from, to: translated.texts[index]! }))];
     const { findings } = await generateStructured(genai, config, {
       role: 'translationCheck',
