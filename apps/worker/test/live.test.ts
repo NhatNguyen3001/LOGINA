@@ -222,6 +222,30 @@ describe('live GENERATE and RERUN', () => {
     expect(textOf(roleCalls(genai, 'xreason')[0]!)).not.toContain('supportExtentRationaleX');
   });
 
+  it('LIVE GENERATE fills the evidence column from QG2', async () => {
+    const reviewed = gates('PASS').map((gate) => (gate.gateId === 'QG2' ? { ...gate, status: 'BLOCKER', overridable: false, sourceRefs: ['p1-1', 'p2-3'], explanationForTeacher: 'The source does not refute A2.' } : gate));
+    const { lessonId, jobId } = await setupGenerate();
+    await worker(stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: reviewed } })).runJob(jobId);
+    expect((await live.db.doc(`lessons/${lessonId}/taskSufficiency/Q1`).get()).data()).toMatchObject({ slot: 'Q1', assessment: 'INSUFFICIENT', sourceRefs: 'p1-1 · p2-3', explanationForTeacher: 'The source does not refute A2.' });
+  });
+
+  it('a task the AI cannot draft does not stop the next one', async () => {
+    let calls = 0;
+    const generator = () => {
+      calls += 1;
+      if (calls <= 2) throw new Error('down');
+      return { draft: q1, ruleBundle: bundle };
+    };
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { lessonId, jobId } = await setupGenerate();
+    await live.db.doc(`jobs/${jobId}`).update({ targetIds: ['Q1', 'Q2'] });
+    await worker(stubGenai({ generator, xreason: { gates: gates('PASS') } })).runJob(jobId);
+    expect(await job(jobId)).toMatchObject({ status: 'FAILED', error: { code: 'AI_FAILED' } });
+    expect(Object.keys((await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds)).toEqual(['Q2']);
+    expect(warn).toHaveBeenCalledWith(JSON.stringify({ event: 'AI_ATTEMPT_FAILED', role: 'generator', attempt: 2, failure: 'CALL_FAILED' }));
+    warn.mockRestore();
+  });
+
   it('LIVE VALIDATE keeps an uncertain gate REVIEW_REQUIRED', async () => {
     const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('REVIEW_REQUIRED') } });
     const { lessonId, jobId } = await setupGenerate();

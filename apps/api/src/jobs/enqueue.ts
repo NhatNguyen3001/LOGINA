@@ -11,6 +11,8 @@ export function cloudTasksEnqueue(env: Env): EnqueueFn {
     await client.createTask({
       parent: client.queuePath(env.GCP_PROJECT_ID!, env.TASKS_LOCATION!, queue!),
       task: {
+        /** The Cloud Tasks maximum. Below the worker's run time, a slow job would be started a second time. */
+        dispatchDeadline: { seconds: 1800 },
         httpRequest: {
           httpMethod: 'POST',
           url: `${env.WORKER_URL}/jobs/run`,

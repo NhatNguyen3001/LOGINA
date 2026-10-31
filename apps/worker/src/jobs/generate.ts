@@ -3,6 +3,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import type { DraftFixture, FixtureName, ReportFixture, RuleBundle } from '@logina/domain';
 import { generateStructured, validatorVersion } from '../ai/model.js';
 import { GeneratorOutput, XReasonOutput } from '../ai/schemas.js';
+import { JobFailure } from '../errors.js';
 import type { JobContext } from '../worker.js';
 import { deterministicChecks, saveDraft, saveReport } from './content.js';
 
@@ -17,6 +18,7 @@ const SEEDED_REPORT: Record<Slot, FixtureName> = {
   Q4: 'reports/q4-v3',
   Q5: 'reports/q5',
 };
+const ASSESSMENT = { PASS: 'SUFFICIENT', REVIEW_REQUIRED: 'UNCERTAIN', BLOCKER: 'INSUFFICIENT' } as const;
 const bundleName = (slot: Slot): FixtureName => `rule-bundles/${slot.toLowerCase()}` as FixtureName;
 
 async function approvedSource(context: JobContext): Promise<{ text: string; evidenceTexts: string[] }> {
@@ -68,8 +70,10 @@ export async function runGenerate(context: JobContext): Promise<void> {
   }
 
   const { text, evidenceTexts } = await approvedSource(context);
-  for (const slot of targets.length > 0 ? (targets as Slot[]) : SLOTS) {
-    await context.step(`draft ${slot}`, async () => {
+  let someFailed = false;
+  /** A task the AI can't draft stays open for Regenerate, and the others still run. */
+  const draftSlot = (slot: Slot) =>
+    context.step(`draft ${slot}`, async () => {
       const { draft, ruleBundle } = await generateStructured(genai, config, {
         role: 'generator',
         schema: GeneratorOutput,
@@ -85,6 +89,28 @@ export async function runGenerate(context: JobContext): Promise<void> {
         text: JSON.stringify({ draft: { ...draft, feedback: undefined }, source: text }),
       });
       await saveReport(db, lesson.id as string, saved, draft, checks, gates, 1, validatorVersion('xreason', config, false));
+      const evidence = gates.find((gate) => gate.gateId === 'QG2');
+      if (evidence) {
+        await lessonRef.collection('taskSufficiency').doc(slot).set(
+          {
+            slot,
+            assessment: ASSESSMENT[evidence.status],
+            sourceRefs: evidence.sourceRefs.join(' · '),
+            explanationForTeacher: evidence.explanationForTeacher,
+            sourceModelVersionId: lesson.currentSourceModelVersionId,
+          },
+          { merge: true },
+        );
+      }
     });
+
+  for (const slot of targets.length > 0 ? (targets as Slot[]) : SLOTS) {
+    try {
+      await draftSlot(slot);
+    } catch (error) {
+      if (!(error instanceof JobFailure && error.code === 'AI_FAILED')) throw error;
+      someFailed = true;
+    }
   }
+  if (someFailed) throw new JobFailure('AI_FAILED');
 }
