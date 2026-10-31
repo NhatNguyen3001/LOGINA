@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AttemptDTO, StudentChallengeDTO, StudentFeedbackDTO, StudentTaskDTO, SubmitResultDTO, findRestrictedKeys } from '@logina/contracts';
+import { loadFixture, type DraftFixture } from '@logina/domain';
 import { harness, seedAssigned, type Client, type Harness } from './helpers.js';
 
 let h: Harness;
@@ -29,6 +30,15 @@ const lock = (attemptId: string, artifact: object, slot = 'Q1', key?: string) =>
 const submit = (attemptId: string, choice: string, finalArtifact: object, slot = 'Q1') =>
   a.post(`/attempts/${attemptId}/tasks/${slot}/submit`, { choice, finalArtifact, finalConfidence: 82 });
 
+const inVietnamese = async <T>(work: () => Promise<T>): Promise<T> => {
+  await a.patch('/me', { uiLocale: 'vi' });
+  try {
+    return await work();
+  } finally {
+    await a.patch('/me', { uiLocale: 'en' });
+  }
+};
+
 const artifacts: Record<string, object> = {
   Q2: { slot: 'Q2', orderedCardIds: ['K1', 'K2', 'K3', 'K4'] },
   Q3: { slot: 'Q3', comparisons: [{ criterionId: 'C1', value: 'O1' }], judgmentOptionId: 'O1', tradeOffIds: ['D1'] },
@@ -46,6 +56,51 @@ afterAll(async () => {
   const copies = await h.live.db.collection('assignments').where('schoolId', '==', a.workspace.schoolId).get();
   await Promise.all(copies.docs.map((doc) => doc.ref.delete()));
   await h.close();
+});
+
+describe('switching language on the sample lesson', () => {
+  const stem = (loadFixture('q1-v4', 'vi') as DraftFixture).questionStem;
+
+  it('questions, options and cards change, and every ID and the order stay the same', async () => {
+    const attemptId = await freshAttempt();
+    const before = (await task(attemptId)) as Extract<StudentTaskDTO, { slot: 'Q1' }>;
+    const after = (await inVietnamese(() => task(attemptId))) as Extract<StudentTaskDTO, { slot: 'Q1' }>;
+    expect(after.stem).toBe(stem);
+    expect(after.answers.map((x) => x.id)).toEqual(before.answers.map((x) => x.id));
+    expect(after.evidence.map((x) => x.id)).toEqual(before.evidence.map((x) => x.id));
+    expect(after.answers[0]?.text).not.toBe(before.answers[0]?.text);
+  });
+
+  it('the locked answer and its prompt follow the language too', async () => {
+    const attemptId = await freshAttempt();
+    const { answers, evidence } = await q1Options(attemptId);
+    await lock(attemptId, q1(answers[0]!, evidence[0]!));
+    const en = StudentChallengeDTO.parse(await (await a.get(`/attempts/${attemptId}/tasks/Q1/challenge`)).json());
+    const vi = StudentChallengeDTO.parse(await inVietnamese(async () => (await a.get(`/attempts/${attemptId}/tasks/Q1/challenge`)).json()));
+    expect(vi.deliveryId).toBe(en.deliveryId);
+    expect(vi.message).not.toBe(en.message);
+    expect(vi.lockedSummary.answerText).not.toBe(en.lockedSummary.answerText);
+  });
+
+  it('wording a teacher changed stays as written', async () => {
+    const attemptId = await freshAttempt();
+    const { releaseIds, lessonId } = (await h.live.db.doc(`attempts/${attemptId}`).get()).data()!;
+    const ref = h.live.db.doc(`lessons/${lessonId}/taskReleases/${releaseIds.Q1}`);
+    const release = (await ref.get()).data()!;
+    await ref.update({ 'publicContent.questionStem': 'A question the teacher rewrote' });
+    const after = await inVietnamese(() => task(attemptId));
+    await ref.update({ 'publicContent.questionStem': release.publicContent.questionStem });
+    expect(after.stem).toBe('A question the teacher rewrote');
+  });
+
+  it('the assignment list shows the title in the chosen language', async () => {
+    const lesson = h.live.db.doc(`lessons/${(await h.live.db.doc(`assignments/${assignmentId}`).get()).data()!.lessonId}`);
+    const { title } = (await lesson.get()).data()!;
+    await lesson.update({ title: 'Lesson 8: Labor and employment' });
+    const { assignments } = await inVietnamese(async () => (await (await a.get('/me/assignments')).json()) as { assignments: { lessonTitle: string }[] });
+    await lesson.update({ title });
+    expect(assignments.map((x) => x.lessonTitle)).toContain('Bài 8: Lao động và việc làm');
+  });
 });
 
 describe('attempts', () => {

@@ -13,3 +13,4 @@ export * from './quotes.js';
 export * from './locators.js';
 export * from './facts.js';
 export * from './research.js';
+export * from './translate.js';
