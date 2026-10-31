@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { getLessons } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -16,7 +17,7 @@ export function LessonsHome() {
         <span className="sp" />
         <Link to="/t/lessons/new" className="btn primary">{t('lessons.new')}</Link>
       </div>
-      {lessons.isPending ? <p className="muted">{t('common.loading')}</p> : null}
+      {lessons.isPending ? <LoadingSkeleton /> : null}
       {lessons.isError ? <p role="alert">{t('errors.generic')}</p> : null}
       {lessons.data?.lessons.length === 0 ? <p className="muted">{t('lessons.empty')}</p> : null}
       <div className="stack">

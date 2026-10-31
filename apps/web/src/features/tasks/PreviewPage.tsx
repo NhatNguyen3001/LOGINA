@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditorShell } from '@/components/logina/EditorShell';
 import { LimitNote } from '@/components/logina/LimitNote';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
@@ -357,7 +358,7 @@ export function PreviewPage() {
 
   return (
     <EditorShell header={header} stepper={<Stepper current={3} />} taskList={taskList} side={side}>
-      {!data ? <p className="muted">{t(preview.isError ? 'errors.generic' : 'common.loading')}</p> : null}
+      {!data ? preview.isError ? <p className="muted">{t('errors.generic')}</p> : <LoadingSkeleton /> : null}
       {rechecking ? (
         <Note kind="info">
           <p className="b">{t('teacher.t09.title')}</p>

@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ConfidenceSlider } from '@/components/logina/ConfidenceSlider';
+import { PhaseLine } from '@/components/logina/PhaseLine';
 import { Pick } from '@/components/logina/Pick';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
@@ -66,6 +67,19 @@ describe('Stepper', () => {
     expect(items[2]).toHaveAttribute('aria-current', 'step');
     expect(items[1]).not.toHaveAttribute('aria-current');
     expect(screen.getAllByText('Done')).toHaveLength(2);
+  });
+});
+
+describe('PhaseLine', () => {
+  it('numbers the steps, ticks the finished ones and marks the current one', async () => {
+    const { container } = await renderWithI18n(<PhaseLine phase="CHALLENGED" />);
+    const items = screen.getAllByRole('listitem');
+    expect(items).toHaveLength(5);
+    expect(items[2]).toHaveAttribute('aria-current', 'step');
+    expect(items[2]).toHaveTextContent('3Think again');
+    expect(items[4]).toHaveTextContent('5Submit');
+    expect(screen.getAllByText('Done')).toHaveLength(2);
+    expect(container.querySelectorAll('.done svg')).toHaveLength(2);
   });
 });
 

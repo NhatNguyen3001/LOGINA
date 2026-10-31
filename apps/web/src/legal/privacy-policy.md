@@ -7,7 +7,7 @@ LOGINA là công cụ giúp giáo viên tạo nhiệm vụ suy luận từ học
 
 Khi một trường học sử dụng LOGINA cho lớp học, **nhà trường là bên quyết định việc sử dụng dữ liệu của học sinh**, còn LOGINA xử lý dữ liệu theo yêu cầu của nhà trường. [Cần thỏa thuận xử lý dữ liệu với từng trường trước khi thí điểm.]
 
-**Bản trình diễn (demo):** bản trình diễn không có tài khoản; ai có liên kết cũng dùng được, và mỗi trình duyệt có một không gian làm việc riêng. Tên học sinh và giáo viên trong bài mẫu là hư cấu. Không có dữ liệu của học sinh thật. Người tham gia nghiên cứu trong bản trình diễn (ví dụ ban giám khảo) là người lớn; LOGINA không hỏi tên hay email của họ.
+**Bản trình diễn (demo):** bản trình diễn không có tài khoản; ai có liên kết cũng dùng được, và mỗi trình duyệt có một không gian làm việc riêng. Tên học sinh và giáo viên trong bài mẫu là hư cấu. Không có dữ liệu của học sinh thật. LOGINA không hỏi tên, email hay tuổi của người tham gia nghiên cứu trong bản trình diễn (ví dụ ban giám khảo).
 
 ## 2. Dữ liệu chúng tôi thu thập
 | Loại dữ liệu | Ví dụ | Của ai |
@@ -62,7 +62,7 @@ Dữ liệu được lưu trên Google Cloud tại **Singapore** (khu vực asia
 - Nhật ký kỹ thuật: [30 ngày, theo mặc định của Cloud Logging].
 
 ## 9. Trẻ em và học sinh chưa đủ 18 tuổi
-LOGINA dành cho học sinh trung học phổ thông. Với học sinh **dưới 16 tuổi**, cần có sự đồng ý của cha mẹ hoặc người giám hộ theo quy định của pháp luật Việt Nam về dữ liệu cá nhân của trẻ em. Nhà trường xác nhận việc này trước khi tạo lớp. Học sinh thật sẽ xem màn hình “Tham gia nghiên cứu” trước nhiệm vụ đầu tiên. **Trong bản trình diễn,** người tham gia nghiên cứu cho biết mình từ 18 tuổi trở lên (tự khai). [Luật sư cần xác nhận ngưỡng tuổi và cách lấy đồng ý theo Luật 91/2025 và Nghị định 356/2025.]
+LOGINA dành cho học sinh trung học phổ thông. Với học sinh **dưới 16 tuổi**, cần có sự đồng ý của cha mẹ hoặc người giám hộ theo quy định của pháp luật Việt Nam về dữ liệu cá nhân của trẻ em. Nhà trường xác nhận việc này trước khi tạo lớp. Học sinh thật sẽ xem màn hình “Tham gia nghiên cứu” trước nhiệm vụ đầu tiên. [Luật sư cần xác nhận ngưỡng tuổi và cách lấy đồng ý theo Luật 91/2025 và Nghị định 356/2025.]
 
 ## 10. Quyền của bạn
 Bạn có quyền: được biết; xem dữ liệu của mình; yêu cầu sửa; yêu cầu xóa; rút lại sự đồng ý; phản đối hoặc hạn chế việc xử lý; khiếu nại tới cơ quan có thẩm quyền. Gửi yêu cầu tới **logina.edu@gmail.com**; học sinh có thể nhờ giáo viên hoặc cha mẹ gửi giúp. **Để rút khỏi nghiên cứu,** hãy gửi mã người tham gia của bạn tới địa chỉ này; nhóm sẽ xóa thủ công các dòng của bạn khỏi Google Sheet và cơ sở dữ liệu. Vì LOGINA không biết tên bạn, chúng tôi chỉ tìm được dữ liệu của bạn qua mã này. Chúng tôi trả lời trong thời hạn pháp luật quy định.
@@ -84,7 +84,7 @@ LOGINA helps teachers create reasoning tasks from their own teaching materials a
 
 When a school uses LOGINA with its classes, **the school decides how student data is used**, and LOGINA processes it on the school's behalf. [A data-processing agreement with each school is needed before the pilot.]
 
-**Demo:** the demo has no accounts; anyone with the link can use it, and each browser has its own private workspace. All student and teacher names in the sample lesson are fictional. No real student data is used. Research participants in the demo (for example judges) are adults; LOGINA does not ask for their name or email.
+**Demo:** the demo has no accounts; anyone with the link can use it, and each browser has its own private workspace. All student and teacher names in the sample lesson are fictional. No real student data is used. LOGINA does not ask research participants in the demo (for example judges) for their name, email or age.
 
 ## 2. Data we collect
 | Category | Examples | Whose |
@@ -139,7 +139,7 @@ Data is stored on Google Cloud in **Singapore** (region asia-southeast1). Google
 - Technical logs: [30 days, Cloud Logging default].
 
 ## 9. Children and students under 18
-LOGINA is for upper-secondary students. For students **under 16**, a parent or guardian's consent is required under Vietnamese rules on children's personal data. The school confirms this before creating a class. Real students will see the "Taking part in research" screen before their first task. **In the demo,** research participants say they are 18 or older (self-declared). [A lawyer must confirm the age thresholds and how consent is obtained under Law 91/2025 and Decree 356/2025.]
+LOGINA is for upper-secondary students. For students **under 16**, a parent or guardian's consent is required under Vietnamese rules on children's personal data. The school confirms this before creating a class. Real students will see the "Taking part in research" screen before their first task. [A lawyer must confirm the age thresholds and how consent is obtained under Law 91/2025 and Decree 356/2025.]
 
 ## 10. Your rights
 You can: be informed; access your data; ask for corrections; ask for deletion; withdraw consent; object to or restrict processing; complain to the competent authority. Email **logina.edu@gmail.com**; students may ask a teacher or parent to send the request. **To withdraw from the study,** email your participant code to this address; the team will delete your rows by hand from the Google Sheet and the database. Because LOGINA does not know your name, we can find your data only through this code. We reply within the time the law requires.

@@ -88,7 +88,7 @@ export const examplesVi = {
   studentChallenge: {
     ...examples.studentChallenge,
     message: TN1.message,
-    lockedSummary: { answerText: `B. ${ANSWER_B}`, evidenceText: `Thẻ 3. ${CARD_3}`, confidence: 70 },
+    lockedSummary: { answerText: `B. ${ANSWER_B}`, evidenceText: `Thẻ C. ${CARD_3}`, confidence: 70 },
   },
 
   teacherTaskPreview: {
@@ -359,7 +359,7 @@ export const examplesVi = {
       ...examples.trace.before,
       answer: { letter: 'B', authoringLabel: 'A2', text: 'Tỉ trọng lao động nông – lâm – thủy sản tăng.' },
       evidence: {
-        letter: 'Thẻ 3',
+        letter: 'Thẻ C',
         authoringLabel: 'E3',
         text: 'Nguồn cho biết tỉ trọng nông – lâm – thủy sản tăng.',
       },
@@ -379,7 +379,7 @@ export const examplesVi = {
         changed: true,
       },
       evidence: {
-        letter: 'Thẻ 1',
+        letter: 'Thẻ A',
         authoringLabel: 'E1',
         text: 'Nguồn cho biết tỉ trọng nông – lâm – thủy sản giảm, còn công nghiệp – xây dựng và dịch vụ tăng.',
         changed: true,
@@ -390,10 +390,10 @@ export const examplesVi = {
 
   studentFeedback: {
     ...examples.studentFeedback,
-    initial: { label: 'B · Thẻ 3', text: 'Tỉ trọng nông – lâm – thủy sản tăng · thẻ nói tỉ trọng tăng' },
+    initial: { label: 'B · Thẻ C', text: 'Tỉ trọng nông – lâm – thủy sản tăng · thẻ nói tỉ trọng tăng' },
     challengeMessage: 'Đối chiếu số liệu đầu và cuối giai đoạn.',
     final: {
-      label: 'A · Thẻ 1',
+      label: 'A · Thẻ A',
       text: 'Nông – lâm – thủy sản giảm; công nghiệp – xây dựng và dịch vụ tăng · thẻ nêu đủ hai chiều',
     },
     explanations: [

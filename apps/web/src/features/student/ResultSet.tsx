@@ -2,6 +2,7 @@ import type { Slot, StudentFeedbackDTO } from '@logina/contracts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StudentShell } from '@/components/logina/StudentShell';
 import { SwitchSide } from '@/components/logina/SwitchSide';
@@ -36,7 +37,7 @@ export function ResultSet() {
 
   return (
     <StudentShell title={t('student.result.title')} actions={<SwitchSide to="teacher" />}>
-      {feedback.isPending ? <p className="muted">{t('common.loading')}</p> : null}
+      {feedback.isPending ? <LoadingSkeleton /> : null}
       {feedback.isError ? <Note kind="info">{t(errorKey(feedback.error instanceof ApiError ? feedback.error.code : ''))}</Note> : null}
       {feedback.data ? (
         <>
@@ -91,7 +92,7 @@ export function ResultDetail() {
   return (
     <StudentShell title={slot} actions={<SwitchSide to="teacher" />}>
       <Link to="/s/attempts/$id/results" params={{ id }} className="lnk">{t('student.result.back')}</Link>
-      {feedback.isPending ? <p className="muted">{t('common.loading')}</p> : null}
+      {feedback.isPending ? <LoadingSkeleton /> : null}
       {row ? (
         <>
           <div className="journey">

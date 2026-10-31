@@ -98,7 +98,7 @@ test('tracking after Jump to T14 shows the class and a trace', async ({ page }) 
   await expect(page.getByText('8 people started, 8 finished')).toBeVisible();
   await expectAccessible(page, 'T14');
   await page.getByRole('link', { name: 'View trace' }).first().click();
-  await expect(page.getByText('1 · FIRST ANSWER')).toBeVisible();
+  await expect(page.getByText('1. FIRST ANSWER')).toBeVisible();
   await expectAccessible(page, 'T15');
 });
 

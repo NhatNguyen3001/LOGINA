@@ -71,7 +71,7 @@ test('a Vietnamese judge stays in Vietnamese and sees no raw keys', async ({ pag
 test('agreeing shows the participant code before the tasks and on the results', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Try as student' }).click();
-  await page.getByRole('button', { name: "I agree, and I'm 18 or older" }).click();
+  await page.getByRole('button', { name: 'I agree' }).click();
   await expect(page.getByText('PARTICIPANT CODE')).toBeVisible();
   await page.waitForTimeout(1500);
   await expect(page.getByText('PARTICIPANT CODE')).toBeVisible();

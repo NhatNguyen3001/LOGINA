@@ -179,6 +179,34 @@ describe('Q2 to Q5', () => {
     expect(screen.getByRole('checkbox', { name: 'Slower' })).toBeInTheDocument();
   });
 
+  it('Think again on Q2 lists the cards in the order the student locked', async () => {
+    const taskBody = { cards: [{ cardId: 'c1', text: 'Trade' }, { cardId: 'c2', text: 'Machines' }, { cardId: 'c3', text: 'Cities' }] };
+    const initialArtifact = { slot: 'Q2', orderedCardIds: ['c3', 'c1', 'c2'] };
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q2', phase: 'CHALLENGED', stem: 'Rank them', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+    await render(<TaskRunner />);
+    await screen.findByText('Cities');
+    const ranked = screen.getByText('Cities').closest('ol')!;
+    expect([...ranked.querySelectorAll('li')].map((row) => row.textContent)).toEqual(['1Cities', '2Trade', '3Machines']);
+  });
+
+  it('Think again on Q3 lists every question with the chosen answer', async () => {
+    const taskBody = {
+      options: [{ optionId: 'o1', text: 'Plan A' }, { optionId: 'o2', text: 'Plan B' }],
+      criteria: [{ criterionId: 'c1', text: 'Which costs less?' }, { criterionId: 'c2', text: 'Which is faster?' }],
+      constraints: [{ tradeOffId: 't1', text: 'Slower' }, { tradeOffId: 't2', text: 'Dearer' }],
+    };
+    const initialArtifact = { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o1' }, { criterionId: 'c2', value: 'o2' }], judgmentOptionId: 'o2', tradeOffIds: ['t2'] };
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q3', phase: 'CHALLENGED', stem: 'Which plan?', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+    await render(<TaskRunner />);
+    const answered = (question: string) => screen.getByText(question).parentElement!;
+    expect(await screen.findByText('Which costs less?')).toBeInTheDocument();
+    expect(answered('Which costs less?')).toHaveTextContent('Plan A');
+    expect(answered('Which is faster?')).toHaveTextContent('Plan B');
+    expect(answered('Your decision')).toHaveTextContent('Plan B');
+    expect(answered('What drawbacks do you accept?')).toHaveTextContent('Dearer');
+    expect(screen.queryByText('Slower')).toBeNull();
+  });
+
   it('Q4 shows only the slots of the chosen template', async () => {
     const body = { templates: [
       { templateId: 't1', text: 'First', slots: [{ slotId: 's1', choices: [{ choiceId: 'c1', text: 'Alpha' }] }] },

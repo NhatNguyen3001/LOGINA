@@ -2,6 +2,7 @@ import type { Slot } from '@logina/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { getTrace } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -26,7 +27,7 @@ export function TracePage() {
   const { t, i18n } = useTranslation();
   const { id, slot } = useParams({ strict: false }) as { id: string; slot: Slot };
   const trace = useQuery({ queryKey: qk.trace(id, slot), queryFn: () => getTrace(id, slot) });
-  if (!trace.data) return <p className="muted">{t(trace.isError ? 'errors.NOT_FOUND' : 'common.loading')}</p>;
+  if (!trace.data) return trace.isError ? <p className="muted">{t('errors.NOT_FOUND')}</p> : <LoadingSkeleton />;
 
   const { participantCode, isSimulated, completedAt, releaseLabel, slotChips, questionStem, before, challenge, after } = trace.data;
   const time = (value: string) => new Date(value).toLocaleTimeString(i18n.language, { hour: 'numeric', minute: '2-digit' });

@@ -119,7 +119,7 @@ describe('opening an assignment', () => {
     vi.mocked(api.sendConsent).mockResolvedValue({ consent: 'AGREED', participantCode: 'P-7K2M' });
     vi.mocked(api.getMe).mockResolvedValueOnce({ ...me, consentRequired: true }).mockResolvedValue({ ...me, consentRequired: false, participantCode: 'P-7K2M' });
     await renderWithI18n(withQuery(<OpenAssignment />));
-    fireEvent.click(await screen.findByRole('button', { name: "I agree, and I'm 18 or older" }));
+    fireEvent.click(await screen.findByRole('button', { name: 'I agree' }));
     expect(await screen.findByText('P-7K2M')).toBeInTheDocument();
     await waitFor(() => expect(api.getMe).toHaveBeenCalledTimes(2));
     expect(screen.getByText('P-7K2M')).toBeInTheDocument();
@@ -132,7 +132,7 @@ describe('opening an assignment', () => {
 describe('consent', () => {
   it('both buttons have identical classes and the text covers the study', async () => {
     await renderWithI18n(withQuery(<Consent onDone={() => {}} />));
-    const agree = await screen.findByRole('button', { name: "I agree, and I'm 18 or older" });
+    const agree = await screen.findByRole('button', { name: 'I agree' });
     expect(agree.className).toBe(screen.getByRole('button', { name: 'No thanks, just try it' }).className);
     for (const text of [/Q5/, /2 years/, /withdraw/]) expect(screen.getAllByText(text).length).toBeGreaterThan(0);
   });
@@ -140,7 +140,7 @@ describe('consent', () => {
   it('agree sends the current version and shows the participant code', async () => {
     vi.mocked(api.sendConsent).mockResolvedValue({ consent: 'AGREED', participantCode: 'P-7K2M' });
     await renderWithI18n(withQuery(<Consent onDone={() => {}} />));
-    fireEvent.click(await screen.findByRole('button', { name: "I agree, and I'm 18 or older" }));
+    fireEvent.click(await screen.findByRole('button', { name: 'I agree' }));
     expect(await screen.findByText('P-7K2M')).toBeInTheDocument();
     expect(vi.mocked(api.sendConsent).mock.calls[0]?.[0]).toEqual({ consentVersion: '2026-10-v1', choice: 'AGREED' });
   });

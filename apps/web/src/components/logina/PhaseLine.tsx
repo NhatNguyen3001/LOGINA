@@ -1,5 +1,5 @@
 import type { Phase } from '@logina/contracts';
-import { Fragment } from 'react';
+import { Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const STEPS = ['answer', 'lock', 'think', 'final', 'submit'] as const;
@@ -18,15 +18,14 @@ export function PhaseLine({ phase }: { phase: Phase }) {
   const { t } = useTranslation();
   const current = STEP_OF[phase];
   return (
-    <div className="phase">
+    <ol className="phase">
       {STEPS.map((step, index) => (
-        <Fragment key={step}>
-          <span className={index < current ? 'done' : index === current ? 'on' : ''} {...(index === current ? { 'aria-current': 'step' as const } : {})}>
-            {index < current ? '✓' : index === current ? '●' : '○'} {t(`student.phase.${step}`)}
-          </span>
-          {index < STEPS.length - 1 ? <span aria-hidden="true">→</span> : null}
-        </Fragment>
+        <li key={step} className={index < current ? 'done' : index === current ? 'on' : undefined} {...(index === current ? { 'aria-current': 'step' as const } : {})}>
+          <span className="dot" aria-hidden="true">{index < current ? <Check className="ico" /> : index + 1}</span>
+          {index < current ? <span className="vh">{t('common.done')}</span> : null}
+          {t(`student.phase.${step}`)}
+        </li>
       ))}
-    </div>
+    </ol>
   );
 }

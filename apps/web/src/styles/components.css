@@ -156,10 +156,19 @@ table.t tr:last-child td{border-bottom:0}
 .prog div.on::before{background:var(--accent)}
 .prog div.done::before{background:var(--green)}
 .stu-body{padding-block:28px 40px;display:flex;flex-direction:column;gap:18px}
-.phase{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--ink-3)}
+.phase{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));list-style:none;margin:0;padding:0}
+.phase li{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding-inline:4px;font-size:13px;line-height:1.3;text-align:center;color:var(--ink-3)}
+.phase li:not(:last-child)::after{content:"";position:absolute;top:13px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;border-radius:2px;background:var(--line)}
+.phase .dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--surface);border:2px solid var(--line-strong)}
+.phase .dot .ico{width:15px;height:15px}
+.phase .done{color:var(--green)}
+.phase .done .dot{background:var(--green);border-color:var(--green);color:var(--on-accent)}
+.phase li.done:not(:last-child)::after{background:var(--green)}
 .phase .on{color:var(--navy);font-weight:600}
-.phase .done{color:var(--green);font-weight:600}
+.phase .on .dot{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:0 0 0 4px var(--navy-bg)}
 .stem{font-size:22px;font-weight:700;line-height:1.35}
+.dialog{width:calc(100% - 32px);max-width:420px;margin:auto;color:var(--ink)}
+.dialog::backdrop{background:rgba(16,24,40,.45)}
 .rank{grid-template-columns:18px 34px minmax(0,1fr) auto;cursor:grab;touch-action:manipulation;user-select:none;-webkit-touch-callout:none}
 .rank .grip{margin-top:6px;color:var(--ink-3)}
 .rank .acts{cursor:default}
@@ -171,6 +180,10 @@ table.t tr:last-child td{border-bottom:0}
 .newtag{font-size:11px;font-weight:700;color:var(--navy);background:var(--surface);border:1px solid var(--navy-line);border-radius:999px;padding:1px 8px;margin-left:6px}
 .pick .lbl{font-weight:700;margin-right:4px}
 .egrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.crit{--g:8px}
+.crit legend{margin-bottom:10px}
+.crit + .crit{margin-top:6px}
+.part{margin-top:14px}
 .stu-foot{background:var(--surface);border-top:1px solid var(--line);padding-block:14px}
 .bubble-tn{border:1px solid var(--navy-line);background:var(--surface);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px}
 .bubble-tn .say{font-size:18px;font-weight:600;line-height:1.45}
@@ -214,6 +227,10 @@ table.t tr:last-child td{border-bottom:0}
 .ok .ico,.no .ico,.wait .ico{width:16px;height:16px;vertical-align:-3px}
 .spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--line-strong);border-top-color:var(--accent);animation:spin .9s linear infinite;vertical-align:-2px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.bone{display:block;height:12px;border-radius:6px;background:var(--gray);animation:bone 1.4s ease-in-out infinite}
+.bone.head{width:40%;height:18px}
+.bone:last-child{width:65%}
+@keyframes bone{50%{opacity:.45}}
 .stepper li.gate{box-shadow:none;border-color:var(--purple-line)}
 .stepper li.gate .gi{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--purple);background:var(--purple-bg);border-radius:999px;padding:1px 7px 1px 5px;margin-left:2px}
 .stepper li.gate.on .gi{background:var(--surface)}
@@ -234,6 +251,13 @@ table.t tr:last-child td{border-bottom:0}
 .ans .ln dt{font-size:12px;font-weight:600;color:var(--ink-3);padding-top:2px}
 .ans .ln dd{margin:0}
 .ans .ln dd b{margin-right:4px}
+.ans.stacked .ln{grid-template-columns:minmax(0,1fr);gap:2px}
+.ans.stacked .ln dt{font-size:13px}
+.ans.stacked .ln dd{font-weight:600}
+.ranked{list-style:none}
+.ranked li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:center;font-size:14px}
+.ranked li:not(:first-child){padding-top:10px;border-top:1px solid var(--line)}
+.ranked .k{width:28px;height:28px;border-radius:7px;background:var(--navy-bg);color:var(--navy);display:grid;place-items:center;font-weight:700;font-size:13px}
 
 .lang-switch{display:inline-flex;background:var(--gray);border-radius:8px;padding:3px}
 .lang-switch button{font:inherit;font-size:13px;font-weight:600;border:0;background:none;color:var(--ink-2);padding:5px 10px;border-radius:6px;cursor:pointer;min-height:28px}
@@ -273,7 +297,7 @@ table.t tr:last-child td{border-bottom:0}
 .ni .ico{width:20px;height:20px}
 @media (max-width:860px){.login{grid-template-columns:minmax(0,1fr)}.login-brand{border-right:0;border-bottom:1px solid var(--line);padding:20px}.login-side{padding:16px}.login-h{font-size:24px}}
 
-@media (prefers-reduced-motion: reduce){*{transition:none!important}.spin{animation:none}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}.spin,.bone{animation:none}}
 @media (max-width:1100px){
   .ed{grid-template-columns:minmax(0,1fr)}
   .ed-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}

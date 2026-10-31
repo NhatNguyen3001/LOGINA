@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
@@ -88,7 +89,7 @@ export function ApprovePage() {
   const approval = useQuery({ queryKey: qk.approval(id), queryFn: () => getApproval(id) });
   const [selected, setSelected] = useState<Slot | null>(null);
 
-  if (!approval.data) return <p className="muted">{t(approval.isError ? 'errors.generic' : 'common.loading')}</p>;
+  if (!approval.data) return approval.isError ? <p className="muted">{t('errors.generic')}</p> : <LoadingSkeleton />;
   const { tasks } = approval.data;
   const approved = tasks.filter((x) => x.approvedAt).length;
   const allApproved = approved === tasks.length;

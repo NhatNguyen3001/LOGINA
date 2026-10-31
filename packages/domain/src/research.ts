@@ -29,9 +29,7 @@ export const researchTime = (date: Date): string =>
 
 export interface Q1Letters {
   answerLetter: (runtimeId: string) => string;
-  cardLabel: (runtimeId: string) => string;
-  answerAuthoring: (runtimeId: string) => string;
-  evidenceAuthoring: (runtimeId: string) => string;
+  cardLetter: (runtimeId: string) => string;
   relation: (answerRuntimeId: string, evidenceRuntimeId: string) => string;
 }
 
@@ -41,13 +39,13 @@ export interface AnswerColumns {
   relation: string | null;
 }
 
-/** Q1 stays one row: letter with authoring label. Q5 keeps the full text as typed. */
+/** Q1 stays one row: the option letters as shown. Q5 keeps the full text as typed. */
 export function answerColumns(artifact: Artifact, letters: Q1Letters): AnswerColumns {
   switch (artifact.slot) {
     case 'Q1':
       return {
-        answer: `${letters.answerLetter(artifact.answerId)} (${letters.answerAuthoring(artifact.answerId)})`,
-        evidence: `${letters.cardLabel(artifact.evidenceId)} (${letters.evidenceAuthoring(artifact.evidenceId)})`,
+        answer: letters.answerLetter(artifact.answerId),
+        evidence: letters.cardLetter(artifact.evidenceId),
         relation: letters.relation(artifact.answerId, artifact.evidenceId),
       };
     case 'Q2':

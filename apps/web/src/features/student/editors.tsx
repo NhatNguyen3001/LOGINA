@@ -17,7 +17,7 @@ interface EditorProps<S extends Artifact['slot'], B> {
 
 const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-export const letterOf = (index: number): string => LETTERS[index] ?? String(index + 1);
+const letterOf = (index: number): string => LETTERS[index] ?? String(index + 1);
 
 const pickState = (id: string, chosen: string | undefined, original: string | undefined) => {
   if (original === undefined) return 'default' as const;
@@ -42,7 +42,7 @@ export function Q1Editor({ task, value, onChange, original }: { task: Q1Task; va
       <h2 className="s15 b">{t('student.answer.chooseCard')}</h2>
       <div className="egrid" role="radiogroup" aria-label={t('student.answer.chooseCard')}>
         {task.evidence.map(({ id, text }, index) => (
-          <Pick key={id} name="evidence" value={id} label={t('student.answer.cardLabel', { n: index + 1 })} checked={value.evidenceId === id} state={pickState(id, value.evidenceId, original?.evidenceId)} onSelect={(evidenceId) => onChange({ ...value, evidenceId })}>
+          <Pick key={id} name="evidence" value={id} label={`${letterOf(index)}.`} checked={value.evidenceId === id} state={pickState(id, value.evidenceId, original?.evidenceId)} onSelect={(evidenceId) => onChange({ ...value, evidenceId })}>
             {text}
           </Pick>
         ))}
@@ -121,7 +121,7 @@ export function Q3Editor({ body, value, onChange }: EditorProps<'Q3', Q3TaskBody
     <>
       <h2 className="s15 b">{t('student.q3.compare')}</h2>
       {body.criteria.map(({ criterionId, text }) => (
-        <fieldset key={criterionId} className="stack">
+        <fieldset key={criterionId} className="stack crit">
           <legend className="b">{text}</legend>
           {body.options.map(({ optionId, text: option }) => (
             <Pick key={optionId} name={criterionId} value={optionId} checked={comparisons.find((c) => c.criterionId === criterionId)?.value === optionId} onSelect={(picked) => compare(criterionId, picked)}>
@@ -130,7 +130,7 @@ export function Q3Editor({ body, value, onChange }: EditorProps<'Q3', Q3TaskBody
           ))}
         </fieldset>
       ))}
-      <h2 className="s15 b">{t('student.q3.decide')}</h2>
+      <h2 className="s15 b part">{t('student.q3.decide')}</h2>
       <div className="stack" role="radiogroup" aria-label={t('student.q3.decide')}>
         {body.options.map(({ optionId, text }) => (
           <Pick key={optionId} name="judgment" value={optionId} checked={value.judgmentOptionId === optionId} onSelect={(judgmentOptionId) => onChange({ ...value, judgmentOptionId })}>
@@ -138,7 +138,7 @@ export function Q3Editor({ body, value, onChange }: EditorProps<'Q3', Q3TaskBody
           </Pick>
         ))}
       </div>
-      <h2 className="s15 b">{t('student.q3.tradeOffs')}</h2>
+      <h2 className="s15 b part">{t('student.q3.tradeOffs')}</h2>
       <div className="stack">
         {body.constraints.map(({ tradeOffId, text }) => (
           <label key={tradeOffId} className="pick">

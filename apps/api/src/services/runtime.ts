@@ -237,7 +237,7 @@ export function answerLabel(artifact: Artifact, release: DocumentData, cardWord:
   if (artifact.slot !== 'Q1') return artifact.slot;
   const content = release.publicContent as { answerOptions: { id: string }[]; evidenceOptions: { evidenceId: string }[] };
   const letter = LETTERS[content.answerOptions.findIndex((a) => a.id === artifact.answerId)];
-  const card = content.evidenceOptions.findIndex((e) => e.evidenceId === artifact.evidenceId) + 1;
+  const card = LETTERS[content.evidenceOptions.findIndex((e) => e.evidenceId === artifact.evidenceId)];
   return `${letter} · ${cardWord} ${card}`;
 }
 

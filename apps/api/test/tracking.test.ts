@@ -89,7 +89,7 @@ describe('T15 trace', () => {
     const raw = await (await a.get(`/attempts/${attemptId}/trace/Q1`)).json();
     const trace = TraceDTO.parse(raw);
     expect(trace.before.answer).toMatchObject({ letter: 'B', authoringLabel: 'A2' });
-    expect(trace.before.evidence).toMatchObject({ letter: 'Card 3', authoringLabel: 'E3' });
+    expect(trace.before.evidence).toMatchObject({ letter: 'Card C', authoringLabel: 'E3' });
     expect(trace.after.answer).toMatchObject({ letter: 'A', changed: true });
     expect(trace.challenge).toMatchObject({ label: 'TN1', studentChoice: 'REVISE' });
     expect(trace.slotChips[0]).toEqual({ slot: 'Q1', choice: 'REVISE' });
@@ -149,7 +149,7 @@ describe('me and consent', () => {
     const fresh = `${copyAttemptId}`;
     await answerQ1(a, fresh, 1, 2, 0, 0);
     const doc = (await h.live.db.doc(`researchRows/${researchRowId(fresh, 'Q1', 1)}`).get()).data()!;
-    expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B (A2)', first_evidence: 'Card 3 (E3)', first_relation: 'contradicts', final_answer: 'A (A1)', final_relation: 'full', first_confidence: 70, final_confidence: 82, confidence_change: 12, choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-10-v1', exportedAt: null });
+    expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B', first_evidence: 'C', first_relation: 'contradicts', final_answer: 'A', final_relation: 'full', first_confidence: 70, final_confidence: 82, confidence_change: 12, choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-10-v1', exportedAt: null });
     expect(JSON.stringify(doc)).not.toMatch(/Ms\. Lan|@/);
     expect(doc.seconds_to_lock).toBeGreaterThanOrEqual(0);
     expect(doc.material_hash).toHaveLength(12);

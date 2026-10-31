@@ -1,10 +1,11 @@
-import type { Artifact, DraftArtifact, Slot, StudentChallengeDTO, StudentTaskDTO } from '@logina/contracts';
+import type { Artifact, DraftArtifact, Q2Artifact, Q2TaskBody, Q3Artifact, Q3TaskBody, Slot, StudentChallengeDTO, StudentTaskDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BusyNote } from '@/components/logina/BusyNote';
 import { ConfidenceSlider, DEFAULT_CONFIDENCE } from '@/components/logina/ConfidenceSlider';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { PhaseLine } from '@/components/logina/PhaseLine';
 import { ResetRun } from '@/components/logina/ResetRun';
@@ -16,7 +17,7 @@ import { useSessionLocale } from '@/components/logina/TeacherShell';
 import { ApiError, getChallenge, getStudentTask, lockTask, newKey, saveDraft, submitTask } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { errorKey } from '@/i18n';
-import { ArtifactEditor, emptyDraft, isComplete, letterOf, sameArtifact } from './editors';
+import { ArtifactEditor, emptyDraft, isComplete, sameArtifact } from './editors';
 
 const SLOTS: Slot[] = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
 const AUTOSAVE_MS = 800;
@@ -43,6 +44,45 @@ function LockedAnswer({ summary }: { summary: StudentChallengeDTO['lockedSummary
         <div className="ln">
           <dt>{t('student.think.card')}</dt>
           <dd>{summary.evidenceText}</dd>
+        </div>
+      ) : null}
+    </dl>
+  );
+}
+
+function LockedQ2({ body, answer }: { body: Q2TaskBody; answer: Q2Artifact }) {
+  return (
+    <ol className="ans ranked">
+      {answer.orderedCardIds.map((id, index) => (
+        <li key={id}>
+          <span className="k">{index + 1}</span>
+          <span>{body.cards.find((card) => card.cardId === id)?.text}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function LockedQ3({ body, answer }: { body: Q3TaskBody; answer: Q3Artifact }) {
+  const { t } = useTranslation();
+  const optionText = (id: string | undefined) => body.options.find((option) => option.optionId === id)?.text;
+  const accepted = body.constraints.filter((constraint) => answer.tradeOffIds.includes(constraint.tradeOffId));
+  return (
+    <dl className="ans stacked">
+      {body.criteria.map(({ criterionId, text }) => (
+        <div key={criterionId} className="ln">
+          <dt>{text}</dt>
+          <dd>{optionText(answer.comparisons.find((c) => c.criterionId === criterionId)?.value)}</dd>
+        </div>
+      ))}
+      <div className="ln">
+        <dt>{t('student.q3.decide')}</dt>
+        <dd>{optionText(answer.judgmentOptionId)}</dd>
+      </div>
+      {accepted.length > 0 ? (
+        <div className="ln">
+          <dt>{t('student.q3.tradeOffs')}</dt>
+          {accepted.map(({ tradeOffId, text }) => <dd key={tradeOffId}>{text}</dd>)}
         </div>
       ) : null}
     </dl>
@@ -84,11 +124,6 @@ function Answering({ attemptId, task, onLocked }: { attemptId: string; task: Stu
 
   const complete = isComplete(task, draft);
 
-  const selectedLine = () => {
-    if (task.slot !== 'Q1' || draft.slot !== 'Q1' || !complete) return null;
-    return t('student.answer.selected', { answer: letterOf(task.answers.findIndex((a) => a.id === draft.answerId)), card: task.evidence.findIndex((e) => e.id === draft.evidenceId) + 1 });
-  };
-
   if (locking) {
     return (
       <>
@@ -113,7 +148,6 @@ function Answering({ attemptId, task, onLocked }: { attemptId: string; task: Stu
       <h1 className="stem">{task.stem}</h1>
       <ArtifactEditor task={task} value={draft} onChange={setDraft} />
       <div className="row">
-        <span className="s13 muted">{selectedLine()}</span>
         <span className="sp" />
         <button type="button" className="btn primary" disabled={!complete} onClick={() => setLocking(true)}>{t('student.continue')}</button>
       </div>
@@ -138,8 +172,11 @@ function Reconsidering({ attemptId, task, onSubmitted }: { attemptId: string; ta
     onSuccess: ({ nextSlot }) => onSubmitted(nextSlot),
   });
 
-  if (!challenge.data) return <p className="muted">{t('common.loading')}</p>;
-  const summary = challenge.data.lockedSummary;
+  if (!challenge.data) return <LoadingSkeleton />;
+  const lockedAnswer =
+    task.slot === 'Q2' && original.slot === 'Q2' ? <LockedQ2 body={task.taskBody} answer={original} />
+    : task.slot === 'Q3' && original.slot === 'Q3' ? <LockedQ3 body={task.taskBody} answer={original} />
+    : <LockedAnswer summary={challenge.data.lockedSummary} />;
   const submitLabel = t('student.submit', { slot: task.slot });
   const failure = submit.isError ? <Note kind="err">{t(errorText(submit.error))}</Note> : null;
 
@@ -157,7 +194,7 @@ function Reconsidering({ attemptId, task, onSubmitted }: { attemptId: string; ta
             <span className="sp" />
             <button type="button" className="lnk jump" onClick={() => setChoice('REVISE')}>{t('student.final.changeMind')}</button>
           </div>
-          <LockedAnswer summary={summary} />
+          {lockedAnswer}
         </div>
         <div className="card tight">
           <div className="row">
@@ -207,7 +244,7 @@ function Reconsidering({ attemptId, task, onSubmitted }: { attemptId: string; ta
       <PhaseLine phase="CHALLENGED" />
       <div className="stack">
         <span className="small b muted">{t('student.think.locked')}</span>
-        <LockedAnswer summary={summary} />
+        {lockedAnswer}
         <span className="small muted">{t('student.think.stays')}</span>
       </div>
       <div className="bubble-tn">
@@ -251,7 +288,7 @@ export function TaskRunner() {
   return (
     <StudentShell title={t('student.home.title')} progress={<StudentProgress slots={progressFor(slot)} />} actions={<><ResetRun attemptId={attemptId} /><SwitchSide to="teacher" /></>}>
       <BusyNote side="student" />
-      {!task.data ? <p className="muted">{t('common.loading')}</p> : null}
+      {!task.data ? <LoadingSkeleton /> : null}
       {task.data?.phase === 'SUBMITTED' ? (
         <button type="button" className="btn primary" onClick={() => onSubmitted(nextAfter)}>{t('student.continue')}</button>
       ) : null}

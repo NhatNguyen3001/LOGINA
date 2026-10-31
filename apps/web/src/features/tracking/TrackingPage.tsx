@@ -2,6 +2,7 @@ import type { ClassTrackingDTO } from '@logina/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { getTracking } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -33,7 +34,7 @@ export function TrackingPage() {
   const { t } = useTranslation();
   const { id } = useParams({ strict: false }) as { id: string };
   const tracking = useQuery({ queryKey: qk.tracking(id), queryFn: () => getTracking(id) });
-  if (!tracking.data) return <p className="muted">{t(tracking.isError ? 'errors.NOT_FOUND' : 'common.loading')}</p>;
+  if (!tracking.data) return tracking.isError ? <p className="muted">{t('errors.NOT_FOUND')}</p> : <LoadingSkeleton />;
 
   const { counts, participants, perTask, q1Relations, releaseLabels } = tracking.data;
   const keep = perTask.reduce((sum, row) => sum + row.keep, 0);
