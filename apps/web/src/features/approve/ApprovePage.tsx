@@ -8,9 +8,10 @@ import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
-import { ApiError, approveTask, getApproval, newKey, sendDisposition } from '@/lib/api';
+import { ApiError, approveTask, getApproval, getLesson, newKey, sendDisposition } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { TaskStatusTag } from '@/features/tasks/task-status';
+import { TranslationReview } from './TranslationReview';
 
 type Task = TaskApprovalDTO['tasks'][number];
 
@@ -42,18 +43,22 @@ const blockingGates = (task: Task) => task.gatesSummary.gates.filter((gate) => g
 
 const BLOCKING_STATUS: Task['status'][] = ['GENERATING', 'VALIDATING', 'STALE', 'FAILED', 'BLOCKED'];
 
-function ApprovePanel({ lessonId, task }: { lessonId: string; task: Task }) {
+const translationReady = (task: Task, uploaded: boolean) =>
+  !uploaded || task.translation?.status === 'READY' || task.translation?.status === 'NEEDS_REVIEW';
+
+function ApprovePanel({ lessonId, task, uploaded }: { lessonId: string; task: Task; uploaded: boolean }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [confirmed, setConfirmed] = useState(false);
   const approve = useMutation({
-    mutationFn: () => approveTask(lessonId, task.slot as Slot, { expectedDraftVersion: task.draftVersion, previewHash: task.previewHash, candidateSetVersion: task.candidateSetVersion, confirmed: true }, newKey()),
+    mutationFn: () => approveTask(lessonId, task.slot as Slot, { expectedDraftVersion: task.draftVersion, previewHash: task.previewHash, candidateSetVersion: task.candidateSetVersion, confirmed: true, ...(task.translation ? { translationVersion: task.translation.version } : {}) }, newKey()),
     onSettled: () => queryClient.invalidateQueries({ queryKey: qk.approval(lessonId) }),
   });
   const blockers = blockingGates(task).length;
   const undecided = task.decisionsNeeded.filter((finding) => finding.overridable).length;
-  const ready = blockers === 0 && undecided === 0 && !BLOCKING_STATUS.includes(task.status);
-  const waitingOn = blockers > 0 ? 'blockers' : undecided > 0 ? 'warnings' : !ready ? 'status' : !confirmed ? 'confirm' : null;
+  const translated = translationReady(task, uploaded);
+  const ready = blockers === 0 && undecided === 0 && translated && !BLOCKING_STATUS.includes(task.status);
+  const waitingOn = blockers > 0 ? 'blockers' : undecided > 0 ? 'warnings' : !translated ? 'translation' : !ready ? 'status' : !confirmed ? 'confirm' : null;
 
   return (
     <div className="card sticky">
@@ -88,7 +93,13 @@ function ApprovePanel({ lessonId, task }: { lessonId: string; task: Task }) {
 export function ApprovePage() {
   const { t } = useTranslation();
   const { id } = useParams({ strict: false }) as { id: string };
-  const approval = useQuery({ queryKey: qk.approval(id), queryFn: () => getApproval(id) });
+  const lesson = useQuery({ queryKey: qk.lesson(id), queryFn: () => getLesson(id) });
+  const approval = useQuery({
+    queryKey: qk.approval(id),
+    queryFn: () => getApproval(id),
+    /** A retry or a recheck finishes on the server. */
+    refetchInterval: (query) => (query.state.data?.tasks.some((task) => task.translation?.status === 'WORKING') ? 3000 : false),
+  });
   const [selected, setSelected] = useState<Slot | null>(null);
 
   if (!approval.data) return approval.isError ? <p className="muted">{t('errors.generic')}</p> : <LoadingSkeleton />;
@@ -96,6 +107,7 @@ export function ApprovePage() {
   const approved = tasks.filter((x) => x.approvedAt).length;
   const allApproved = approved === tasks.length;
   const current = tasks.find((x) => !x.approvedAt && (selected === null || x.slot === selected)) ?? tasks.find((x) => !x.approvedAt);
+  const uploaded = lesson.data?.aiMode === 'LIVE';
 
   return (
     <>
@@ -163,8 +175,9 @@ export function ApprovePage() {
           </table>
         </div>
       </div>
-      {current ? <ApprovePanel key={`${current.slot}-${current.draftVersion}`} lessonId={id} task={current} /> : null}
+      {current ? <ApprovePanel key={`${current.slot}-${current.draftVersion}`} lessonId={id} task={current} uploaded={uploaded} /> : null}
       </div>
+      {current && uploaded ? <TranslationReview key={`${current.slot}-${current.translation?.version ?? 0}`} lessonId={id} task={current} /> : null}
       <div className="row">
         {allApproved ? null : <span className="s13 sec">{t('teacher.t12.assignWhy')}</span>}
         <span className="sp" />

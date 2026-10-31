@@ -35,6 +35,8 @@ vi.mock('@/lib/api', async (original) => ({
   sendEdit: vi.fn(),
   rerunTask: vi.fn(),
   getApproval: vi.fn(),
+  retryTranslation: vi.fn(),
+  editTranslation: vi.fn(),
   approveTask: vi.fn(),
   sendDisposition: vi.fn(async () => ({ ok: true })),
   assignLesson: vi.fn(),
@@ -143,6 +145,75 @@ describe('T6', () => {
     await render(<TasksPage />);
     fireEvent.click(await screen.findByRole('button', { name: 'Regenerate Q4 with this choice' }));
     await waitFor(() => expect(api.chooseSufficiency).toHaveBeenCalledWith('l1', 'Q4', { choice: 'REFOCUS', baseVersion: 5 }, expect.any(String)));
+  });
+});
+
+describe('T12 translation', () => {
+  const translation = (over: object = {}) => ({ status: 'READY', locale: 'vi', version: 2, texts: [{ from: 'Which statement?', to: 'Nhận định nào?' }], keywords: {}, findings: [], ...over });
+  const showing = (slot: string, value: object | undefined) => {
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'LIVE' } as unknown as LessonDTO);
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask(slot, value ? { translation: value } as never : {})], contentManifestHash: '', canApprove: true } as never);
+  };
+
+  it('shows both languages side by side', async () => {
+    showing('Q1', translation());
+    await render(<ApprovePage />);
+    expect(await screen.findByText('Which statement?')).toBeInTheDocument();
+    expect(screen.getByText('Nhận định nào?')).toBeInTheDocument();
+  });
+
+  it('a failed translation can be retried, and the task cannot be approved', async () => {
+    showing('Q1', translation({ status: 'FAILED', texts: [] }));
+    vi.mocked(api.retryTranslation).mockResolvedValue({ id: 'j' } as never);
+    await render(<ApprovePage />);
+    fireEvent.click(await screen.findByRole('checkbox'));
+    expect(screen.getByRole('button', { name: 'Approve Q1' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry translation' }));
+    await waitFor(() => expect(api.retryTranslation).toHaveBeenCalledWith('l1', 'Q1', expect.any(String)));
+  });
+
+  it('a blocked translation shows why and stops approval', async () => {
+    showing('Q1', translation({ status: 'BLOCKED', findings: [{ status: 'BLOCKER', findingCode: 'NUMBER_CHANGED', text: 'Which statement?', explanationForTeacher: 'A number changed.' }] }));
+    await render(<ApprovePage />);
+    expect(await screen.findByText('A number changed.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('checkbox'));
+    expect(screen.getByRole('button', { name: 'Approve Q1' })).toBeDisabled();
+  });
+
+  it('a teacher can edit one translated line', async () => {
+    showing('Q1', translation());
+    vi.mocked(api.editTranslation).mockResolvedValue({ id: 'j' } as never);
+    await render(<ApprovePage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit translation' }));
+    fireEvent.change(screen.getByRole('textbox', { name: 'Which statement?' }), { target: { value: 'Câu nào đúng?' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save and recheck' }));
+    await waitFor(() => expect(api.editTranslation).toHaveBeenCalledWith('l1', 'Q1', { from: 'Which statement?', to: 'Câu nào đúng?', translationVersion: 2 }, expect.any(String)));
+  });
+
+  it('Q5 shows the keywords for review', async () => {
+    showing('Q5', translation({ keywords: { training: ['đào tạo', 'kỹ năng'] } }));
+    await render(<ApprovePage />);
+    expect(await screen.findByText('đào tạo, kỹ năng')).toBeInTheDocument();
+  });
+
+  it('approval sends the translation version', async () => {
+    showing('Q1', translation());
+    vi.mocked(api.approveTask).mockResolvedValue({ taskReleaseId: 'r', releaseLabel: 'r1' });
+    await render(<ApprovePage />);
+    fireEvent.click(await screen.findByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: 'Approve Q1' }));
+    await waitFor(() => expect(api.approveTask).toHaveBeenCalledWith('l1', 'Q1', expect.objectContaining({ translationVersion: 2 }), expect.any(String)));
+  });
+
+  it('an upload with no translation yet offers a retry, and the sample lesson shows nothing', async () => {
+    showing('Q1', undefined);
+    const { unmount } = await render(<ApprovePage />);
+    expect(await screen.findByRole('button', { name: 'Retry translation' })).toBeInTheDocument();
+    unmount();
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'SEEDED' } as unknown as LessonDTO);
+    await render(<ApprovePage />);
+    await screen.findByRole('button', { name: 'Approve Q1' });
+    expect(screen.queryByRole('button', { name: 'Retry translation' })).toBeNull();
   });
 });
 

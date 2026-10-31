@@ -300,7 +300,23 @@
       "change": {
         "PREVIEW_CHANGED": "This task changed since you last viewed it."
       },
+      "translation": {
+        "title": "{{slot}}: both languages",
+        "save": "Save and recheck",
+        "edit": "Edit translation",
+        "retry": "Retry translation",
+        "missing": "This task has no translation yet.",
+        "keywords": "Keywords that choose the Think again prompt",
+        "status": {
+          "WORKING": "Translating…",
+          "READY": "Checked",
+          "NEEDS_REVIEW": "Needs your review",
+          "BLOCKED": "Must be fixed",
+          "FAILED": "Failed"
+        }
+      },
       "why": {
+        "translation": "Wait for the translation, or fix it, before you approve.",
         "blockers": "Fix the blockers before you approve.",
         "warnings": "Decide on the warnings before you approve.",
         "status": "Wait for the checks to finish.",

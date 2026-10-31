@@ -300,7 +300,23 @@
       "change": {
         "PREVIEW_CHANGED": "Nhiệm vụ này đã thay đổi từ lần cô xem trước."
       },
+      "translation": {
+        "title": "{{slot}}: hai ngôn ngữ",
+        "save": "Lưu và kiểm tra lại",
+        "edit": "Sửa bản dịch",
+        "retry": "Dịch lại",
+        "missing": "Nhiệm vụ này chưa có bản dịch.",
+        "keywords": "Từ khóa chọn câu hỏi Thử nghĩ thêm",
+        "status": {
+          "WORKING": "Đang dịch…",
+          "READY": "Đã kiểm tra",
+          "NEEDS_REVIEW": "Cần cô xem lại",
+          "BLOCKED": "Phải sửa",
+          "FAILED": "Thất bại"
+        }
+      },
       "why": {
+        "translation": "Hãy chờ bản dịch, hoặc sửa bản dịch, trước khi duyệt.",
         "blockers": "Hãy xử lý các điểm chặn trước khi duyệt.",
         "warnings": "Hãy quyết định về các cảnh báo trước khi duyệt.",
         "status": "Hãy chờ kiểm tra xong.",
