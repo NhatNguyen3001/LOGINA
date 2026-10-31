@@ -1,0 +1,61 @@
+{
+  "slot": "Q5",
+  "version": 1,
+  "fallbackChallengeId": "FB",
+  "candidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "priorityOrder": 1,
+      "when": {
+        "all": [
+          {
+            "field": "q5.keywordPartition",
+            "op": "eq",
+            "value": "training"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN1"
+      }
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "priorityOrder": 2,
+      "when": {
+        "all": [
+          {
+            "field": "q5.keywordPartition",
+            "op": "eq",
+            "value": "business"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN2"
+      }
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "priorityOrder": 3,
+      "when": {
+        "all": [
+          {
+            "field": "q5.keywordPartition",
+            "op": "eq",
+            "value": "living"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN3"
+      }
+    }
+  ]
+}

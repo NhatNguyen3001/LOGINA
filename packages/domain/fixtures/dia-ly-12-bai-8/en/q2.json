@@ -1,0 +1,109 @@
+{
+  "slot": "Q2",
+  "taskType": "EVIDENCE_RANKING",
+  "draftVersion": 2,
+  "questionStem": "Rank these four factors from the most direct to the least direct cause of more jobs outside agriculture.",
+  "taskBody": {
+    "cards": [
+      {
+        "cardId": "K1",
+        "text": "Industrialization and modernization create more jobs in industry and services."
+      },
+      {
+        "cardId": "K2",
+        "text": "International integration and foreign investment bring more factories and businesses."
+      },
+      {
+        "cardId": "K3",
+        "text": "Urbanization draws workers from rural areas to cities and industrial zones."
+      },
+      {
+        "cardId": "K4",
+        "text": "Mechanization reduces the workers needed for each harvest."
+      }
+    ],
+    "basis": "Use the factors in the paragraph on p. 8.",
+    "acceptedOrders": [
+      [
+        "K1",
+        "K2",
+        "K3",
+        "K4"
+      ],
+      [
+        "K2",
+        "K1",
+        "K3",
+        "K4"
+      ]
+    ]
+  },
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Direct or indirect",
+      "whenShownForTeacher": "When mechanization is ranked first",
+      "sourceAnchor": "p. 8 · Section 2",
+      "message": "Does the factor you put first create jobs outside agriculture, or does it free up workers from farming?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Movement or new jobs",
+      "whenShownForTeacher": "When urbanization is ranked first",
+      "sourceAnchor": "p. 8 · Section 2",
+      "message": "Does the factor you put first make new jobs, or move people to where jobs are?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Check against the text",
+      "whenShownForTeacher": "When a job-creating factor is ranked first",
+      "sourceAnchor": "p. 8 · Section 2",
+      "message": "Which words in the paragraph show how direct each factor is?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Fallback",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Neutral re-check",
+      "whenShownForTeacher": "When none of the above applies",
+      "sourceAnchor": "p. 8 · Section 2",
+      "message": "Read your order once more. Could you explain why each card sits above the next one?"
+    }
+  ],
+  "neutralFallbackId": "FB",
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se5"
+    ],
+    "sourceUnitIds": [
+      "p8-3"
+    ],
+    "sourceClaimIds": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "relationIds": []
+  },
+  "feedback": [
+    {
+      "optionId": "K1",
+      "relationLabel": "Creates jobs",
+      "text": "The paragraph says industrialization and investment bring jobs and businesses directly; urbanization moves workers, and mechanization frees them from farming."
+    }
+  ]
+}

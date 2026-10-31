@@ -1,0 +1,409 @@
+{
+  "slot": "Q1",
+  "taskType": "JUDGMENT_EVIDENCE",
+  "questionStem": "Nhận định nào đúng về sự chuyển dịch cơ cấu lao động theo ngành ở nước ta? Chọn 1 nhận định và 1 thẻ căn cứ phù hợp nhất.",
+  "generatedE": [
+    {
+      "generatedEId": "E1",
+      "text": "Nguồn cho biết tỉ trọng nông – lâm – thủy sản giảm, còn công nghiệp – xây dựng và dịch vụ tăng.",
+      "qualityRelativeToCorrectA": "FULL_SUPPORT",
+      "eFactuality": "SOURCE_SUPPORTED",
+      "eSupportCompleteness": "FULL",
+      "teacherLabel": "Đầy đủ",
+      "relationNote": "đủ cả hai vế của A1",
+      "sourceAnchor": "Bảng 8.1",
+      "supportSourceEvidenceIds": [
+        "se1",
+        "se2"
+      ],
+      "counterSourceEvidenceIds": [],
+      "supportExtentRationale": "Đủ cả hai vế."
+    },
+    {
+      "generatedEId": "E2",
+      "text": "Nguồn cho biết tỉ trọng nông – lâm – thủy sản giảm.",
+      "qualityRelativeToCorrectA": "PARTIAL_SUPPORT",
+      "eFactuality": "SOURCE_SUPPORTED",
+      "eSupportCompleteness": "PARTIAL",
+      "teacherLabel": "Một phần",
+      "relationNote": "đúng, nhưng thiếu vế “tăng”",
+      "sourceAnchor": "Bảng 8.1",
+      "supportSourceEvidenceIds": [
+        "se1"
+      ],
+      "counterSourceEvidenceIds": [],
+      "supportExtentRationale": "Chỉ đủ một vế."
+    },
+    {
+      "generatedEId": "E3",
+      "text": "Nguồn cho biết tỉ trọng nông – lâm – thủy sản tăng.",
+      "qualityRelativeToCorrectA": "FACTUALLY_FALSE",
+      "eFactuality": "SOURCE_CONTRADICTED",
+      "eSupportCompleteness": "NONE",
+      "teacherLabel": "Sai dữ kiện",
+      "relationNote": "nguồn phản chứng",
+      "sourceAnchor": "Bảng 8.1",
+      "supportSourceEvidenceIds": [],
+      "counterSourceEvidenceIds": [
+        "se1"
+      ],
+      "supportExtentRationale": "Trái với Bảng 8.1."
+    },
+    {
+      "generatedEId": "E4",
+      "text": "Chất lượng lao động được cải thiện nhờ giáo dục và đào tạo.",
+      "qualityRelativeToCorrectA": "IRRELEVANT",
+      "eFactuality": "SOURCE_SUPPORTED",
+      "eSupportCompleteness": "NONE",
+      "teacherLabel": "Không liên quan",
+      "relationNote": "đúng, nhưng không giải thích tỉ trọng",
+      "sourceAnchor": "tr. 9",
+      "supportSourceEvidenceIds": [
+        "se4"
+      ],
+      "counterSourceEvidenceIds": [],
+      "supportExtentRationale": "Đúng nhưng nói về điều khác."
+    }
+  ],
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "SOURCE_DIRECTION",
+      "purposeForTeacher": "Hướng của nguồn",
+      "whenShownForTeacher": "Khi học sinh chọn nhận định ngược chiều với nguồn",
+      "sourceAnchor": "Bảng 8.1",
+      "message": "Em hãy đối chiếu nhận định với số liệu ở đầu và cuối giai đoạn. Chiều biến động có nhất quán với lựa chọn của em không?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Đủ căn cứ",
+      "whenShownForTeacher": "Khi học sinh chọn A1 với thẻ chỉ hỗ trợ một vế",
+      "sourceAnchor": "Bảng 8.1",
+      "message": "Câu A1 có hai vế. Thẻ em chọn đã làm căn cứ cho cả hai vế chưa?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "PAIR_CONSISTENCY",
+      "purposeForTeacher": "Nhất quán nhận định và thẻ",
+      "whenShownForTeacher": "Khi thẻ nói ngược chiều với nhận định",
+      "sourceAnchor": "Bảng 8.1",
+      "message": "Thẻ em chọn và nhận định của em có cùng nói về một chiều thay đổi không?"
+    },
+    {
+      "challengeId": "TN4",
+      "label": "TN4",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Liên quan",
+      "whenShownForTeacher": "Khi chọn thẻ không giải thích tỉ trọng (E4)",
+      "sourceAnchor": "tr. 9",
+      "message": "Thẻ em chọn nói về chất lượng lao động. Nó có giúp giải thích sự thay đổi tỉ trọng không?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Câu dự phòng",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Kiểm tra căn cứ, trung lập",
+      "whenShownForTeacher": "Khi không câu nào ở trên khớp",
+      "sourceAnchor": "tr. 8 · Bảng 8.1",
+      "message": "Em hãy đọc lại thẻ căn cứ đã chọn. Nó hỗ trợ trực tiếp nhận định của em đến mức nào?"
+    }
+  ],
+  "neutralFallbackId": "FB",
+  "displayOrder": {
+    "answers": [
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "evidence": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se1",
+      "se2",
+      "se3",
+      "se4"
+    ],
+    "sourceUnitIds": [
+      "table 8.1",
+      "p8-2",
+      "p9-1"
+    ],
+    "sourceClaimIds": [
+      "c1",
+      "c2",
+      "c3",
+      "c4"
+    ],
+    "relationIds": [
+      "rel1",
+      "rel2",
+      "rel3",
+      "rel4"
+    ]
+  },
+  "feedback": [
+    {
+      "optionId": "A1",
+      "relationLabel": "Khớp với nguồn",
+      "text": "Nhận định A khớp với Bảng 8.1: tỉ trọng nông – lâm – thủy sản giảm, công nghiệp – xây dựng và dịch vụ tăng."
+    },
+    {
+      "optionId": "E1",
+      "relationLabel": "Hỗ trợ đầy đủ",
+      "text": "Nêu đủ cả hai vế của nhận định A."
+    },
+    {
+      "optionId": "E2",
+      "relationLabel": "Hỗ trợ một phần",
+      "text": "Đúng nhưng chỉ nói vế “giảm”, chưa đủ cho cả nhận định A."
+    },
+    {
+      "optionId": "E3",
+      "relationLabel": "Mâu thuẫn",
+      "text": "Trái với Bảng 8.1."
+    },
+    {
+      "optionId": "E4",
+      "relationLabel": "Không liên quan",
+      "text": "Đúng theo nguồn nhưng nói về chất lượng lao động, không giải thích tỉ trọng."
+    }
+  ],
+  "draftVersion": 3,
+  "answerOptions": [
+    {
+      "answerOptionId": "A1",
+      "text": "Tỉ trọng lao động nông – lâm – thủy sản giảm; tỉ trọng công nghiệp – xây dựng và dịch vụ tăng.",
+      "answerCorrectness": "SUPPORTED_CORRECT",
+      "teacherLabel": "Đúng · nguồn hỗ trợ cả hai vế",
+      "sourceAnchor": "Bảng 8.1",
+      "plausibilityRationale": "Nêu đủ hai chiều trong nguồn."
+    },
+    {
+      "answerOptionId": "A2",
+      "text": "Tỉ trọng lao động nông – lâm – thủy sản tăng.",
+      "answerCorrectness": "CONTRADICTED_INCORRECT",
+      "teacherLabel": "Phương án sai · nguồn bác bỏ",
+      "sourceAnchor": "Bảng 8.1",
+      "falsifyingSourceRef": "se1",
+      "plausibilityRationale": "Đảo chiều xu hướng chính."
+    },
+    {
+      "answerOptionId": "A3",
+      "text": "Tỉ trọng lao động công nghiệp – xây dựng giảm.",
+      "answerCorrectness": "CONTRADICTED_INCORRECT",
+      "teacherLabel": "Phương án sai · nguồn bác bỏ",
+      "sourceAnchor": "Bảng 8.1",
+      "falsifyingSourceRef": "se2",
+      "plausibilityRationale": "Đảo chiều của một ngành."
+    },
+    {
+      "answerOptionId": "A4",
+      "text": "Cuối giai đoạn không còn người làm nông – lâm – thủy sản.",
+      "answerCorrectness": "CONTRADICTED_INCORRECT",
+      "teacherLabel": "Phương án sai · nguồn bác bỏ",
+      "sourceAnchor": "tr. 8 · đoạn 2",
+      "falsifyingSourceRef": "se3",
+      "plausibilityRationale": "Đẩy xu hướng giảm đến mức cực đoan."
+    }
+  ],
+  "pairAlignments": [
+    {
+      "answerOptionId": "A1",
+      "generatedEId": "E1",
+      "pairAlignment": "SUPPORTS_FULL",
+      "relationLabel": "Hỗ trợ đầy đủ",
+      "explanationForTeacher": "Đủ cả hai vế.",
+      "sourceEvidenceRefs": [
+        "se1",
+        "se2"
+      ],
+      "goesToChallengeLabel": "Câu dự phòng"
+    },
+    {
+      "answerOptionId": "A1",
+      "generatedEId": "E2",
+      "pairAlignment": "SUPPORTS_PARTIAL",
+      "relationLabel": "Hỗ trợ một phần",
+      "explanationForTeacher": "Thiếu vế “tăng”.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN2"
+    },
+    {
+      "answerOptionId": "A1",
+      "generatedEId": "E3",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Mâu thuẫn",
+      "explanationForTeacher": "Thẻ nói ngược chiều với nhận định.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN3"
+    },
+    {
+      "answerOptionId": "A1",
+      "generatedEId": "E4",
+      "pairAlignment": "IRRELEVANT",
+      "relationLabel": "Không liên quan",
+      "explanationForTeacher": "Không nói về tỉ trọng.",
+      "sourceEvidenceRefs": [
+        "se4"
+      ],
+      "goesToChallengeLabel": "TN4"
+    },
+    {
+      "answerOptionId": "A2",
+      "generatedEId": "E1",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Bác bỏ A2",
+      "explanationForTeacher": "Thẻ cho thấy tỉ trọng giảm.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A2",
+      "generatedEId": "E2",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Bác bỏ A2",
+      "explanationForTeacher": "Thẻ cho thấy tỉ trọng giảm.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A2",
+      "generatedEId": "E3",
+      "pairAlignment": "SAME_CLAIM_UNSUPPORTED",
+      "relationLabel": "Cùng ý, nguồn bác bỏ cả hai",
+      "explanationForTeacher": "Khớp nhau nhưng trái Bảng 8.1.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A2",
+      "generatedEId": "E4",
+      "pairAlignment": "IRRELEVANT",
+      "relationLabel": "Không liên quan",
+      "explanationForTeacher": "Không nói về tỉ trọng.",
+      "sourceEvidenceRefs": [
+        "se4"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A3",
+      "generatedEId": "E1",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Bác bỏ A3",
+      "explanationForTeacher": "Thẻ cho thấy công nghiệp – xây dựng tăng.",
+      "sourceEvidenceRefs": [
+        "se2"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A3",
+      "generatedEId": "E2",
+      "pairAlignment": "INSUFFICIENT",
+      "relationLabel": "Chưa đủ",
+      "explanationForTeacher": "Không nói về công nghiệp – xây dựng.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A3",
+      "generatedEId": "E3",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Thẻ sai dữ kiện",
+      "explanationForTeacher": "Thẻ trái nguồn, không hỗ trợ A3.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A3",
+      "generatedEId": "E4",
+      "pairAlignment": "IRRELEVANT",
+      "relationLabel": "Không liên quan",
+      "explanationForTeacher": "Không nói về tỉ trọng.",
+      "sourceEvidenceRefs": [
+        "se4"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A4",
+      "generatedEId": "E1",
+      "pairAlignment": "INSUFFICIENT",
+      "relationLabel": "Chưa đủ",
+      "explanationForTeacher": "Tỉ trọng giảm chưa cho biết còn hay hết người làm.",
+      "sourceEvidenceRefs": [
+        "se3"
+      ],
+      "goesToChallengeLabel": "Câu dự phòng"
+    },
+    {
+      "answerOptionId": "A4",
+      "generatedEId": "E2",
+      "pairAlignment": "INSUFFICIENT",
+      "relationLabel": "Chưa đủ",
+      "explanationForTeacher": "Như E1.",
+      "sourceEvidenceRefs": [
+        "se3"
+      ],
+      "goesToChallengeLabel": "Câu dự phòng"
+    },
+    {
+      "answerOptionId": "A4",
+      "generatedEId": "E3",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Thẻ sai dữ kiện",
+      "explanationForTeacher": "Thẻ trái nguồn.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN3"
+    },
+    {
+      "answerOptionId": "A4",
+      "generatedEId": "E4",
+      "pairAlignment": "IRRELEVANT",
+      "relationLabel": "Không liên quan",
+      "explanationForTeacher": "Không nói về tỉ trọng.",
+      "sourceEvidenceRefs": [
+        "se4"
+      ],
+      "goesToChallengeLabel": "TN4"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "logina",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "vitest run && pnpm --filter @logina/web test",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r typecheck",
+    "check": "pnpm -r build && pnpm lint && pnpm typecheck && pnpm test",
+    "make:material": "tsx tools/seed/make-material-pdf.ts",
+    "research:flush": "tsx tools/research/flush.ts",
+    "seed:start": "tsx tools/seed/start-state.ts",
+    "seed:snapshots": "tsx tools/seed/snapshots.ts",
+    "deploy:dev": "bash tools/deploy-dev.sh",
+    "smoke": "tsx tools/smoke.ts",
+    "dev:stack": "tsx tools/dev-stack.ts",
+    "e2e": "pnpm --filter @logina/web e2e"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@hono/node-server": "^2.1.5",
+    "@logina/contracts": "workspace:^",
+    "@logina/db": "workspace:^",
+    "@logina/domain": "workspace:^",
+    "@types/node": "22",
+    "@types/pdfkit": "^0.17.7",
+    "eslint": "^10.14.0",
+    "eslint-plugin-i18next": "^6.1.5",
+    "firebase-admin": "^14.5.0",
+    "pdfkit": "^0.20.2",
+    "tsup": "^9.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.0.5"
+  }
+}

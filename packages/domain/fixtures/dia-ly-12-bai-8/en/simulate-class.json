@@ -1,0 +1,939 @@
+[
+  {
+    "participantNumber": 1,
+    "tasks": [
+      {
+        "slot": "Q1",
+        "initial": {
+          "answerId": "A2",
+          "evidenceId": "E3"
+        },
+        "initialConfidence": 65,
+        "choice": "REVISE",
+        "final": {
+          "answerId": "A1",
+          "evidenceId": "E1"
+        },
+        "finalConfidence": 80
+      },
+      {
+        "slot": "Q2",
+        "initial": {
+          "orderedCardIds": [
+            "K4",
+            "K1",
+            "K2",
+            "K3"
+          ]
+        },
+        "initialConfidence": 50,
+        "choice": "REVISE",
+        "final": {
+          "orderedCardIds": [
+            "K1",
+            "K2",
+            "K3",
+            "K4"
+          ]
+        },
+        "finalConfidence": 70
+      },
+      {
+        "slot": "Q3",
+        "initial": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O1"
+            }
+          ],
+          "judgmentOptionId": "O1",
+          "tradeOffIds": []
+        },
+        "initialConfidence": 60,
+        "choice": "REVISE",
+        "final": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O1"
+            }
+          ],
+          "judgmentOptionId": "O1",
+          "tradeOffIds": [
+            "D1"
+          ]
+        },
+        "finalConfidence": 65
+      },
+      {
+        "slot": "Q4",
+        "initial": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S2"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M2"
+            }
+          ]
+        },
+        "initialConfidence": 55,
+        "choice": "REVISE",
+        "final": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S1"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M1"
+            }
+          ]
+        },
+        "finalConfidence": 75
+      },
+      {
+        "slot": "Q5",
+        "initial": {
+          "proposal": "Open short trade courses at the commune center",
+          "reason": "Many new jobs need trained workers"
+        },
+        "initialConfidence": 70,
+        "choice": "KEEP",
+        "final": {
+          "proposal": "Open short trade courses at the commune center",
+          "reason": "Many new jobs need trained workers"
+        },
+        "finalConfidence": 70
+      }
+    ]
+  },
+  {
+    "participantNumber": 2,
+    "tasks": [
+      {
+        "slot": "Q1",
+        "initial": {
+          "answerId": "A1",
+          "evidenceId": "E2"
+        },
+        "initialConfidence": 70,
+        "choice": "REVISE",
+        "final": {
+          "answerId": "A1",
+          "evidenceId": "E1"
+        },
+        "finalConfidence": 85
+      },
+      {
+        "slot": "Q2",
+        "initial": {
+          "orderedCardIds": [
+            "K1",
+            "K2",
+            "K3",
+            "K4"
+          ]
+        },
+        "initialConfidence": 75,
+        "choice": "KEEP",
+        "final": {
+          "orderedCardIds": [
+            "K1",
+            "K2",
+            "K3",
+            "K4"
+          ]
+        },
+        "finalConfidence": 80
+      },
+      {
+        "slot": "Q3",
+        "initial": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O2"
+            }
+          ],
+          "judgmentOptionId": "O2",
+          "tradeOffIds": [
+            "D3"
+          ]
+        },
+        "initialConfidence": 65,
+        "choice": "KEEP",
+        "final": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O2"
+            }
+          ],
+          "judgmentOptionId": "O2",
+          "tradeOffIds": [
+            "D3"
+          ]
+        },
+        "finalConfidence": 70
+      },
+      {
+        "slot": "Q4",
+        "initial": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S1"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M1"
+            }
+          ]
+        },
+        "initialConfidence": 70,
+        "choice": "KEEP",
+        "final": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S1"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M1"
+            }
+          ]
+        },
+        "finalConfidence": 75
+      },
+      {
+        "slot": "Q5",
+        "initial": {
+          "proposal": "Support a local craft business",
+          "reason": "Young people could work near home"
+        },
+        "initialConfidence": 60,
+        "choice": "KEEP",
+        "final": {
+          "proposal": "Support a local craft business",
+          "reason": "Young people could work near home"
+        },
+        "finalConfidence": 65
+      }
+    ]
+  },
+  {
+    "participantNumber": 3,
+    "tasks": [
+      {
+        "slot": "Q1",
+        "initial": {
+          "answerId": "A1",
+          "evidenceId": "E1"
+        },
+        "initialConfidence": 85,
+        "choice": "KEEP",
+        "final": {
+          "answerId": "A1",
+          "evidenceId": "E1"
+        },
+        "finalConfidence": 90
+      },
+      {
+        "slot": "Q2",
+        "initial": {
+          "orderedCardIds": [
+            "K3",
+            "K1",
+            "K2",
+            "K4"
+          ]
+        },
+        "initialConfidence": 55,
+        "choice": "REVISE",
+        "final": {
+          "orderedCardIds": [
+            "K1",
+            "K3",
+            "K2",
+            "K4"
+          ]
+        },
+        "finalConfidence": 60
+      },
+      {
+        "slot": "Q3",
+        "initial": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O1"
+            }
+          ],
+          "judgmentOptionId": "O1",
+          "tradeOffIds": [
+            "D1",
+            "D2"
+          ]
+        },
+        "initialConfidence": 70,
+        "choice": "KEEP",
+        "final": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O1"
+            }
+          ],
+          "judgmentOptionId": "O1",
+          "tradeOffIds": [
+            "D1",
+            "D2"
+          ]
+        },
+        "finalConfidence": 70
+      },
+      {
+        "slot": "Q4",
+        "initial": {
+          "templateId": "M2",
+          "slots": [
+            {
+              "slotId": "still",
+              "choiceId": "S3"
+            },
+            {
+              "slotId": "conclusion",
+              "choiceId": "C1"
+            }
+          ]
+        },
+        "initialConfidence": 60,
+        "choice": "KEEP",
+        "final": {
+          "templateId": "M2",
+          "slots": [
+            {
+              "slotId": "still",
+              "choiceId": "S3"
+            },
+            {
+              "slotId": "conclusion",
+              "choiceId": "C1"
+            }
+          ]
+        },
+        "finalConfidence": 65
+      },
+      {
+        "slot": "Q5",
+        "initial": {
+          "proposal": "Improve the road to the industrial zone",
+          "reason": "Better living conditions keep youth here"
+        },
+        "initialConfidence": 55,
+        "choice": "REVISE",
+        "final": {
+          "proposal": "Open short trade courses at the commune center",
+          "reason": "Many new jobs need trained workers"
+        },
+        "finalConfidence": 60
+      }
+    ]
+  },
+  {
+    "participantNumber": 4,
+    "tasks": [
+      {
+        "slot": "Q1",
+        "initial": {
+          "answerId": "A4",
+          "evidenceId": "E4"
+        },
+        "initialConfidence": 50,
+        "choice": "REVISE",
+        "final": {
+          "answerId": "A1",
+          "evidenceId": "E2"
+        },
+        "finalConfidence": 55
+      },
+      {
+        "slot": "Q2",
+        "initial": {
+          "orderedCardIds": [
+            "K2",
+            "K1",
+            "K3",
+            "K4"
+          ]
+        },
+        "initialConfidence": 65,
+        "choice": "KEEP",
+        "final": {
+          "orderedCardIds": [
+            "K2",
+            "K1",
+            "K3",
+            "K4"
+          ]
+        },
+        "finalConfidence": 65
+      },
+      {
+        "slot": "Q3",
+        "initial": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O2"
+            }
+          ],
+          "judgmentOptionId": "O2",
+          "tradeOffIds": [
+            "D3",
+            "D4"
+          ]
+        },
+        "initialConfidence": 60,
+        "choice": "KEEP",
+        "final": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O2"
+            }
+          ],
+          "judgmentOptionId": "O2",
+          "tradeOffIds": [
+            "D3",
+            "D4"
+          ]
+        },
+        "finalConfidence": 65
+      },
+      {
+        "slot": "Q4",
+        "initial": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S1"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M2"
+            }
+          ]
+        },
+        "initialConfidence": 50,
+        "choice": "REVISE",
+        "final": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S1"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M1"
+            }
+          ]
+        },
+        "finalConfidence": 60
+      },
+      {
+        "slot": "Q5",
+        "initial": {
+          "proposal": "Open short trade courses at the commune center",
+          "reason": "Many new jobs need trained workers"
+        },
+        "initialConfidence": 65,
+        "choice": "KEEP",
+        "final": {
+          "proposal": "Open short trade courses at the commune center",
+          "reason": "Many new jobs need trained workers"
+        },
+        "finalConfidence": 70
+      }
+    ]
+  },
+  {
+    "participantNumber": 5,
+    "tasks": [
+      {
+        "slot": "Q1",
+        "initial": {
+          "answerId": "A1",
+          "evidenceId": "E3"
+        },
+        "initialConfidence": 60,
+        "choice": "REVISE",
+        "final": {
+          "answerId": "A1",
+          "evidenceId": "E1"
+        },
+        "finalConfidence": 80
+      },
+      {
+        "slot": "Q2",
+        "initial": {
+          "orderedCardIds": [
+            "K1",
+            "K3",
+            "K2",
+            "K4"
+          ]
+        },
+        "initialConfidence": 70,
+        "choice": "KEEP",
+        "final": {
+          "orderedCardIds": [
+            "K1",
+            "K3",
+            "K2",
+            "K4"
+          ]
+        },
+        "finalConfidence": 70
+      },
+      {
+        "slot": "Q3",
+        "initial": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O1"
+            }
+          ],
+          "judgmentOptionId": "O1",
+          "tradeOffIds": [
+            "D2"
+          ]
+        },
+        "initialConfidence": 55,
+        "choice": "REVISE",
+        "final": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O2"
+            }
+          ],
+          "judgmentOptionId": "O2",
+          "tradeOffIds": [
+            "D3"
+          ]
+        },
+        "finalConfidence": 60
+      },
+      {
+        "slot": "Q4",
+        "initial": {
+          "templateId": "M2",
+          "slots": [
+            {
+              "slotId": "still",
+              "choiceId": "S4"
+            },
+            {
+              "slotId": "conclusion",
+              "choiceId": "C2"
+            }
+          ]
+        },
+        "initialConfidence": 45,
+        "choice": "REVISE",
+        "final": {
+          "templateId": "M2",
+          "slots": [
+            {
+              "slotId": "still",
+              "choiceId": "S3"
+            },
+            {
+              "slotId": "conclusion",
+              "choiceId": "C1"
+            }
+          ]
+        },
+        "finalConfidence": 65
+      },
+      {
+        "slot": "Q5",
+        "initial": {
+          "proposal": "Support a local craft business",
+          "reason": "Young people could work near home"
+        },
+        "initialConfidence": 70,
+        "choice": "KEEP",
+        "final": {
+          "proposal": "Support a local craft business",
+          "reason": "Young people could work near home"
+        },
+        "finalConfidence": 75
+      }
+    ]
+  },
+  {
+    "participantNumber": 6,
+    "tasks": [
+      {
+        "slot": "Q1",
+        "initial": {
+          "answerId": "A1",
+          "evidenceId": "E1"
+        },
+        "initialConfidence": 90,
+        "choice": "KEEP",
+        "final": {
+          "answerId": "A1",
+          "evidenceId": "E1"
+        },
+        "finalConfidence": 90
+      },
+      {
+        "slot": "Q2",
+        "initial": {
+          "orderedCardIds": [
+            "K1",
+            "K2",
+            "K3",
+            "K4"
+          ]
+        },
+        "initialConfidence": 80,
+        "choice": "KEEP",
+        "final": {
+          "orderedCardIds": [
+            "K1",
+            "K2",
+            "K3",
+            "K4"
+          ]
+        },
+        "finalConfidence": 85
+      },
+      {
+        "slot": "Q3",
+        "initial": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O2"
+            }
+          ],
+          "judgmentOptionId": "O2",
+          "tradeOffIds": [
+            "D3"
+          ]
+        },
+        "initialConfidence": 75,
+        "choice": "KEEP",
+        "final": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O2"
+            }
+          ],
+          "judgmentOptionId": "O2",
+          "tradeOffIds": [
+            "D3"
+          ]
+        },
+        "finalConfidence": 75
+      },
+      {
+        "slot": "Q4",
+        "initial": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S1"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M1"
+            }
+          ]
+        },
+        "initialConfidence": 80,
+        "choice": "KEEP",
+        "final": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S1"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M1"
+            }
+          ]
+        },
+        "finalConfidence": 80
+      },
+      {
+        "slot": "Q5",
+        "initial": {
+          "proposal": "Open short trade courses at the commune center",
+          "reason": "Many new jobs need trained workers"
+        },
+        "initialConfidence": 75,
+        "choice": "KEEP",
+        "final": {
+          "proposal": "Open short trade courses at the commune center",
+          "reason": "Many new jobs need trained workers"
+        },
+        "finalConfidence": 80
+      }
+    ]
+  },
+  {
+    "participantNumber": 7,
+    "tasks": [
+      {
+        "slot": "Q1",
+        "initial": {
+          "answerId": "A3",
+          "evidenceId": "E2"
+        },
+        "initialConfidence": 55,
+        "choice": "REVISE",
+        "final": {
+          "answerId": "A1",
+          "evidenceId": "E2"
+        },
+        "finalConfidence": 60
+      },
+      {
+        "slot": "Q2",
+        "initial": {
+          "orderedCardIds": [
+            "K4",
+            "K3",
+            "K2",
+            "K1"
+          ]
+        },
+        "initialConfidence": 40,
+        "choice": "REVISE",
+        "final": {
+          "orderedCardIds": [
+            "K1",
+            "K2",
+            "K4",
+            "K3"
+          ]
+        },
+        "finalConfidence": 50
+      },
+      {
+        "slot": "Q3",
+        "initial": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O1"
+            }
+          ],
+          "judgmentOptionId": "O1",
+          "tradeOffIds": [
+            "D1",
+            "D2",
+            "D4"
+          ]
+        },
+        "initialConfidence": 50,
+        "choice": "KEEP",
+        "final": {
+          "comparisons": [
+            {
+              "criterionId": "C1",
+              "value": "O1"
+            },
+            {
+              "criterionId": "C2",
+              "value": "O2"
+            },
+            {
+              "criterionId": "C3",
+              "value": "O1"
+            }
+          ],
+          "judgmentOptionId": "O1",
+          "tradeOffIds": [
+            "D1",
+            "D2",
+            "D4"
+          ]
+        },
+        "finalConfidence": 55
+      },
+      {
+        "slot": "Q4",
+        "initial": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S2"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M1"
+            }
+          ]
+        },
+        "initialConfidence": 45,
+        "choice": "REVISE",
+        "final": {
+          "templateId": "M1",
+          "slots": [
+            {
+              "slotId": "shown",
+              "choiceId": "S1"
+            },
+            {
+              "slotId": "missing",
+              "choiceId": "M1"
+            }
+          ]
+        },
+        "finalConfidence": 60
+      },
+      {
+        "slot": "Q5",
+        "initial": {
+          "proposal": "Improve the road to the industrial zone",
+          "reason": "Better living conditions keep youth here"
+        },
+        "initialConfidence": 50,
+        "choice": "KEEP",
+        "final": {
+          "proposal": "Improve the road to the industrial zone",
+          "reason": "Better living conditions keep youth here"
+        },
+        "finalConfidence": 55
+      }
+    ]
+  }
+]

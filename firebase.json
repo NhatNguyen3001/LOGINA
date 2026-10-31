@@ -1,0 +1,18 @@
+{
+  "firestore": [
+    { "database": "(default)", "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
+    { "database": "logina-test", "rules": "firestore.rules", "indexes": "firestore.indexes.json" }
+  ],
+  "storage": [
+    { "bucket": "logina-dev-materials", "rules": "storage.rules" },
+    { "bucket": "logina-dev-test", "rules": "storage.rules" }
+  ],
+  "hosting": {
+    "public": "apps/web/dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { "source": "/api/**", "run": { "serviceId": "api", "region": "asia-southeast1" } },
+      { "source": "**", "destination": "/index.html" }
+    ]
+  }
+}

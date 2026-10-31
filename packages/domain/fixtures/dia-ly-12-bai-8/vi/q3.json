@@ -1,0 +1,136 @@
+{
+  "slot": "Q3",
+  "taskType": "COMPARE_TRADEOFF",
+  "draftVersion": 2,
+  "questionStem": "Một thanh niên nông thôn đang cân nhắc hai hướng. Em hãy so sánh, chọn một hướng và nêu hạn chế em chấp nhận.",
+  "taskBody": {
+    "options": [
+      {
+        "optionId": "O1",
+        "text": "Đến thành phố hoặc khu công nghiệp làm việc trong nhà máy"
+      },
+      {
+        "optionId": "O2",
+        "text": "Ở lại quê làm dịch vụ, làng nghề hoặc nông nghiệp kết hợp nghề phụ"
+      }
+    ],
+    "criteria": [
+      {
+        "criterionId": "C1",
+        "text": "Thu nhập ổn định"
+      },
+      {
+        "criterionId": "C2",
+        "text": "Gần gia đình và cộng đồng"
+      },
+      {
+        "criterionId": "C3",
+        "text": "Cơ hội học nghề"
+      }
+    ],
+    "constraints": [
+      {
+        "tradeOffId": "D1",
+        "text": "Sống xa gia đình"
+      },
+      {
+        "tradeOffId": "D2",
+        "text": "Chi phí sinh hoạt cao"
+      },
+      {
+        "tradeOffId": "D3",
+        "text": "Thu nhập thấp hơn và không đều"
+      },
+      {
+        "tradeOffId": "D4",
+        "text": "Ít cơ hội thăng tiến"
+      }
+    ],
+    "priorities": {
+      "O1": [
+        "C1",
+        "C3"
+      ],
+      "O2": [
+        "C2"
+      ]
+    }
+  },
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "TRADEOFF_CHECK",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Nêu cái giá phải trả",
+      "whenShownForTeacher": "Khi không chọn hạn chế nào",
+      "sourceAnchor": "tr. 9 · đoạn 2–3",
+      "message": "Nguồn nêu hạn chế của cả hai hướng. Hạn chế nào đi kèm hướng em đã chọn?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "TRADEOFF_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Hướng làm nhà máy",
+      "whenShownForTeacher": "Khi chọn hướng làm nhà máy",
+      "sourceAnchor": "tr. 9 · đoạn 2–3",
+      "message": "Nguồn nói nhiều việc ở nhà máy cần kĩ năng người lao động chưa được đào tạo. Lựa chọn của em đã tính đến điều đó chưa?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "TRADEOFF_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Hướng ở lại quê",
+      "whenShownForTeacher": "Khi chọn hướng ở lại quê",
+      "sourceAnchor": "tr. 9 · đoạn 2–3",
+      "message": "Nguồn nói thu nhập ở hướng này thường thấp hơn và không đều. Lựa chọn của em đã tính đến điều đó chưa?"
+    },
+    {
+      "challengeId": "TN4",
+      "label": "TN4",
+      "isNeutralFallback": false,
+      "primaryFunction": "TRADEOFF_CHECK",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Hạn chế nào quan trọng nhất",
+      "whenShownForTeacher": "Khi chọn từ ba hạn chế trở lên",
+      "sourceAnchor": "tr. 9 · đoạn 2–3",
+      "message": "Em chấp nhận nhiều hạn chế. Hạn chế nào quan trọng nhất với người thanh niên này?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Câu dự phòng",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Kiểm tra lại, trung lập",
+      "whenShownForTeacher": "Khi không câu nào ở trên khớp",
+      "sourceAnchor": "tr. 9 · đoạn 2–3",
+      "message": "Em hãy đọc lại hai hướng. Lựa chọn của em phải đánh đổi điều gì?"
+    }
+  ],
+  "neutralFallbackId": "FB",
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se6",
+      "se7"
+    ],
+    "sourceUnitIds": [
+      "p9-2",
+      "p9-3"
+    ],
+    "sourceClaimIds": [],
+    "relationIds": []
+  },
+  "feedback": [
+    {
+      "optionId": "O1",
+      "relationLabel": "Lựa chọn có đánh đổi",
+      "text": "Nguồn nêu cả lợi ích và hạn chế của hai hướng. Không hướng nào là đáp án đúng; điều quan trọng là nêu được lựa chọn của em phải đánh đổi gì."
+    }
+  ]
+}

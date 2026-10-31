@@ -1,0 +1,87 @@
+{
+  "slot": "Q1",
+  "version": 1,
+  "fallbackChallengeId": "FB",
+  "candidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "priorityOrder": 1,
+      "when": {
+        "all": [
+          {
+            "field": "answerId",
+            "op": "in",
+            "value": [
+              "A2",
+              "A3"
+            ]
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN1"
+      }
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "priorityOrder": 2,
+      "when": {
+        "all": [
+          {
+            "field": "evidenceId",
+            "op": "eq",
+            "value": "E3"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN3"
+      }
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "priorityOrder": 3,
+      "when": {
+        "all": [
+          {
+            "field": "answerId",
+            "op": "eq",
+            "value": "A1"
+          },
+          {
+            "field": "evidenceId",
+            "op": "eq",
+            "value": "E2"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN2"
+      }
+    },
+    {
+      "challengeId": "TN4",
+      "label": "TN4",
+      "priorityOrder": 4,
+      "when": {
+        "all": [
+          {
+            "field": "evidenceId",
+            "op": "eq",
+            "value": "E4"
+          }
+        ]
+      },
+      "requires": {
+        "message": true,
+        "targetRef": "ref_TN4"
+      }
+    }
+  ]
+}

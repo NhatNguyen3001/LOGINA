@@ -1,0 +1,157 @@
+{
+  "slot": "Q4",
+  "taskType": "COUNTERARGUMENT",
+  "questionStem": "Có ý kiến: “Lao động nông thôn giảm nên nông nghiệp suy yếu.” Em hãy lập luận phản biện từ điều nguồn thực sự cho thấy.",
+  "taskBody": {
+    "templates": [
+      {
+        "templateId": "M1",
+        "text": "Nguồn cho thấy [shown], nhưng điều đó chưa cho biết [missing].",
+        "slots": [
+          {
+            "slotId": "shown",
+            "choices": [
+              {
+                "choiceId": "S1",
+                "text": "tỉ trọng lao động ngành này giảm"
+              },
+              {
+                "choiceId": "S2",
+                "text": "số lao động giảm"
+              }
+            ]
+          },
+          {
+            "slotId": "missing",
+            "choices": [
+              {
+                "choiceId": "M1",
+                "text": "số người hay sản lượng có giảm không"
+              },
+              {
+                "choiceId": "M2",
+                "text": "vì sao tỉ trọng thay đổi"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "templateId": "M2",
+        "text": "Ngành này vẫn còn [still], nên [conclusion].",
+        "slots": [
+          {
+            "slotId": "still",
+            "choices": [
+              {
+                "choiceId": "S3",
+                "text": "tỉ trọng lao động lớn"
+              },
+              {
+                "choiceId": "S4",
+                "text": "thu nhập cao hơn"
+              }
+            ]
+          },
+          {
+            "slotId": "conclusion",
+            "choices": [
+              {
+                "choiceId": "C1",
+                "text": "chỉ tỉ trọng nhỏ hơn thì chưa cho thấy ngành suy yếu"
+              },
+              {
+                "choiceId": "C2",
+                "text": "ngành đang tăng trưởng nhanh"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "neutralFallbackId": "FB",
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se1",
+      "se3"
+    ],
+    "sourceUnitIds": [
+      "table 8.1",
+      "p8-2"
+    ],
+    "sourceClaimIds": [
+      "c1",
+      "c4"
+    ],
+    "relationIds": [
+      "rel1",
+      "rel4"
+    ]
+  },
+  "feedback": [
+    {
+      "optionId": "M1",
+      "relationLabel": "Bám sát nguồn",
+      "text": "Nguồn cho thấy tỉ trọng giảm. Nguồn không nói số lao động hay sản lượng có giảm không, nên ý kiến trên vượt quá dữ liệu."
+    }
+  ],
+  "draftVersion": 4,
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "COUNTERPOINT",
+      "challengeTarget": "SOURCE_DIRECTION",
+      "purposeForTeacher": "Tỉ trọng hay số người",
+      "whenShownForTeacher": "Khi lập luận bắt đầu từ số lao động",
+      "sourceAnchor": "tr. 8 · Bảng 8.1",
+      "message": "Bảng 8.1 cho biết số lao động hay tỉ trọng lao động?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "COUNTERPOINT",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Điều còn thiếu",
+      "whenShownForTeacher": "Khi dùng mẫu thứ nhất",
+      "sourceAnchor": "tr. 8 · Bảng 8.1",
+      "message": "Em cần biết thêm điều gì trước khi nói nông nghiệp suy yếu?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "COUNTERPOINT",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Bám sát nguồn",
+      "whenShownForTeacher": "Khi lập luận nêu điều nguồn không cho thấy",
+      "sourceAnchor": "tr. 8 · đoạn 2",
+      "message": "Câu nào trong nguồn hỗ trợ phần em đã điền?"
+    },
+    {
+      "challengeId": "TN4",
+      "label": "TN4",
+      "isNeutralFallback": false,
+      "primaryFunction": "COUNTERPOINT",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Vẫn chiếm tỉ trọng lớn",
+      "whenShownForTeacher": "Khi dùng mẫu thứ hai",
+      "sourceAnchor": "tr. 8 · đoạn 2",
+      "message": "Hiện vẫn chiếm tỉ trọng lớn: điều đó có trả lời được ý kiến về suy yếu không?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Câu dự phòng",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Kiểm tra lại, trung lập",
+      "whenShownForTeacher": "Khi không câu nào ở trên khớp",
+      "sourceAnchor": "tr. 8 · Bảng 8.1",
+      "message": "Em hãy đọc lại lập luận. Mỗi phần có xuất phát từ điều nguồn cho thấy không?"
+    }
+  ]
+}

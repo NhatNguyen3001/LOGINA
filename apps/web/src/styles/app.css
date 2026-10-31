@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+@import '@logina/ui/tokens.css';
+@import './components.css';
+@import '@fontsource/be-vietnam-pro/400.css';
+@import '@fontsource/be-vietnam-pro/500.css';
+@import '@fontsource/be-vietnam-pro/600.css';
+@import '@fontsource/be-vietnam-pro/700.css';
+
+@theme inline {
+  --font-sans: var(--font);
+  --color-canvas: var(--canvas);
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-subtle: var(--subtle);
+  --color-gray: var(--gray);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-control: var(--control);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-on-accent: var(--on-accent);
+  --color-accent: var(--accent);
+  --color-navy: var(--navy);
+  --color-navy-bg: var(--navy-bg);
+  --color-navy-line: var(--navy-line);
+  --color-green: var(--green);
+  --color-green-bg: var(--green-bg);
+  --color-green-line: var(--green-line);
+  --color-orange: var(--orange);
+  --color-orange-bg: var(--orange-bg);
+  --color-orange-line: var(--orange-line);
+  --color-red: var(--red);
+  --color-red-bg: var(--red-bg);
+  --color-red-line: var(--red-line);
+  --color-purple: var(--purple);
+  --color-purple-bg: var(--purple-bg);
+  --color-purple-line: var(--purple-line);
+  --shadow-card: var(--shadow);
+}
+
+/* shadcn/ui reads these names; 04-UX-UI section 3.2. */
+:root {
+  --background: var(--page);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --primary: var(--accent);
+  --primary-foreground: var(--on-accent);
+  --secondary: var(--subtle);
+  --secondary-foreground: var(--ink);
+  --muted: var(--gray);
+  --muted-foreground: var(--ink-3);
+  --destructive: var(--red);
+  --border: var(--line);
+  --input: var(--control);
+  --ring: var(--accent);
+}
+
+@layer base {
+  html {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--font);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    line-height: 1.25;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* The gallery frames are 900 px tall; a real window is whatever it is. */
+.app {
+  min-height: 100dvh;
+}
+
+@media (min-width: 861px) {
+  .side {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+}

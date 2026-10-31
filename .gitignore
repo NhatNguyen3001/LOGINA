@@ -1,0 +1,43 @@
+# Local tooling and private docs
+.claude/
+.codegraph/
+.superpowers/
+AGENTS.md
+CLAUDE.md
+
+# Secrets: never commit
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+*.pem
+*.key
+*-key.json
+serviceAccount*.json
+service-account*.json
+application_default_credentials.json
+credentials.json
+tools/seed/.env.seed
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.turbo/
+playwright-report/
+test-results/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*-debug.log
+emulator-data/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

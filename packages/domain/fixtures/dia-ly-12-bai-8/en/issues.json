@@ -1,0 +1,100 @@
+[
+  {
+    "id": "iss1",
+    "pointNumber": 1,
+    "spans": [
+      {
+        "paragraphId": "p8-1",
+        "start": 0,
+        "end": 236
+      }
+    ],
+    "issueType": "MISSING",
+    "questionKind": "SOURCE",
+    "severity": "BLOCKER",
+    "sourceRef": "p. 8 · Table 8.1",
+    "bubble": "The material says the share in agriculture, forestry and fisheries fell, but gives no total workforce figure, so we can't tell whether the number of people fell. Do you want to keep this as a point for students to consider, or add a source?",
+    "currentInterpretation": "conclude only about shares, not about the number of people.",
+    "suggestions": [
+      {
+        "id": "sug1",
+        "text": "Keep this open: students may only conclude about shares",
+        "sourceRef": "Evidence: the source has no total workforce figure",
+        "rationale": "Table 8.1 gives percentages only."
+      }
+    ],
+    "state": "UNRESOLVED"
+  },
+  {
+    "id": "iss2",
+    "pointNumber": 2,
+    "spans": [],
+    "issueType": "AMBIGUOUS",
+    "questionKind": "TEACHER_INTENT",
+    "severity": "BLOCKER",
+    "sourceRef": "Lesson goal",
+    "bubble": "For this part, do you want students to recognize the shift, or to test a conclusion that goes beyond the data?",
+    "currentInterpretation": "students recognize the shift.",
+    "suggestions": [
+      {
+        "id": "sug2",
+        "text": "Recognize the trend and choose evidence that covers both parts",
+        "sourceRef": "Evidence: Table 8.1 shows both the decrease and the increase",
+        "rationale": "The table has both directions."
+      },
+      {
+        "id": "sug3",
+        "text": "Test a conclusion that goes beyond the data (share is not headcount)",
+        "sourceRef": "Evidence: the source has no total workforce figure",
+        "rationale": "Headcount is not in the source."
+      }
+    ],
+    "state": "UNRESOLVED"
+  },
+  {
+    "id": "iss3",
+    "pointNumber": 3,
+    "spans": [
+      {
+        "paragraphId": "p9-1",
+        "start": 0,
+        "end": 188
+      }
+    ],
+    "issueType": "AMBIGUOUS",
+    "questionKind": "SOURCE",
+    "severity": "REVIEW",
+    "sourceRef": "p. 9",
+    "bubble": "Can “Workforce quality is improving” be used as evidence for the sector structure, or is it only background information?",
+    "currentInterpretation": "background information; it does not explain the share structure.",
+    "suggestions": [
+      {
+        "id": "sug4",
+        "text": "Treat it as background only",
+        "sourceRef": "Evidence: p. 9 does not link quality to sector shares",
+        "rationale": "The paragraph is about training, not sectors."
+      }
+    ],
+    "state": "UNRESOLVED"
+  },
+  {
+    "id": "iss4",
+    "pointNumber": 4,
+    "spans": [
+      {
+        "paragraphId": "secondary",
+        "start": 0,
+        "end": 194
+      }
+    ],
+    "issueType": "CONFLICT",
+    "questionKind": "SOURCE",
+    "severity": "REVIEW",
+    "sourceRef": "Secondary source · 2015",
+    "bubble": "The 2015 figures in the secondary source are from a different year than Table 8.1.",
+    "currentInterpretation": "not used in this lesson.",
+    "suggestions": [],
+    "state": "EXCLUDED",
+    "excludeReason": "different year from the main source."
+  }
+]

@@ -1,0 +1,109 @@
+{
+  "slot": "Q2",
+  "taskType": "EVIDENCE_RANKING",
+  "draftVersion": 2,
+  "questionStem": "Xếp bốn yếu tố sau theo thứ tự từ tác động trực tiếp nhất đến ít trực tiếp nhất tới việc tạo thêm việc làm ngoài nông nghiệp.",
+  "taskBody": {
+    "cards": [
+      {
+        "cardId": "K1",
+        "text": "Công nghiệp hóa, hiện đại hóa tạo thêm việc làm trong công nghiệp và dịch vụ."
+      },
+      {
+        "cardId": "K2",
+        "text": "Hội nhập quốc tế và đầu tư nước ngoài đưa thêm nhà máy, doanh nghiệp vào hoạt động."
+      },
+      {
+        "cardId": "K3",
+        "text": "Đô thị hóa thu hút lao động từ nông thôn đến thành phố và khu công nghiệp."
+      },
+      {
+        "cardId": "K4",
+        "text": "Cơ giới hóa làm giảm số lao động cần cho mỗi vụ."
+      }
+    ],
+    "basis": "Dùng các yếu tố trong đoạn ở tr. 8.",
+    "acceptedOrders": [
+      [
+        "K1",
+        "K2",
+        "K3",
+        "K4"
+      ],
+      [
+        "K2",
+        "K1",
+        "K3",
+        "K4"
+      ]
+    ]
+  },
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Trực tiếp hay gián tiếp",
+      "whenShownForTeacher": "Khi xếp cơ giới hóa đầu tiên",
+      "sourceAnchor": "tr. 8 · Mục 2",
+      "message": "Yếu tố em xếp đầu tiên tạo ra việc làm ngoài nông nghiệp, hay giúp lao động rời khỏi nông nghiệp?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Di chuyển hay việc làm mới",
+      "whenShownForTeacher": "Khi xếp đô thị hóa đầu tiên",
+      "sourceAnchor": "tr. 8 · Mục 2",
+      "message": "Yếu tố em xếp đầu tiên tạo ra việc làm mới, hay đưa người đến nơi có việc làm?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Đối chiếu với đoạn văn",
+      "whenShownForTeacher": "Khi xếp yếu tố tạo việc làm đầu tiên",
+      "sourceAnchor": "tr. 8 · Mục 2",
+      "message": "Những từ nào trong đoạn văn cho thấy mỗi yếu tố tác động trực tiếp đến đâu?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Câu dự phòng",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Kiểm tra lại, trung lập",
+      "whenShownForTeacher": "Khi không câu nào ở trên khớp",
+      "sourceAnchor": "tr. 8 · Mục 2",
+      "message": "Em hãy đọc lại thứ tự đã xếp. Em có giải thích được vì sao mỗi thẻ đứng trên thẻ kế tiếp không?"
+    }
+  ],
+  "neutralFallbackId": "FB",
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se5"
+    ],
+    "sourceUnitIds": [
+      "p8-3"
+    ],
+    "sourceClaimIds": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "relationIds": []
+  },
+  "feedback": [
+    {
+      "optionId": "K1",
+      "relationLabel": "Tạo việc làm",
+      "text": "Đoạn văn nói công nghiệp hóa và đầu tư trực tiếp mang lại việc làm, doanh nghiệp; đô thị hóa đưa lao động di chuyển, còn cơ giới hóa giúp lao động rời khỏi nông nghiệp."
+    }
+  ]
+}

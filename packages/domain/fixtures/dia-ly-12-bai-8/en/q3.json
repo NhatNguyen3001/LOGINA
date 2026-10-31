@@ -1,0 +1,136 @@
+{
+  "slot": "Q3",
+  "taskType": "COMPARE_TRADEOFF",
+  "draftVersion": 2,
+  "questionStem": "A young rural worker is choosing between two paths. Compare them, choose one, and name the drawback you accept.",
+  "taskBody": {
+    "options": [
+      {
+        "optionId": "O1",
+        "text": "Move to a city or industrial zone to work in a factory"
+      },
+      {
+        "optionId": "O2",
+        "text": "Stay home and work in services, a craft village or farming with a side job"
+      }
+    ],
+    "criteria": [
+      {
+        "criterionId": "C1",
+        "text": "Steady income"
+      },
+      {
+        "criterionId": "C2",
+        "text": "Being near family and community"
+      },
+      {
+        "criterionId": "C3",
+        "text": "Chances to learn a trade"
+      }
+    ],
+    "constraints": [
+      {
+        "tradeOffId": "D1",
+        "text": "Living far from family"
+      },
+      {
+        "tradeOffId": "D2",
+        "text": "High living costs"
+      },
+      {
+        "tradeOffId": "D3",
+        "text": "Lower, irregular income"
+      },
+      {
+        "tradeOffId": "D4",
+        "text": "Fewer chances to move up"
+      }
+    ],
+    "priorities": {
+      "O1": [
+        "C1",
+        "C3"
+      ],
+      "O2": [
+        "C2"
+      ]
+    }
+  },
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "TRADEOFF_CHECK",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Naming a cost",
+      "whenShownForTeacher": "When no drawback is chosen",
+      "sourceAnchor": "p. 9 · paras. 2–3",
+      "message": "The source names drawbacks for both paths. Which one comes with the path you chose?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "TRADEOFF_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Factory path",
+      "whenShownForTeacher": "When the factory path is chosen",
+      "sourceAnchor": "p. 9 · paras. 2–3",
+      "message": "The source says many factory jobs need skills people have not been trained for. Does your choice take that into account?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "TRADEOFF_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Stay-home path",
+      "whenShownForTeacher": "When the stay-home path is chosen",
+      "sourceAnchor": "p. 9 · paras. 2–3",
+      "message": "The source says income on this path is often lower and irregular. Does your choice take that into account?"
+    },
+    {
+      "challengeId": "TN4",
+      "label": "TN4",
+      "isNeutralFallback": false,
+      "primaryFunction": "TRADEOFF_CHECK",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Which drawback matters most",
+      "whenShownForTeacher": "When three or more drawbacks are chosen",
+      "sourceAnchor": "p. 9 · paras. 2–3",
+      "message": "You accepted several drawbacks. Which one would matter most to this young worker?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Fallback",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Neutral re-check",
+      "whenShownForTeacher": "When none of the above applies",
+      "sourceAnchor": "p. 9 · paras. 2–3",
+      "message": "Read the two paths again. What does your choice give up?"
+    }
+  ],
+  "neutralFallbackId": "FB",
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se6",
+      "se7"
+    ],
+    "sourceUnitIds": [
+      "p9-2",
+      "p9-3"
+    ],
+    "sourceClaimIds": [],
+    "relationIds": []
+  },
+  "feedback": [
+    {
+      "optionId": "O1",
+      "relationLabel": "A choice with trade-offs",
+      "text": "The source gives both paths gains and drawbacks. Neither is the right answer; what counts is naming what your choice gives up."
+    }
+  ]
+}

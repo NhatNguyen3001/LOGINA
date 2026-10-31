@@ -1,0 +1,101 @@
+{
+  "slot": "Q5",
+  "taskType": "OPEN_PROPOSAL",
+  "draftVersion": 3,
+  "questionStem": "Một xã có thể làm một việc gì để tạo việc làm phù hợp cho thanh niên nông thôn? Em hãy viết một đề xuất và một lí do.",
+  "taskBody": {
+    "instructions": "Viết một đề xuất ngắn và một lí do, mỗi phần tối đa 120 kí tự.",
+    "maxCharsPerField": 120,
+    "keywordPartitions": {
+      "training": [
+        "đào tạo",
+        "học nghề",
+        "dạy nghề",
+        "kĩ năng",
+        "kỹ năng"
+      ],
+      "business": [
+        "doanh nghiệp",
+        "làng nghề",
+        "nhà máy",
+        "công ty",
+        "kinh doanh"
+      ],
+      "living": [
+        "đời sống",
+        "nhà ở",
+        "đường",
+        "trường",
+        "y tế"
+      ]
+    }
+  },
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Đào tạo",
+      "whenShownForTeacher": "Khi đề xuất nói về đào tạo",
+      "sourceAnchor": "tr. 9 · đoạn 4",
+      "message": "Sau khi học xong, những bạn trẻ này sẽ làm việc ở đâu?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Doanh nghiệp địa phương",
+      "whenShownForTeacher": "Khi đề xuất nói về doanh nghiệp địa phương",
+      "sourceAnchor": "tr. 9 · đoạn 4",
+      "message": "Người lao động ở cơ sở này cần biết làm những gì?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Điều kiện sống",
+      "whenShownForTeacher": "Khi đề xuất nói về điều kiện sống",
+      "sourceAnchor": "tr. 9 · đoạn 4",
+      "message": "Việc này giúp thanh niên có việc làm như thế nào, chứ không chỉ sống tốt hơn?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Câu dự phòng",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Kiểm tra lại, trung lập",
+      "whenShownForTeacher": "Khi không câu nào ở trên khớp",
+      "sourceAnchor": "tr. 8–9",
+      "message": "Em hãy đọc lại lí do. Lí do đó dựa trên phần nào của nguồn?"
+    }
+  ],
+  "neutralFallbackId": "FB",
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se6",
+      "se7",
+      "se8"
+    ],
+    "sourceUnitIds": [
+      "p9-2",
+      "p9-3",
+      "p9-4"
+    ],
+    "sourceClaimIds": [],
+    "relationIds": []
+  },
+  "feedback": [
+    {
+      "optionId": "proposal",
+      "relationLabel": "Đề xuất mở",
+      "text": "Nguồn gắn việc làm của thanh niên nông thôn với đào tạo nghề, doanh nghiệp địa phương và điều kiện sống. Không có một đề xuất đúng duy nhất."
+    }
+  ]
+}

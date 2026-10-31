@@ -1,0 +1,90 @@
+{
+  "deterministic": [
+    {
+      "checkId": "STRUCT",
+      "label": "4 statements, 4 cards of the right types",
+      "status": "PASS",
+      "affectedIds": []
+    },
+    {
+      "checkId": "PAIRS",
+      "label": "16/16 statement × card pairs evaluated",
+      "status": "PASS",
+      "affectedIds": []
+    },
+    {
+      "checkId": "COVERAGE",
+      "label": "Every choice gets exactly 1 Think-again prompt",
+      "status": "PASS",
+      "affectedIds": []
+    },
+    {
+      "checkId": "ANCHORS",
+      "label": "All content has a source location",
+      "status": "PASS",
+      "affectedIds": []
+    }
+  ],
+  "gates": [
+    {
+      "gateId": "QG1",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The question makes students weigh the evidence, matching the chosen objective.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG2",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The source is enough for this task.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG3",
+      "status": "REVIEW_REQUIRED",
+      "findingCodes": [
+        "DISTRACTOR_IMPLAUSIBLE"
+      ],
+      "sourceRefs": [],
+      "affectedArtifactIds": [
+        "A4"
+      ],
+      "explanationForTeacher": "A4 is easy to rule out because of its extreme wording. Revise the wording or accept it with a reason.",
+      "overridable": true
+    },
+    {
+      "gateId": "QG4",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The evidence plays different roles and doesn't overlap.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG5",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "No prompt gives away the answer; the fallback prompt is neutral.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG6",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The question, options and source all cover the same period.",
+      "overridable": false
+    }
+  ],
+  "aggregate": "REVIEW_REQUIRED",
+  "candidateSetVersion": 1
+}

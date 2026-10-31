@@ -1,0 +1,80 @@
+{
+  "deterministic": [
+    {
+      "checkId": "STRUCT",
+      "label": "Task structure is valid",
+      "status": "PASS",
+      "affectedIds": []
+    },
+    {
+      "checkId": "COVERAGE",
+      "label": "Every choice gets exactly 1 Think-again prompt",
+      "status": "PASS",
+      "affectedIds": []
+    },
+    {
+      "checkId": "ANCHORS",
+      "label": "All content has a source location",
+      "status": "PASS",
+      "affectedIds": []
+    }
+  ],
+  "gates": [
+    {
+      "gateId": "QG1",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The question makes students weigh the evidence, matching the chosen objective.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG2",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The source is enough for this task.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG3",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The wrong options need checking against the source.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG4",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The evidence plays different roles and doesn't overlap.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG5",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "No prompt gives away the answer; the fallback prompt is neutral.",
+      "overridable": false
+    },
+    {
+      "gateId": "QG6",
+      "status": "PASS",
+      "findingCodes": [],
+      "sourceRefs": [],
+      "affectedArtifactIds": [],
+      "explanationForTeacher": "The question, options and source all cover the same period.",
+      "overridable": false
+    }
+  ],
+  "aggregate": "MACHINE_PASS",
+  "candidateSetVersion": 1
+}

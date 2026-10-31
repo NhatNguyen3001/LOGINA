@@ -1,0 +1,10 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-f', 'apps/api/Dockerfile', '-t', '$_IMAGE:$_TAG', '.']
+images:
+  - '$_IMAGE:$_TAG'
+substitutions:
+  _IMAGE: asia-southeast1-docker.pkg.dev/${PROJECT_ID}/logina/api
+  _TAG: latest
+options:
+  dynamicSubstitutions: true

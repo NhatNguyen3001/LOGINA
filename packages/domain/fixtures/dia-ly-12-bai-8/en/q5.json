@@ -1,0 +1,101 @@
+{
+  "slot": "Q5",
+  "taskType": "OPEN_PROPOSAL",
+  "draftVersion": 3,
+  "questionStem": "What is one thing a commune could do to create suitable jobs for rural youth? Write a proposal and a reason.",
+  "taskBody": {
+    "instructions": "Write a short proposal and a reason, up to 120 characters each.",
+    "maxCharsPerField": 120,
+    "keywordPartitions": {
+      "training": [
+        "training",
+        "train",
+        "course",
+        "skill",
+        "trade"
+      ],
+      "business": [
+        "business",
+        "enterprise",
+        "craft",
+        "factory",
+        "company"
+      ],
+      "living": [
+        "living",
+        "housing",
+        "road",
+        "school",
+        "health"
+      ]
+    }
+  },
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Training",
+      "whenShownForTeacher": "When the proposal is about training",
+      "sourceAnchor": "p. 9 · para. 4",
+      "message": "After the training, where would these young people work?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Local business",
+      "whenShownForTeacher": "When the proposal is about local business",
+      "sourceAnchor": "p. 9 · para. 4",
+      "message": "What would the workers in this business need to know how to do?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Living conditions",
+      "whenShownForTeacher": "When the proposal is about living conditions",
+      "sourceAnchor": "p. 9 · para. 4",
+      "message": "How would this help young people find a job, not only live better?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Fallback",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Neutral re-check",
+      "whenShownForTeacher": "When none of the above applies",
+      "sourceAnchor": "pp. 8–9",
+      "message": "Read your reason again. Which part of the source does it rest on?"
+    }
+  ],
+  "neutralFallbackId": "FB",
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se6",
+      "se7",
+      "se8"
+    ],
+    "sourceUnitIds": [
+      "p9-2",
+      "p9-3",
+      "p9-4"
+    ],
+    "sourceClaimIds": [],
+    "relationIds": []
+  },
+  "feedback": [
+    {
+      "optionId": "proposal",
+      "relationLabel": "Open proposal",
+      "text": "The source links jobs for rural youth to vocational training, local businesses and better living conditions. There is no single right proposal."
+    }
+  ]
+}

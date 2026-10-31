@@ -1,0 +1,36 @@
+{
+  "name": "@logina/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "prompts"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --root ../.. apps/worker/"
+  },
+  "dependencies": {
+    "@google/genai": "^2.32.0",
+    "@googleapis/sheets": "^18.1.2",
+    "@hono/node-server": "^2.1.5",
+    "@logina/contracts": "workspace:*",
+    "@logina/db": "workspace:*",
+    "@logina/domain": "workspace:*",
+    "firebase-admin": "^14.5.0",
+    "hono": "^4.13.14",
+    "mammoth": "^1.13.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@logina/test-utils": "workspace:^"
+  }
+}

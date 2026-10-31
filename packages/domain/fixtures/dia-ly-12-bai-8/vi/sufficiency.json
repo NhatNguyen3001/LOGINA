@@ -1,0 +1,86 @@
+[
+  {
+    "slot": "Q1",
+    "taskType": "JUDGMENT_EVIDENCE",
+    "reasoningTarget": "1 nhận định đúng, bác bỏ 3 nhận định sai, 4 thẻ căn cứ",
+    "targetClaimIds": [
+      "c1",
+      "c2",
+      "c3",
+      "c4"
+    ],
+    "eligibleSourceEvidenceIds": [
+      "se1",
+      "se2",
+      "se3",
+      "se4"
+    ],
+    "scopeConditions": "Tỉ trọng, 2010–2021",
+    "assessment": "SUFFICIENT",
+    "sourceRefs": "Bảng 8.1 · tr. 8 đoạn 2 · tr. 9",
+    "explanationForTeacher": "Nguồn xác nhận được một nhận định và bác bỏ các nhận định còn lại."
+  },
+  {
+    "slot": "Q2",
+    "taskType": "EVIDENCE_RANKING",
+    "reasoningTarget": "Thứ tự ảnh hưởng của 4 yếu tố tới chuyển dịch lao động",
+    "targetClaimIds": [
+      "c1",
+      "c2",
+      "c3"
+    ],
+    "eligibleSourceEvidenceIds": [
+      "se5"
+    ],
+    "scopeConditions": "Các yếu tố được nguồn nêu",
+    "assessment": "SUFFICIENT",
+    "sourceRefs": "tr. 8 · Mục 2",
+    "explanationForTeacher": "Nguồn nêu đủ bốn yếu tố."
+  },
+  {
+    "slot": "Q3",
+    "taskType": "COMPARE_TRADEOFF",
+    "reasoningTarget": "Hạn chế của 2 phương án việc làm cho lao động nông thôn",
+    "targetClaimIds": [],
+    "eligibleSourceEvidenceIds": [
+      "se6",
+      "se7"
+    ],
+    "scopeConditions": "Hai hướng được nguồn nêu",
+    "assessment": "SUFFICIENT",
+    "sourceRefs": "tr. 9 · đoạn 2–3",
+    "explanationForTeacher": "Nguồn nêu cả lợi ích và hạn chế của hai hướng."
+  },
+  {
+    "slot": "Q4",
+    "taskType": "COUNTERARGUMENT",
+    "reasoningTarget": "Phản biện “Lao động nông thôn giảm nên nông nghiệp suy yếu”",
+    "targetClaimIds": [
+      "c1",
+      "c4"
+    ],
+    "eligibleSourceEvidenceIds": [
+      "se1",
+      "se3"
+    ],
+    "scopeConditions": "Nguồn có tỉ trọng, không có số liệu năng suất",
+    "assessment": "UNCERTAIN",
+    "sourceRefs": "tr. 8 · Bảng 8.1",
+    "explanationForTeacher": "Bài 8 không có số liệu năng suất lao động nông nghiệp, mà lời phản biện cần căn cứ này."
+  },
+  {
+    "slot": "Q5",
+    "taskType": "OPEN_PROPOSAL",
+    "reasoningTarget": "Bối cảnh việc làm của thanh niên nông thôn",
+    "targetClaimIds": [],
+    "eligibleSourceEvidenceIds": [
+      "se6",
+      "se7",
+      "se8"
+    ],
+    "scopeConditions": "Đề xuất dựa trên tr. 8–9",
+    "assessment": "SUFFICIENT",
+    "sourceRefs": "tr. 8–9",
+    "explanationForTeacher": "Nguồn nêu những điều việc làm của thanh niên nông thôn phụ thuộc vào."
+  }
+]

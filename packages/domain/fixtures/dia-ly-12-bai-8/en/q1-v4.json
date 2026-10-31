@@ -1,0 +1,409 @@
+{
+  "slot": "Q1",
+  "taskType": "JUDGMENT_EVIDENCE",
+  "questionStem": "Which statement about the shift in Vietnam's employment structure by sector is correct? Choose 1 statement and the 1 evidence card that fits best.",
+  "generatedE": [
+    {
+      "generatedEId": "E1",
+      "text": "The source shows that the share of agriculture, forestry and fisheries decreased, while industry and construction and services increased.",
+      "qualityRelativeToCorrectA": "FULL_SUPPORT",
+      "eFactuality": "SOURCE_SUPPORTED",
+      "eSupportCompleteness": "FULL",
+      "teacherLabel": "Full",
+      "relationNote": "covers both parts of A1",
+      "sourceAnchor": "Table 8.1",
+      "supportSourceEvidenceIds": [
+        "se1",
+        "se2"
+      ],
+      "counterSourceEvidenceIds": [],
+      "supportExtentRationale": "Covers both parts."
+    },
+    {
+      "generatedEId": "E2",
+      "text": "The source shows that the share of agriculture, forestry and fisheries decreased.",
+      "qualityRelativeToCorrectA": "PARTIAL_SUPPORT",
+      "eFactuality": "SOURCE_SUPPORTED",
+      "eSupportCompleteness": "PARTIAL",
+      "teacherLabel": "Partial",
+      "relationNote": "true, but missing the “increased” part",
+      "sourceAnchor": "Table 8.1",
+      "supportSourceEvidenceIds": [
+        "se1"
+      ],
+      "counterSourceEvidenceIds": [],
+      "supportExtentRationale": "Covers one part only."
+    },
+    {
+      "generatedEId": "E3",
+      "text": "The source shows that the share of agriculture, forestry and fisheries increased.",
+      "qualityRelativeToCorrectA": "FACTUALLY_FALSE",
+      "eFactuality": "SOURCE_CONTRADICTED",
+      "eSupportCompleteness": "NONE",
+      "teacherLabel": "Factually false",
+      "relationNote": "contradicted by the source",
+      "sourceAnchor": "Table 8.1",
+      "supportSourceEvidenceIds": [],
+      "counterSourceEvidenceIds": [
+        "se1"
+      ],
+      "supportExtentRationale": "Contradicted by Table 8.1."
+    },
+    {
+      "generatedEId": "E4",
+      "text": "Workforce quality improved thanks to education and training.",
+      "qualityRelativeToCorrectA": "IRRELEVANT",
+      "eFactuality": "SOURCE_SUPPORTED",
+      "eSupportCompleteness": "NONE",
+      "teacherLabel": "Irrelevant",
+      "relationNote": "true, but doesn't explain the shares",
+      "sourceAnchor": "p. 9",
+      "supportSourceEvidenceIds": [
+        "se4"
+      ],
+      "counterSourceEvidenceIds": [],
+      "supportExtentRationale": "True, about something else."
+    }
+  ],
+  "challengeCandidates": [
+    {
+      "challengeId": "TN1",
+      "label": "TN1",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "SOURCE_DIRECTION",
+      "purposeForTeacher": "Source direction",
+      "whenShownForTeacher": "When a student picks a statement that runs against the source",
+      "sourceAnchor": "Table 8.1",
+      "message": "Compare the statement with the figures at the start and end of the period. Does the direction of change match your choice?"
+    },
+    {
+      "challengeId": "TN2",
+      "label": "TN2",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "EVIDENCE_SUFFICIENCY",
+      "purposeForTeacher": "Sufficient evidence",
+      "whenShownForTeacher": "When a student picks A1 with a card that supports only one part",
+      "sourceAnchor": "Table 8.1",
+      "message": "Statement A1 has two parts. Does the card you chose provide evidence for both?"
+    },
+    {
+      "challengeId": "TN3",
+      "label": "TN3",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "PAIR_CONSISTENCY",
+      "purposeForTeacher": "Statement and card consistency",
+      "whenShownForTeacher": "When the card runs opposite to the statement",
+      "sourceAnchor": "Table 8.1",
+      "message": "Do the card you chose and your statement describe the same direction of change?"
+    },
+    {
+      "challengeId": "TN4",
+      "label": "TN4",
+      "isNeutralFallback": false,
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "RELEVANCE",
+      "purposeForTeacher": "Relevance",
+      "whenShownForTeacher": "When a student picks a card that does not explain shares (E4)",
+      "sourceAnchor": "p. 9",
+      "message": "The card you chose is about workforce quality. Does it help explain the change in shares?"
+    },
+    {
+      "challengeId": "FB",
+      "label": "Fallback",
+      "isNeutralFallback": true,
+      "primaryFunction": "CLARIFICATION",
+      "challengeTarget": "CLARIFY_MISSING",
+      "purposeForTeacher": "Evidence check, neutral",
+      "whenShownForTeacher": "When none of the above applies",
+      "sourceAnchor": "p. 8 · Table 8.1",
+      "message": "Read the evidence card you chose again. How directly does it support your statement?"
+    }
+  ],
+  "neutralFallbackId": "FB",
+  "displayOrder": {
+    "answers": [
+      "A1",
+      "A2",
+      "A3",
+      "A4"
+    ],
+    "evidence": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ]
+  },
+  "dependencyManifest": {
+    "sourceEvidenceIds": [
+      "se1",
+      "se2",
+      "se3",
+      "se4"
+    ],
+    "sourceUnitIds": [
+      "table 8.1",
+      "p8-2",
+      "p9-1"
+    ],
+    "sourceClaimIds": [
+      "c1",
+      "c2",
+      "c3",
+      "c4"
+    ],
+    "relationIds": [
+      "rel1",
+      "rel2",
+      "rel3",
+      "rel4"
+    ]
+  },
+  "feedback": [
+    {
+      "optionId": "A1",
+      "relationLabel": "Matches the source",
+      "text": "Statement A matches Table 8.1: the share in agriculture, forestry and fisheries fell; industry and construction and services rose."
+    },
+    {
+      "optionId": "E1",
+      "relationLabel": "Fully supports",
+      "text": "Covers both parts of statement A."
+    },
+    {
+      "optionId": "E2",
+      "relationLabel": "Partly supports",
+      "text": "True, but it covers only the “decreased” part, not all of statement A."
+    },
+    {
+      "optionId": "E3",
+      "relationLabel": "Contradicts",
+      "text": "Contradicts Table 8.1."
+    },
+    {
+      "optionId": "E4",
+      "relationLabel": "Irrelevant",
+      "text": "True according to the source, but it is about workforce quality and does not explain the shares."
+    }
+  ],
+  "draftVersion": 4,
+  "answerOptions": [
+    {
+      "answerOptionId": "A1",
+      "text": "The share of workers in agriculture, forestry and fisheries fell; the share in industry and construction and in services rose.",
+      "answerCorrectness": "SUPPORTED_CORRECT",
+      "teacherLabel": "Correct · source supports both parts",
+      "sourceAnchor": "Table 8.1",
+      "plausibilityRationale": "States both directions shown in the source."
+    },
+    {
+      "answerOptionId": "A2",
+      "text": "The share of workers in agriculture, forestry and fisheries rose.",
+      "answerCorrectness": "CONTRADICTED_INCORRECT",
+      "teacherLabel": "Wrong option · source refutes it",
+      "sourceAnchor": "Table 8.1",
+      "falsifyingSourceRef": "se1",
+      "plausibilityRationale": "Reverses the direction of the main trend."
+    },
+    {
+      "answerOptionId": "A3",
+      "text": "The share of workers in industry and construction decreased.",
+      "answerCorrectness": "CONTRADICTED_INCORRECT",
+      "teacherLabel": "Wrong option · source refutes it",
+      "sourceAnchor": "Table 8.1",
+      "falsifyingSourceRef": "se2",
+      "plausibilityRationale": "Reverses the direction for one sector."
+    },
+    {
+      "answerOptionId": "A4",
+      "text": "The share of workers in services decreased, giving way to industry and construction.",
+      "answerCorrectness": "CONTRADICTED_INCORRECT",
+      "teacherLabel": "Wrong option · source refutes it",
+      "sourceAnchor": "Table 8.1",
+      "falsifyingSourceRef": "se2",
+      "plausibilityRationale": "Plausible, since one sector rises, but the source shows services rising too."
+    }
+  ],
+  "pairAlignments": [
+    {
+      "answerOptionId": "A1",
+      "generatedEId": "E1",
+      "pairAlignment": "SUPPORTS_FULL",
+      "relationLabel": "Fully supports",
+      "explanationForTeacher": "Covers both parts.",
+      "sourceEvidenceRefs": [
+        "se1",
+        "se2"
+      ],
+      "goesToChallengeLabel": "Fallback"
+    },
+    {
+      "answerOptionId": "A1",
+      "generatedEId": "E2",
+      "pairAlignment": "SUPPORTS_PARTIAL",
+      "relationLabel": "Partly supports",
+      "explanationForTeacher": "Missing the “increased” part.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN2"
+    },
+    {
+      "answerOptionId": "A1",
+      "generatedEId": "E3",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Contradicts",
+      "explanationForTeacher": "The card runs opposite to the statement.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN3"
+    },
+    {
+      "answerOptionId": "A1",
+      "generatedEId": "E4",
+      "pairAlignment": "IRRELEVANT",
+      "relationLabel": "Irrelevant",
+      "explanationForTeacher": "Not about shares.",
+      "sourceEvidenceRefs": [
+        "se4"
+      ],
+      "goesToChallengeLabel": "TN4"
+    },
+    {
+      "answerOptionId": "A2",
+      "generatedEId": "E1",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Refutes A2",
+      "explanationForTeacher": "The card shows the share fell.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A2",
+      "generatedEId": "E2",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Refutes A2",
+      "explanationForTeacher": "The card shows the share fell.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A2",
+      "generatedEId": "E3",
+      "pairAlignment": "SAME_CLAIM_UNSUPPORTED",
+      "relationLabel": "Same idea, source refutes both",
+      "explanationForTeacher": "They match, but contradict Table 8.1.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A2",
+      "generatedEId": "E4",
+      "pairAlignment": "IRRELEVANT",
+      "relationLabel": "Irrelevant",
+      "explanationForTeacher": "Not about shares.",
+      "sourceEvidenceRefs": [
+        "se4"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A3",
+      "generatedEId": "E1",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Refutes A3",
+      "explanationForTeacher": "The card shows industry and construction rose.",
+      "sourceEvidenceRefs": [
+        "se2"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A3",
+      "generatedEId": "E2",
+      "pairAlignment": "INSUFFICIENT",
+      "relationLabel": "Not enough",
+      "explanationForTeacher": "Says nothing about industry and construction.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A3",
+      "generatedEId": "E3",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Factually false card",
+      "explanationForTeacher": "The card contradicts the source and does not support A3.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A3",
+      "generatedEId": "E4",
+      "pairAlignment": "IRRELEVANT",
+      "relationLabel": "Irrelevant",
+      "explanationForTeacher": "Not about shares.",
+      "sourceEvidenceRefs": [
+        "se4"
+      ],
+      "goesToChallengeLabel": "TN1"
+    },
+    {
+      "answerOptionId": "A4",
+      "generatedEId": "E1",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Refutes A4",
+      "explanationForTeacher": "The card shows services rose.",
+      "sourceEvidenceRefs": [
+        "se2"
+      ],
+      "goesToChallengeLabel": "Fallback"
+    },
+    {
+      "answerOptionId": "A4",
+      "generatedEId": "E2",
+      "pairAlignment": "INSUFFICIENT",
+      "relationLabel": "Not enough",
+      "explanationForTeacher": "Says nothing about services.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "Fallback"
+    },
+    {
+      "answerOptionId": "A4",
+      "generatedEId": "E3",
+      "pairAlignment": "CONTRADICTS",
+      "relationLabel": "Factually false card",
+      "explanationForTeacher": "The card contradicts the source.",
+      "sourceEvidenceRefs": [
+        "se1"
+      ],
+      "goesToChallengeLabel": "TN3"
+    },
+    {
+      "answerOptionId": "A4",
+      "generatedEId": "E4",
+      "pairAlignment": "IRRELEVANT",
+      "relationLabel": "Irrelevant",
+      "explanationForTeacher": "Not about shares.",
+      "sourceEvidenceRefs": [
+        "se4"
+      ],
+      "goesToChallengeLabel": "TN4"
+    }
+  ]
+}
