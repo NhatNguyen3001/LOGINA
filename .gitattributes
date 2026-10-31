@@ -1,0 +1,2 @@
+# Deploy files are read by Linux tools, so every checkout keeps LF.
+* text=auto eol=lf
