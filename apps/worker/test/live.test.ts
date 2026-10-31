@@ -244,6 +244,44 @@ describe('translateTask', () => {
   });
 });
 
+describe('TRANSLATE jobs', () => {
+  const q1 = loadFixture('q1-v4', 'en') as DraftFixture;
+  const bundle = loadFixture('rule-bundles/q1', 'en');
+  const pass = ['QG1', 'QG2', 'QG3', 'QG4', 'QG5', 'QG6'].map((gateId) => ({ gateId, status: 'PASS', findingCodes: [], sourceRefs: [], affectedArtifactIds: [], explanationForTeacher: 'x', overridable: false }));
+  const translated = () => ({ texts: studentTexts(q1).map((text) => `vi ${text}`), keywords: {} });
+
+  const drafted = async () => {
+    const context = await setup({ stage: 'GENERATE_PREVIEW' });
+    await live.db.doc(`lessons/${context.lessonId}/sourceUnits/p1-1`).set({ text: q1.answerOptions!.map((a) => a.text).join(' ') + q1.generatedE!.map((e) => e.text).join(' ') });
+    await live.db.doc(`jobs/${context.jobId}`).update({ type: 'GENERATE', targetIds: ['Q1'] });
+    await worker(stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: pass }, translator: translated(), translationCheck: { findings: [] } })).runJob(context.jobId);
+    const translateId = `${context.jobId}_t`;
+    jobs.push(translateId);
+    return { ...context, translateId };
+  };
+
+  it('a retry translates the task again', async () => {
+    const { lessonId, translateId } = await drafted();
+    await live.db.doc(`jobs/${translateId}`).set({ schoolId, lessonId, type: 'TRANSLATE', status: 'QUEUED', steps: [], targetIds: ['Q1'] });
+    const genai = stubGenai({ translator: translated(), translationCheck: { findings: [] } });
+    await worker(genai).runJob(translateId);
+    expect(genai.calls.map((c) => c.role)).toEqual(['translator', 'translationCheck']);
+  });
+
+  it('a recheck keeps the teacher wording and calls only the check', async () => {
+    const { lessonId, translateId } = await drafted();
+    const ref = live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`);
+    const texts = (await ref.get()).data()!.texts as { from: string; to: string }[];
+    await ref.update({ texts: texts.map((pair, index) => (index === 0 ? { ...pair, to: 'Lời của cô' } : pair)), status: 'WORKING' });
+    await live.db.doc(`jobs/${translateId}`).set({ schoolId, lessonId, type: 'TRANSLATE', status: 'QUEUED', steps: [], targetIds: ['Q1'], recheck: true });
+    const genai = stubGenai({ translationCheck: { findings: [] } });
+    await worker(genai).runJob(translateId);
+    expect(genai.calls.map((c) => c.role)).toEqual(['translationCheck']);
+    expect((await ref.get()).data()).toMatchObject({ status: 'READY' });
+    expect((await ref.get()).data()!.texts[0].to).toBe('Lời của cô');
+  });
+});
+
 describe('live GENERATE and RERUN', () => {
   const q1 = loadFixture('q1-v4', 'en') as DraftFixture;
   const bundle = loadFixture('rule-bundles/q1', 'en');

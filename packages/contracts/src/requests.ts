@@ -109,9 +109,14 @@ export const ApproveReq = z
     previewHash: z.string(),
     candidateSetVersion: Version,
     confirmed: z.literal(true),
+    /** Required on an uploaded lesson, so a tab opened before a translation changed can't approve it. */
+    translationVersion: Version.optional(),
   })
   .strict();
 export type ApproveReq = z.infer<typeof ApproveReq>;
+
+export const TranslationEditReq = z.object({ from: z.string(), to: z.string().min(1), translationVersion: Version }).strict();
+export type TranslationEditReq = z.infer<typeof TranslationEditReq>;
 
 /** The server sets `openAccess`; the demo targets no roster. */
 export const AssignReq = z

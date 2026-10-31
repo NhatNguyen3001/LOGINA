@@ -27,6 +27,7 @@ import {
   Sufficiency,
   TaskStatus,
   TaskType,
+  TranslationStatus,
   UnitKind,
 } from '../enums.js';
 import { Confidence, ReleaseLabels, Timestamp, Version } from './common.js';
@@ -378,6 +379,18 @@ export const TaskApprovalDTO = z
             approvedAt: Timestamp.optional(),
             releaseLabel: z.string().optional(),
             acceptedWarning: z.boolean(),
+            /** Absent on the sample lesson, which is written in both languages. */
+            translation: z
+              .object({
+                status: TranslationStatus,
+                locale: Locale,
+                version: Version,
+                texts: z.array(z.object({ from: z.string(), to: z.string() }).strict()),
+                keywords: z.record(z.string(), z.array(z.string())),
+                findings: z.array(z.object({ status: GateStatus, findingCode: z.string(), text: z.string(), explanationForTeacher: z.string() }).strict()),
+              })
+              .strict()
+              .optional(),
           })
           .strict(),
       )

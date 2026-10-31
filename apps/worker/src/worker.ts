@@ -7,7 +7,7 @@ import type { WorkerConfig } from './config.js';
 import { JobCancelled, JobFailure, JobPaused } from './errors.js';
 import { runGenerate } from './jobs/generate.js';
 import { runParse } from './jobs/parse.js';
-import { runRerun } from './jobs/rerun.js';
+import { runRerun, translateJob } from './jobs/rerun.js';
 
 export interface WorkerDeps {
   db: Firestore;
@@ -69,6 +69,7 @@ export function createWorker(deps: WorkerDeps) {
       if (job.type === 'PARSE') await runParse(context);
       else if (job.type === 'GENERATE') await runGenerate(context);
       else if (job.type === 'RERUN') await runRerun(context);
+      else if (job.type === 'TRANSLATE') await translateJob(context);
       else throw new Error(`Unknown job type ${job.type as string}`);
 
       await finish({ status: 'DONE' });

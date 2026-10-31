@@ -397,6 +397,8 @@
     "UNSUPPORTED_LANGUAGE": "LOGINA works with English or Vietnamese material.",
     "TOO_LITTLE_CONTENT": "There isn't enough to reason about here. Try a lesson with facts, figures or tables.",
     "generic": "Something went wrong. Please try again.",
+    "TRANSLATION_NOT_READY": "The translation for this task isn't ready to approve yet.",
+    "TRANSLATION_MIXED": "Some tasks have no approved translation. Approve the translation for every task first.",
     "TIMED_OUT": "This took too long, so it stopped. Finished drafts are saved. Choose an option below to draft the rest.",
     "AI_FAILED": "Some tasks couldn't be drafted. Finished drafts are saved. Choose an option below to try again.",
     "NOT_FOUND": "We can't find that page or item.",

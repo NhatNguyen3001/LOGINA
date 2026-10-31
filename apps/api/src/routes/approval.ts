@@ -1,12 +1,13 @@
 import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/firestore';
 import { Hono } from 'hono';
-import { ApproveReq, ApproveResultDTO, DispositionReq, TaskApprovalDTO } from '@logina/contracts';
+import { ApproveReq, ApproveResultDTO, DispositionReq, JobDTO, TaskApprovalDTO, TranslationEditReq } from '@logina/contracts';
 import { AppError, auditRepo, decodeNested, encodeNested, lessonsRepo, newId, previewViewsRepo, writeOnce } from '@logina/db';
 import { assignRuntimeIds, checkApproval, type QualityGate, shuffleAvoiding } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { requireBaseVersion } from '../middleware/base-version.js';
 import { withIdempotency } from '../middleware/idempotency.js';
 import { respond } from '../middleware/respond.js';
+import { createJob, toJobDTO } from '../services/jobs.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const SERVER_ONLY_BODY = ['acceptedOrders', 'priorities', 'keywordPartitions'];
@@ -59,7 +60,24 @@ async function buildRelease(db: Firestore, lessonId: string, draftId: string, dr
   };
 }
 
-export function approvalRoutes({ db }: AppDeps): Hono<AppEnv> {
+/** Stops approval unless the teacher can stand behind both languages. */
+function checkTranslation(translation: DocumentData | undefined, dispositions: DocumentData[], expectedVersion: number | undefined): void {
+  if (!translation || ['WORKING', 'BLOCKED', 'FAILED'].includes(translation.status as string)) {
+    throw new AppError('TRANSLATION_NOT_READY', 409, 'The translation is not ready to approve.');
+  }
+  if (expectedVersion !== translation.version) throw new AppError('STALE_VERSION', 409, 'This translation changed.');
+  const open = (translation.findings as DocumentData[]).filter((finding) => !dispositions.some((d) => d.gateId === 'TRANSLATION' && d.findingCode === finding.findingCode));
+  if (open.length > 0) throw new AppError('UNDISPOSITIONED_REVIEW', 409, 'A translation finding needs a decision.');
+}
+
+const mergeKeywords = (body: DocumentData, keywords: Record<string, string[]>): DocumentData => ({
+  ...body,
+  keywordPartitions: Object.fromEntries(
+    Object.entries((body.keywordPartitions ?? {}) as Record<string, string[]>).map(([name, words]) => [name, [...new Set([...words, ...(keywords[name] ?? [])])]]),
+  ),
+});
+
+export function approvalRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
   const routes = new Hono<AppEnv>();
 
   const requireLesson = async (schoolId: string, lessonId: string): Promise<DocumentData> => {
@@ -75,7 +93,15 @@ export function approvalRoutes({ db }: AppDeps): Hono<AppEnv> {
     const draft = decodeNested((await db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`).get()).data()!);
     const report = (await db.doc(`lessons/${lessonId}/validationReports/${draft.latestValidationReportId as string}`).get()).data()!;
     const dispositions = (await db.collection(`lessons/${lessonId}/dispositions`).where('validationReportId', '==', draft.latestValidationReportId).get()).docs.map((d) => d.data());
-    return { draftId, draft, report, dispositions };
+    const translation = (await db.doc(`lessons/${lessonId}/taskTranslations/${slot}`).get()).data();
+    return { draftId, draft, report, dispositions, translation };
+  };
+
+  const startTranslate = async (lesson: DocumentData, slot: string, recheck: boolean) => {
+    const job = await createJob(db, { schoolId: lesson.schoolId as string, lessonId: lesson.id as string, type: 'TRANSLATE', targetIds: [slot] });
+    await db.doc(`jobs/${job.id}`).update({ recheck });
+    await enqueue({ jobId: job.id, type: 'TRANSLATE', lessonId: lesson.id as string, targetIds: [slot] });
+    return job;
   };
 
   const draftVersion = requireBaseVersion(async (c) => {
@@ -92,7 +118,7 @@ export function approvalRoutes({ db }: AppDeps): Hono<AppEnv> {
 
     const tasks = await Promise.all(
       SLOTS.map(async (slot) => {
-        const { draftId, draft, report, dispositions } = await loadTask(lesson, slot);
+        const { draftId, draft, report, dispositions, translation } = await loadTask(lesson, slot);
         const release = releases.find((r) => r.taskDraftId === draftId);
         const seen = await previewViewsRepo.get(db, schoolId, uid, draftId);
         const accepted = dispositions.filter((d) => d.decision === 'TEACHER_ACCEPT_WITH_REASON');
@@ -114,9 +140,15 @@ export function approvalRoutes({ db }: AppDeps): Hono<AppEnv> {
               (g.findingCodes as string[])
                 .filter((code) => !accepted.some((d) => d.gateId === g.gateId && d.findingCode === code))
                 .map((findingCode) => ({ gateId: g.gateId, findingCode, explanationForTeacher: g.explanationForTeacher, overridable: g.overridable })),
+            )
+            .concat(
+              ((translation?.findings ?? []) as DocumentData[])
+                .filter((finding) => finding.status === 'REVIEW_REQUIRED' && !dispositions.some((d) => d.gateId === 'TRANSLATION' && d.findingCode === finding.findingCode))
+                .map((finding) => ({ gateId: 'TRANSLATION', findingCode: finding.findingCode, explanationForTeacher: finding.explanationForTeacher, overridable: true })),
             ),
           acceptedWarning: accepted.length > 0,
           ...(release ? { releaseLabel: release.releaseLabel, approvedAt: iso(release.approvedAt) } : {}),
+          ...(translation ? { translation: { status: translation.status, locale: translation.locale, version: translation.version, texts: translation.texts, keywords: translation.keywords, findings: translation.findings } } : {}),
         };
       }),
     );
@@ -157,7 +189,8 @@ export function approvalRoutes({ db }: AppDeps): Hono<AppEnv> {
       const req = ApproveReq.safeParse(await c.req.json());
       if (!req.success) throw new AppError('INVALID_REQUEST', 400, 'The request is not valid.');
 
-      const { draftId, draft, report, dispositions } = await loadTask(lesson, slot);
+      const { draftId, draft, report, dispositions, translation } = await loadTask(lesson, slot);
+      if (lesson.aiMode === 'LIVE') checkTranslation(translation, dispositions, req.data.translationVersion);
       const verdict = checkApproval({
         draft: { draftVersion: draft.draftVersion as number, status: draft.status, sourceModelVersionId: draft.sourceModelVersionId as string },
         expectedDraftVersion: req.data.expectedDraftVersion,
@@ -174,7 +207,14 @@ export function approvalRoutes({ db }: AppDeps): Hono<AppEnv> {
 
       const releaseId = `rel_${draftId}`;
       const releaseLabel = `r${draft.draftVersion as number}`;
-      const content = await buildRelease(db, lessonId, draftId, draft, report, releaseId);
+      const built = await buildRelease(db, lessonId, draftId, draft, report, releaseId);
+      const content = translation
+        ? {
+            ...built,
+            translations: { [translation.locale as string]: translation.texts },
+            ...(draft.taskBody ? { serverBody: encodeNested(mergeKeywords(draft.taskBody as DocumentData, translation.keywords as Record<string, string[]>)) } : {}),
+          }
+        : built;
       await db.runTransaction(async (tx) => {
         const live = (await tx.get(db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`))).data();
         if (live?.status !== draft.status) throw new AppError('STALE_VERSION', 409, 'This task changed.');
@@ -208,6 +248,33 @@ export function approvalRoutes({ db }: AppDeps): Hono<AppEnv> {
         });
       });
       return respond(c, ApproveResultDTO, { taskReleaseId: releaseId, releaseLabel });
+    }),
+  );
+
+  routes.post(
+    '/:id/tasks/:slot/translation',
+    withIdempotency(db, async (c) => {
+      const lesson = await requireLesson(c.var.user.schoolId, c.req.param('id') as string);
+      const slot = c.req.param('slot') as string;
+      const req = TranslationEditReq.safeParse(await c.req.json());
+      if (!req.success) throw new AppError('INVALID_REQUEST', 400, 'The request is not valid.');
+      const ref = db.doc(`lessons/${lesson.id as string}/taskTranslations/${slot}`);
+      const translation = (await ref.get()).data();
+      if (!translation) throw new AppError('NOT_FOUND', 404, 'Not found.');
+      if (translation.version !== req.data.translationVersion) throw new AppError('STALE_VERSION', 409, 'This translation changed.');
+      const texts = (translation.texts as DocumentData[]).map((pair) => (pair.from === req.data.from ? { from: pair.from, to: req.data.to } : pair));
+      await ref.update({ texts, status: 'WORKING', version: FieldValue.increment(1) });
+      return respond(c, JobDTO, toJobDTO(await startTranslate(lesson, slot, true)));
+    }),
+  );
+
+  routes.post(
+    '/:id/tasks/:slot/translation/retry',
+    withIdempotency(db, async (c) => {
+      const lesson = await requireLesson(c.var.user.schoolId, c.req.param('id') as string);
+      const slot = c.req.param('slot') as string;
+      await db.doc(`lessons/${lesson.id as string}/taskTranslations/${slot}`).set({ slot, status: 'WORKING', version: FieldValue.increment(1) }, { merge: true });
+      return respond(c, JobDTO, toJobDTO(await startTranslate(lesson, slot, false)));
     }),
   );
 
