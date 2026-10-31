@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "LOGINA system architecture",
+    "locale": "en",
+    "output": "logina-architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1240,
+      800
+    ]
+  },
+  "components": [
+    {
+      "id": "web",
+      "type": "frontend",
+      "label": "Web app",
+      "sublabel": "React 19 + Vite",
+      "pos": [
+        30,
+        300
+      ],
+      "size": [
+        160,
+        74
+      ],
+      "tag": "Teacher and student"
+    },
+    {
+      "id": "identity",
+      "type": "security",
+      "label": "Firebase Auth",
+      "sublabel": "Anonymous sessions",
+      "pos": [
+        270,
+        90
+      ],
+      "size": [
+        160,
+        74
+      ]
+    },
+    {
+      "id": "hosting",
+      "type": "cloud",
+      "label": "Firebase Hosting",
+      "sublabel": "CDN and /api rewrite",
+      "pos": [
+        270,
+        300
+      ],
+      "size": [
+        160,
+        74
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "API",
+      "sublabel": "Hono on Cloud Run",
+      "pos": [
+        510,
+        300
+      ],
+      "size": [
+        160,
+        74
+      ],
+      "tag": "Public"
+    },
+    {
+      "id": "firestore",
+      "type": "database",
+      "label": "Firestore",
+      "sublabel": "Clients denied by rules",
+      "pos": [
+        750,
+        300
+      ],
+      "size": [
+        160,
+        74
+      ]
+    },
+    {
+      "id": "queue",
+      "type": "messagebus",
+      "label": "Cloud Tasks",
+      "sublabel": "Jobs and export queues",
+      "pos": [
+        510,
+        500
+      ],
+      "size": [
+        160,
+        74
+      ]
+    },
+    {
+      "id": "worker",
+      "type": "backend",
+      "label": "Worker",
+      "sublabel": "Hono on Cloud Run",
+      "pos": [
+        750,
+        500
+      ],
+      "size": [
+        160,
+        74
+      ],
+      "tag": "Private"
+    },
+    {
+      "id": "storage",
+      "type": "cloud",
+      "label": "Cloud Storage",
+      "sublabel": "Uploaded materials",
+      "pos": [
+        750,
+        680
+      ],
+      "size": [
+        160,
+        74
+      ]
+    },
+    {
+      "id": "gemini",
+      "type": "external",
+      "label": "Vertex AI",
+      "sublabel": "Gemini models",
+      "pos": [
+        1040,
+        410
+      ],
+      "size": [
+        160,
+        74
+      ]
+    },
+    {
+      "id": "sheet",
+      "type": "external",
+      "label": "Google Sheets",
+      "sublabel": "Research rows",
+      "pos": [
+        1040,
+        590
+      ],
+      "size": [
+        160,
+        74
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Google Cloud: asia-southeast1",
+      "wraps": [
+        "api",
+        "firestore",
+        "queue",
+        "worker",
+        "storage"
+      ],
+      "pad": 36
+    }
+  ],
+  "connections": [
+    {
+      "id": "web-to-hosting",
+      "from": "web",
+      "to": "hosting",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "hosting-to-api",
+      "from": "hosting",
+      "to": "api",
+      "label": "/api/v1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-to-firestore",
+      "from": "api",
+      "to": "firestore",
+      "label": "Admin SDK",
+      "variant": "emphasis"
+    },
+    {
+      "id": "web-sign-in",
+      "from": "web",
+      "to": "identity",
+      "label": "sign in",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "left"
+    },
+    {
+      "id": "api-verify",
+      "from": "api",
+      "to": "identity",
+      "label": "verify token",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "right"
+    },
+    {
+      "id": "api-enqueue",
+      "from": "api",
+      "to": "queue",
+      "label": "enqueue job",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "queue-to-worker",
+      "from": "queue",
+      "to": "worker",
+      "label": "OIDC",
+      "variant": "security"
+    },
+    {
+      "id": "worker-to-firestore",
+      "from": "worker",
+      "to": "firestore",
+      "label": "job state",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "worker-to-storage",
+      "from": "worker",
+      "to": "storage",
+      "label": "read file",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 24
+    },
+    {
+      "id": "worker-to-gemini",
+      "from": "worker",
+      "to": "gemini",
+      "label": "read and draft",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "worker-to-sheet",
+      "from": "worker",
+      "to": "sheet",
+      "label": "append row",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "web-upload",
+      "from": "web",
+      "to": "storage",
+      "label": "signed URL upload",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "via": [
+        [
+          110,
+          717
+        ]
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Request path",
+      "items": [
+        "Clients reach data only through the API",
+        "Every session is its own tenant"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Async work",
+      "items": [
+        "Parsing, analysis and generation run as jobs",
+        "Research rows export on a throttled queue"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Security",
+      "items": [
+        "Firestore and Storage deny all clients",
+        "Answer keys never reach a browser"
+      ]
+    }
+  ]
+}
