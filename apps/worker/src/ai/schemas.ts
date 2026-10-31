@@ -37,3 +37,17 @@ export const GeneratorOutput = z.object({ draft: DraftFixture, ruleBundle: RuleB
 export type GeneratorOutput = z.infer<typeof GeneratorOutput>;
 
 export const XReasonOutput = z.object({ gates: ReportFixture.shape.gates });
+
+export const TranslatorOutput = z.object({ texts: z.array(z.string()), keywords: z.record(z.string(), z.array(z.string())) });
+
+export const TranslationCheckOutput = z.object({
+  findings: z.array(
+    z.object({
+      status: z.enum(['REVIEW_REQUIRED', 'BLOCKER']),
+      findingCode: z.string(),
+      text: z.string(),
+      explanationForTeacher: z.string(),
+    }),
+  ),
+});
+export type TranslationFinding = z.infer<typeof TranslationCheckOutput>['findings'][number];

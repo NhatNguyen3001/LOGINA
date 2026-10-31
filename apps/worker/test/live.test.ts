@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { loadFixture, type DraftFixture } from '@logina/domain';
+import { loadFixture, studentTexts, type DraftFixture } from '@logina/domain';
 import { liveSetup, testSchoolId, type LiveProject } from '@logina/test-utils';
 import { z } from 'zod';
 import { generateStructured, modelFor } from '../src/ai/model.js';
+import { translateTask } from '../src/jobs/translate.js';
 import { testWorkerConfig } from '../src/config.js';
 import { createWorker, type WorkerDeps } from '../src/worker.js';
 import * as docx from '../src/live/docx.js';
@@ -197,6 +198,49 @@ describe('live ANALYZE', () => {
     const { lessonId, jobId } = await setup();
     await worker(stubGenai({ reader: reading('en'), analyzer: analysis })).runJob(jobId);
     expect((await live.db.doc(`lessons/${lessonId}`).get()).data()?.stage).toBe('SOURCE_REVIEW');
+  });
+});
+
+describe('translateTask', () => {
+  const q5 = loadFixture('q5', 'en') as DraftFixture;
+  const texts = studentTexts(q5);
+  const keywords = { training: ['đào tạo'] };
+  const translator = { texts: texts.map((text) => `vi ${text}`), keywords };
+  const run = async (genai: StubGenai, contentLocale = 'en') => {
+    n += 1;
+    const id = `les_${schoolId}_t${n}`;
+    lessons.push(id);
+    const deps = { db: live.db, bucket: live.bucket, genai, config: testWorkerConfig(), loadFixture };
+    await translateTask({ deps, lesson: { id, contentLocale } }, q5, 'tdr_1');
+    return (await live.db.doc(`lessons/${id}/taskTranslations/Q5`).get()).data()!;
+  };
+
+  it('stores pairs and keywords, translator then check', async () => {
+    const genai = stubGenai({ translator, translationCheck: { findings: [] } });
+    const saved = await run(genai);
+    expect(genai.calls.map((c) => c.role)).toEqual(['translator', 'translationCheck']);
+    expect(saved).toMatchObject({ slot: 'Q5', draftId: 'tdr_1', locale: 'vi', status: 'READY', keywords, version: 1 });
+    expect(saved.texts[0]).toEqual({ from: texts[0], to: `vi ${texts[0]}` });
+  });
+
+  it('a Vietnamese lesson translates into English', async () => {
+    expect((await run(stubGenai({ translator, translationCheck: { findings: [] } }), 'vi')).locale).toBe('en');
+  });
+
+  it('a reply with the wrong number of strings stores FAILED and no pairs', async () => {
+    const saved = await run(stubGenai({ translator: { texts: ['one'], keywords }, translationCheck: { findings: [] } }));
+    expect(saved).toMatchObject({ status: 'FAILED', texts: [] });
+  });
+
+  it('a blocker finding stores BLOCKED, a review finding NEEDS_REVIEW', async () => {
+    const finding = (status: string) => ({ findings: [{ status, findingCode: 'NUMBER_CHANGED', text: texts[0], explanationForTeacher: 'x' }] });
+    expect((await run(stubGenai({ translator, translationCheck: finding('BLOCKER') }))).status).toBe('BLOCKED');
+    expect((await run(stubGenai({ translator, translationCheck: finding('REVIEW_REQUIRED') }))).status).toBe('NEEDS_REVIEW');
+  });
+
+  it('a failed check stores FAILED, so an unchecked translation cannot be approved', async () => {
+    const saved = await run(stubGenai({ translator, translationCheck: () => { throw new Error('down'); } }));
+    expect(saved).toMatchObject({ status: 'FAILED', texts: [] });
   });
 });
 

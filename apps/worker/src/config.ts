@@ -4,6 +4,7 @@ export interface WorkerConfig {
   readerModel: string;
   generatorModel: string;
   xreasonModel: string;
+  translatorModel: string;
   version: string;
   stepDelayMs: number;
   deadlineMs: number;
@@ -18,6 +19,7 @@ export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
   readerModel: env.READER_MODEL ?? 'gemini-4-argon',
   generatorModel: env.GENERATOR_MODEL ?? 'gemini-4-argon',
   xreasonModel: env.XREASON_MODEL ?? 'gemini-4-argon',
+  translatorModel: env.TRANSLATOR_MODEL ?? 'gemini-4-argon',
   version: '0.1.0',
   stepDelayMs: Number(env.SEEDED_STEP_DELAY_MS ?? 5000),
   /** Stays under the 30 minute dispatch deadline in apps/api/src/jobs/enqueue.ts. */

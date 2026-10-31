@@ -5,7 +5,7 @@ import { z } from 'zod';
 import type { WorkerConfig } from '../config.js';
 import { JobFailure } from '../errors.js';
 
-export type Role = 'reader' | 'analyzer' | 'generator' | 'xreason';
+export type Role = 'reader' | 'analyzer' | 'generator' | 'xreason' | 'translator' | 'translationCheck';
 export type Part = { text: string } | { fileData: { fileUri: string; mimeType: string } };
 
 export interface GenerateRequest {
@@ -29,7 +29,7 @@ export interface StructuredRequest<S extends z.ZodType> {
 }
 
 export const modelFor = (role: Role, config: WorkerConfig): string =>
-  ({ reader: config.readerModel, generator: config.generatorModel, analyzer: config.xreasonModel, xreason: config.xreasonModel })[role];
+  ({ reader: config.readerModel, generator: config.generatorModel, analyzer: config.xreasonModel, xreason: config.xreasonModel, translator: config.translatorModel, translationCheck: config.xreasonModel })[role];
 
 export const validatorVersion = (role: Role, config: WorkerConfig, seeded: boolean): string =>
   `${role}@${config.version}+${seeded ? 'seeded' : modelFor(role, config)}`;
