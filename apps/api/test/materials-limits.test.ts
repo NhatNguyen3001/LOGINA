@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PDFDocument } from 'pdf-lib';
 import { LessonDTO } from '@logina/contracts';
-import { testConfig } from '../src/config.js';
 import { usageDay } from '../src/services/live-usage.js';
 import { sha256 } from '../src/services/materials.js';
 import { harness, minimalLesson, type Client, type Harness } from './helpers.js';
@@ -61,15 +60,6 @@ describe('daily limit and sample matching', () => {
     expect(await aiMode(lesson.id)).toBe('SEEDED');
     expect((await h.live.db.doc(`demoMeta/liveUsage_${DAY}`).get()).exists).toBe(false);
   });
-
-  it('a sample sha256 works at an upload limit of 0', async () => {
-    const limits = { ...testConfig().limits, UPLOAD: { perSession: { max: 0, seconds: 3600 } } };
-    const blocked = await harness({ limits }, { now: () => NOW });
-    const client = await blocked.client();
-    const lesson = await newLesson(client);
-    expect((await registerFile(client, blocked, lesson.id, sampleBytes)).status).toBe(201);
-    await blocked.close();
-  }, 60_000);
 
   it('uploaded file that is not the sample gets aiMode LIVE', async () => {
     const lesson = await newLesson(a);

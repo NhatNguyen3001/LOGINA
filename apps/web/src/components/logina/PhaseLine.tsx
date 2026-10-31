@@ -2,7 +2,7 @@ import type { Phase } from '@logina/contracts';
 import { Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const STEPS = ['answer', 'lock', 'think', 'final', 'submit'] as const;
+const STEPS = ['answer', 'lock', 'think', 'final'] as const;
 
 const STEP_OF: Record<Phase, number> = {
   REASON: 0,

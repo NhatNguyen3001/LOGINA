@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
@@ -31,6 +32,9 @@ export function AssignPage() {
     },
   });
 
+  if (lesson.isError || approval.isError) return <Note kind="err">{t('errors.generic')}</Note>;
+  if (!lesson.data || !approval.data) return <LoadingSkeleton />;
+
   return (
     <>
       <nav className="crumbs">
@@ -45,7 +49,7 @@ export function AssignPage() {
         <div className="card">
           <div className="field">
             <span className="b">{t('teacher.t01.class')}</span>
-            <span>{classInfo.data?.name}</span>
+            <span>{classInfo.data?.name ?? t('common.loading')}</span>
           </div>
           <div className="field">
             <label htmlFor="due">{t('teacher.t13.due')}</label>
@@ -62,7 +66,7 @@ export function AssignPage() {
           <div className="tbl-wrap">
             <table className="t">
               <tbody>
-                {approval.data?.tasks.map((task) => (
+                {approval.data.tasks.map((task) => (
                   <tr key={task.slot}>
                     <td className="b">{task.slot}</td>
                     <td className="num">{task.releaseLabel}</td>
@@ -74,7 +78,7 @@ export function AssignPage() {
           </div>
           <p className="small muted">{t('teacher.t13.pinned')}</p>
           {assign.isError ? <Note kind="err">{t(errorKey(assign.error instanceof ApiError ? assign.error.code : ''))}</Note> : null}
-          <button type="button" className="btn primary block" disabled={!lesson.data || assign.isPending} onClick={() => assign.mutate()}>{t('teacher.t13.title')}</button>
+          <button type="button" className="btn primary block" disabled={assign.isPending} onClick={() => assign.mutate()}>{t('teacher.t13.title')}</button>
         </div>
       </div>
     </>

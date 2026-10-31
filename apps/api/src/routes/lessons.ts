@@ -4,7 +4,6 @@ import { CreateLessonReq, JobDTO, LessonDTO, LessonListDTO } from '@logina/contr
 import { AppError, classesRepo, lessonsRepo, newId } from '@logina/db';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
-import { limited } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
 import { createJob, toJobDTO } from '../services/jobs.js';
 
@@ -103,7 +102,7 @@ export function lessonRoutes(deps: AppDeps): Hono<AppEnv> {
 
   routes.post(
     '/:id/analyze',
-    withIdempotency(db, limited(deps, 'AI_ACTION', async (c) => {
+    withIdempotency(db, async (c) => {
       const { schoolId } = c.var.user;
       const lessonId = c.req.param('id') as string;
       const lesson = await lessonsRepo.get(db, schoolId, lessonId);
@@ -115,7 +114,7 @@ export function lessonRoutes(deps: AppDeps): Hono<AppEnv> {
       await db.doc(`lessons/${lessonId}`).update({ stage: 'CLARIFY', activeJobId: job.id });
       await enqueue({ jobId: job.id, type: 'PARSE', lessonId, targetIds: [] });
       return respond(c, JobDTO, toJobDTO(job));
-    })),
+    }),
   );
 
   return routes;

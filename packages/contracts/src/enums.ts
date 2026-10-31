@@ -136,9 +136,6 @@ export const ChallengeTarget = z.enum([
 ]);
 export type ChallengeTarget = z.infer<typeof ChallengeTarget>;
 
-/** Limits a caller can see in `LimitsDTO`. `API` and `SESSION` are 429 values only (RateLimitDTO). */
-export const RateAction = z.enum(['UPLOAD', 'AI_ACTION', 'SIMULATE_CLASS', 'RESET']);
-export type RateAction = z.infer<typeof RateAction>;
 
 export const AiMode = z.enum(['SEEDED', 'LIVE']);
 export type AiMode = z.infer<typeof AiMode>;

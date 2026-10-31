@@ -49,6 +49,8 @@ const taskFields = {
   phase: Phase,
   stem: z.string(),
   draftArtifact: DraftArtifact.nullable(),
+  /** Which tasks of this attempt are really finished, so progress never guesses from the order. */
+  submittedSlots: z.array(Slot),
   initialArtifact: Artifact.optional(),
   initialConfidence: Confidence.optional(),
 };

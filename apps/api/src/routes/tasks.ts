@@ -14,7 +14,6 @@ import { selectChallenge, type RuleBundle } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { requireBaseVersion } from '../middleware/base-version.js';
 import { withIdempotency } from '../middleware/idempotency.js';
-import { limited } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
 import { createJob, toJobDTO } from '../services/jobs.js';
 
@@ -195,7 +194,7 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
   routes.post(
     '/:id/tasks/:slot/sufficiency-choice',
     requireBaseVersion(async (c) => (await requireLesson(c.var.user.schoolId, c.req.param('id') as string)).version as number),
-    withIdempotency(db, limited(deps, 'AI_ACTION', async (c) => {
+    withIdempotency(db, async (c) => {
       const { schoolId } = c.var.user;
       const lessonId = c.req.param('id') as string;
       const slot = c.req.param('slot') as string;
@@ -210,7 +209,7 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
       await batch.commit();
       if (regenerates) await enqueue({ jobId: job.id, type: 'GENERATE', lessonId, targetIds: [slot] });
       return respond(c, JobDTO, toJobDTO({ ...job, ...(regenerates ? {} : { status: 'DONE' }) }));
-    })),
+    }),
   );
 
   return routes;

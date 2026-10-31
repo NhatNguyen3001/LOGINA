@@ -6,12 +6,10 @@ import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { LimitNote } from '@/components/logina/LimitNote';
 import { Note } from '@/components/logina/Note';
 import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { ApiError, createLesson, getClass, getMe, getUploadUrl, newKey, registerMaterial, startAnalyze } from '@/lib/api';
-import { limitState, useLimit } from '@/lib/limits';
 import { qk } from '@/lib/query';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
@@ -57,8 +55,6 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
   const me = useQuery({ queryKey: qk.me(), queryFn: getMe });
   const classId = me.data?.classIds[0];
   const classInfo = useQuery({ queryKey: qk.class(classId ?? 'none'), queryFn: () => getClass(classId!), enabled: Boolean(classId) });
-  const upload = useLimit('UPLOAD');
-  const uploadsBlocked = upload ? limitState(upload) === 'reached' : false;
 
   const { register, handleSubmit, formState: { errors } } = useForm<Form>({
     resolver: zodResolver(Form),
@@ -86,7 +82,6 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
       await queryClient.invalidateQueries({ queryKey: qk.lessons() });
       await navigate({ to: '/t/lessons/$id/analyze', params: { id: lessonId } });
     },
-    onError: () => queryClient.invalidateQueries({ queryKey: qk.limits() }),
   });
 
   const submit = handleSubmit((values) => {
@@ -124,7 +119,6 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
                 ))}
               </ul>
             </div>
-            <LimitNote action="UPLOAD" />
             <div className="row">
               <input ref={fileInput} type="file" accept={ACCEPT} className="vh" aria-label={t('teacher.t01.chooseFile')} tabIndex={-1} onChange={(event) => {
                 setFile(event.target.files?.[0] ?? null);
@@ -132,7 +126,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
                 setMissingMaterial(false);
                 analyze.reset();
               }} />
-              <button type="button" className="btn secondary sm" disabled={uploadsBlocked} onClick={() => fileInput.current?.click()}>{t(analyze.isError ? 'teacher.t01.refusal.chooseAnother' : 'teacher.t01.chooseFile')}</button>
+              <button type="button" className="btn secondary sm" onClick={() => fileInput.current?.click()}>{t(analyze.isError ? 'teacher.t01.refusal.chooseAnother' : 'teacher.t01.chooseFile')}</button>
               {sampleAllowed ? (
                 <button type="button" className="btn secondary sm" onClick={() => {
                   setUseSample(true);
@@ -185,7 +179,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
         <div className="card sticky">
           <div className="row">
             <span className="s13 muted">{t('teacher.t01.class')}</span>
-            <span className="b">{classInfo.data?.name}</span>
+            <span className="b">{classInfo.data?.name ?? t('common.loading')}</span>
           </div>
           <h3 className="s15 b">{t('teacher.t01.structureTitle')}</h3>
           <ol className="stack">
@@ -195,6 +189,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
           </ol>
           <p className="small muted">{t('teacher.t01.structureNote')}</p>
           <button type="submit" className="btn primary block" disabled={analyze.isPending || !classId}>{t('teacher.t01.analyze')}</button>
+          {classId ? null : <p className="hint">{t(me.isError ? 'errors.generic' : 'common.loading')}</p>}
         </div>
       </div>
     </form>

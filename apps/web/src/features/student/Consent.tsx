@@ -4,9 +4,7 @@ import { Clock, EyeOff, FlaskConical, HandHeart, Sheet, UserRound, Users, type L
 import { Link } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LegalFooter } from '@/components/logina/LegalFooter';
-import { Logo } from '@/components/logina/Logo';
-import { HomeLink } from '@/components/logina/StudentShell';
+import { StudentShell } from '@/components/logina/StudentShell';
 import { Note } from '@/components/logina/Note';
 import { newKey, sendConsent } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -39,16 +37,28 @@ export function Consent({ onDone }: { onDone: () => void }) {
   });
 
   return (
-    <div className="flex min-h-dvh flex-col bg-page">
-      <div className="stu-top pb-4">
-        <div className="stu-in row">
-          <Logo />
-          <span className="sp" />
-          <HomeLink />
-        </div>
-      </div>
+    <StudentShell
+      current={t('consent.title')}
+      {...(code
+        ? {}
+        : {
+            footer: (
+              <div className="stack grow">
+                <div className="egrid">
+                  <button type="button" className="btn secondary" disabled={choose.isPending} onClick={() => choose.mutate('AGREED')}>{t('consent.agree')}</button>
+                  <button type="button" className="btn secondary" disabled={choose.isPending} onClick={() => choose.mutate('DECLINED')}>{t('consent.decline')}</button>
+                </div>
+                <div className="row">
+                  <span className="s13 muted">{t('consent.once')}</span>
+                  <span className="sp" />
+                  <span className="s13 muted num">{t('consent.version', { version: CURRENT_CONSENT_VERSION })}</span>
+                </div>
+              </div>
+            ),
+          })}
+    >
       {code ? (
-        <div className="stu-in stu-body w-full grow">
+        <>
           <div className="card tight">
             <h1 className="s15 b">{t('consent.thanks')}</h1>
             <div className="stack">
@@ -58,45 +68,29 @@ export function Consent({ onDone }: { onDone: () => void }) {
             <p className="s13 sec">{t('consent.keepCode')}</p>
           </div>
           <button type="button" className="btn primary" onClick={onDone}>{t('consent.continue')}</button>
-        </div>
+        </>
       ) : (
         <>
-          <main className="stu-in stu-body w-full grow">
-            <h1 className="stem">{t('consent.title')}</h1>
-            <div className="card notice-card">
-              {POINTS.map(({ icon: Icon, title, lines }) => (
-                <div key={title} className="np">
-                  <span className="ni">
-                    <Icon className="ico" aria-hidden="true" />
-                  </span>
-                  <div className="stack">
-                    <span className="b">{t(`consent.${title}`)}</span>
-                    {lines.map((line) => (
-                      <span key={line} className="s15 sec">{t(`consent.${line}`)}</span>
-                    ))}
-                  </div>
+          <h1 className="stem">{t('consent.title')}</h1>
+          <div className="card notice-card">
+            {POINTS.map(({ icon: Icon, title, lines }) => (
+              <div key={title} className="np">
+                <span className="ni">
+                  <Icon className="ico" aria-hidden="true" />
+                </span>
+                <div className="stack">
+                  <span className="b">{t(`consent.${title}`)}</span>
+                  {lines.map((line) => (
+                    <span key={line} className="s15 sec">{t(`consent.${line}`)}</span>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <Link to="/privacy" className="lnk">{t('consent.privacyLink')}</Link>
-            {choose.isError ? <Note kind="err">{t(errorKey(choose.error instanceof ApiError ? choose.error.code : ''))}</Note> : null}
-          </main>
-          <div className="stu-foot">
-            <div className="stu-in stack">
-              <div className="egrid">
-                <button type="button" className="btn secondary" disabled={choose.isPending} onClick={() => choose.mutate('AGREED')}>{t('consent.agree')}</button>
-                <button type="button" className="btn secondary" disabled={choose.isPending} onClick={() => choose.mutate('DECLINED')}>{t('consent.decline')}</button>
               </div>
-              <div className="row">
-                <span className="s13 muted">{t('consent.once')}</span>
-                <span className="sp" />
-                <span className="s13 muted num">{t('consent.version', { version: CURRENT_CONSENT_VERSION })}</span>
-              </div>
-            </div>
+            ))}
           </div>
+          <Link to="/privacy" className="lnk">{t('consent.privacyLink')}</Link>
+          {choose.isError ? <Note kind="err">{t(errorKey(choose.error instanceof ApiError ? choose.error.code : ''))}</Note> : null}
         </>
       )}
-      <LegalFooter />
-    </div>
+    </StudentShell>
   );
 }

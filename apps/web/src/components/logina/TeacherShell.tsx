@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Layers } from 'lucide-react';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { applySessionLocale, setUserLocaleSaver } from '@/i18n';
 import { getMe, updateMe } from '@/lib/api';
@@ -9,8 +9,11 @@ import { qk } from '@/lib/query';
 import { BusyNote } from './BusyNote';
 import { DemoMenu } from './DemoMenu';
 import { LangSwitch } from './LangSwitch';
+import { LegalFooter } from './LegalFooter';
 import { Logo } from './Logo';
+import { MenuButton } from './MenuButton';
 import { SwitchSide } from './SwitchSide';
+import { Toast } from './Toast';
 
 /** Applies the saved language once the session is known, and saves later switches. */
 export function useSessionLocale(): void {
@@ -25,19 +28,9 @@ export function useSessionLocale(): void {
   }, [uiLocale]);
 }
 
-export function LegalLinks() {
-  const { t } = useTranslation();
-  return (
-    <nav className="side-legal" aria-label={t('common.policies')}>
-      <Link to="/privacy">{t('teacher.shell.privacy')}</Link>
-      <Link to="/terms">{t('teacher.shell.terms')}</Link>
-      <Link to="/accessibility">{t('teacher.shell.accessibility')}</Link>
-    </nav>
-  );
-}
-
 export function TeacherShell({ lessonId, assignmentId, children }: { lessonId?: string; assignmentId?: string; children: ReactNode }) {
   const { t } = useTranslation();
+  const [menuOpen, setMenuOpen] = useState(false);
   useSessionLocale();
 
   return (
@@ -48,15 +41,21 @@ export function TeacherShell({ lessonId, assignmentId, children }: { lessonId?: 
           <Layers aria-hidden="true" />
           <span>{t('teacher.shell.lessons')}</span>
         </Link>
-        <div className="me">
-          <LangSwitch />
-          <SwitchSide to="student" block {...(lessonId ? { lessonId } : {})} />
-          <DemoMenu {...(assignmentId ? { assignmentId } : {})} />
+        <MenuButton open={menuOpen} onToggle={() => setMenuOpen(!menuOpen)} />
+        <div className={`side-more ${menuOpen ? 'open' : ''}`}>
+          <div className="me">
+            <LangSwitch />
+            <SwitchSide to="student" block {...(lessonId ? { lessonId } : {})} />
+            <DemoMenu {...(assignmentId ? { assignmentId } : {})} />
+          </div>
         </div>
-        <LegalLinks />
       </aside>
-      <main className="main">{children}</main>
+      <div className="app-col">
+        <main className="main">{children}</main>
+        <LegalFooter />
+      </div>
       <BusyNote side="teacher" />
+      <Toast />
     </div>
   );
 }

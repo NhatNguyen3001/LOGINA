@@ -296,7 +296,14 @@
       "assignCount": "Giao bài · {{count}}/5",
       "change": {
         "PREVIEW_CHANGED": "Nhiệm vụ này đã thay đổi từ lần cô xem trước."
-      }
+      },
+      "why": {
+        "blockers": "Hãy xử lý các điểm chặn trước khi duyệt.",
+        "warnings": "Hãy quyết định về các cảnh báo trước khi duyệt.",
+        "status": "Hãy chờ kiểm tra xong.",
+        "confirm": "Hãy đánh dấu ô xác nhận."
+      },
+      "assignWhy": "Hãy duyệt mọi nhiệm vụ để giao bài."
     },
     "t13": {
       "title": "Giao bài",
@@ -320,23 +327,39 @@
       "keepOrRevise": "Giữ / Sửa",
       "avgConfidence": "Tự tin TB trước → sau",
       "prompts": "Câu Thử nghĩ thêm đã giao",
-      "relations": "Q1 · quan hệ giữa nhận định và thẻ đã chọn",
-      "relationsNote": "{{count}} lượt đã nộp · bản {{release}}",
-      "first": "Ban đầu",
-      "final": "Bản cuối",
-      "relation": {
-        "full": "Đầy đủ",
-        "partial": "Một phần",
-        "irrelevant": "Không liên quan",
-        "contradicts": "Mâu thuẫn hoặc bị bác bỏ"
-      },
       "disclaimer": "Tỉ lệ Sửa, tự tin tăng hay chọn đúng không đủ để kết luận học sinh học tốt hơn. Cần thiết kế đánh giá riêng.",
       "participants": "Người tham gia",
       "code": "Mã người tham gia",
       "progress": "Tiến độ",
       "notInResearch": "Không tham gia nghiên cứu",
       "simulated": "Mô phỏng",
-      "trace": "Xem chi tiết"
+      "trace": "Xem chi tiết",
+      "tab": {
+        "dashboard": "Tổng quan",
+        "students": "Học sinh",
+        "prompts": "Câu Thử nghĩ thêm"
+      },
+      "started": "Số người bắt đầu",
+      "inAssignment": "trong lần giao bài này",
+      "finished": "Đã xong",
+      "ofTotal": "trên {{total}}",
+      "answersRevised": "Câu trả lời đã sửa",
+      "avgConfidenceTitle": "Mức tự tin trung bình",
+      "firstToFinal": "từ bản đầu đến bản cuối",
+      "keepReviseTitle": "Giữ hay sửa",
+      "kept": "Giữ",
+      "revised": "Sửa",
+      "confidenceTitle": "Mức tự tin, từ đầu đến cuối",
+      "firstDot": "Đầu",
+      "finalDot": "Cuối",
+      "barKeep": "{{slot}}: giữ {{keep}}, sửa {{revise}}",
+      "barConfidence": "{{slot}}: mức tự tin {{change}}",
+      "empty": "Chưa có ai nộp nhiệm vụ.",
+      "noPrompts": "Chưa có câu nào được hiển thị.",
+      "promptsNote": "Mỗi câu được hiển thị bao nhiêu lần, và bao nhiêu lần học sinh sửa sau đó. Số liệu cho biết điều gì xảy ra tiếp theo, không cho biết vì sao.",
+      "promptsTitle": "Những câu học sinh sửa bài sau khi đọc",
+      "seeAll": "Xem tất cả",
+      "revisedOf": "{{revised}} trên {{count}} đã sửa"
     },
     "t15": {
       "changed": "Đổi",
@@ -410,22 +433,51 @@
     "confirm": "Xác nhận",
     "retry": "Thử lại",
     "policies": "Chính sách",
-    "backHome": "Về trang đầu",
-    "draft": "Bản nháp"
+    "draft": "Bản nháp",
+    "menu": "Trình đơn",
+    "back": "Quay lại"
   },
   "demo": {
     "jumpSampleOnly": "Chỉ cho bộ bài mẫu",
     "resetConfirm": "Thao tác này xóa mọi bộ bài trong không gian làm việc của trình duyệt này, kể cả tệp đã tải lên. Công việc của người khác không bị ảnh hưởng.",
-    "title": "Menu demo",
+    "title": "Khám phá bản demo",
     "reset": "Đặt lại demo",
-    "simulate": "Mô phỏng lớp học",
-    "jump": "Nhảy tới bước…",
+    "simulate": "Mô phỏng một lớp",
+    "jump": "Đi tới một bước",
     "failRecheck": "Lần kiểm tra lại tiếp theo sẽ lỗi",
-    "availableIn": "Dùng được sau {{minutes}} phút",
-    "leftThisHour": "Còn {{count}} lượt trong giờ này",
     "armed": "Lần kiểm tra lại tiếp theo sẽ lỗi.",
     "noAssignment": "Cô hãy giao bài trước.",
-    "avatar": "L"
+    "avatar": "L",
+    "intro": "Thử bài mẫu từ bất kỳ bước nào. Những việc ở đây không ảnh hưởng đến người khác.",
+    "tryTitle": "Thử một việc",
+    "simulateNote": "Thêm học sinh mẫu vào phần theo dõi.",
+    "failNote": "Xem LOGINA xử lý lỗi thế nào.",
+    "close": "Đóng",
+    "replay": "Xem lại hướng dẫn",
+    "step": {
+      "S1": "Trả lời Q1 với vai trò học sinh",
+      "T7": "Xem AI soạn nháp nhiệm vụ",
+      "T12": "Duyệt năm nhiệm vụ",
+      "T14": "Xem kết quả của một lớp"
+    },
+    "tour": {
+      "stepOf": "Bước {{n}} trên {{total}}",
+      "next": "Tiếp",
+      "skip": "Bỏ qua",
+      "done": "Đã hiểu",
+      "buttonTitle": "Trình đơn demo",
+      "buttonBody": "Mở Khám phá bản demo bất cứ lúc nào để thử LOGINA. Trên điện thoại, mục này nằm trong trình đơn ở trên cùng.",
+      "jumpTitle": "Đi tới bất kỳ bước nào",
+      "jumpBody": "Đi thẳng tới phần bạn muốn xem. S là màn hình học sinh, T là màn hình giáo viên.",
+      "tryTitle": "Thử một việc",
+      "tryBody": "Thêm một lớp mẫu vào trang theo dõi, hoặc xem LOGINA xử lý lỗi thế nào.",
+      "resetTitle": "Bắt đầu lại",
+      "resetBody": "Đặt lại demo sẽ xóa không gian làm việc của bạn. Bài của người khác không bị ảnh hưởng."
+    },
+    "jumpedTitle": "Đã chuyển tới {{step}}",
+    "jumpedBody": "Mở bộ bài để tiếp tục.",
+    "resetDoneTitle": "Đã đặt lại demo",
+    "resetDoneBody": "Bạn đã trở về từ đầu."
   },
   "student": {
     "new": "Mới",
@@ -445,7 +497,6 @@
     "phase": {
       "think": "Thử nghĩ thêm",
       "final": "Câu trả lời cuối",
-      "submit": "Nộp bài",
       "answer": "Tự trả lời",
       "lock": "Chốt"
     },
@@ -455,7 +506,10 @@
       "reset": "Làm lại từ đầu",
       "resetTitle": "Làm lại từ đầu?",
       "resetConfirm": "Có, làm lại",
-      "resetCancel": "Hủy"
+      "resetCancel": "Hủy",
+      "logoHome": "logina Trang chủ",
+      "panel": "Bộ bài của em",
+      "progress": "Tiến độ của em"
     },
     "home": {
       "title": "Bộ bài của em",
@@ -506,7 +560,6 @@
       "changeMind": "Đổi ý: Sửa câu trả lời",
       "confidenceNote": "Mức tự tin thay đổi được ghi riêng, không tính là sửa câu trả lời.",
       "reviseTitle": "Sửa câu trả lời của em",
-      "original": "Ban đầu {{value}}",
       "confidence": "Mức tự tin cuối cùng",
       "sameAsFirst": "Câu trả lời chưa thay đổi so với bản ban đầu, nên sẽ được ghi là Giữ.",
       "onlyRevision": "Đây là lần sửa duy nhất của {{slot}}; sau khi nộp, em chuyển sang bài tiếp theo."
@@ -552,6 +605,20 @@
       "confidenceValue": "Mức tự tin {{value}}",
       "disclaimerShort": "Trang này ghi lại những gì em đã chọn và thay đổi. Nó không đánh giá em đã suy nghĩ thế nào.",
       "back": "← Tất cả nhiệm vụ"
+    },
+    "save": {
+      "saving": "Đang lưu…",
+      "failed": "Chưa lưu được. Lựa chọn của em vẫn còn trên trang này, và khi Chốt sẽ được lưu."
+    },
+    "need": {
+      "statement": "Chọn một nhận định để tiếp tục.",
+      "card": "Chọn một thẻ căn cứ để tiếp tục.",
+      "compare": "So sánh các phương án theo mọi tiêu chí để tiếp tục.",
+      "decide": "Đưa ra quyết định của em để tiếp tục.",
+      "template": "Chọn một mẫu để tiếp tục.",
+      "blanks": "Điền mọi chỗ trống để tiếp tục.",
+      "proposal": "Viết đề xuất của em để tiếp tục.",
+      "reason": "Viết lý do của em để tiếp tục."
     }
   },
   "entry": {
@@ -559,7 +626,13 @@
     "title": "Dùng thử LOGINA",
     "teacher": "Dùng thử với vai trò giáo viên",
     "student": "Dùng thử với vai trò học sinh",
-    "demoLine": "Đây là bản dùng thử, không cần tài khoản. Lớp học thật sẽ có tài khoản."
+    "demoLine": "Đây là bản dùng thử, không cần tài khoản. Lớp học thật sẽ có tài khoản.",
+    "how": {
+      "add": "Giáo viên đưa học liệu của mình lên.",
+      "draft": "LOGINA đọc học liệu, hỏi lại chỗ chưa rõ và soạn năm nhiệm vụ.",
+      "approve": "Giáo viên duyệt nguồn và duyệt nhiệm vụ.",
+      "think": "Học sinh trả lời, thử nghĩ thêm, rồi giữ hoặc sửa."
+    }
   },
   "lessons": {
     "title": "Bộ bài",
@@ -604,12 +677,13 @@
     "continue": "Tiếp tục làm bài"
   },
   "limits": {
-    "uploadAlmost": "Cô còn {{count}} lượt tải lên trong giờ này. Có thêm lượt lúc {{time}}.",
-    "uploadReached": "Cô đã dùng hết lượt tải lên của giờ này. Cô có thể tải lên lại lúc {{time}}, hoặc dùng học liệu mẫu để tiếp tục ngay.",
-    "aiAlmost": "Cô còn {{count}} lượt kiểm tra lại trong giờ này. Có thêm lượt lúc {{time}}.",
-    "aiReached": "Việc kiểm tra lại tạm dừng {{minutes}} phút. Phần cô vừa sửa vẫn ở trên trang này nhưng chưa được lưu. Duyệt sẽ dùng bản đã lưu gần nhất.",
-    "wait": "Chờ {{minutes}} phút",
     "busyStudent": "LOGINA đang bận. Lựa chọn của em vẫn an toàn trên trang này và sẽ tự được lưu. Em không cần làm gì.",
     "busyTeacher": "LOGINA đang bận. Phần cô làm vẫn an toàn trên trang này và sẽ tự được lưu. Cô không cần làm gì."
+  },
+  "titles": {
+    "teacher": "Giáo viên",
+    "student": "Học sinh",
+    "trace": "Trace học sinh",
+    "results": "Kết quả"
   }
 }

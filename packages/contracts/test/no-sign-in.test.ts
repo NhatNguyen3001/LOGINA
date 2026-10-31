@@ -5,9 +5,7 @@ import {
   ConsentResultDTO,
   CURRENT_CONSENT_VERSION,
   JobType,
-  LimitsDTO,
   MeDTO,
-  RateAction,
   RateLimitDTO,
   RESEARCH_COLUMNS,
   ResearchRow,
@@ -51,10 +49,6 @@ const row = {
 };
 
 describe('rate limits', () => {
-  it('RateAction has the four action limits', () => {
-    expect(RateAction.options).toEqual(['UPLOAD', 'AI_ACTION', 'SIMULATE_CLASS', 'RESET']);
-  });
-
   it('RateLimitDTO rejects a stack key', () => {
     expect(() => RateLimitDTO.parse({ ...examples.rateLimit, stack: 'x' })).toThrow();
   });
@@ -62,15 +56,9 @@ describe('rate limits', () => {
   it('RateLimitDTO allows API and SESSION as 429 actions', () => {
     expect(() => RateLimitDTO.parse({ ...examples.rateLimit, action: 'API' })).not.toThrow();
     expect(() => RateLimitDTO.parse({ ...examples.rateLimit, action: 'SESSION' })).not.toThrow();
-    expect(() => RateLimitDTO.parse({ ...examples.rateLimit, action: 'OTHER' })).toThrow();
+    expect(() => RateLimitDTO.parse({ ...examples.rateLimit, action: 'UPLOAD' })).toThrow();
   });
 
-  it('LimitsDTO never carries the 429-only actions', () => {
-    const limit = examples.limits.limits[0]!;
-    expect(() => LimitsDTO.parse({ limits: [{ ...limit, action: 'UPLOAD' }] })).not.toThrow();
-    expect(() => LimitsDTO.parse({ limits: [{ ...limit, action: 'API' }] })).toThrow();
-    expect(() => LimitsDTO.parse({ limits: [{ ...limit, action: 'SESSION' }] })).toThrow();
-  });
 });
 
 describe('consent', () => {

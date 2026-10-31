@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { Pick } from '@/components/logina/Pick';
 import { StatusTag } from '@/components/logina/StatusTag';
@@ -82,7 +83,9 @@ export function TasksPage() {
         <h1 className="h1">{t('teacher.t06.title')}</h1>
         <p className="lede">{t('teacher.t06.lede')}</p>
       </div>
-      <div className="card flush">
+      {tasks.isPending ? <LoadingSkeleton /> : null}
+      {tasks.isError ? <Note kind="err">{t('errors.generic')}</Note> : null}
+      {tasks.data ? <div className="card flush">
         <div className="row p-4">
           <h3 className="s15 b">{t('teacher.t06.count')}</h3>
           <span className="sp" />
@@ -116,7 +119,7 @@ export function TasksPage() {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> : null}
       {paused && lesson.data && !running ? <Q4Decision lessonId={id} slot={paused.slot} version={lesson.data.version} /> : null}
       <div className="row">
         <span className="sp" />

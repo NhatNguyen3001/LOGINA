@@ -438,7 +438,7 @@ export const ClassTrackingDTO = z
           avgConfidenceBefore: z.number().nullable(),
           avgConfidenceAfter: z.number().nullable(),
           deliveredChallenges: z.array(
-            z.object({ label: z.string(), count: z.number().int().nonnegative() }).strict(),
+            z.object({ label: z.string(), message: z.string(), count: z.number().int().nonnegative(), revised: z.number().int().nonnegative() }).strict(),
           ),
         })
         .strict(),
@@ -460,6 +460,7 @@ const ChangedTraceOption = TraceOption.extend({ changed: z.boolean() }).strict()
 
 export const TraceDTO = z
   .object({
+    assignmentId: z.string(),
     participantCode: z.string().optional(),
     isSimulated: z.boolean(),
     completedAt: Timestamp.optional(),
@@ -471,7 +472,8 @@ export const TraceDTO = z
     before: z
       .object({
         answer: TraceOption,
-        evidence: TraceOption,
+        /** Q1 only: Q2 to Q5 have no evidence card, and their `letter` is empty. */
+        evidence: TraceOption.optional(),
         confidence: Confidence,
         lockedAt: Timestamp,
         relationLabel: z.string(),
@@ -483,7 +485,7 @@ export const TraceDTO = z
     after: z
       .object({
         answer: ChangedTraceOption,
-        evidence: ChangedTraceOption,
+        evidence: ChangedTraceOption.optional(),
         confidenceBefore: Confidence,
         confidenceAfter: Confidence,
         submittedAt: Timestamp,

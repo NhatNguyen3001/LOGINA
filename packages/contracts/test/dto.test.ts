@@ -98,13 +98,13 @@ describe('student DTOs', () => {
 
   it('SEC01 a Q2 task body rejects acceptedOrders', () => {
     const body = { cards: [{ cardId: 'c1', text: 'x' }], basis: 'y' };
-    const task = { slot: 'Q2', phase: 'REASON', stem: 's', draftArtifact: null };
+    const task = { slot: 'Q2', phase: 'REASON', stem: 's', draftArtifact: null, submittedSlots: [] };
     expect(() => StudentTaskDTO.parse({ ...task, taskBody: body })).not.toThrow();
     expect(() => StudentTaskDTO.parse({ ...task, taskBody: { ...body, acceptedOrders: [['c1']] } })).toThrow();
   });
 
   it('SEC01 Q3 to Q5 task bodies parse and reject their server-only keys', () => {
-    const shared = { phase: 'REASON', stem: 's', draftArtifact: null };
+    const shared = { phase: 'REASON', stem: 's', draftArtifact: null, submittedSlots: [] };
     const q3 = {
       options: [{ optionId: 'o1', text: 'x' }],
       criteria: [{ criterionId: 'c1', text: 'y' }],

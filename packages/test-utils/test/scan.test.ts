@@ -18,7 +18,6 @@ const STUDENT_VISIBLE: (keyof typeof dtoSchemas)[] = [
   'studentFeedback',
   'me',
   'consentResult',
-  'limits',
   'rateLimit',
   'error',
 ];

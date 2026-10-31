@@ -1,5 +1,5 @@
 import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/firestore';
-import { Artifact, type AttemptDTO, type StudentChallengeDTO, type SubmitResultDTO } from '@logina/contracts';
+import { Artifact, type AttemptDTO, type Q4TaskBody, type StudentChallengeDTO, type SubmitResultDTO } from '@logina/contracts';
 import { AppError, decodeNested, moveTree, newId, scopedGet, writeOnce } from '@logina/db';
 import { buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle } from '@logina/domain';
 
@@ -102,6 +102,8 @@ function q1Labels(release: DocumentData): Q1Labels {
   };
 }
 
+type Q4Template = Q4TaskBody['templates'][number];
+
 export function artifactSummary(artifact: Artifact, release: DocumentData): { answerText: string; evidenceText?: string } {
   if (artifact.slot === 'Q1') {
     const content = release.publicContent as { answerOptions: { id: string; text: string }[]; evidenceOptions: { evidenceId: string; text: string }[] };
@@ -117,7 +119,12 @@ export function artifactSummary(artifact: Artifact, release: DocumentData): { an
     return { answerText: artifact.orderedCardIds.map((id) => cards.find((card) => card.cardId === id)?.text ?? '').join(' > ') };
   }
   if (artifact.slot === 'Q3') return { answerText: (body.options as { optionId: string; text: string }[]).find((o) => o.optionId === artifact.judgmentOptionId)?.text ?? '' };
-  return { answerText: (body.templates as { templateId: string; text: string }[]).find((x) => x.templateId === artifact.templateId)?.text ?? '' };
+  const template = (body.templates as Q4Template[]).find((x) => x.templateId === artifact.templateId);
+  const chosen = (slotId: string) => {
+    const choiceId = artifact.slots.find((x) => x.slotId === slotId)?.choiceId;
+    return template?.slots.find((x) => x.slotId === slotId)?.choices.find((x) => x.choiceId === choiceId)?.text;
+  };
+  return { answerText: (template?.text ?? '').replace(/\[([^\]]+)\]/g, (blank, slotId: string) => chosen(slotId) ?? blank) };
 }
 
 const toChallengeDTO = (taskDoc: DocumentData, delivery: DocumentData, deliveryId: string, release: DocumentData): StudentChallengeDTO => ({

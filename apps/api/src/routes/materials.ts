@@ -5,7 +5,6 @@ import { MaterialViewUrlDTO, RegisterMaterialReq, UploadUrlDTO, UploadUrlReq } f
 import { AppError, lessonsRepo, newId } from '@logina/db';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
-import { enforce } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
 import { RateLimited } from '../services/limits.js';
 import { incrementLiveUsage } from '../services/live-usage.js';
@@ -103,7 +102,6 @@ export function materialRoutes(deps: AppDeps): Hono<AppEnv> {
         const hash = sha256(bytes);
         const matchedLocale = Object.entries(samples).find(([, sample]) => sample === hash)?.[0];
         const aiMode = config.demoMode && matchedLocale ? 'SEEDED' : 'LIVE';
-        if (aiMode === 'LIVE') await enforce(deps, c, 'UPLOAD');
         const { mimeType, pageCount, unitKind } = await inspectUpload(bytes, fileName);
         const seenOnLesson = !(
           await lessonRef.collection('materialVersions').where('sha256', '==', hash).limit(1).get()

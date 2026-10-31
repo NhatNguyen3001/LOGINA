@@ -9,7 +9,7 @@ async function studentTarget(lessonId?: string): Promise<string> {
 }
 
 /** One session reaches both sides, so a second tab is enough. */
-export function SwitchSide({ to, lessonId, block }: { to: 'student' | 'teacher'; lessonId?: string; block?: boolean }) {
+export function SwitchSide({ to, lessonId, block, short }: { to: 'student' | 'teacher'; lessonId?: string; block?: boolean; short?: boolean }) {
   const { t } = useTranslation();
   const open = async () => {
     window.open(to === 'student' ? await studentTarget(lessonId) : '/t/lessons', '_blank', 'noopener');
@@ -18,7 +18,7 @@ export function SwitchSide({ to, lessonId, block }: { to: 'student' | 'teacher';
   return (
     <button type="button" className={`btn secondary sm ${block ? 'block' : ''}`} aria-label={label} title={label} onClick={() => void open()}>
       <ExternalLink className="ico" aria-hidden="true" />
-      <span>{t(to === 'student' ? 'common.openStudentView' : 'common.openTeacherView')}</span>
+      <span>{short ? t(`titles.${to}`) : t(to === 'student' ? 'common.openStudentView' : 'common.openTeacherView')}</span>
     </button>
   );
 }

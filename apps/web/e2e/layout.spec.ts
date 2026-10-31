@@ -65,7 +65,7 @@ test('the final-answer bar drags on both Keep and Revise', async ({ page }) => {
   await page.getByRole('button', { name: 'Lock in answer' }).click();
   await page.getByRole('button', { name: 'Keep my answer' }).click();
   await dragBar(page, page.getByRole('slider'));
-  await page.getByRole('button', { name: /Revise my answer/ }).click();
+  await page.getByRole('button', { name: /Revise answer/ }).click();
   await dragBar(page, page.getByRole('slider'));
 });
 
@@ -75,13 +75,17 @@ test('Q2 cards reorder by drag and by the buttons', async ({ page }) => {
   await expect(page).toHaveURL(/\/Q2$/);
   const rows = page.locator('li.rank');
   await expect(rows).toHaveCount(4);
-  const lastCard = await rows.nth(3).locator('> span').nth(1).innerText();
+  const lastCard = await rows.nth(3).locator('.rank-card > span').first().innerText();
 
   const last = (await rows.nth(3).boundingBox())!;
   const first = (await rows.nth(0).boundingBox())!;
   await page.mouse.move(last.x + last.width / 2, last.y + last.height / 2);
   await page.mouse.down();
+  const bottomRank = (await rows.nth(3).locator('.k').boundingBox())!;
   await page.mouse.move(last.x + last.width / 2, first.y, { steps: 20 });
+  // Only the card moves: the rank numbers stay where they are during the drag.
+  expect((await rows.nth(3).locator('.k').boundingBox())!.y).toBe(bottomRank.y);
+  await expect(rows.nth(3).locator('.k')).toHaveText('4');
   await page.mouse.up();
   await expect(rows.nth(0)).toContainText(lastCard);
 
@@ -110,7 +114,7 @@ test('the consent footer stays at the bottom', async ({ page }) => {
 test('the teacher footer stays at the bottom with no extra height', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await openTeacher(page);
-  await expectAtBottom(page, page.locator('.side-legal'));
+  await expectAtBottom(page, page.locator('.legal-foot'));
 });
 
 test('the task editor has the footer at the bottom', async ({ page }) => {
@@ -172,6 +176,45 @@ test('every bar starts at 50 with one knob, and Reset run goes back to Q1', asyn
   await popup.getByRole('button', { name: 'Yes, start over' }).click();
   await expect(page).toHaveURL(/\/Q1$/);
   await expect(page.getByRole('button', { name: 'Continue →' })).toBeDisabled();
+});
+
+test('the header menu is for phones: desktop shows its actions, a phone folds them away', async ({ page }) => {
+  await startTasks(page);
+  await expect(page.getByRole('button', { name: 'Menu' })).toBeHidden();
+  await expect(page.getByRole('link', { name: 'My runs' })).toBeVisible();
+  await expect(page).toHaveTitle('Q1 Statement · Student · LOGINA');
+
+  await page.setViewportSize({ width: 375, height: 760 });
+  await expect(page.getByRole('link', { name: 'My runs' })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Reset run' })).toBeHidden();
+  const height = await page.locator('.stu-phone').evaluate((header) => header.getBoundingClientRect().height);
+  expect(height).toBeLessThanOrEqual(60);
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await expect(page.getByRole('button', { name: 'Reset run' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Reset run' })).toBeHidden();
+});
+
+test('the Continue bar stays in view on a long page and says why it waits', async ({ page }) => {
+  await startTasks(page);
+  await expect(page.getByText('Choose a statement to continue.')).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'Continue →' })).toBeInViewport();
+});
+
+test('progress shows only what was submitted, even when a task is opened by URL', async ({ page }) => {
+  await startTasks(page);
+  await page.goto(page.url().replace(/Q1$/, 'Q3'));
+  await expect(page.getByRole('button', { name: 'Continue →' })).toBeVisible();
+  await expect(page.locator('.tasks > li.done')).toHaveCount(0);
+});
+
+test('the teacher phone header is short and opens a menu', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 760 });
+  await openTeacher(page);
+  const height = await page.locator('.side').evaluate((header) => header.getBoundingClientRect().height);
+  expect(height).toBeLessThanOrEqual(80);
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await expect(page.getByRole('button', { name: /Open student view/ })).toBeVisible();
 });
 
 test('the teacher sidebar cannot be collapsed', async ({ page }) => {

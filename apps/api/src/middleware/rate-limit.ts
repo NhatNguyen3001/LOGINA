@@ -1,4 +1,4 @@
-import type { Context, Handler, MiddlewareHandler } from 'hono';
+import type { Context, MiddlewareHandler } from 'hono';
 import type { AppDeps, AppEnv } from '../context.js';
 import { clientAddress, consume, createApiCounter, hashAddress, RateLimited, type LimitedAction } from '../services/limits.js';
 
@@ -12,13 +12,6 @@ export async function enforce({ db, config, now }: AppDeps, c: Context<AppEnv>, 
   const result = await consume(db, action, config.limits[action], keysOf(c, at, config.trustedProxyHops));
   if (!result.allowed) throw new RateLimited(action, result.resetsAt, at);
 }
-
-/** Goes inside `withIdempotency`, so a replay is not counted and a 429 is never stored as the answer to a key. */
-export const limited = (deps: AppDeps, action: LimitedAction, handler: Handler<AppEnv>): Handler<AppEnv> =>
-  async (c, next) => {
-    await enforce(deps, c, action);
-    return handler(c, next);
-  };
 
 export function apiLimiter({ config, now }: AppDeps): MiddlewareHandler<AppEnv> {
   const counter = createApiCounter(config.limits.API);

@@ -2,7 +2,8 @@ import { closestCenter, DndContext, MouseSensor, TouchSensor, useSensor, useSens
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Artifact, DraftArtifact, Q2TaskBody, Q3TaskBody, Q4TaskBody, Q5TaskBody, StudentTaskDTO } from '@logina/contracts';
-import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
+import { ArrowDown, ArrowUp, Check, GripVertical } from 'lucide-react';
+import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pick } from '@/components/logina/Pick';
 
@@ -57,19 +58,22 @@ function RankRow({ id, index, count, text, onMove }: { id: string; index: number
   const style = { transform: CSS.Translate.toString(transform && { ...transform, x: 0 }), transition };
 
   return (
-    <li ref={setNodeRef} style={style} className={`opt rank ${isDragging ? 'dragging' : ''}`} {...listeners}>
-      <GripVertical className="ico grip" aria-hidden="true" />
+    <li className="rank">
+      {/* The number is the rank, so it stays in place and only the card moves. */}
       <span className="k">{index + 1}</span>
-      <span>{text}</span>
-      {/* The row starts a drag, so the buttons keep their own presses. */}
-      <span className="acts" onMouseDown={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()}>
-        <button type="button" className="ibtn" aria-label={t('student.q2.moveUp', { card: text })} disabled={index === 0} onClick={() => onMove(-1)}>
-          <ArrowUp className="ico" aria-hidden="true" />
-        </button>
-        <button type="button" className="ibtn" aria-label={t('student.q2.moveDown', { card: text })} disabled={index === count - 1} onClick={() => onMove(1)}>
-          <ArrowDown className="ico" aria-hidden="true" />
-        </button>
-      </span>
+      <div ref={setNodeRef} style={style} className={`opt rank-card ${isDragging ? 'dragging' : ''}`} {...listeners}>
+        <GripVertical className="ico grip" aria-hidden="true" />
+        <span>{text}</span>
+        {/* The row starts a drag, so the buttons keep their own presses. */}
+        <span className="acts" onMouseDown={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()}>
+          <button type="button" className="ibtn" aria-label={t('student.q2.moveUp', { card: text })} disabled={index === 0} onClick={() => onMove(-1)}>
+            <ArrowUp className="ico" aria-hidden="true" />
+          </button>
+          <button type="button" className="ibtn" aria-label={t('student.q2.moveDown', { card: text })} disabled={index === count - 1} onClick={() => onMove(1)}>
+            <ArrowDown className="ico" aria-hidden="true" />
+          </button>
+        </span>
+      </div>
     </li>
   );
 }
@@ -119,33 +123,49 @@ export function Q3Editor({ body, value, onChange }: EditorProps<'Q3', Q3TaskBody
 
   return (
     <>
-      <h2 className="s15 b">{t('student.q3.compare')}</h2>
-      {body.criteria.map(({ criterionId, text }) => (
-        <fieldset key={criterionId} className="stack crit">
-          <legend className="b">{text}</legend>
-          {body.options.map(({ optionId, text: option }) => (
-            <Pick key={optionId} name={criterionId} value={optionId} checked={comparisons.find((c) => c.criterionId === criterionId)?.value === optionId} onSelect={(picked) => compare(criterionId, picked)}>
-              {option}
-            </Pick>
-          ))}
-        </fieldset>
-      ))}
+      <ol className="ans ranked">
+        {body.options.map(({ optionId, text }, index) => (
+          <li key={optionId}>
+            <span className="k">{letterOf(index)}</span>
+            <span>{text}</span>
+          </li>
+        ))}
+      </ol>
+      <h2 className="s15 b part">{t('student.q3.compare')}</h2>
+      {/* One row per criterion: the option wording above is not repeated in every row. */}
+      <div className="cmp" style={{ '--cols': body.options.length } as CSSProperties}>
+        {body.criteria.map(({ criterionId, text }) => (
+          <fieldset key={criterionId} className="cmp-row">
+            <legend className="vh">{text}</legend>
+            <span className="m" aria-hidden="true">{text}</span>
+            {body.options.map(({ optionId, text: option }, index) => (
+              <Pick key={optionId} name={criterionId} value={optionId} label={letterOf(index)} checked={comparisons.find((c) => c.criterionId === criterionId)?.value === optionId} onSelect={(picked) => compare(criterionId, picked)}>
+                <span className="vh">{option}</span>
+              </Pick>
+            ))}
+          </fieldset>
+        ))}
+      </div>
       <h2 className="s15 b part">{t('student.q3.decide')}</h2>
       <div className="stack" role="radiogroup" aria-label={t('student.q3.decide')}>
-        {body.options.map(({ optionId, text }) => (
-          <Pick key={optionId} name="judgment" value={optionId} checked={value.judgmentOptionId === optionId} onSelect={(judgmentOptionId) => onChange({ ...value, judgmentOptionId })}>
+        {body.options.map(({ optionId, text }, index) => (
+          <Pick key={optionId} name="judgment" value={optionId} label={`${letterOf(index)}.`} checked={value.judgmentOptionId === optionId} onSelect={(judgmentOptionId) => onChange({ ...value, judgmentOptionId })}>
             {text}
           </Pick>
         ))}
       </div>
       <h2 className="s15 b part">{t('student.q3.tradeOffs')}</h2>
       <div className="stack">
-        {body.constraints.map(({ tradeOffId, text }) => (
-          <label key={tradeOffId} className="pick">
-            <input type="checkbox" checked={tradeOffIds.includes(tradeOffId)} onChange={() => toggle(tradeOffId)} />
-            <span className="grow">{text}</span>
-          </label>
-        ))}
+        {body.constraints.map(({ tradeOffId, text }) => {
+          const ticked = tradeOffIds.includes(tradeOffId);
+          return (
+            <label key={tradeOffId} className={`pick ${ticked ? 'on' : ''}`}>
+              <input type="checkbox" checked={ticked} onChange={() => toggle(tradeOffId)} className="vh" />
+              <span className={`check ${ticked ? 'on' : ''}`} aria-hidden="true">{ticked ? <Check className="ico" /> : null}</span>
+              <span className="grow">{text}</span>
+            </label>
+          );
+        })}
       </div>
     </>
   );
@@ -225,6 +245,27 @@ export function isComplete(task: StudentTaskDTO, value: DraftArtifact): value is
   }
   if (value.slot === 'Q5') return Boolean(value.proposal?.trim() && value.reason?.trim());
   return false;
+}
+
+/** Names the first thing still missing, so a disabled Continue always says why. */
+export function missingKey(task: StudentTaskDTO, value: DraftArtifact): string | null {
+  if (value.slot === 'Q1') {
+    if (!value.answerId) return 'student.need.statement';
+    return value.evidenceId ? null : 'student.need.card';
+  }
+  if (value.slot === 'Q3' && task.slot === 'Q3') {
+    if (!task.taskBody.criteria.every((c) => value.comparisons?.some((x) => x.criterionId === c.criterionId))) return 'student.need.compare';
+    return value.judgmentOptionId ? null : 'student.need.decide';
+  }
+  if (value.slot === 'Q4' && task.slot === 'Q4') {
+    if (!value.templateId) return 'student.need.template';
+    return isComplete(task, value) ? null : 'student.need.blanks';
+  }
+  if (value.slot === 'Q5') {
+    if (!value.proposal?.trim()) return 'student.need.proposal';
+    return value.reason?.trim() ? null : 'student.need.reason';
+  }
+  return null;
 }
 
 /** Lists the request requires start empty, so a student who ticks no drawback can still lock. */
