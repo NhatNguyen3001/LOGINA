@@ -208,13 +208,12 @@ describe('results', () => {
     explanations: [],
   });
 
-  it('S8 shows Keep and Revise in the same neutral style with no score, and the code', async () => {
+  it('S8 shows Keep and Revise in the same neutral style with no score and no participant code', async () => {
     vi.mocked(api.getFeedback).mockResolvedValue([row('Q1', true), row('Q2', false)] as never);
-    vi.mocked(api.getMe).mockResolvedValue({ ...me, participantCode: 'P-7K2M' });
     await render(<ResultSet />);
     const keep = await screen.findByText('Keep');
     expect(keep.className).toBe(screen.getByText('Revise').className);
-    expect(await screen.findByText('P-7K2M')).toBeInTheDocument();
+    expect(screen.queryByText('P-7K2M')).toBeNull();
     expect(screen.getByText(/does not grade you/)).toBeInTheDocument();
   });
 

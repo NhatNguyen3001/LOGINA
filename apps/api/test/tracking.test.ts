@@ -1,6 +1,6 @@
 import { researchRowId } from '../src/services/research.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { AttemptDTO, ClassTrackingDTO, ConsentResultDTO, MeDTO, StudentTaskDTO, TraceDTO, findRestrictedKeys } from '@logina/contracts';
+import { AttemptDTO, ClassTrackingDTO, ConsentResultDTO, MeDTO, RecordedRunsDTO, StudentTaskDTO, TraceDTO, findRestrictedKeys } from '@logina/contracts';
 import { harness, seedAssigned, type Client, type Harness } from './helpers.js';
 
 let h: Harness;
@@ -168,5 +168,34 @@ describe('me and consent', () => {
     expect(doc.first_answer).toContain('Open trade courses');
     expect(doc.first_answer).toContain('Many jobs need training');
     expect(doc.first_evidence).toBeNull();
+  });
+
+  it('a restart after a finished attempt starts clean, keeps the rows and counts as run 2', async () => {
+    const attempt = AttemptDTO.parse(await (await a.post(`/assignments/${copyId}/attempts/restart`)).json());
+    expect(attempt).toMatchObject({ attemptId: copyAttemptId, status: 'NOT_STARTED' });
+    expect(attempt.slots.every((s) => s.phase === 'REASON')).toBe(true);
+
+    await answerQ1(a, copyAttemptId, 0, 0, 0, 0);
+    expect((await h.live.db.doc(`researchRows/${researchRowId(copyAttemptId, 'Q1', 1)}`).get()).exists).toBe(true);
+    const second = (await h.live.db.doc(`researchRows/${researchRowId(copyAttemptId, 'Q1', 2)}`).get()).data()!;
+    expect(second.run_number).toBe(2);
+  });
+
+  it('a finished run stays readable by its student and is listed, but not in class tracking', async () => {
+    const recorded = `${copyAttemptId}_run1`;
+    const feedback = await a.get(`/attempts/${recorded}/feedback`);
+    expect(feedback.status).toBe(200);
+
+    const { runs } = RecordedRunsDTO.parse(await (await a.get('/me/assignments/runs')).json());
+    expect(runs.find((r) => r.attemptId === recorded)).toMatchObject({ run: 1 });
+
+    const tracking = ClassTrackingDTO.parse(await (await a.get(`/assignments/${copyId}/tracking`)).json());
+    expect(JSON.stringify(tracking)).not.toContain(recorded);
+  });
+
+  it('a restart does not clear an unfinished attempt', async () => {
+    const attempt = AttemptDTO.parse(await (await a.post(`/assignments/${copyId}/attempts/restart`)).json());
+    expect(attempt.status).toBe('IN_PROGRESS');
+    expect(attempt.slots[0]!.phase).toBe('SUBMITTED');
   });
 });

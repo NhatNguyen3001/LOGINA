@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
 import { respond } from '../middleware/respond.js';
-import { answerLabel, artifactSummary, loadAttempt, loadRelease, lockTask, startAttempt, submitTask, toChallengeDTO } from '../services/runtime.js';
+import { answerLabel, artifactSummary, loadAttempt, loadRelease, lockTask, restartAttempt, startAttempt, submitTask, toChallengeDTO } from '../services/runtime.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const CARD_WORD = { en: 'Card', vi: 'Thẻ' };
@@ -24,6 +24,11 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
   routes.post(
     '/assignments/:id/attempts',
     withIdempotency(db, async (c) => respond(c, AttemptDTO, await startAttempt(db, c.var.user, c.req.param('id') as string))),
+  );
+
+  routes.post(
+    '/assignments/:id/attempts/restart',
+    withIdempotency(db, async (c) => respond(c, AttemptDTO, await restartAttempt(db, c.var.user, c.req.param('id') as string))),
   );
 
   routes.get('/attempts/:id/tasks/:slot', async (c) => {

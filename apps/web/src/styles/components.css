@@ -74,7 +74,7 @@ table.t td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:
 table.t tr:last-child td{border-bottom:0}
 
 /* teacher app shell */
-.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:900px}
+.app{display:grid;grid-template-columns:240px minmax(0,1fr)}
 .side{background:var(--surface);border-right:1px solid var(--line);padding:24px 16px 20px;display:flex;flex-direction:column;gap:6px}
 .logo{display:flex;align-items:center;gap:10px;padding:0 4px 18px}
 .logo .mk{width:30px;height:30px;display:block;flex:none}
@@ -82,19 +82,7 @@ table.t tr:last-child td{border-bottom:0}
 .logo .wm{font-weight:500;font-size:21px;color:var(--logo-navy);letter-spacing:.01em;line-height:1}
 .nav{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--ink);text-decoration:none}
 .nav.on{background:var(--navy-bg);color:var(--navy);font-weight:600}
-.nav svg,.collapse-btn svg{width:18px;height:18px;flex:none}
-.collapse-btn{margin-left:auto;width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);display:grid;place-items:center;cursor:pointer;padding:0}
-.collapse-btn:hover{background:var(--subtle);color:var(--ink)}
-.app{transition:grid-template-columns .2s ease}
-.app.side-collapsed{grid-template-columns:72px minmax(0,1fr)}
-.app.side-collapsed .side{padding-left:12px;padding-right:12px}
-.app.side-collapsed .wm,.app.side-collapsed .nav span,.app.side-collapsed .me .btn span{display:none}
-.app.side-collapsed .logo{flex-direction:column;gap:12px;padding:0 0 18px}
-.app.side-collapsed .collapse-btn{margin-left:0}
-.app.side-collapsed .collapse-btn svg{transform:rotate(180deg)}
-.app.side-collapsed .nav{justify-content:center;padding:9px 0}
-.app.side-collapsed .me{justify-content:center}
-.app.side-collapsed .me .btn{padding-inline:0}
+.nav svg{width:18px;height:18px;flex:none}
 .me{margin-top:auto;border-top:1px solid var(--line);padding-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .me .nav{width:100%;padding-inline:4px}
 .av{width:32px;height:32px;border-radius:50%;background:var(--navy-bg);color:var(--navy);display:grid;place-items:center;font-weight:600;font-size:13px;flex:none}
@@ -159,10 +147,10 @@ table.t tr:last-child td{border-bottom:0}
 .goes{font-size:12px;color:var(--navy);font-weight:600}
 
 /* student shell */
-.stu-top{background:var(--surface);border-bottom:1px solid var(--line);padding:16px 0 0}
+.stu-top{background:var(--surface);border-bottom:1px solid var(--line);padding:18px 0 0}
 .stu-in{max-width:780px;margin:0 auto;padding-inline:24px}
-.prog{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:14px}
-.prog div{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink-2);padding-bottom:10px;min-width:0;overflow-wrap:anywhere;hyphens:auto}
+.prog{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:20px}
+.prog div{display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--ink-2);padding-bottom:16px;min-width:0;overflow-wrap:anywhere;hyphens:auto}
 .prog div::before{content:"";height:4px;border-radius:4px;background:var(--line)}
 .prog div.on{color:var(--navy);font-weight:600}
 .prog div.on::before{background:var(--accent)}
@@ -172,6 +160,10 @@ table.t tr:last-child td{border-bottom:0}
 .phase .on{color:var(--navy);font-weight:600}
 .phase .done{color:var(--green);font-weight:600}
 .stem{font-size:22px;font-weight:700;line-height:1.35}
+.rank{grid-template-columns:18px 34px minmax(0,1fr) auto;cursor:grab;touch-action:manipulation;user-select:none;-webkit-touch-callout:none}
+.rank .grip{margin-top:6px;color:var(--ink-3)}
+.rank .acts{cursor:default}
+.rank.dragging{position:relative;z-index:1;cursor:grabbing;box-shadow:0 6px 18px rgba(16,24,40,.16)}
 .pick{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:15px}
 .pick.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--navy-bg)}
 .pick.new{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--navy-bg)}
@@ -185,7 +177,8 @@ table.t tr:last-child td{border-bottom:0}
 .locked{background:var(--subtle);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;grid-template-columns:repeat(3,auto);gap:4px 28px;justify-content:start}
 .locked dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
 .locked dd{margin:0;font-weight:600}
-.slider{position:relative;height:8px;border-radius:8px;background:var(--line)}
+.slider{position:relative;height:8px;border-radius:8px;background:var(--line);cursor:pointer;touch-action:none;user-select:none}
+.slider::before{content:"";position:absolute;inset:-14px 0}
 .slider .fill{position:absolute;inset:0 auto 0 0;border-radius:8px;background:var(--accent)}
 .slider .knob{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);transform:translate(-50%,-50%)}
 .trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -252,7 +245,6 @@ table.t tr:last-child td{border-bottom:0}
 .side-legal{display:flex;flex-wrap:wrap;gap:2px 8px;padding:10px 4px 0;font-size:12px}
 .side-legal a{color:var(--ink-3);text-decoration:none;padding:3px 0}
 .side-legal a:hover{color:var(--navy);text-decoration:underline}
-.app.side-collapsed .side-legal{display:none}
 .login{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
 .login-brand{background:var(--surface);border-right:1px solid var(--line);padding:56px 64px;display:flex;flex-direction:column;gap:20px;justify-content:center}
 .login-brand .logo{padding:0}
@@ -291,11 +283,8 @@ table.t tr:last-child td{border-bottom:0}
   .sticky{position:static}
 }
 @media (max-width:860px){
-  .app,.app.side-collapsed{grid-template-columns:minmax(0,1fr);min-height:0}
+  .app{grid-template-columns:minmax(0,1fr)}
   .collapse-btn{display:none}
-  .app.side-collapsed .wm,.app.side-collapsed .nav span,.app.side-collapsed .me .btn span{display:inline}
-  .app.side-collapsed .logo{flex-direction:row;padding:0 8px 0 0}
-  .app.side-collapsed .nav{padding:9px 12px}
   .side{flex-direction:row;flex-wrap:wrap;align-items:center;border-right:0;border-bottom:1px solid var(--line);padding:12px 16px}
   .logo{padding:0 8px 0 0}
   .row.top:has(> .field){flex-wrap:wrap}
@@ -309,10 +298,12 @@ table.t tr:last-child td{border-bottom:0}
   .journey .arrow{transform:rotate(90deg)}
   .opt{grid-template-columns:30px minmax(0,1fr)}
   .opt .acts{grid-column:2}
+  .rank{grid-template-columns:18px 30px minmax(0,1fr)}
+  .rank .acts{grid-column:3}
   .locked{grid-template-columns:repeat(2,auto)}
   .ans .ln{grid-template-columns:minmax(0,1fr);gap:2px}
   .stem{font-size:19px}
-  .prog{grid-template-columns:repeat(5,auto);gap:4px;overflow-x:auto}
+  .prog{grid-template-columns:repeat(5,auto);gap:10px;overflow-x:auto}
   .prog div{font-size:12px;min-width:auto;overflow-wrap:normal;hyphens:manual}
   .h1{font-size:22px}
 }

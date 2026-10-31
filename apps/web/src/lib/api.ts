@@ -2,6 +2,7 @@ import {
   ApproveResultDTO,
   AssignResultDTO,
   AssignmentListDTO,
+  RecordedRunsDTO,
   AttemptDTO,
   ChallengeListDTO,
   ClassDTO,
@@ -172,7 +173,9 @@ export const getTracking = (assignmentId: string) => get(`/assignments/${assignm
 export const getTrace = (attemptId: string, slot: Slot) => get(`/attempts/${attemptId}/trace/${slot}`, TraceDTO);
 
 export const getMyAssignments = () => get('/me/assignments', AssignmentListDTO);
+export const getRecordedRuns = () => get('/me/assignments/runs', RecordedRunsDTO);
 export const startAttempt = (assignmentId: string, key: string) => post(`/assignments/${assignmentId}/attempts`, AttemptDTO, {}, key);
+export const restartAttempt = (assignmentId: string, key: string) => post(`/assignments/${assignmentId}/attempts/restart`, AttemptDTO, {}, key);
 export const getStudentTask = (attemptId: string, slot: Slot) => get(attemptTask(attemptId, slot), StudentTaskDTO);
 export const saveDraft = (attemptId: string, slot: Slot, body: unknown) => request(`${attemptTask(attemptId, slot)}/draft`, Ok, { method: 'PUT', body, key: newKey() });
 export const lockTask = (attemptId: string, slot: Slot, req: LockReq, key: string) => post(`${attemptTask(attemptId, slot)}/lock`, StudentChallengeDTO, req, key);

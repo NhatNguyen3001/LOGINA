@@ -4,7 +4,9 @@ import { Clock, EyeOff, FlaskConical, HandHeart, Sheet, UserRound, Users, type L
 import { Link } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LegalFooter } from '@/components/logina/LegalFooter';
 import { Logo } from '@/components/logina/Logo';
+import { HomeLink } from '@/components/logina/StudentShell';
 import { Note } from '@/components/logina/Note';
 import { newKey, sendConsent } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -37,14 +39,16 @@ export function Consent({ onDone }: { onDone: () => void }) {
   });
 
   return (
-    <div className="min-h-dvh bg-page">
+    <div className="flex min-h-dvh flex-col bg-page">
       <div className="stu-top pb-4">
         <div className="stu-in row">
           <Logo />
+          <span className="sp" />
+          <HomeLink />
         </div>
       </div>
       {code ? (
-        <div className="stu-in stu-body">
+        <div className="stu-in stu-body w-full grow">
           <div className="card tight">
             <h1 className="s15 b">{t('consent.thanks')}</h1>
             <div className="stack">
@@ -57,7 +61,7 @@ export function Consent({ onDone }: { onDone: () => void }) {
         </div>
       ) : (
         <>
-          <main className="stu-in stu-body">
+          <main className="stu-in stu-body w-full grow">
             <h1 className="stem">{t('consent.title')}</h1>
             <div className="card notice-card">
               {POINTS.map(({ icon: Icon, title, lines }) => (
@@ -92,6 +96,7 @@ export function Consent({ onDone }: { onDone: () => void }) {
           </div>
         </>
       )}
+      <LegalFooter />
     </div>
   );
 }

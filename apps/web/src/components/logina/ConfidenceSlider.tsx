@@ -36,6 +36,16 @@ export function ConfidenceSlider({ value, onChange, initial }: ConfidenceSliderP
     onChange(clamp(Math.round(((event.clientX - left) / width) * 100)));
   };
 
+  /** Capture keeps the drag alive when the pointer leaves the bar. */
+  const startDrag = (event: PointerEvent<HTMLDivElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    fromPointer(event);
+  };
+
+  const drag = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) fromPointer(event);
+  };
+
   return (
     <div className="stack">
       <div className="row">
@@ -52,7 +62,8 @@ export function ConfidenceSlider({ value, onChange, initial }: ConfidenceSliderP
         {...(value === null ? {} : { 'aria-valuenow': value })}
         className={`slider ${value === null ? 'empty' : ''}`}
         onKeyDown={onKeyDown}
-        onPointerDown={fromPointer}
+        onPointerDown={startDrag}
+        onPointerMove={drag}
       >
         {value === null ? null : (
           <>

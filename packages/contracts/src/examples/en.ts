@@ -847,6 +847,9 @@ export const examples = {
     },
   },
 
+  recordedRuns: {
+    runs: [{ attemptId: 'att_01JB8_run1', lessonTitle: 'Lesson 8: Labor and employment', run: 1, completedAt: '2026-11-02T07:03:10.000Z' }],
+  },
   assignmentList: {
     assignments: [
       {

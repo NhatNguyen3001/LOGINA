@@ -1,6 +1,6 @@
 import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/firestore';
 import { Artifact, type AttemptDTO, type StudentChallengeDTO, type SubmitResultDTO } from '@logina/contracts';
-import { AppError, decodeNested, newId, scopedGet, writeOnce } from '@logina/db';
+import { AppError, decodeNested, moveTree, newId, scopedGet, writeOnce } from '@logina/db';
 import { buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle } from '@logina/domain';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
@@ -45,6 +45,20 @@ export async function startAttempt(db: Firestore, actor: Actor, assignmentId: st
   const phases = new Map(tasks.docs.map((doc) => [doc.id, doc.data().phase as string]));
   const status = (await ref.get()).data()?.status as AttemptDTO['status'];
   return { attemptId, status, slots: SLOTS.map((slot) => ({ slot, phase: phases.get(slot) as AttemptDTO['slots'][number]['phase'] })) };
+}
+
+/**
+ * Files a finished attempt as a recorded run so the same person can go again. The recorded copy has
+ * no assignmentId, so class tracking never counts it. An unfinished attempt simply resumes.
+ */
+export async function restartAttempt(db: Firestore, actor: Actor, assignmentId: string): Promise<AttemptDTO> {
+  const ref = db.doc(`attempts/${attemptIdFor(actor.uid, assignmentId)}`);
+  const attempt = (await ref.get()).data();
+  if (attempt?.status !== 'COMPLETE') return startAttempt(db, actor, assignmentId);
+
+  const run = (attempt.run as number | undefined) ?? 1;
+  await moveTree(db, ref, db.doc(`${ref.path}_run${run}`), ({ assignmentId: _filed, ...rest }) => ({ ...rest, run }));
+  return startAttempt(db, actor, assignmentId, { run: run + 1 });
 }
 
 export async function loadAttempt(db: Firestore, actor: Actor, attemptId: string): Promise<DocumentData> {

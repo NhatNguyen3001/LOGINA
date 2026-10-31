@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { LangSwitch } from '@/components/logina/LangSwitch';
 import { LegalFooter } from '@/components/logina/LegalFooter';
 import { Logo } from '@/components/logina/Logo';
-import { getMyAssignments, updateMe } from '@/lib/api';
+import { getMyAssignments, newKey, restartAttempt, updateMe } from '@/lib/api';
+import { queryClient } from '@/lib/query';
 
 export function EntryPage() {
   const { t, i18n } = useTranslation();
@@ -26,6 +27,11 @@ export function EntryPage() {
     setPending(true);
     await keepLanguage();
     const newest = (await getMyAssignments()).assignments[0];
+    /** A finished run is filed away, so every try is a real one. */
+    if (newest?.status === 'COMPLETE') {
+      await restartAttempt(newest.assignmentId, newKey());
+      queryClient.clear();
+    }
     await (newest ? navigate({ to: '/s/assignments/$id', params: { id: newest.assignmentId } }) : navigate({ to: '/s/assignments' }));
   };
 

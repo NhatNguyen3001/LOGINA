@@ -4,6 +4,7 @@ import { DemoSnapshotsDTO } from './demo.js';
 import {
   AssignmentListDTO,
   AttemptDTO,
+  RecordedRunsDTO,
   StudentChallengeDTO,
   StudentFeedbackDTO,
   StudentTaskDTO,
@@ -59,6 +60,7 @@ export const dtoSchemas = {
   classTracking: ClassTrackingDTO,
   trace: TraceDTO,
   assignmentList: AssignmentListDTO,
+  recordedRuns: RecordedRunsDTO,
   attempt: AttemptDTO,
   studentTask: StudentTaskDTO,
   studentChallenge: StudentChallengeDTO,

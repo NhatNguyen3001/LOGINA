@@ -23,6 +23,16 @@ export const AssignmentListDTO = z
   .strict();
 export type AssignmentListDTO = z.infer<typeof AssignmentListDTO>;
 
+/** Every finished run of this student, newest first. Results open through the attempt ID. */
+export const RecordedRunsDTO = z
+  .object({
+    runs: z.array(
+      z.object({ attemptId: z.string(), lessonTitle: z.string(), run: z.number().int().positive(), completedAt: Timestamp }).strict(),
+    ),
+  })
+  .strict();
+export type RecordedRunsDTO = z.infer<typeof RecordedRunsDTO>;
+
 export const AttemptDTO = z
   .object({
     attemptId: z.string(),

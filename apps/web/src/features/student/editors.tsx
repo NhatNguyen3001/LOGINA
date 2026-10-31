@@ -1,5 +1,8 @@
+import { closestCenter, DndContext, MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { Artifact, DraftArtifact, Q2TaskBody, Q3TaskBody, Q4TaskBody, Q5TaskBody, StudentTaskDTO } from '@logina/contracts';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pick } from '@/components/logina/Pick';
 
@@ -48,37 +51,57 @@ export function Q1Editor({ task, value, onChange, original }: { task: Q1Task; va
   );
 }
 
+function RankRow({ id, index, count, text, onMove }: { id: string; index: number; count: number; text: string; onMove: (by: number) => void }) {
+  const { t } = useTranslation();
+  const { setNodeRef, listeners, transform, transition, isDragging } = useSortable({ id });
+  const style = { transform: CSS.Translate.toString(transform && { ...transform, x: 0 }), transition };
+
+  return (
+    <li ref={setNodeRef} style={style} className={`opt rank ${isDragging ? 'dragging' : ''}`} {...listeners}>
+      <GripVertical className="ico grip" aria-hidden="true" />
+      <span className="k">{index + 1}</span>
+      <span>{text}</span>
+      {/* The row starts a drag, so the buttons keep their own presses. */}
+      <span className="acts" onMouseDown={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()}>
+        <button type="button" className="ibtn" aria-label={t('student.q2.moveUp', { card: text })} disabled={index === 0} onClick={() => onMove(-1)}>
+          <ArrowUp className="ico" aria-hidden="true" />
+        </button>
+        <button type="button" className="ibtn" aria-label={t('student.q2.moveDown', { card: text })} disabled={index === count - 1} onClick={() => onMove(1)}>
+          <ArrowDown className="ico" aria-hidden="true" />
+        </button>
+      </span>
+    </li>
+  );
+}
+
 export function Q2Editor({ body, value, onChange }: EditorProps<'Q2', Q2TaskBody>) {
   const { t } = useTranslation();
+  /** On touch, a short hold starts the drag, so a swipe over the cards still scrolls the page. */
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+  );
   const order = value.orderedCardIds ?? body.cards.map((c) => c.cardId);
   const textOf = (id: string) => body.cards.find((c) => c.cardId === id)?.text ?? id;
 
-  const move = (index: number, by: number) => {
-    const next = [...order];
-    const [card] = next.splice(index, 1);
-    next.splice(index + by, 0, card!);
-    onChange({ ...value, orderedCardIds: next });
+  const place = (from: number, to: number) => onChange({ ...value, orderedCardIds: arrayMove(order, from, to) });
+
+  const drop = ({ active, over }: DragEndEvent) => {
+    if (over && active.id !== over.id) place(order.indexOf(String(active.id)), order.indexOf(String(over.id)));
   };
 
   return (
     <>
       <p className="s15 sec">{t('student.q2.instructions')}</p>
-      <ol className="stack">
-        {order.map((id, index) => (
-          <li key={id} className="opt">
-            <span className="k">{index + 1}</span>
-            <span>{textOf(id)}</span>
-            <span className="acts">
-              <button type="button" className="ibtn" aria-label={t('student.q2.moveUp', { card: textOf(id) })} disabled={index === 0} onClick={() => move(index, -1)}>
-                <ArrowUp className="ico" aria-hidden="true" />
-              </button>
-              <button type="button" className="ibtn" aria-label={t('student.q2.moveDown', { card: textOf(id) })} disabled={index === order.length - 1} onClick={() => move(index, 1)}>
-                <ArrowDown className="ico" aria-hidden="true" />
-              </button>
-            </span>
-          </li>
-        ))}
-      </ol>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={drop}>
+        <SortableContext items={order} strategy={verticalListSortingStrategy}>
+          <ol className="stack">
+            {order.map((id, index) => (
+              <RankRow key={id} id={id} index={index} count={order.length} text={textOf(id)} onMove={(by) => place(index, index + by)} />
+            ))}
+          </ol>
+        </SortableContext>
+      </DndContext>
     </>
   );
 }

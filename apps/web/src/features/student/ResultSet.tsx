@@ -1,13 +1,13 @@
 import type { Slot, StudentFeedbackDTO } from '@logina/contracts';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useParams } from '@tanstack/react-router';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { Note } from '@/components/logina/Note';
 import { StudentShell } from '@/components/logina/StudentShell';
 import { SwitchSide } from '@/components/logina/SwitchSide';
 import { useSessionLocale } from '@/components/logina/TeacherShell';
-import { ApiError, getFeedback, getMe } from '@/lib/api';
-import { qk } from '@/lib/query';
+import { ApiError, getFeedback, getMyAssignments, newKey, restartAttempt } from '@/lib/api';
+import { qk, queryClient } from '@/lib/query';
 import { errorKey } from '@/i18n';
 
 const changed = (row: StudentFeedbackDTO) => row.choice === 'REVISE';
@@ -21,7 +21,16 @@ export function ResultSet() {
   const { id } = useParams({ strict: false }) as { id: string };
   useSessionLocale();
   const feedback = useFeedback(id);
-  const me = useQuery({ queryKey: qk.me(), queryFn: getMe });
+  const assignments = useQuery({ queryKey: qk.myAssignments(), queryFn: getMyAssignments });
+  const current = assignments.data?.assignments.find((a) => a.attemptId === id && a.status === 'COMPLETE');
+  const navigate = useNavigate();
+  const restart = useMutation({
+    mutationFn: (assignmentId: string) => restartAttempt(assignmentId, newKey()),
+    onSuccess: async (_, assignmentId) => {
+      queryClient.clear();
+      await navigate({ to: '/s/assignments/$id', params: { id: assignmentId } });
+    },
+  });
   const rows = feedback.data ?? [];
   const revised = rows.filter(changed).length;
 
@@ -60,15 +69,10 @@ export function ResultSet() {
               </table>
             </div>
           </div>
-          {me.data?.participantCode ? (
-            <div className="card tight">
-              <div className="row">
-                <span className="small b sec">{t('consent.code')}</span>
-                <span className="sp" />
-                <span className="bb num s15">{me.data.participantCode}</span>
-              </div>
-              <p className="s13 sec">{t('consent.withdraw')}</p>
-            </div>
+          {current ? (
+            <button type="button" className="btn primary" disabled={restart.isPending} onClick={() => restart.mutate(current.assignmentId)}>
+              {t('student.result.newRun')}
+            </button>
           ) : null}
           <p className="small muted">{t('student.result.disclaimer')}</p>
         </>

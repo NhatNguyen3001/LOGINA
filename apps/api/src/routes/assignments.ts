@@ -1,6 +1,6 @@
 import { FieldValue, type DocumentData } from 'firebase-admin/firestore';
 import { Hono } from 'hono';
-import { AssignReq, AssignResultDTO, AssignmentListDTO } from '@logina/contracts';
+import { AssignReq, AssignResultDTO, AssignmentListDTO, RecordedRunsDTO } from '@logina/contracts';
 import { AppError, lessonsRepo, newId } from '@logina/db';
 import type { AppDeps, AppEnv } from '../context.js';
 import { requireBaseVersion } from '../middleware/base-version.js';
@@ -69,7 +69,23 @@ export function assignmentRoutes({ db }: AppDeps): Hono<AppEnv> {
 }
 
 export function studentAssignmentRoutes({ db }: AppDeps): Hono<AppEnv> {
-  return new Hono<AppEnv>().get('/', async (c) => {
+  const routes = new Hono<AppEnv>();
+
+  routes.get('/runs', async (c) => {
+    const { schoolId, uid } = c.var.user;
+    const attempts = await db.collection('attempts').where('schoolId', '==', schoolId).where('studentId', '==', uid).get();
+    const finished = attempts.docs.filter((doc) => doc.data().status === 'COMPLETE');
+    const runs = await Promise.all(
+      finished.map(async (doc) => {
+        const attempt = doc.data();
+        const lesson = (await db.doc(`lessons/${attempt.lessonId as string}`).get()).data();
+        return { attemptId: doc.id, lessonTitle: lesson?.title ?? '', run: attempt.run ?? 1, completedAt: attempt.completedAt.toDate().toISOString() };
+      }),
+    );
+    return respond(c, RecordedRunsDTO, { runs: runs.sort((a, b) => b.completedAt.localeCompare(a.completedAt)) });
+  });
+
+  routes.get('/', async (c) => {
     const { schoolId, uid } = c.var.user;
     const docs = await db.collection('assignments').where('schoolId', '==', schoolId).orderBy('publishedAt', 'desc').get();
     const attempts = await db.collection('attempts').where('schoolId', '==', schoolId).where('studentId', '==', uid).get();
@@ -93,4 +109,6 @@ export function studentAssignmentRoutes({ db }: AppDeps): Hono<AppEnv> {
     );
     return respond(c, AssignmentListDTO, { assignments });
   });
+
+  return routes;
 }

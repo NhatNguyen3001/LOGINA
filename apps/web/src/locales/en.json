@@ -104,7 +104,6 @@
     },
     "shell": {
       "lessons": "Lesson sets",
-      "collapse": "Collapse sidebar",
       "openStudentView": "Open student view",
       "privacy": "Privacy",
       "terms": "Terms",
@@ -450,9 +449,17 @@
       "answer": "Answer on your own",
       "lock": "Lock in"
     },
+    "shell": {
+      "home": "Home",
+      "runs": "My runs"
+    },
     "home": {
       "title": "Your lesson sets",
       "empty": "Nothing assigned yet.",
+      "runsTitle": "My recorded runs",
+      "runsEmpty": "Your finished runs will appear here.",
+      "runLine": "Run {{run}} · {{date}}",
+      "viewRun": "View results",
       "open": "Open",
       "from": "From {{name}}",
       "due": "Due {{date}}"
@@ -506,7 +513,7 @@
     },
     "submit": "Submit {{slot}}",
     "q2": {
-      "instructions": "Put the cards in order, strongest first.",
+      "instructions": "Drag the cards into order, strongest first.",
       "moveUp": "Move {{card}} up",
       "moveDown": "Move {{card}} down"
     },
@@ -526,6 +533,7 @@
     },
     "result": {
       "title": "You've completed all 5 tasks",
+      "newRun": "Start a new run",
       "summary": "After the Think-again prompt, you kept {{kept}} and revised {{revised}}.",
       "task": "Task",
       "after": "After Think again",

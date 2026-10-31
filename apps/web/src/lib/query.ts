@@ -22,6 +22,7 @@ export const qk = {
   approval: (id: string) => ['lesson', id, 'approval'] as const,
   job: (id: string) => ['job', id] as const,
   myAssignments: () => ['my-assignments'] as const,
+  recordedRuns: () => ['recorded-runs'] as const,
   attemptTask: (id: string, slot: Slot) => ['attempt', id, slot] as const,
   challenge: (id: string, slot: Slot) => ['attempt', id, slot, 'challenge'] as const,
   feedback: (id: string) => ['attempt', id, 'feedback'] as const,

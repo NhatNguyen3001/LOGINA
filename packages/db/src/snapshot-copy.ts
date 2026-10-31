@@ -49,6 +49,16 @@ async function collectTree(ref: DocumentReference): Promise<SnapshotDoc[]> {
   return [...own, ...nested.flat()];
 }
 
+/** Moves a document and everything under it. The copy lands first, so a failure loses nothing. */
+export async function moveTree(db: Firestore, from: DocumentReference, to: DocumentReference, reshapeRoot: (data: DocumentData) => DocumentData): Promise<void> {
+  const batch = db.batch();
+  for (const { path, data } of await collectTree(from)) {
+    batch.set(db.doc(path.replace(from.path, to.path)), path === from.path ? reshapeRoot(data) : data);
+  }
+  await batch.commit();
+  await db.recursiveDelete(from);
+}
+
 export async function captureSnapshot(db: Firestore, id: string, source: { schoolId: string; label: string }): Promise<void> {
   const { schoolId, label } = source;
   const lessons = await db.collection('lessons').where('schoolId', '==', schoolId).get();

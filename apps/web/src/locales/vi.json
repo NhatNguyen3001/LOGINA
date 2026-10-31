@@ -104,7 +104,6 @@
     },
     "shell": {
       "lessons": "Bộ bài",
-      "collapse": "Thu gọn thanh bên",
       "openStudentView": "Mở giao diện học sinh",
       "privacy": "Quyền riêng tư",
       "terms": "Điều khoản",
@@ -450,9 +449,17 @@
       "answer": "Tự trả lời",
       "lock": "Chốt"
     },
+    "shell": {
+      "home": "Trang chủ",
+      "runs": "Các lần làm"
+    },
     "home": {
       "title": "Bộ bài của em",
       "empty": "Chưa có bộ bài nào được giao.",
+      "runsTitle": "Các lần làm đã lưu",
+      "runsEmpty": "Các lần em làm xong sẽ hiện ở đây.",
+      "runLine": "Lần {{run}} · {{date}}",
+      "viewRun": "Xem kết quả",
       "open": "Mở",
       "from": "Từ {{name}}",
       "due": "Hạn {{date}}"
@@ -506,7 +513,7 @@
     },
     "submit": "Nộp {{slot}}",
     "q2": {
-      "instructions": "Xếp các thẻ theo thứ tự, thẻ mạnh nhất lên đầu.",
+      "instructions": "Kéo các thẻ để xếp theo thứ tự, thẻ mạnh nhất lên đầu.",
       "moveUp": "Chuyển {{card}} lên",
       "moveDown": "Chuyển {{card}} xuống"
     },
@@ -526,6 +533,7 @@
     },
     "result": {
       "title": "Em đã hoàn thành cả 5 nhiệm vụ",
+      "newRun": "Làm một lần mới",
       "summary": "Sau câu Thử nghĩ thêm, em giữ {{kept}} và sửa {{revised}}.",
       "task": "Nhiệm vụ",
       "after": "Sau Thử nghĩ thêm",
