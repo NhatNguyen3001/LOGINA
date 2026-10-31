@@ -262,7 +262,7 @@ describe('live GENERATE and RERUN', () => {
     await worker(genai).runJob(jobId);
     const draftId = (await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds.Q1;
     expect((await live.db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`).get()).data()?.status).toBe('MACHINE_PASS');
-    expect(genai.calls.map((c) => c.role)).toEqual(['generator', 'xreason']);
+    expect(genai.calls.map((c) => c.role).slice(0, 2)).toEqual(['generator', 'xreason']);
     expect(textOf(roleCalls(genai, 'xreason')[0]!)).not.toContain('supportExtentRationaleX');
   });
 
@@ -274,20 +274,83 @@ describe('live GENERATE and RERUN', () => {
   });
 
   it('a task the AI cannot draft does not stop the next one', async () => {
-    let calls = 0;
-    const generator = () => {
-      calls += 1;
-      if (calls <= 2) throw new Error('down');
-      return { draft: q1, ruleBundle: bundle };
+    const inner = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') } });
+    const genai: StubGenai = {
+      ...inner,
+      generate: async (request) => {
+        if (request.role === 'generator' && JSON.stringify(request.parts).includes('Task slot: Q1')) throw new Error('down');
+        return inner.generate(request);
+      },
     };
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { lessonId, jobId } = await setupGenerate();
     await live.db.doc(`jobs/${jobId}`).update({ targetIds: ['Q1', 'Q2'] });
-    await worker(stubGenai({ generator, xreason: { gates: gates('PASS') } })).runJob(jobId);
+    await worker(genai).runJob(jobId);
     expect(await job(jobId)).toMatchObject({ status: 'FAILED', error: { code: 'AI_FAILED' } });
     expect(Object.keys((await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds)).toEqual(['Q2']);
     expect(warn).toHaveBeenCalledWith(JSON.stringify({ event: 'AI_ATTEMPT_FAILED', role: 'generator', attempt: 2, failure: 'CALL_FAILED' }));
     warn.mockRestore();
+  });
+
+  const translated = () => ({ texts: studentTexts(q1).map((text) => `vi ${text}`), keywords: {} });
+
+  it('LIVE GENERATE translates each task it drafts', async () => {
+    const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    const { lessonId, jobId } = await setupGenerate();
+    await worker(genai).runJob(jobId);
+    expect((await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).get()).data()).toMatchObject({ status: 'READY', locale: 'vi' });
+    expect(await job(jobId)).toMatchObject({ status: 'DONE' });
+  });
+
+  it('a failed translation leaves the draft and the job done, ready to retry', async () => {
+    const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: () => { throw new Error('down'); } });
+    const { lessonId, jobId } = await setupGenerate();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await worker(genai).runJob(jobId);
+    warn.mockRestore();
+    expect((await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).get()).data()).toMatchObject({ status: 'FAILED' });
+    expect((await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds.Q1).toBeDefined();
+    expect(await job(jobId)).toMatchObject({ status: 'DONE' });
+  });
+
+  it('tasks are drafted at the same time, not one after another', async () => {
+    let started = 0;
+    let release!: () => void;
+    const both = new Promise<void>((resolve) => { release = resolve; });
+    const inner = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    const genai: StubGenai = {
+      ...inner,
+      generate: async (request) => {
+        if (request.role === 'generator') {
+          started += 1;
+          if (started === 2) release();
+          await both;
+        }
+        return inner.generate(request);
+      },
+    };
+    const { jobId } = await setupGenerate();
+    await live.db.doc(`jobs/${jobId}`).update({ targetIds: ['Q1', 'Q2'] });
+    await worker(genai).runJob(jobId);
+    expect(started).toBe(2);
+  }, 20_000);
+
+  it('an edit retranslates only new wording and keeps the other pairs', async () => {
+    const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    const { lessonId, jobId } = await setupGenerate();
+    await worker(genai).runJob(jobId);
+    const draftId = (await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds.Q1 as string;
+    const ref = live.db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`);
+    await ref.update({ questionStem: 'A rewritten question' });
+    const rerunId = `${jobId}_e`;
+    jobs.push(rerunId);
+    await live.db.doc(`jobs/${rerunId}`).set({ schoolId, lessonId, type: 'RERUN', status: 'QUEUED', steps: [], targetIds: [draftId] });
+    const again = stubGenai({ xreason: { gates: gates('PASS') }, translator: { texts: ['vi rewritten'], keywords: {} }, translationCheck: { findings: [] } });
+    await worker(again).runJob(rerunId);
+    expect(textOf(roleCalls(again, 'translator')[0]!)).toContain('{"texts":["A rewritten question"]');
+    const saved = (await live.db.doc(`lessons/${lessonId}/taskTranslations/Q1`).get()).data()!;
+    expect(saved.texts).toContainEqual({ from: 'A rewritten question', to: 'vi rewritten' });
+    expect(saved.texts).toContainEqual({ from: q1.answerOptions![0]!.text, to: `vi ${q1.answerOptions![0]!.text}` });
   });
 
   it('LIVE VALIDATE keeps an uncertain gate REVIEW_REQUIRED', async () => {

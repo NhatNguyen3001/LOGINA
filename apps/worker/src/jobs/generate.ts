@@ -6,6 +6,7 @@ import { GeneratorOutput, XReasonOutput } from '../ai/schemas.js';
 import { JobFailure } from '../errors.js';
 import type { JobContext } from '../worker.js';
 import { deterministicChecks, saveDraft, saveReport } from './content.js';
+import { translateTask } from './translate.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 type Slot = (typeof SLOTS)[number];
@@ -70,7 +71,6 @@ export async function runGenerate(context: JobContext): Promise<void> {
   }
 
   const { text, evidenceTexts } = await approvedSource(context);
-  let someFailed = false;
   /** A task the AI can't draft stays open for Regenerate, and the others still run. */
   const draftSlot = (slot: Slot) =>
     context.step(`draft ${slot}`, async () => {
@@ -102,15 +102,12 @@ export async function runGenerate(context: JobContext): Promise<void> {
           { merge: true },
         );
       }
+      await translateTask(context, { ...draft, slot }, saved.draftId);
     });
 
-  for (const slot of targets.length > 0 ? (targets as Slot[]) : SLOTS) {
-    try {
-      await draftSlot(slot);
-    } catch (error) {
-      if (!(error instanceof JobFailure && error.code === 'AI_FAILED')) throw error;
-      someFailed = true;
-    }
-  }
-  if (someFailed) throw new JobFailure('AI_FAILED');
+  const results = await Promise.allSettled((targets.length > 0 ? (targets as Slot[]) : SLOTS).map(draftSlot));
+  const failures = results.flatMap((result) => (result.status === 'rejected' ? [result.reason as unknown] : []));
+  const serious = failures.find((error) => !(error instanceof JobFailure && error.code === 'AI_FAILED'));
+  if (serious) throw serious;
+  if (failures.length > 0) throw failures[0];
 }

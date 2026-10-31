@@ -12,7 +12,7 @@ const statusOf = (findings: TranslationFinding[]) => {
   return findings.length > 0 ? 'NEEDS_REVIEW' : 'READY';
 };
 
-/** Runs after a draft is saved. `keep` holds pairs still valid after an edit, so only new wording goes to the AI. */
+/** Runs after a draft is saved. `keep` holds the pairs from before an edit, so only new wording goes to the AI. */
 export async function translateTask(context: Pick<JobContext, 'deps' | 'lesson'>, draft: DraftFixture, draftId: string, keep: TextPair[] = []): Promise<void> {
   const { deps, lesson } = context;
   const { db, genai, config } = deps;
@@ -23,6 +23,10 @@ export async function translateTask(context: Pick<JobContext, 'deps' | 'lesson'>
   const pending = texts.filter((text) => !keep.some((pair) => pair.from === text));
   const keywords = (draft.taskBody?.keywordPartitions ?? {}) as Record<string, string[]>;
   const ref = db.doc(`lessons/${lesson.id as string}/taskTranslations/${draft.slot}`);
+  if (keep.length > 0 && pending.length === 0) {
+    await ref.update({ draftId });
+    return;
+  }
   const shared = { slot: draft.slot, draftId, locale, version: FieldValue.increment(1), updatedAt: FieldValue.serverTimestamp() };
 
   try {
