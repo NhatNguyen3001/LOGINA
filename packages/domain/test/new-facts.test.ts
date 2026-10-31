@@ -23,6 +23,16 @@ describe('detectNewFacts', () => {
     expect(detectNewFacts('Xu hướng này kéo dài đến năm 2030.', evidence)).toContain('2030');
   });
 
+  it('a percentage matches its bare value in a table marked (%)', () => {
+    const table = ['Table 8.1 (%)\nServices | 29.5 | 37.8'];
+    expect(detectNewFacts('Services rose from 29.5% to 37.8%.', table)).toEqual([]);
+  });
+
+  it('a percentage the table does not hold is still new', () => {
+    const table = ['Table 8.1 (%)\nServices | 29.5 | 37.8'];
+    expect(detectNewFacts('Services rose to 41.2%.', table)).toEqual(['41.2%']);
+  });
+
   it('a decimal number is one token', () => {
     expect(detectNewFacts('Tăng 2,5 lần.', evidence)).toEqual(['2,5']);
   });
