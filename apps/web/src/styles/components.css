@@ -253,7 +253,7 @@ table.t tr:last-child td{border-bottom:0}
 .side-legal a{color:var(--ink-3);text-decoration:none;padding:3px 0}
 .side-legal a:hover{color:var(--navy);text-decoration:underline}
 .app.side-collapsed .side-legal{display:none}
-.login{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);min-height:820px}
+.login{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
 .login-brand{background:var(--surface);border-right:1px solid var(--line);padding:56px 64px;display:flex;flex-direction:column;gap:20px;justify-content:center}
 .login-brand .logo{padding:0}
 .login-h{font-size:32px;font-weight:700;letter-spacing:-.01em;max-width:18ch}
@@ -280,7 +280,7 @@ table.t tr:last-child td{border-bottom:0}
 .np:first-child{border-top:0}
 .ni{width:40px;height:40px;border-radius:10px;background:var(--navy-bg);color:var(--navy);display:grid;place-items:center}
 .ni .ico{width:20px;height:20px}
-@media (max-width:860px){.login{grid-template-columns:minmax(0,1fr)}.login-brand{border-right:0;border-bottom:1px solid var(--line);padding:32px 20px}.login-h{font-size:24px}}
+@media (max-width:860px){.login{grid-template-columns:minmax(0,1fr)}.login-brand{border-right:0;border-bottom:1px solid var(--line);padding:20px}.login-side{padding:16px}.login-h{font-size:24px}}
 
 @media (prefers-reduced-motion: reduce){*{transition:none!important}.spin{animation:none}}
 @media (max-width:1100px){
