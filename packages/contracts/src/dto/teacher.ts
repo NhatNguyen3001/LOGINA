@@ -309,7 +309,8 @@ export const TasksOverviewDTO = z
         .object({
           slot: Slot,
           taskType: TaskType,
-          sufficiency: Sufficiency,
+          /** Null until a live draft has been reviewed. */
+          sufficiency: Sufficiency.nullable(),
           sufficiencyNote: z.string(),
           sourceRefs: z.array(z.string()),
           /** Null until a draft exists for the slot. */

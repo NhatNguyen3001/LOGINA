@@ -1,3 +1,4 @@
+import { FieldValue } from 'firebase-admin/firestore';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   ChallengeListDTO,
@@ -139,5 +140,29 @@ describe('sufficiency choice', () => {
     const { slots } = TasksOverviewDTO.parse(await (await a.get(base())).json());
     expect(slots[3]).toMatchObject({ draftStatus: 'BLOCKED' });
     expect(slots[0]?.draftId).toBe(TasksOverviewDTO.parse(before).slots[0]?.draftId);
+  });
+});
+
+describe('a live lesson while its drafts are still being written', () => {
+  const lesson = () => h.live.db.doc(`lessons/${lessonId}`);
+
+  beforeAll(async () => {
+    const rows = await lesson().collection('taskSufficiency').get();
+    await Promise.all(rows.docs.map((row) => row.ref.delete()));
+    await lesson().update({ 'currentTaskDraftIds.Q5': FieldValue.delete() });
+  });
+
+  it('the overview still lists all five slots with no sufficiency rows and a missing draft', async () => {
+    const response = await a.get(base());
+    expect(response.status).toBe(200);
+    const { slots } = TasksOverviewDTO.parse(await response.json());
+    expect(slots[4]).toMatchObject({ slot: 'Q5', taskType: 'OPEN_PROPOSAL', sufficiency: null, draftStatus: null });
+  });
+
+  it('a slot left without a draft can be regenerated', async () => {
+    const version = (await lesson().get()).data()?.version as number;
+    const response = await a.post(`${base()}/Q5/sufficiency-choice`, { choice: 'REFOCUS', baseVersion: version });
+    expect(response.status).toBe(200);
+    expect(h.enqueued).toContainEqual(expect.objectContaining({ jobId: JobDTO.parse(await response.json()).id, targetIds: ['Q5'] }));
   });
 });

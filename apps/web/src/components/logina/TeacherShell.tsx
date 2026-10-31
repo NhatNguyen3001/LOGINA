@@ -5,7 +5,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { applySessionLocale, setUserLocaleSaver } from '@/i18n';
 import { getMe, updateMe } from '@/lib/api';
-import { qk } from '@/lib/query';
+import { qk, queryClient } from '@/lib/query';
 import { BusyNote } from './BusyNote';
 import { DemoMenu } from './DemoMenu';
 import { LangSwitch } from './LangSwitch';
@@ -24,6 +24,8 @@ export function useSessionLocale(): void {
     void applySessionLocale(uiLocale);
     setUserLocaleSaver(async (lang) => {
       await updateMe({ uiLocale: lang });
+      /** Questions and answers come from the server in the saved language. */
+      await queryClient.invalidateQueries();
     });
   }, [uiLocale]);
 }

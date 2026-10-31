@@ -182,6 +182,9 @@
       "draft": "Bản nháp",
       "paused": "Tạm dừng, chờ cô",
       "drafting": "Đang soạn…",
+      "checking": "Đang kiểm tra…",
+      "notChecked": "Chưa kiểm tra",
+      "wait": "Soạn nhiệm vụ từ tài liệu của cô có thể mất tới 15 phút. Cô cứ để trang này mở; bản nháp nào xong sẽ hiện ở đây.",
       "sufficiency": {
         "SUFFICIENT": "Đủ",
         "UNCERTAIN": "Chưa chắc",
@@ -394,6 +397,8 @@
     "UNSUPPORTED_LANGUAGE": "LOGINA dùng được học liệu tiếng Anh hoặc tiếng Việt.",
     "TOO_LITTLE_CONTENT": "Nội dung chưa đủ để suy luận. Cô hãy thử một bài có dữ kiện, số liệu hoặc bảng.",
     "generic": "Có lỗi xảy ra. Cô hãy thử lại nhé.",
+    "TIMED_OUT": "Việc này mất quá lâu nên đã dừng lại. Các bản nháp đã xong vẫn được lưu. Cô hãy chọn một mục bên dưới để soạn tiếp.",
+    "AI_FAILED": "Có nhiệm vụ chưa soạn được. Các bản nháp đã xong vẫn được lưu. Cô hãy chọn một mục bên dưới để thử lại.",
     "NOT_FOUND": "Không tìm thấy nội dung này.",
     "VERSION_CONFLICT": "Đã có phiên bản mới hơn. Cô hãy tải lại để xem.",
     "STALE_VERSION": "Bản nháp đã thay đổi. Cô hãy tải lại để xem bản mới nhất.",

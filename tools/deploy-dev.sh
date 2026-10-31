@@ -38,7 +38,7 @@ gcloud builds submit --project "$PROJECT_ID" --config apps/api/cloudbuild.yaml -
 
 gcloud run deploy worker --project "$PROJECT_ID" --region "$REGION" --image "$REGISTRY/worker:$SHA" \
   --service-account "logina-worker@$PROJECT_ID.iam.gserviceaccount.com" \
-  --no-allow-unauthenticated --timeout 900 --set-env-vars "$WORKER_ENV"
+  --no-allow-unauthenticated --timeout 1800 --set-env-vars "$WORKER_ENV"
 WORKER_URL=$(gcloud run services describe worker --project "$PROJECT_ID" --region "$REGION" --format='value(status.url)')
 
 gcloud run deploy api --project "$PROJECT_ID" --region "$REGION" --image "$REGISTRY/api:$SHA" \

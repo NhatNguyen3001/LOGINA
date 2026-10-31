@@ -30,6 +30,8 @@ export const qk = {
   snapshots: () => ['snapshots'] as const,
 };
 
+export const jobFinished = (job: JobDTO | undefined): boolean => Boolean(job && FINISHED.includes(job.status));
+
 /** Stops at a final status and pauses on NEEDS_INPUT; the screen invalidates this query after answering. */
 export function jobPollInterval(job: JobDTO | undefined): number | false {
   if (!job) return JOB_POLL_MS;

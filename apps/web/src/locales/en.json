@@ -182,6 +182,9 @@
       "draft": "Draft",
       "paused": "Paused, waiting for you",
       "drafting": "Drafting…",
+      "checking": "Checking…",
+      "notChecked": "Not checked",
+      "wait": "Drafting from your own file can take up to 15 minutes. Keep this page open; finished drafts appear here as they're ready.",
       "sufficiency": {
         "SUFFICIENT": "Enough",
         "UNCERTAIN": "Uncertain",
@@ -394,6 +397,8 @@
     "UNSUPPORTED_LANGUAGE": "LOGINA works with English or Vietnamese material.",
     "TOO_LITTLE_CONTENT": "There isn't enough to reason about here. Try a lesson with facts, figures or tables.",
     "generic": "Something went wrong. Please try again.",
+    "TIMED_OUT": "This took too long, so it stopped. Finished drafts are saved. Choose an option below to draft the rest.",
+    "AI_FAILED": "Some tasks couldn't be drafted. Finished drafts are saved. Choose an option below to try again.",
     "NOT_FOUND": "We can't find that page or item.",
     "VERSION_CONFLICT": "Someone else saved a newer version. Reload to see it.",
     "STALE_VERSION": "This draft has changed. Reload to see the latest version.",

@@ -20,7 +20,8 @@ export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
   xreasonModel: env.XREASON_MODEL ?? 'gemini-4-argon',
   version: '0.1.0',
   stepDelayMs: Number(env.SEEDED_STEP_DELAY_MS ?? 5000),
-  deadlineMs: 10 * 60 * 1000,
+  /** Stays under the 30 minute dispatch deadline in apps/api/src/jobs/enqueue.ts. */
+  deadlineMs: 25 * 60 * 1000,
   materialsBucket: env.MATERIALS_BUCKET ?? 'logina-dev-materials',
 });
 

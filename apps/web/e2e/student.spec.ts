@@ -68,6 +68,21 @@ test('a Vietnamese judge stays in Vietnamese and sees no raw keys', async ({ pag
   await expect(page.locator('body')).not.toContainText(/student\.|teacher\.|common\./);
 });
 
+test('switching language changes the questions and keeps the chosen answer', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Try as student' }).click();
+  await page.getByRole('button', { name: 'No thanks, just try it' }).click();
+  await expect(page).toHaveURL(/\/Q1$/);
+  const stem = page.getByRole('heading', { level: 1 });
+  const before = await stem.innerText();
+  await page.getByRole('radiogroup').nth(0).getByRole('radio').nth(1).check({ force: true });
+  await page.getByRole('button', { name: 'Tiếng Việt' }).click();
+  await expect(stem).not.toHaveText(before);
+  await expect(page.getByRole('radiogroup').nth(0).getByRole('radio').nth(1)).toBeChecked();
+  await page.getByRole('button', { name: 'English' }).click();
+  await expect(stem).toHaveText(before);
+});
+
 test('agreeing shows the participant code before the tasks and on the results', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Try as student' }).click();

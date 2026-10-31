@@ -34,6 +34,9 @@ export const modelFor = (role: Role, config: WorkerConfig): string =>
 export const validatorVersion = (role: Role, config: WorkerConfig, seeded: boolean): string =>
   `${role}@${config.version}+${seeded ? 'seeded' : modelFor(role, config)}`;
 
+const logFailure = (role: Role, attempt: number, failure: 'CALL_FAILED' | 'NOT_JSON' | 'WRONG_SHAPE') =>
+  console.warn(JSON.stringify({ event: 'AI_ATTEMPT_FAILED', role, attempt: attempt + 1, failure }));
+
 const PROMPT_VERSION = 'v1';
 /** The bundle sits at a different depth than this source file, so the image sets PROMPT_DIR. */
 const PROMPT_DIR = process.env.PROMPT_DIR ?? fileURLToPath(new URL('../../prompts/', import.meta.url));
@@ -58,12 +61,16 @@ export async function generateStructured<S extends z.ZodType>(
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const raw = await genai.generate(request).catch(() => null);
-    if (raw === null) continue;
+    if (raw === null) {
+      logFailure(role, attempt, 'CALL_FAILED');
+      continue;
+    }
     try {
       const parsed = schema.safeParse(JSON.parse(raw));
       if (parsed.success) return parsed.data;
+      logFailure(role, attempt, 'WRONG_SHAPE');
     } catch {
-      continue;
+      logFailure(role, attempt, 'NOT_JSON');
     }
   }
   throw new JobFailure('AI_FAILED');

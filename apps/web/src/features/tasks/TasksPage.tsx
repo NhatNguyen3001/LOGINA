@@ -10,7 +10,7 @@ import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { ApiError, chooseSufficiency, getLesson, getTasks, newKey } from '@/lib/api';
-import { qk, useJobPolling } from '@/lib/query';
+import { jobFinished, qk, useJobPolling } from '@/lib/query';
 import { TaskStatusTag } from './task-status';
 
 const CHOICES = ['REFOCUS', 'ADD_SOURCE', 'LEAVE_EMPTY'] as const;
@@ -60,12 +60,17 @@ export function TasksPage() {
   const queryClient = useQueryClient();
   const lesson = useQuery({ queryKey: qk.lesson(id), queryFn: () => getLesson(id) });
   const job = useJobPolling(lesson.data?.activeJobId);
-  const running = Boolean(lesson.data?.activeJobId) && job.data?.status !== 'DONE';
+  const finished = jobFinished(job.data);
+  const running = Boolean(lesson.data?.activeJobId) && !finished;
+  /** Kept in state: reloading the lesson clears activeJobId, and the job with it. */
+  const [failure, setFailure] = useState<string | null>(null);
   const tasks = useQuery({ queryKey: qk.tasks(id), queryFn: () => getTasks(id), refetchInterval: running ? 2000 : false });
 
   useEffect(() => {
-    if (job.data?.status === 'DONE') void queryClient.invalidateQueries({ queryKey: ['lesson', id] });
-  }, [id, job.data?.status, queryClient]);
+    if (!finished) return;
+    if (job.data?.status === 'FAILED' || job.data?.status === 'TIMED_OUT') setFailure(job.data.errorCode ?? '');
+    void queryClient.invalidateQueries({ queryKey: ['lesson', id] });
+  }, [finished, id, job.data?.errorCode, job.data?.status, queryClient]);
 
   const slots = tasks.data?.slots ?? [];
   const ready = slots.filter((s) => s.draftStatus).length;
@@ -83,6 +88,8 @@ export function TasksPage() {
         <h1 className="h1">{t('teacher.t06.title')}</h1>
         <p className="lede">{t('teacher.t06.lede')}</p>
       </div>
+      {running && lesson.data?.aiMode === 'LIVE' ? <Note kind="info">{t('teacher.t06.wait')}</Note> : null}
+      {failure !== null && !running ? <Note kind="err">{t(errorKey(failure))}</Note> : null}
       {tasks.isPending ? <LoadingSkeleton /> : null}
       {tasks.isError ? <Note kind="err">{t('errors.generic')}</Note> : null}
       {tasks.data ? <div className="card flush">
@@ -108,12 +115,16 @@ export function TasksPage() {
                   </td>
                   <td>
                     <div className="stack">
-                      <StatusTag kind={SUFFICIENCY_KIND[slot.sufficiency]}>{t(`teacher.t06.sufficiency.${slot.sufficiency}`)}</StatusTag>
+                      {slot.sufficiency ? (
+                        <StatusTag kind={SUFFICIENCY_KIND[slot.sufficiency]}>{t(`teacher.t06.sufficiency.${slot.sufficiency}`)}</StatusTag>
+                      ) : (
+                        <StatusTag kind="neutral">{t(running ? 'teacher.t06.checking' : 'teacher.t06.notChecked')}</StatusTag>
+                      )}
                       <span className="s13">{slot.sufficiencyNote}</span>
                       <span className="src">{slot.sourceRefs.join(' · ')}</span>
                     </div>
                   </td>
-                  <td>{slot.draftStatus ? <TaskStatusTag status={slot.draftStatus} /> : <span className="s13 b">{t(paused?.slot === slot.slot ? 'teacher.t06.paused' : 'teacher.t06.drafting')}</span>}</td>
+                  <td>{slot.draftStatus ? <TaskStatusTag status={slot.draftStatus} /> : <span className="s13 b">{t(running ? 'teacher.t06.drafting' : 'teacher.t06.paused')}</span>}</td>
                 </tr>
               ))}
             </tbody>

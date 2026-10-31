@@ -2,10 +2,12 @@ import { FieldValue, type DocumentData } from 'firebase-admin/firestore';
 import { Hono } from 'hono';
 import { AssignReq, AssignResultDTO, AssignmentListDTO, RecordedRunsDTO } from '@logina/contracts';
 import { AppError, lessonsRepo, newId } from '@logina/db';
+import { applyTexts } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { requireBaseVersion } from '../middleware/base-version.js';
 import { withIdempotency } from '../middleware/idempotency.js';
 import { respond } from '../middleware/respond.js';
+import { studentLocale, textsFor } from '../services/localize.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 
@@ -73,13 +75,14 @@ export function studentAssignmentRoutes({ db }: AppDeps): Hono<AppEnv> {
 
   routes.get('/runs', async (c) => {
     const { schoolId, uid } = c.var.user;
+    const locale = await studentLocale(db, schoolId);
     const attempts = await db.collection('attempts').where('schoolId', '==', schoolId).where('studentId', '==', uid).get();
     const finished = attempts.docs.filter((doc) => doc.data().status === 'COMPLETE');
     const runs = await Promise.all(
       finished.map(async (doc) => {
         const attempt = doc.data();
         const lesson = (await db.doc(`lessons/${attempt.lessonId as string}`).get()).data();
-        return { attemptId: doc.id, lessonTitle: lesson?.title ?? '', run: attempt.run ?? 1, completedAt: attempt.completedAt.toDate().toISOString() };
+        return { attemptId: doc.id, lessonTitle: applyTexts(lesson?.title ?? '', textsFor(lesson, locale)), run: attempt.run ?? 1, completedAt: attempt.completedAt.toDate().toISOString() };
       }),
     );
     return respond(c, RecordedRunsDTO, { runs: runs.sort((a, b) => b.completedAt.localeCompare(a.completedAt)) });
@@ -87,6 +90,7 @@ export function studentAssignmentRoutes({ db }: AppDeps): Hono<AppEnv> {
 
   routes.get('/', async (c) => {
     const { schoolId, uid } = c.var.user;
+    const locale = await studentLocale(db, schoolId);
     const docs = await db.collection('assignments').where('schoolId', '==', schoolId).orderBy('publishedAt', 'desc').get();
     const attempts = await db.collection('attempts').where('schoolId', '==', schoolId).where('studentId', '==', uid).get();
 
@@ -98,7 +102,7 @@ export function studentAssignmentRoutes({ db }: AppDeps): Hono<AppEnv> {
         const attempt = attempts.docs.find((a) => a.data().assignmentId === doc.id);
         return {
           assignmentId: doc.id,
-          lessonTitle: lesson?.title ?? '',
+          lessonTitle: applyTexts(lesson?.title ?? '', textsFor(lesson, locale)),
           teacherName: teacher?.displayName ?? '',
           ...(assignment.dueAt ? { dueAt: assignment.dueAt } : {}),
           ...(assignment.messageToStudents ? { messageToStudents: assignment.messageToStudents } : {}),

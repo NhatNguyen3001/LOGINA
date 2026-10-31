@@ -114,6 +114,29 @@ describe('T6', () => {
     expect(screen.getAllByText('Paused, waiting for you')).toHaveLength(1);
   });
 
+  it('while a job runs, an undrafted task says Drafting and the page says how long it can take', async () => {
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
+    vi.mocked(api.getJob).mockResolvedValue({ id: 'j', type: 'GENERATE', status: 'RUNNING', steps: [] });
+    vi.mocked(api.getTasks).mockResolvedValue(overview({ sufficiency: null, draftStatus: null }));
+    await render(<TasksPage />);
+    expect(await screen.findByText('Drafting…')).toBeInTheDocument();
+    expect(screen.getByText('Checking…')).toBeInTheDocument();
+    expect(await screen.findByText(/up to 15 minutes/)).toBeInTheDocument();
+    expect(screen.queryByText('Paused, waiting for you')).toBeNull();
+  });
+
+  it('a job that timed out says so, and the unfinished task can be regenerated', async () => {
+    vi.mocked(api.getLesson).mockResolvedValueOnce({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 6, aiMode: 'LIVE' } as unknown as LessonDTO);
+    vi.mocked(api.getJob).mockResolvedValue({ id: 'j', type: 'GENERATE', status: 'TIMED_OUT', steps: [], errorCode: 'TIMED_OUT' });
+    vi.mocked(api.getTasks).mockResolvedValue(overview({ sufficiency: null, draftStatus: null }));
+    await render(<TasksPage />);
+    expect(await screen.findByText(/took too long/)).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Regenerate Q4 with this choice' })).toBeInTheDocument();
+    expect(screen.getByText('Paused, waiting for you')).toBeInTheDocument();
+    expect(screen.getByText('Not checked')).toBeInTheDocument();
+  });
+
   it('a choice sends the lesson version', async () => {
     vi.mocked(api.getTasks).mockResolvedValue(overview({ sufficiency: 'UNCERTAIN', draftStatus: null }));
     vi.mocked(api.chooseSufficiency).mockResolvedValue({ id: 'j' } as never);

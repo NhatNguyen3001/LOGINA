@@ -18,6 +18,7 @@ import { respond } from '../middleware/respond.js';
 import { createJob, toJobDTO } from '../services/jobs.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
+const TASK_TYPES = { Q1: 'JUDGMENT_EVIDENCE', Q2: 'EVIDENCE_RANKING', Q3: 'COMPARE_TRADEOFF', Q4: 'COUNTERARGUMENT', Q5: 'OPEN_PROPOSAL' } as const;
 const MAX_EXAMPLES = 3;
 const APPROVABLE = ['MACHINE_PASS', 'REVIEW_REQUIRED'];
 /** Fields of a Q2 to Q5 body that only the server may see. */
@@ -85,8 +86,8 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
         const draft = draftId ? (await db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`).get()).data() : undefined;
         return {
           slot,
-          taskType: row?.taskType ?? draft?.taskType,
-          sufficiency: row?.assessment ?? 'UNCERTAIN',
+          taskType: TASK_TYPES[slot],
+          sufficiency: row?.assessment ?? null,
           sufficiencyNote: row?.explanationForTeacher ?? '',
           sourceRefs: row?.sourceRefs ? [row.sourceRefs as string] : [],
           draftStatus: draft?.status ?? null,
@@ -202,7 +203,7 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
       const regenerates = choice === 'REFOCUS';
       const job = await createJob(db, { schoolId, lessonId, type: 'GENERATE', targetIds: [slot] });
       const batch = db.batch();
-      batch.update(db.doc(`lessons/${lessonId}/taskSufficiency/${slot}`), { teacherChoice: choice });
+      batch.set(db.doc(`lessons/${lessonId}/taskSufficiency/${slot}`), { slot, teacherChoice: choice }, { merge: true });
       batch.update(db.doc(`lessons/${lessonId}`), { version: FieldValue.increment(1), ...(regenerates ? { activeJobId: job.id } : {}) });
       /** Only Refocus has work to do; any other choice must not leave a job that never runs. */
       if (!regenerates) batch.update(db.doc(`jobs/${job.id}`), { status: 'DONE' });
