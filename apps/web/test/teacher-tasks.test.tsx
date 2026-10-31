@@ -27,7 +27,6 @@ vi.mock('@/lib/api', async (original) => ({
   getLesson: vi.fn(),
   getTasks: vi.fn(),
   getPreview: vi.fn(),
-  getLimits: vi.fn(async () => ({ limits: [] })),
   getMyAssignments: vi.fn(async () => ({ assignments: [] })),
   getJob: vi.fn(),
   chooseSufficiency: vi.fn(),
@@ -89,6 +88,15 @@ beforeEach(() => {
   vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', title: 'Lesson 8', version: 5, primaryClassId: 'c', currentTaskDraftIds: {} } as unknown as LessonDTO);
   vi.mocked(api.getTasks).mockResolvedValue(overview());
   vi.mocked(api.getPreview).mockResolvedValue(preview());
+});
+
+describe('loading', () => {
+  it('Tasks shows a skeleton, not an empty table, while it loads', async () => {
+    vi.mocked(api.getTasks).mockImplementation(() => new Promise(() => {}));
+    await render(<TasksPage />);
+    expect(screen.getByRole('status', { name: 'Loading…' })).toBeInTheDocument();
+    expect(screen.queryByRole('table')).toBeNull();
+  });
 });
 
 describe('T6', () => {
@@ -177,17 +185,6 @@ describe('T7, T9 and T11', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save and recheck' }));
     expect(await screen.findByText('Someone else saved first')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Copy your wording' })).toBeInTheDocument();
-  });
-
-  it('a reached limit keeps the edit and disables save with the wait', async () => {
-    vi.mocked(api.getLimits).mockResolvedValue({ limits: [{ action: 'AI_ACTION', limit: 50, remaining: 0, resetsAt: new Date(Date.now() + 700_000).toISOString() }] } as never);
-    await render(<PreviewPage />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Quick edit A1' }));
-    fireEvent.change(screen.getByLabelText('Quick edit A1', { selector: 'textarea' }), { target: { value: 'Kept' } });
-    expect(await screen.findByText(/Rechecks are paused for 12 minutes/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Wait 12 min' })).toBeDisabled();
-    expect(screen.getByLabelText('Quick edit A1', { selector: 'textarea' })).toHaveValue('Kept');
-    expect(screen.getByText(/Approval uses the last saved version/)).toBeInTheDocument();
   });
 
   it('FAILED shows Try again and never the old pass, and Try again posts a rerun', async () => {
@@ -285,6 +282,13 @@ describe('T12 and T13', () => {
     await waitFor(() => expect(api.approveTask).toHaveBeenCalledWith('l1', 'Q1', { expectedDraftVersion: 3, previewHash: 'h', candidateSetVersion: 1, confirmed: true }, expect.any(String)));
   });
 
+  it('a disabled Approve says what it is waiting for', async () => {
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'].map((slot) => approvalTask(slot)), contentManifestHash: 'h', canApprove: true });
+    await render(<ApprovePage />);
+    expect(await screen.findByText('Tick the box to confirm.')).toBeInTheDocument();
+    expect(screen.getByText('Approve every task to assign.')).toBeInTheDocument();
+  });
+
   it('Assign stays disabled until all five are approved', async () => {
     vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { approvedAt: '2026-10-31T00:00:00.000Z', releaseLabel: 'r4' }), approvalTask('Q2'), approvalTask('Q3'), approvalTask('Q4'), approvalTask('Q5')], contentManifestHash: 'h', canApprove: true });
     await render(<ApprovePage />);
@@ -314,7 +318,7 @@ describe('T14 and T15', () => {
       { attemptId: 'att1', participantCode: 'P-7K2M', isSimulated: false, status: 'COMPLETE', submittedCount: 5, keepCount: 4, reviseCount: 1, confidenceBefore: 70, confidenceAfter: 82 },
       { attemptId: 'att2', isSimulated: false, status: 'COMPLETE', submittedCount: 5, keepCount: 5, reviseCount: 0 },
     ],
-    perTask: [{ slot: 'Q1', submitted: 8, keep: 4, revise: 4, avgConfidenceBefore: 68, avgConfidenceAfter: 76, deliveredChallenges: [{ label: 'TN1', count: 3 }] }],
+    perTask: [{ slot: 'Q1', submitted: 8, keep: 4, revise: 4, avgConfidenceBefore: 68, avgConfidenceAfter: 76, deliveredChallenges: [{ label: 'TN1', message: 'Compare the figures.', count: 3, revised: 1 }, { label: 'TN2', message: 'Check the card.', count: 2, revised: 2 }] }],
     q1Relations: { releaseLabel: 'r4', denominator: 8, before: { full: 2, partial: 2, contradicts: 3, irrelevant: 1 }, after: { full: 5, partial: 1, contradicts: 2, irrelevant: 0 } },
   } as unknown as ClassTrackingDTO;
 
@@ -322,28 +326,63 @@ describe('T14 and T15', () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     await render(<TrackingPage />);
     expect(await screen.findByText('8 people started, 8 finished')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: /Students/ }));
     expect(screen.getByText('P-7K2M')).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: 'View trace' })[0]).toHaveAttribute('href', '/t/attempts/$id/trace/$slot');
   });
 
   it('shows keep and revise, confidence, prompts and the disclaimer', async () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
-    await render(<TrackingPage />);
+    const { container } = await render(<TrackingPage />);
     expect(await screen.findByText('4 / 4')).toBeInTheDocument();
-    expect(screen.getByText('68 → 76')).toBeInTheDocument();
-    expect(screen.getByText('TN1 · 3')).toBeInTheDocument();
-    expect(screen.getByText('Full 5/8')).toBeInTheDocument();
+    expect(screen.getAllByText('68 → 76')).toHaveLength(2);
     expect(screen.getByText(/not enough to conclude that students learned better/)).toBeInTheDocument();
+    const prompts = [...container.querySelectorAll('.prompt-row')].map((row) => row.textContent);
+    expect(prompts).toEqual(['Q1 · TN2Check the card.2 of 2 revised', 'Q1 · TN1Compare the figures.1 of 3 revised']);
+    fireEvent.click(screen.getByRole('button', { name: 'See all prompts' }));
+    expect(screen.getByRole('tab', { name: /Think-again prompts/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('TN1')).toBeInTheDocument();
   });
 
   it('someone who declined shows Not in research', async () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     await render(<TrackingPage />);
-    expect(await screen.findByText('Not in research')).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole('tab', { name: /Students/ }));
+    expect(screen.getByText('Not in research')).toBeInTheDocument();
+  });
+
+  it('Keep and Revise share one neutral treatment, with no status colors', async () => {
+    vi.mocked(api.getTracking).mockResolvedValue(tracking);
+    const { container } = await render(<TrackingPage />);
+    await screen.findByText('4 / 4');
+    expect(screen.getByRole('img', { name: 'Q1: 4 kept, 4 revised' })).toBeInTheDocument();
+    expect(container.querySelector('[role="img"] .full, [role="img"] .contra')).toBeNull();
+  });
+
+  it('a Q2 trace has no evidence card and no empty letters', async () => {
+    vi.mocked(api.getTrace).mockResolvedValue({
+      assignmentId: 'asg1',
+      isSimulated: false,
+      releaseLabel: 'r4',
+      slotChips: [{ slot: 'Q1', choice: 'REVISE' }, { slot: 'Q2', choice: 'KEEP' }, { slot: 'Q3', choice: null }],
+      slot: 'Q2',
+      questionStem: 'Rank them',
+      before: { answer: { letter: '', authoringLabel: '', text: 'Trade > Cities' }, confidence: 70, lockedAt: '2026-10-31T03:31:00.000Z', relationLabel: '' },
+      challenge: { label: 'TN1', message: 'Look again.', whySelected: '', studentChoice: 'KEEP' },
+      after: { answer: { letter: '', authoringLabel: '', text: 'Trade > Cities', changed: false }, confidenceBefore: 70, confidenceAfter: 82, submittedAt: '2026-10-31T03:34:00.000Z', relationLabel: '' },
+    } as unknown as TraceDTO);
+    await render(<TracePage />);
+    expect(await screen.findAllByText('Trade > Cities')).toHaveLength(2);
+    expect(screen.queryByText('Evidence card')).toBeNull();
+    expect(screen.queryByText('()')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Q1 · Revise' })).toHaveAttribute('href', '/t/attempts/$id/trace/$slot');
+    expect(screen.queryByRole('link', { name: 'Q3' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Attempt tracking' })).toBeInTheDocument();
   });
 
   it('the trace shows labels, the prompt, why it was chosen, changes and the disclaimer', async () => {
     vi.mocked(api.getTrace).mockResolvedValue({
+      assignmentId: 'asg1',
       participantCode: 'P-7K2M',
       isSimulated: false,
       releaseLabel: 'r4',

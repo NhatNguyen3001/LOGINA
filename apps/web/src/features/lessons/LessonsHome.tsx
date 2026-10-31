@@ -17,7 +17,7 @@ export function LessonsHome() {
         <span className="sp" />
         <Link to="/t/lessons/new" className="btn primary">{t('lessons.new')}</Link>
       </div>
-      {lessons.isPending ? <LoadingSkeleton /> : null}
+      {lessons.isPending ? <LoadingSkeleton cards={3} /> : null}
       {lessons.isError ? <p role="alert">{t('errors.generic')}</p> : null}
       {lessons.data?.lessons.length === 0 ? <p className="muted">{t('lessons.empty')}</p> : null}
       <div className="stack">

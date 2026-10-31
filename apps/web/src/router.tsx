@@ -1,6 +1,7 @@
 import { Outlet, createRootRoute, createRoute, createRouter, useNavigate, useParams } from '@tanstack/react-router';
 import type { ReactElement } from 'react';
 import { TeacherShell, useSessionLocale } from '@/components/logina/TeacherShell';
+import { usePageTitle } from '@/lib/page-title';
 import { EntryPage } from '@/features/entry/EntryPage';
 import { LegalPage } from '@/features/legal/LegalPage';
 import { ApprovePage } from '@/features/approve/ApprovePage';
@@ -23,7 +24,12 @@ import { ResultDetail, ResultSet } from '@/features/student/ResultSet';
 import { StudentHome } from '@/features/student/StudentHome';
 import { TaskRunner } from '@/features/student/TaskRunner';
 
-const rootRoute = createRootRoute({ component: Outlet });
+function Root() {
+  usePageTitle();
+  return <Outlet />;
+}
+
+const rootRoute = createRootRoute({ component: Root });
 
 type Screen = () => ReactElement;
 

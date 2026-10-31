@@ -13,7 +13,6 @@ import {
   JobDTO,
   LessonDTO,
   LessonListDTO,
-  LimitsDTO,
   MaterialViewUrlDTO,
   MeDTO,
   SourceApprovalResultDTO,
@@ -133,7 +132,6 @@ const attemptTask = (id: string, slot: Slot) => `/attempts/${id}/tasks/${slot}`;
 
 export const getMe = () => get('/me', MeDTO);
 export const updateMe = (req: UpdateMeReq) => request('/me', MeDTO, { method: 'PATCH', body: req, key: newKey() });
-export const getLimits = () => get('/limits', LimitsDTO);
 export const sendConsent = (req: { consentVersion: string; choice: 'AGREED' | 'DECLINED' }, key: string) => post('/me/consent', ConsentResultDTO, req, key);
 
 export const getLessons = () => get('/lessons', LessonListDTO);

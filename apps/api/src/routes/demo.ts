@@ -4,7 +4,6 @@ import { DemoSnapshotsDTO } from '@logina/contracts';
 import { AppError, lessonsRepo, scopedGet, snapshotId } from '@logina/db';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
-import { limited } from '../middleware/rate-limit.js';
 import { respond } from '../middleware/respond.js';
 import { restoreWorkspace, simulateClass } from '../services/demo.js';
 
@@ -18,10 +17,10 @@ export function demoRoutes(deps: AppDeps): Hono<AppEnv> {
 
   routes.post(
     '/reset',
-    withIdempotency(db, limited(deps, 'RESET', async (c) => {
+    withIdempotency(db, async (c) => {
       await restoreWorkspace(db, files, workspaceOf(c.var.user), config.readySnapshot);
       return c.json(ok);
-    })),
+    }),
   );
 
   routes.post(
@@ -34,7 +33,7 @@ export function demoRoutes(deps: AppDeps): Hono<AppEnv> {
 
   routes.post(
     '/simulate-class',
-    withIdempotency(db, limited(deps, 'SIMULATE_CLASS', async (c) => {
+    withIdempotency(db, async (c) => {
       const { schoolId } = c.var.user;
       const { assignmentId } = (await c.req.json()) as { assignmentId?: string };
       const assignment = assignmentId ? await scopedGet(db.doc(`assignments/${assignmentId}`), schoolId) : null;
@@ -46,7 +45,7 @@ export function demoRoutes(deps: AppDeps): Hono<AppEnv> {
       });
       await db.doc(`schools/${schoolId}`).update({ simulatedAt: FieldValue.serverTimestamp() });
       return c.json(ok);
-    })),
+    }),
   );
 
   routes.get('/snapshots', async (c) => {
@@ -60,12 +59,12 @@ export function demoRoutes(deps: AppDeps): Hono<AppEnv> {
 
   routes.post(
     '/snapshots/:stepId/restore',
-    withIdempotency(db, limited(deps, 'RESET', async (c) => {
+    withIdempotency(db, async (c) => {
       const id = snapshotId(config.snapshotLocale, c.req.param('stepId') as string);
       if (!(await db.doc(`demoSnapshots/${id}`).get()).exists) throw new AppError('NOT_FOUND', 404, 'Not found.');
       await restoreWorkspace(db, files, workspaceOf(c.var.user), id);
       return c.json(ok);
-    })),
+    }),
   );
 
   return routes;

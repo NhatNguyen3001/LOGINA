@@ -7,12 +7,6 @@ const script = read('tools/deploy-dev.sh');
 const lineOf = (text: string) => script.split('\n').findIndex((line) => line.includes(text));
 const LIMITS = [
   'LIMIT_NEW_SESSIONS_ADDRESS_HOUR',
-  'LIMIT_UPLOAD_SESSION_HOUR',
-  'LIMIT_UPLOAD_ADDRESS_HOUR',
-  'LIMIT_AI_SESSION_HOUR',
-  'LIMIT_AI_ADDRESS_HOUR',
-  'LIMIT_RESET_SESSION_5MIN',
-  'LIMIT_SIMULATE_SESSION_HOUR',
   'LIMIT_API_SESSION_MINUTE',
   'LIMIT_API_ADDRESS_MINUTE',
 ];

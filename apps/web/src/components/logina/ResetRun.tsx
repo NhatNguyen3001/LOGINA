@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { newKey, resetAttempt } from '@/lib/api';
@@ -14,7 +15,10 @@ export function ResetRun({ attemptId }: { attemptId: string }) {
 
   return (
     <>
-      <button type="button" className="btn secondary sm" onClick={() => setAsking(true)}>{t('student.shell.reset')}</button>
+      <button type="button" className="lnk jump stu-reset" onClick={() => setAsking(true)}>
+        <RotateCcw className="ico" aria-hidden="true" />
+        {t('student.shell.reset')}
+      </button>
       {asking ? (
         <dialog
           ref={(node) => {

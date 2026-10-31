@@ -1,10 +1,11 @@
 import { type DocumentData, type Firestore, type Timestamp } from 'firebase-admin/firestore';
 import { Hono } from 'hono';
-import { ClassTrackingDTO, TraceDTO } from '@logina/contracts';
+import { Artifact, ClassTrackingDTO, TraceDTO } from '@logina/contracts';
 import { AppError, decodeNested, scopedGet } from '@logina/db';
 import { relationBucket } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { respond } from '../middleware/respond.js';
+import { artifactSummary } from '../services/runtime.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const LETTERS = 'ABCD';
@@ -69,10 +70,13 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
 
     const perTask = SLOTS.map((slot) => {
       const rows = loaded.flatMap((l) => l.tasks.filter((t) => t.slot === slot && t.data.submittedAt));
-      const delivered = new Map<string, number>();
+      const delivered = new Map<string, { label: string; message: string; count: number; revised: number }>();
       for (const row of rows) {
         const label = row.delivery?.challengeLabel as string;
-        delivered.set(label, (delivered.get(label) ?? 0) + 1);
+        const entry = delivered.get(label) ?? { label, message: row.delivery?.renderedMessage as string, count: 0, revised: 0 };
+        entry.count += 1;
+        if (row.data.choice === 'REVISE') entry.revised += 1;
+        delivered.set(label, entry);
       }
       return {
         slot,
@@ -81,7 +85,7 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
         revise: rows.filter((r) => r.data.choice === 'REVISE').length,
         avgConfidenceBefore: average(rows.map((r) => r.data.initialConfidence as number)),
         avgConfidenceAfter: average(rows.map((r) => r.data.finalConfidence as number)),
-        deliveredChallenges: [...delivered].map(([label, count]) => ({ label, count })),
+        deliveredChallenges: [...delivered.values()],
       };
     });
 
@@ -121,7 +125,9 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
     const lesson = (await db.doc(`lessons/${lessonId}`).get()).data();
     const cardWord = lesson?.contentLocale === 'vi' ? 'Thẻ' : 'Card';
 
+    const isQ1 = slot === 'Q1';
     const option = (artifact: DocumentData) => {
+      if (!isQ1) return { answer: { letter: '', authoringLabel: '', text: artifactSummary(Artifact.parse(artifact), release).answerText } };
       const a = content.answerOptions.findIndex((x) => x.id === artifact.answerId);
       const e = content.evidenceOptions.findIndex((x) => x.evidenceId === artifact.evidenceId);
       return {
@@ -131,10 +137,12 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
     };
     const before = option(task.initialArtifact as DocumentData);
     const after = option(task.finalArtifact as DocumentData);
-    const relation = (artifact: DocumentData) => (pairOf(release, artifact)?.relationLabel as string | undefined) ?? '';
-    const candidate = (release.teacherContent.candidates as DocumentData[]).find((x) => x.challengeId === delivery.challengeId);
+    const relation = (artifact: DocumentData) => (isQ1 ? (pairOf(release, artifact)?.relationLabel as string | undefined) : undefined) ?? '';
+    const candidate = (release.teacherContent.candidates as DocumentData[] | undefined)?.find((x) => x.challengeId === delivery.challengeId);
+    const changed = task.changedElements as string[];
 
     return respond(c, TraceDTO, {
+      assignmentId: attempt.assignmentId,
       ...(attempt.participantCode ? { participantCode: attempt.participantCode } : {}),
       isSimulated: attempt.isSimulated === true,
       ...(attempt.completedAt ? { completedAt: iso(attempt.completedAt) } : {}),
@@ -145,8 +153,8 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
       before: { ...before, confidence: task.initialConfidence, lockedAt: iso(task.lockedAt), relationLabel: relation(task.initialArtifact as DocumentData) },
       challenge: { label: delivery.challengeLabel, message: delivery.renderedMessage, whySelected: candidate?.whenShownForTeacher ?? '', studentChoice: task.choice },
       after: {
-        answer: { ...after.answer, changed: (task.changedElements as string[]).includes('answer') },
-        evidence: { ...after.evidence, changed: (task.changedElements as string[]).includes('evidence') },
+        answer: { ...after.answer, changed: isQ1 ? changed.includes('answer') : task.choice === 'REVISE' },
+        ...(after.evidence ? { evidence: { ...after.evidence, changed: changed.includes('evidence') } } : {}),
         confidenceBefore: task.initialConfidence,
         confidenceAfter: task.finalConfidence,
         submittedAt: iso(task.submittedAt),

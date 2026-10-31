@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { expectAccessible, expectNoSideScroll } from './helpers';
 
-const openDemoMenu = async (page: Page) => page.getByRole('button', { name: 'Demo menu' }).click();
+const openDemoMenu = async (page: Page) => page.getByRole('button', { name: 'Explore the demo' }).click();
 
 test('a new teacher sees the ready Lesson 8 set', async ({ page }) => {
   await page.goto('/');
@@ -84,8 +84,8 @@ test('the full teacher path, from the sample to tracking', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/t\/assignments\//);
   await expect(page.getByText('0 people started, 0 finished')).toBeVisible();
-  await page.getByRole('button', { name: 'Demo menu' }).click();
-  await page.getByRole('button', { name: 'Simulate class' }).click();
+  await page.getByRole('button', { name: 'Explore the demo' }).click();
+  await page.getByRole('button', { name: /Simulate a class/ }).click();
   await expect(page.getByText('7 people started, 7 finished')).toBeVisible({ timeout: 60_000 });
 });
 
@@ -94,9 +94,11 @@ test('tracking after Jump to T14 shows the class and a trace', async ({ page }) 
   await openDemoMenu(page);
   await page.getByRole('button', { name: /T14/ }).click();
   await expect(page.getByRole('button', { name: /T14/ })).toBeHidden({ timeout: 30_000 });
+  await expect(page.getByText(/Jumped to T14/)).toBeVisible();
   await page.locator('a.card').first().click();
   await expect(page.getByText('8 people started, 8 finished')).toBeVisible();
   await expectAccessible(page, 'T14');
+  await page.getByRole('tab', { name: /Students/ }).click();
   await page.getByRole('link', { name: 'View trace' }).first().click();
   await expect(page.getByText('1. FIRST ANSWER')).toBeVisible();
   await expectAccessible(page, 'T15');
@@ -113,4 +115,25 @@ test('two browsers never see each other', async ({ browser }) => {
   expect(await second.locator('a.card').first().getAttribute('href')).not.toBe(href);
   await one.close();
   await two.close();
+});
+
+test.describe('a first visit', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test('the tour walks through the demo drawer once, and the drawer never scrolls sideways', async ({ page }) => {
+    await page.goto('/t/lessons');
+    await expect(page.getByRole('heading', { name: 'Your demo menu' })).toBeVisible();
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Jump to any point' })).toBeVisible();
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Try something', level: 2 })).toBeVisible();
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await page.getByRole('button', { name: 'Got it' }).click();
+    await expect(page.getByRole('dialog', { name: 'Explore the demo' })).toBeVisible();
+    const sideways = await page.locator('.drawer').evaluate((drawer) => drawer.scrollWidth - drawer.clientWidth);
+    expect(sideways).toBeLessThanOrEqual(0);
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Explore the demo' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Your demo menu' })).toHaveCount(0);
+  });
 });

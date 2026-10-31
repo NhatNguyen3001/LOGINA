@@ -21,7 +21,6 @@ vi.mock('@/lib/api', async (original) => ({
   ...(await original<object>()),
   getMe: vi.fn(),
   getClass: vi.fn(),
-  getLimits: vi.fn(async () => ({ limits: [] })),
   createLesson: vi.fn(),
   registerMaterial: vi.fn(),
   getUploadUrl: vi.fn(),
@@ -268,6 +267,14 @@ describe('T5', () => {
   it('approve is blocked until ready', async () => {
     await render(<SourcePage />);
     expect(await screen.findByRole('button', { name: 'Approve source (Approval 1)' })).toBeDisabled();
+  });
+
+  it('the location check reflects the claims, not a fixed tick', async () => {
+    const claim = { id: 'c1', wording: 'The share fell.', evidenceSnippet: 'it fell', locator: '', status: 'VERIFIED' };
+    vi.mocked(api.getSourceReview).mockResolvedValue(review({ summaryClaims: [claim] } as never));
+    await render(<SourcePage />);
+    const row = (await screen.findByText('Every claim has a location in the source')).parentElement!;
+    expect(row).toHaveTextContent('✕');
   });
 
   it('approval sends the version and moves to tasks', async () => {

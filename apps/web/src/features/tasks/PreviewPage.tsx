@@ -5,7 +5,6 @@ import { ArrowLeft, Pencil } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EditorShell } from '@/components/logina/EditorShell';
-import { LimitNote } from '@/components/logina/LimitNote';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
@@ -13,7 +12,6 @@ import { Stepper } from '@/components/logina/Stepper';
 import { SwitchSide } from '@/components/logina/SwitchSide';
 import { errorKey } from '@/i18n';
 import { ApiError, getChallenges, getLesson, getPreview, getTasks, newKey, rerunTask, sendEdit, tryCase } from '@/lib/api';
-import { limitState, minutesUntil, useLimit } from '@/lib/limits';
 import { qk, useJobPolling } from '@/lib/query';
 import { TaskStatusTag } from './task-status';
 
@@ -53,7 +51,6 @@ function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, o
     <div className="stack">
       <label className="s13 b" htmlFor={`prompt-${challengeId}`}>{t('teacher.t07.editPrompt', { label: challengeId })}</label>
       <textarea id={`prompt-${challengeId}`} className="textarea" value={value} onChange={(event) => setValue(event.target.value)} />
-      <LimitNote action="AI_ACTION" />
       {save.isError ? <Note kind="err">{t(errorKey(save.error instanceof ApiError ? save.error.code : ''))}</Note> : null}
       <div className="row">
         <button type="button" className="btn primary sm" disabled={!value.trim() || value === message || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
@@ -170,8 +167,6 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
   const queryClient = useQueryClient();
   const [value, setValue] = useState(text);
   const key = useRef(newKey());
-  const limit = useLimit('AI_ACTION');
-  const blocked = limit ? limitState(limit) === 'reached' : false;
 
   const save = useMutation({
     mutationFn: () => sendEdit(lessonId, { editScope: 'CONTENT', targetType: 'answerOption', targetId: preview.draftId, changedRefs: [optionId], baseVersion: preview.draftVersion, payload: { optionId, text: value } }, key.current),
@@ -181,7 +176,6 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
     },
     onError: () => {
       key.current = newKey();
-      return queryClient.invalidateQueries({ queryKey: qk.limits() });
     },
   });
 
@@ -198,7 +192,6 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
     <div className="stack">
       <label className="vh" htmlFor={`edit-${optionId}`}>{t('teacher.t07.quickEdit', { option: optionId })}</label>
       <textarea id={`edit-${optionId}`} className="textarea" value={value} onChange={(event) => setValue(event.target.value)} />
-      <LimitNote action="AI_ACTION" />
       {refused ? (
         <div className="card b-red">
           <StatusTag kind="block">{t('teacher.t11.refusedTitle')}</StatusTag>
@@ -222,9 +215,7 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
       ) : null}
       {save.isError && !refused && !conflict && code !== 'RATE_LIMITED' ? <Note kind="err">{t(errorKey(code))}</Note> : null}
       <div className="row">
-        <button type="button" className="btn primary sm" disabled={blocked || !value.trim() || value === text || save.isPending} onClick={() => save.mutate()}>
-          {blocked && limit ? t('limits.wait', { minutes: minutesUntil(limit.resetsAt) }) : t('teacher.t07.saveRecheck')}
-        </button>
+        <button type="button" className="btn primary sm" disabled={!value.trim() || value === text || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         <button type="button" className="btn secondary sm" onClick={onClose}>{t('common.cancel')}</button>
       </div>
     </div>

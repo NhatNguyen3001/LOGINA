@@ -69,7 +69,7 @@ describe('T14 tracking', () => {
     const { body } = await tracking();
     const q1 = body.perTask.find((t) => t.slot === 'Q1')!;
     expect(q1).toMatchObject({ submitted: 1, revise: 1, keep: 0, avgConfidenceBefore: 70, avgConfidenceAfter: 82 });
-    expect(q1.deliveredChallenges).toEqual([{ label: 'TN1', count: 1 }]);
+    expect(q1.deliveredChallenges).toEqual([{ label: 'TN1', message: expect.any(String), count: 1, revised: 1 }]);
   });
 
   it('relation distribution counts only submitted attempts and states the denominator', async () => {
@@ -164,6 +164,16 @@ describe('me and consent', () => {
       await a.post(`/attempts/${copyAttemptId}/tasks/${slot}/lock`, { artifact, initialConfidence: 60 });
       await a.post(`/attempts/${copyAttemptId}/tasks/${slot}/submit`, { choice: 'KEEP', finalArtifact: artifact, finalConfidence: 60 });
     }
+    const q2 = TraceDTO.parse(await (await a.get(`/attempts/${copyAttemptId}/trace/Q2`)).json());
+    expect(q2.assignmentId).toBe(copyId);
+    expect(q2.before.evidence).toBeUndefined();
+    expect(q2.before.answer.text).not.toBe('');
+    expect(q2.after.answer).toMatchObject({ letter: '', changed: false });
+    const q4 = TraceDTO.parse(await (await a.get(`/attempts/${copyAttemptId}/trace/Q4`)).json());
+    expect(q4.before.answer.text).not.toBe('');
+    expect(q4.before.answer.text).not.toMatch(/\[|\]/);
+    const last = StudentTaskDTO.parse(await (await a.get(`/attempts/${copyAttemptId}/tasks/Q5`)).json());
+    expect(last.submittedSlots).toEqual(['Q1', 'Q2', 'Q3', 'Q4', 'Q5']);
     const doc = (await h.live.db.doc(`researchRows/${researchRowId(copyAttemptId, 'Q5', 1)}`).get()).data()!;
     expect(doc.first_answer).toContain('Open trade courses');
     expect(doc.first_answer).toContain('Many jobs need training');

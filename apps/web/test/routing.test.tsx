@@ -20,18 +20,16 @@ vi.mock('@tanstack/react-router', async (original) => ({
   Navigate: ({ to }: { to: string }) => <p>{`redirect ${to}`}</p>,
   Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => <a href={to} className={className}>{children}</a>,
 }));
-vi.mock('@/lib/api', async (original) => ({ ...(await original<object>()), getLessons: vi.fn(), getLesson: vi.fn(), getMyAssignments: vi.fn(), getMe: vi.fn(), sendConsent: vi.fn(), getLimits: vi.fn(), getDemoSnapshots: vi.fn(), startAttempt: vi.fn(async () => ({ attemptId: 'att', status: 'NOT_STARTED', slots: [{ slot: 'Q1', phase: 'REASON' }] })) }));
+vi.mock('@/lib/api', async (original) => ({ ...(await original<object>()), getLessons: vi.fn(), getLesson: vi.fn(), getMyAssignments: vi.fn(), getMe: vi.fn(), sendConsent: vi.fn(), getDemoSnapshots: vi.fn(), startAttempt: vi.fn(async () => ({ attemptId: 'att', status: 'NOT_STARTED', slots: [{ slot: 'Q1', phase: 'REASON' }] })) }));
 vi.mock('@/lib/auth', () => ({ ensureSession: vi.fn(async () => {}), idToken: vi.fn(async () => 't'), renewSession: vi.fn(async () => {}) }));
 
 const withQuery = (ui: React.ReactElement) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{ui}</QueryClientProvider>;
 
 const me = { uid: 'u', role: 'demo', displayName: 'x', schoolId: 's', classIds: ['c'], uiLocale: 'en', demoMenu: true, consentRequired: true, currentConsentVersion: '2026-10-v1' } as MeDTO;
-const limits = { limits: [{ action: 'RESET', limit: 1, remaining: 0, resetsAt: new Date(Date.now() + 170_000).toISOString() }, { action: 'SIMULATE_CLASS', limit: 10, remaining: 2, resetsAt: new Date(Date.now() + 3_000_000).toISOString() }] } as never;
 
 beforeEach(() => {
   navigate.mockReset();
   vi.mocked(api.getMe).mockResolvedValue(me);
-  vi.mocked(api.getLimits).mockResolvedValue(limits);
   vi.mocked(api.getDemoSnapshots).mockResolvedValue({ snapshots: [{ stepId: 't07', label: 'T7 · Matching Preview' }] });
 });
 
@@ -99,18 +97,34 @@ describe('switching sides', () => {
 });
 
 describe('demo menu', () => {
-  it('shows Available in 3 min and what is left', async () => {
+  it('Reset is always available', async () => {
     await renderWithI18n(withQuery(<DemoMenu assignmentId="a" />));
-    fireEvent.click(await screen.findByRole('button', { name: 'Demo menu' }));
-    expect(await screen.findByText('Available in 3 min')).toBeInTheDocument();
-    expect(screen.getByText('2 left this hour')).toBeInTheDocument();
+    fireEvent.click(await screen.findByRole('button', { name: 'Explore the demo' }));
+    expect(await screen.findByRole('button', { name: 'Reset demo' })).toBeEnabled();
+  });
+
+  it('explains each action in plain words, and keeps the jumps usable', async () => {
+    vi.mocked(api.getDemoSnapshots).mockResolvedValue({ snapshots: [{ stepId: 'T7', label: 'T7 · Matching Preview' }] });
+    await renderWithI18n(withQuery(<DemoMenu assignmentId="a" />));
+    fireEvent.click(await screen.findByRole('button', { name: 'Explore the demo' }));
+    expect(await screen.findByRole('button', { name: /Matching Preview/ })).toHaveTextContent('See how AI drafted a task');
+    expect(screen.getByRole('button', { name: /Simulate a class/ })).toHaveTextContent('Fill tracking with sample students.');
+  });
+
+  it('runs the tour on a first visit, and skipping ends it for good', async () => {
+    localStorage.removeItem('logina.demoTourSeen');
+    await renderWithI18n(withQuery(<DemoMenu assignmentId="a" />));
+    expect(await screen.findByRole('heading', { name: 'Your demo menu' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Skip' }));
+    expect(screen.queryByRole('heading', { name: 'Your demo menu' })).toBeNull();
+    expect(localStorage.getItem('logina.demoTourSeen')).toBe('1');
   });
 
   it('is hidden when MeDTO.demoMenu is false', async () => {
     vi.mocked(api.getMe).mockResolvedValue({ ...me, demoMenu: false });
     await renderWithI18n(withQuery(<DemoMenu />));
     await waitFor(() => expect(api.getMe).toHaveBeenCalled());
-    expect(screen.queryByRole('button', { name: 'Demo menu' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Explore the demo' })).toBeNull();
   });
 });
 

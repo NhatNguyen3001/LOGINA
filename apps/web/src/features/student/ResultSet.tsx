@@ -4,14 +4,17 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
+import { StudentProgress } from '@/components/logina/StudentProgress';
 import { StudentShell } from '@/components/logina/StudentShell';
-import { SwitchSide } from '@/components/logina/SwitchSide';
 import { useSessionLocale } from '@/components/logina/TeacherShell';
 import { ApiError, getFeedback, getMyAssignments, newKey, restartAttempt } from '@/lib/api';
 import { qk, queryClient } from '@/lib/query';
 import { errorKey } from '@/i18n';
+import { useLessonTitle } from './use-lesson-title';
 
 const changed = (row: StudentFeedbackDTO) => row.choice === 'REVISE';
+
+const SLOTS: Slot[] = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
 
 function useFeedback(attemptId: string) {
   return useQuery({ queryKey: qk.feedback(attemptId), queryFn: () => getFeedback(attemptId) });
@@ -34,9 +37,11 @@ export function ResultSet() {
   });
   const rows = feedback.data ?? [];
   const revised = rows.filter(changed).length;
+  const lesson = useLessonTitle(id);
+  const submitted = rows.map((row) => row.slot);
 
   return (
-    <StudentShell title={t('student.result.title')} actions={<SwitchSide to="teacher" />}>
+    <StudentShell title={t('student.result.title')} lesson={lesson} progress={<StudentProgress slots={SLOTS.map((slot) => ({ slot, state: submitted.includes(slot) ? 'done' : 'todo' }))} />}>
       {feedback.isPending ? <LoadingSkeleton /> : null}
       {feedback.isError ? <Note kind="info">{t(errorKey(feedback.error instanceof ApiError ? feedback.error.code : ''))}</Note> : null}
       {feedback.data ? (
@@ -88,9 +93,10 @@ export function ResultDetail() {
   useSessionLocale();
   const feedback = useFeedback(id);
   const row = feedback.data?.find((r) => r.slot === slot);
+  const lesson = useLessonTitle(id);
 
   return (
-    <StudentShell title={slot} actions={<SwitchSide to="teacher" />}>
+    <StudentShell title={t(`student.progress.${slot}`)} lesson={lesson} progress={<StudentProgress slots={SLOTS.map((item) => ({ slot: item, state: item === slot ? 'on' : 'done' }))} />}>
       <Link to="/s/attempts/$id/results" params={{ id }} className="lnk">{t('student.result.back')}</Link>
       {feedback.isPending ? <LoadingSkeleton /> : null}
       {row ? (

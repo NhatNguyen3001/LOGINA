@@ -296,7 +296,14 @@
       "assignCount": "Assign · {{count}}/5",
       "change": {
         "PREVIEW_CHANGED": "This task changed since you last viewed it."
-      }
+      },
+      "why": {
+        "blockers": "Fix the blockers before you approve.",
+        "warnings": "Decide on the warnings before you approve.",
+        "status": "Wait for the checks to finish.",
+        "confirm": "Tick the box to confirm."
+      },
+      "assignWhy": "Approve every task to assign."
     },
     "t13": {
       "title": "Assign",
@@ -320,23 +327,39 @@
       "keepOrRevise": "Keep / Revise",
       "avgConfidence": "Avg. confidence before → after",
       "prompts": "Think-again prompts given",
-      "relations": "Q1 · how the chosen statement and card relate",
-      "relationsNote": "{{count}} submitted attempts · release {{release}}",
-      "first": "First answer",
-      "final": "Final answer",
-      "relation": {
-        "full": "Full",
-        "partial": "Partial",
-        "irrelevant": "Irrelevant",
-        "contradicts": "Contradicts or refuted"
-      },
       "disclaimer": "Revision rates, rising confidence or correct choices are not enough to conclude that students learned better. That needs a separate evaluation design.",
       "participants": "Participants",
       "code": "Participant code",
       "progress": "Progress",
       "notInResearch": "Not in research",
       "simulated": "Simulated",
-      "trace": "View trace"
+      "trace": "View trace",
+      "tab": {
+        "dashboard": "Dashboard",
+        "students": "Students",
+        "prompts": "Think-again prompts"
+      },
+      "started": "People started",
+      "inAssignment": "in this assignment",
+      "finished": "Finished",
+      "ofTotal": "of {{total}}",
+      "answersRevised": "Answers revised",
+      "avgConfidenceTitle": "Average confidence",
+      "firstToFinal": "first to final answer",
+      "keepReviseTitle": "Keep or revise",
+      "kept": "Kept",
+      "revised": "Revised",
+      "confidenceTitle": "Confidence, first to final",
+      "firstDot": "First",
+      "finalDot": "Final",
+      "barKeep": "{{slot}}: {{keep}} kept, {{revise}} revised",
+      "barConfidence": "{{slot}}: confidence {{change}}",
+      "empty": "No one has submitted a task yet.",
+      "noPrompts": "No prompts shown yet.",
+      "promptsNote": "How often each prompt was shown, and how often students revised after it. This shows what happened next, not why.",
+      "promptsTitle": "Prompts followed by a revision",
+      "seeAll": "See all prompts",
+      "revisedOf": "{{revised}} of {{count}} revised"
     },
     "t15": {
       "changed": "Changed",
@@ -410,22 +433,51 @@
     "confirm": "Confirm",
     "retry": "Try again",
     "policies": "Policies",
-    "backHome": "Back to the start",
-    "draft": "Draft"
+    "draft": "Draft",
+    "menu": "Menu",
+    "back": "Back"
   },
   "demo": {
     "jumpSampleOnly": "Sample lesson only",
     "resetConfirm": "This deletes every lesson in this browser's workspace, including uploaded files. Other people's work is not affected.",
-    "title": "Demo menu",
+    "title": "Explore the demo",
     "reset": "Reset demo",
-    "simulate": "Simulate class",
-    "jump": "Jump to step…",
+    "simulate": "Simulate a class",
+    "jump": "Jump to a step",
     "failRecheck": "Make the next recheck fail",
-    "availableIn": "Available in {{minutes}} min",
-    "leftThisHour": "{{count}} left this hour",
     "armed": "The next recheck will fail.",
     "noAssignment": "Assign a lesson first.",
-    "avatar": "L"
+    "avatar": "L",
+    "intro": "Try the sample lesson from any point. Nothing here affects other people.",
+    "tryTitle": "Try something",
+    "simulateNote": "Fill tracking with sample students.",
+    "failNote": "See how LOGINA handles an error.",
+    "close": "Close",
+    "replay": "Show the tour again",
+    "step": {
+      "S1": "Answer Q1 as a student",
+      "T7": "See how AI drafted a task",
+      "T12": "Approve the five tasks",
+      "T14": "See results from a class"
+    },
+    "tour": {
+      "stepOf": "Step {{n}} of {{total}}",
+      "next": "Next",
+      "skip": "Skip",
+      "done": "Got it",
+      "buttonTitle": "Your demo menu",
+      "buttonBody": "Open Explore the demo any time to try LOGINA. On a phone it is in the menu at the top.",
+      "jumpTitle": "Jump to any point",
+      "jumpBody": "Skip straight to the part you want to see. S is a student screen, T is a teacher screen.",
+      "tryTitle": "Try something",
+      "tryBody": "Fill the tracking page with a sample class, or see how LOGINA handles an error.",
+      "resetTitle": "Start fresh",
+      "resetBody": "Reset demo clears your workspace. Other people's work is not affected."
+    },
+    "jumpedTitle": "Jumped to {{step}}",
+    "jumpedBody": "Open the lesson set to continue.",
+    "resetDoneTitle": "Demo reset",
+    "resetDoneBody": "You're back at the start."
   },
   "student": {
     "new": "New",
@@ -445,7 +497,6 @@
     "phase": {
       "think": "Think again",
       "final": "Final answer",
-      "submit": "Submit",
       "answer": "Answer on your own",
       "lock": "Lock in"
     },
@@ -455,7 +506,10 @@
       "reset": "Reset run",
       "resetTitle": "Start over?",
       "resetConfirm": "Yes, start over",
-      "resetCancel": "Cancel"
+      "resetCancel": "Cancel",
+      "logoHome": "logina Home",
+      "panel": "Your lesson set",
+      "progress": "Your progress"
     },
     "home": {
       "title": "Your lesson sets",
@@ -498,15 +552,14 @@
       "question": "Do you want to keep your answer or revise it?"
     },
     "keep": "Keep my answer",
-    "revise": "Revise my answer",
+    "revise": "Revise answer",
     "final": {
       "keepTitle": "You're keeping your answer",
       "readOnly": "Read-only",
       "unchanged": "Unchanged",
-      "changeMind": "Changed your mind? Revise my answer",
+      "changeMind": "Changed your mind? Revise answer",
       "confidenceNote": "A change in confidence is recorded separately and does not count as revising your answer.",
       "reviseTitle": "Revise your answer",
-      "original": "Original {{value}}",
       "confidence": "Final confidence",
       "sameAsFirst": "Your answer hasn't changed from your first answer, so it will be recorded as Keep.",
       "onlyRevision": "This is your only revision for {{slot}}; after you submit, you move on."
@@ -552,6 +605,20 @@
       "confidenceValue": "Confidence {{value}}",
       "disclaimerShort": "This page records what you chose and changed. It does not judge how you thought.",
       "back": "← All tasks"
+    },
+    "save": {
+      "saving": "Saving…",
+      "failed": "Not saved yet. Your choices are safe on this page, and locking in saves them."
+    },
+    "need": {
+      "statement": "Choose a statement to continue.",
+      "card": "Choose an evidence card to continue.",
+      "compare": "Compare the options on every criterion to continue.",
+      "decide": "Make your decision to continue.",
+      "template": "Choose a template to continue.",
+      "blanks": "Fill every blank to continue.",
+      "proposal": "Write your proposal to continue.",
+      "reason": "Write your reason to continue."
     }
   },
   "entry": {
@@ -559,7 +626,13 @@
     "title": "Try LOGINA",
     "teacher": "Try as teacher",
     "student": "Try as student",
-    "demoLine": "This is a demo without accounts. Real classes would have accounts."
+    "demoLine": "This is a demo without accounts. Real classes would have accounts.",
+    "how": {
+      "add": "A teacher adds their own material.",
+      "draft": "LOGINA reads it, asks about anything unclear, and drafts five tasks.",
+      "approve": "The teacher approves the source and the tasks.",
+      "think": "Students answer, think again, then keep or revise."
+    }
   },
   "lessons": {
     "title": "Lesson sets",
@@ -604,12 +677,13 @@
     "continue": "Continue to the tasks"
   },
   "limits": {
-    "uploadAlmost": "{{count}} uploads left this hour. Resets at {{time}}.",
-    "uploadReached": "You've reached the upload limit for this hour. You can upload again at {{time}}, or keep going now with the sample material.",
-    "aiAlmost": "{{count}} rechecks left this hour. Resets at {{time}}.",
-    "aiReached": "Rechecks are paused for {{minutes}} minutes. Your edit is still on this page, not saved yet. Approval uses the last saved version.",
-    "wait": "Wait {{minutes}} min",
     "busyStudent": "LOGINA is busy right now. Your choices are safe on this page and will save by themselves. You don't need to do anything.",
     "busyTeacher": "LOGINA is busy right now. Your choices are safe on this page and will save by themselves. You don't need to do anything."
+  },
+  "titles": {
+    "teacher": "Teacher",
+    "student": "Student",
+    "trace": "Student trace",
+    "results": "Results"
   }
 }

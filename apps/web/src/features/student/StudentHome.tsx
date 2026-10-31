@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StudentShell } from '@/components/logina/StudentShell';
 import { StatusTag } from '@/components/logina/StatusTag';
-import { SwitchSide } from '@/components/logina/SwitchSide';
 import { useSessionLocale } from '@/components/logina/TeacherShell';
 import { getMyAssignments, getRecordedRuns } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -15,8 +14,8 @@ export function StudentHome() {
   const assignments = useQuery({ queryKey: qk.myAssignments(), queryFn: getMyAssignments });
   const runs = useQuery({ queryKey: qk.recordedRuns(), queryFn: getRecordedRuns });
   return (
-    <StudentShell title={t('student.home.title')} actions={<SwitchSide to="teacher" />}>
-      {assignments.isPending ? <LoadingSkeleton /> : null}
+    <StudentShell title={t('student.home.title')}>
+      {assignments.isPending ? <LoadingSkeleton cards={2} /> : null}
       {assignments.data?.assignments.length === 0 ? <p className="muted">{t('student.home.empty')}</p> : null}
       {assignments.data?.assignments.map((item) => (
         <Link key={item.assignmentId} to="/s/assignments/$id" params={{ id: item.assignmentId }} className="card tight no-underline">

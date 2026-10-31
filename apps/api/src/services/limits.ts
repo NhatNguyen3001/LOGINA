@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto';
 import { Timestamp, type DocumentReference, type Firestore } from 'firebase-admin/firestore';
-import type { RateAction } from '@logina/contracts';
 
 export interface Window {
   max: number;
@@ -13,7 +12,7 @@ export interface ActionWindows {
 }
 
 /** `API` and `SESSION` never appear in `GET /limits`; they exist only as 429 values. */
-export type LimitedAction = RateAction | 'API' | 'SESSION';
+export type LimitedAction = 'API' | 'SESSION';
 export type RateLimits = Record<LimitedAction, ActionWindows>;
 
 interface Keys {
@@ -30,7 +29,6 @@ export interface LimitState {
 
 const HOUR = 3600;
 const MINUTE = 60;
-const FIVE_MINUTES = 300;
 const MAX_API_ENTRIES = 100_000;
 
 type Env = Record<string, string | undefined>;
@@ -39,16 +37,6 @@ export function limitsFromEnv(env: Env): RateLimits {
   const value = (name: string, fallback: number): number => Number(env[name] ?? fallback);
   return {
     SESSION: { perAddress: { max: value('LIMIT_NEW_SESSIONS_ADDRESS_HOUR', 300), seconds: HOUR } },
-    UPLOAD: {
-      perSession: { max: value('LIMIT_UPLOAD_SESSION_HOUR', 5), seconds: HOUR },
-      perAddress: { max: value('LIMIT_UPLOAD_ADDRESS_HOUR', 30), seconds: HOUR },
-    },
-    AI_ACTION: {
-      perSession: { max: value('LIMIT_AI_SESSION_HOUR', 50), seconds: HOUR },
-      perAddress: { max: value('LIMIT_AI_ADDRESS_HOUR', 200), seconds: HOUR },
-    },
-    RESET: { perSession: { max: value('LIMIT_RESET_SESSION_5MIN', 1), seconds: FIVE_MINUTES } },
-    SIMULATE_CLASS: { perSession: { max: value('LIMIT_SIMULATE_SESSION_HOUR', 10), seconds: HOUR } },
     API: {
       perSession: { max: value('LIMIT_API_SESSION_MINUTE', 600), seconds: MINUTE },
       perAddress: { max: value('LIMIT_API_ADDRESS_MINUTE', 5000), seconds: MINUTE },

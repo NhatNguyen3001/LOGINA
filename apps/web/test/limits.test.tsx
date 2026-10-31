@@ -2,7 +2,7 @@ import { act, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BusyNote } from '@/components/logina/BusyNote';
 import { getLesson, lockTask } from '@/lib/api';
-import { limitState, minutesUntil, setBusy } from '@/lib/limits';
+import { setBusy } from '@/lib/busy';
 import { renderWithI18n } from './utils';
 
 vi.mock('@/lib/auth', () => ({
@@ -21,26 +21,6 @@ beforeEach(() => {
   fetchMock.mockReset();
   vi.stubGlobal('fetch', fetchMock);
   setBusy(false);
-});
-
-describe('limitState', () => {
-  it('is almost at the last 20 percent and at the final 1', () => {
-    expect(limitState({ limit: 50, remaining: 11 })).toBe('ok');
-    expect(limitState({ limit: 50, remaining: 10 })).toBe('almost');
-    expect(limitState({ limit: 5, remaining: 1 })).toBe('almost');
-    expect(limitState({ limit: 5, remaining: 2 })).toBe('ok');
-    expect(limitState({ limit: 5, remaining: 0 })).toBe('reached');
-  });
-
-  it('a limit of 1 is never almost', () => {
-    expect(limitState({ limit: 1, remaining: 1 })).toBe('ok');
-    expect(limitState({ limit: 1, remaining: 0 })).toBe('reached');
-  });
-
-  it('rounds the wait up and never shows 0', () => {
-    expect(minutesUntil('2026-01-01T00:02:01Z', Date.parse('2026-01-01T00:00:00Z'))).toBe(3);
-    expect(minutesUntil('2026-01-01T00:00:00Z', Date.parse('2026-01-01T00:00:00Z'))).toBe(1);
-  });
 });
 
 describe('busy retries', () => {

@@ -9,7 +9,6 @@ export const queryClient = new QueryClient({ defaultOptions: { queries: { retry:
 
 export const qk = {
   me: () => ['me'] as const,
-  limits: () => ['limits'] as const,
   lessons: () => ['lessons'] as const,
   lesson: (id: string) => ['lesson', id] as const,
   class: (id: string) => ['class', id] as const,

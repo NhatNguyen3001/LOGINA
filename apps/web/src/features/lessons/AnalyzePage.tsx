@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Navigate, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
@@ -61,6 +62,7 @@ export function AnalyzePage() {
   const done = steps.filter((s) => s.status === 'DONE').length;
   const percent = steps.length ? Math.round((done / steps.length) * 100) : 0;
   const question = job.data?.question;
+  const unreadable = lesson.isError || job.isError;
 
   return (
     <>
@@ -95,7 +97,9 @@ export function AnalyzePage() {
           <button type="button" className="btn secondary sm" onClick={() => retry.mutate()}>{t('common.retry')}</button>
         </Note>
       ) : null}
-      <div className="card">
+      {unreadable ? <Note kind="err">{t('errors.generic')}</Note> : null}
+      {!job.data && !unreadable ? <LoadingSkeleton /> : null}
+      {job.data ? <div className="card">
         <div className="row">
           <h3 className="s15 b">{t('teacher.t02.progress')}</h3>
           <span className="sp" />
@@ -114,9 +118,9 @@ export function AnalyzePage() {
         </div>
         <div className="row">
           <span className="s13 sec grow">{t('teacher.t02.timing')}</span>
-          <button type="button" className="btn secondary" disabled={!job.data || stop.isPending} onClick={() => stop.mutate()}>{t('teacher.t02.stop')}</button>
+          <button type="button" className="btn secondary" disabled={stop.isPending} onClick={() => stop.mutate()}>{t('teacher.t02.stop')}</button>
         </div>
-      </div>
+      </div> : null}
     </>
   );
 }

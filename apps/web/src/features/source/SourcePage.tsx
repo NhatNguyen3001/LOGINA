@@ -34,6 +34,7 @@ export function SourcePage() {
 
   if (!review.data) return <LoadingSkeleton />;
   const { summaryClaims, teacherDecisions, openGaps, excluded, approveReady, blockersRemaining, readByAI } = review.data;
+  const located = summaryClaims.every((claim) => claim.locator);
 
   return (
     <>
@@ -117,7 +118,7 @@ export function SourcePage() {
         <div className="card sticky">
           <h3 className="b">{t('teacher.t05.ready')}</h3>
           <div className="row"><span className={blockersRemaining === 0 ? 'ok' : 'no'}>{blockersRemaining === 0 ? '✓' : '✕'}</span><span>{t('teacher.t05.blockers', { count: blockersRemaining })}</span></div>
-          <div className="row"><span className="ok">{'✓'}</span><span>{t('teacher.t05.located')}</span></div>
+          <div className="row"><span className={located ? 'ok' : 'no'}>{located ? '✓' : '✕'}</span><span>{t('teacher.t05.located')}</span></div>
           {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
           <button type="button" className="btn primary block" disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t05.approve')}</button>
           <p className="small muted">{t('teacher.t05.note')}</p>

@@ -41,7 +41,8 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
     const attemptId = c.req.param('id');
     const attempt = await loadAttempt(db, c.var.user, attemptId);
     const release = await loadRelease(db, attempt, slot);
-    const task = (await db.doc(`attempts/${attemptId}/tasks/${slot}`).get()).data()!;
+    const tasks = await db.collection(`attempts/${attemptId}/tasks`).get();
+    const task = tasks.docs.find((doc) => doc.id === slot)!.data();
 
     if (!task.openedAt) await db.doc(`attempts/${attemptId}/tasks/${slot}`).update({ openedAt: FieldValue.serverTimestamp() });
     const content = release.publicContent as DocumentData;
@@ -50,6 +51,7 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
       phase: task.phase,
       stem: content.questionStem,
       draftArtifact: task.draftArtifact ?? null,
+      submittedSlots: tasks.docs.filter((doc) => doc.data().phase === 'SUBMITTED').map((doc) => doc.id),
       ...(task.lockedAt ? { initialArtifact: task.initialArtifact, initialConfidence: task.initialConfidence } : {}),
     };
     return respond(

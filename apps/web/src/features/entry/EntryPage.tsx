@@ -7,6 +7,8 @@ import { Logo } from '@/components/logina/Logo';
 import { getMyAssignments, newKey, restartAttempt, updateMe } from '@/lib/api';
 import { queryClient } from '@/lib/query';
 
+const HOW = ['add', 'draft', 'approve', 'think'] as const;
+
 export function EntryPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -41,6 +43,14 @@ export function EntryPage() {
         <div className="login-brand">
           <Logo />
           <h1 className="login-h">{t('entry.headline')}</h1>
+          <ol className="how">
+            {HOW.map((step, index) => (
+              <li key={step}>
+                <span className="k">{index + 1}</span>
+                <span>{t(`entry.how.${step}`)}</span>
+              </li>
+            ))}
+          </ol>
         </div>
         <div className="login-side">
           <div className="card login-card">

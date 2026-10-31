@@ -46,14 +46,14 @@ describe('language', () => {
     const saver = vitest.fn(async () => {});
     setUserLocaleSaver(saver);
     await renderWithI18n(<LangSwitch />);
-    await userEvent.click(screen.getByRole('button', { name: 'VI' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Tiếng Việt' }));
     expect(saver).toHaveBeenCalledWith('vi');
-    expect(screen.getByRole('button', { name: 'VI' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Tiếng Việt' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('switching without a session updates ?lang=', async () => {
     await renderWithI18n(<LangSwitch />);
-    await userEvent.click(screen.getByRole('button', { name: 'VI' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Tiếng Việt' }));
     expect(window.location.search).toBe('?lang=vi');
     window.history.replaceState(null, '', '/');
   });

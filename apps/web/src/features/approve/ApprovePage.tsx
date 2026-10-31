@@ -53,6 +53,7 @@ function ApprovePanel({ lessonId, task }: { lessonId: string; task: Task }) {
   const blockers = blockingGates(task).length;
   const undecided = task.decisionsNeeded.filter((finding) => finding.overridable).length;
   const ready = blockers === 0 && undecided === 0 && !BLOCKING_STATUS.includes(task.status);
+  const waitingOn = blockers > 0 ? 'blockers' : undecided > 0 ? 'warnings' : !ready ? 'status' : !confirmed ? 'confirm' : null;
 
   return (
     <div className="card sticky">
@@ -79,6 +80,7 @@ function ApprovePanel({ lessonId, task }: { lessonId: string; task: Task }) {
       </label>
       {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
       <button type="button" className="btn primary block" disabled={!confirmed || !ready || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t12.approveSlot', { slot: task.slot })}</button>
+      {waitingOn ? <p className="hint">{t(`teacher.t12.why.${waitingOn}`)}</p> : null}
     </div>
   );
 }
@@ -164,6 +166,7 @@ export function ApprovePage() {
       {current ? <ApprovePanel key={`${current.slot}-${current.draftVersion}`} lessonId={id} task={current} /> : null}
       </div>
       <div className="row">
+        {allApproved ? null : <span className="s13 sec">{t('teacher.t12.assignWhy')}</span>}
         <span className="sp" />
         {allApproved ? <Link to="/t/lessons/$id/assign" params={{ id }} className="btn primary">{t('teacher.t12.assignCount', { count: approved })}</Link> : <button type="button" className="btn primary" disabled>{t('teacher.t12.assignCount', { count: approved })}</button>}
       </div>

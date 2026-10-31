@@ -10,7 +10,9 @@
   --purple:#5B3FA8; --purple-bg:#F1EDFB; --purple-line:#D3C8F0;
   --shadow:0 1px 2px rgba(24,33,47,.06),0 8px 24px rgba(24,33,47,.06);
   --logo-navy:#0E3A7E; --logo-teal:#12B5C6; --logo-gap:var(--surface);
-  --font:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font:'Source Sans 3',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-heading:'Lexend',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-logo:'Be Vietnam Pro',var(--font-heading);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --canvas:#0B0F15; --page:#10151D; --surface:#171D27; --subtle:#1C2330; --gray:#242C39;

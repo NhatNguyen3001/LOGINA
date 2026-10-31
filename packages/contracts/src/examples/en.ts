@@ -728,10 +728,10 @@ export const examples = {
         avgConfidenceBefore: 68,
         avgConfidenceAfter: 76,
         deliveredChallenges: [
-          { label: 'TN1', count: 3 },
-          { label: 'TN2', count: 2 },
-          { label: 'TN4', count: 1 },
-          { label: 'Fallback', count: 2 },
+          { label: 'TN1', message: 'Look at the figures again.', count: 3, revised: 1 },
+          { label: 'TN2', message: 'Look at the figures again.', count: 2, revised: 1 },
+          { label: 'TN4', message: 'Look at the figures again.', count: 1, revised: 0 },
+          { label: 'Fallback', message: 'Look at the figures again.', count: 2, revised: 1 },
         ],
       },
       {
@@ -742,8 +742,8 @@ export const examples = {
         avgConfidenceBefore: 70,
         avgConfidenceAfter: 73,
         deliveredChallenges: [
-          { label: 'TN1', count: 3 },
-          { label: 'Fallback', count: 5 },
+          { label: 'TN1', message: 'Look at the figures again.', count: 3, revised: 1 },
+          { label: 'Fallback', message: 'Look at the figures again.', count: 5, revised: 2 },
         ],
       },
       {
@@ -754,8 +754,8 @@ export const examples = {
         avgConfidenceBefore: 62,
         avgConfidenceAfter: 66,
         deliveredChallenges: [
-          { label: 'TN2', count: 4 },
-          { label: 'Fallback', count: 4 },
+          { label: 'TN2', message: 'Look at the figures again.', count: 4, revised: 2 },
+          { label: 'Fallback', message: 'Look at the figures again.', count: 4, revised: 2 },
         ],
       },
       {
@@ -766,9 +766,9 @@ export const examples = {
         avgConfidenceBefore: 66,
         avgConfidenceAfter: 67,
         deliveredChallenges: [
-          { label: 'TN1', count: 3 },
-          { label: 'TN3', count: 1 },
-          { label: 'Fallback', count: 4 },
+          { label: 'TN1', message: 'Look at the figures again.', count: 3, revised: 1 },
+          { label: 'TN3', message: 'Look at the figures again.', count: 1, revised: 0 },
+          { label: 'Fallback', message: 'Look at the figures again.', count: 4, revised: 2 },
         ],
       },
       {
@@ -779,8 +779,8 @@ export const examples = {
         avgConfidenceBefore: 64,
         avgConfidenceAfter: 65,
         deliveredChallenges: [
-          { label: 'TN1', count: 2 },
-          { label: 'Fallback', count: 6 },
+          { label: 'TN1', message: 'Look at the figures again.', count: 2, revised: 1 },
+          { label: 'Fallback', message: 'Look at the figures again.', count: 6, revised: 3 },
         ],
       },
     ],
@@ -793,6 +793,7 @@ export const examples = {
   },
 
   trace: {
+    assignmentId: 'asg_01JQ1',
     participantCode: 'P-7K2M',
     isSimulated: false,
     completedAt: '2026-11-06T03:42:00.000Z',
@@ -880,6 +881,7 @@ export const examples = {
   studentTask: {
     slot: 'Q1',
     phase: 'REASON',
+    submittedSlots: [],
     stem: STEM,
     answers: [
       { id: 'opt_1', text: ANSWER_A },
@@ -948,18 +950,9 @@ export const examples = {
 
   consentResult: { consent: 'AGREED', participantCode: 'P-7K2M' },
 
-  limits: {
-    limits: [
-      { action: 'UPLOAD', limit: 5, remaining: 1, resetsAt: '2026-11-05T08:40:00.000Z' },
-      { action: 'AI_ACTION', limit: 50, remaining: 38, resetsAt: '2026-11-05T08:40:00.000Z' },
-      { action: 'SIMULATE_CLASS', limit: 10, remaining: 2, resetsAt: '2026-11-05T08:40:00.000Z' },
-      { action: 'RESET', limit: 1, remaining: 1, resetsAt: '2026-11-05T08:40:00.000Z' },
-    ],
-  },
-
   rateLimit: {
     code: 'RATE_LIMITED',
-    action: 'AI_ACTION',
+    action: 'API',
     retryAfterSeconds: 720,
     resetsAt: '2026-11-05T08:40:00.000Z',
   },
