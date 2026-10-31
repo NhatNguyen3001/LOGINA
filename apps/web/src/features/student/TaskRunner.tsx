@@ -4,9 +4,10 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BusyNote } from '@/components/logina/BusyNote';
-import { ConfidenceSlider } from '@/components/logina/ConfidenceSlider';
+import { ConfidenceSlider, DEFAULT_CONFIDENCE } from '@/components/logina/ConfidenceSlider';
 import { Note } from '@/components/logina/Note';
 import { PhaseLine } from '@/components/logina/PhaseLine';
+import { ResetRun } from '@/components/logina/ResetRun';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { StudentProgress } from '@/components/logina/StudentProgress';
 import { StudentShell } from '@/components/logina/StudentShell';
@@ -52,7 +53,7 @@ function Answering({ attemptId, task, onLocked }: { attemptId: string; task: Stu
   const { t } = useTranslation();
   const [draft, setDraft] = useState<DraftArtifact>(() => emptyDraft(task));
   const [locking, setLocking] = useState(false);
-  const [confidence, setConfidence] = useState<number | null>(null);
+  const [confidence, setConfidence] = useState(DEFAULT_CONFIDENCE);
   const lockKey = useRef(newKey());
   const lockSent = useRef(false);
   const firstRender = useRef(true);
@@ -67,7 +68,7 @@ function Answering({ attemptId, task, onLocked }: { attemptId: string; task: Stu
   }, [attemptId, draft, task.slot]);
 
   const lock = useMutation({
-    mutationFn: () => lockTask(attemptId, task.slot, { artifact: draft as Artifact, initialConfidence: confidence! }, lockKey.current),
+    mutationFn: () => lockTask(attemptId, task.slot, { artifact: draft as Artifact, initialConfidence: confidence }, lockKey.current),
     onSuccess: onLocked,
     onError: () => {
       lockSent.current = false;
@@ -100,7 +101,7 @@ function Answering({ attemptId, task, onLocked }: { attemptId: string; task: Stu
         <div className="row">
           <button type="button" className="btn secondary" onClick={() => setLocking(false)}>{t('student.lock.back')}</button>
           <span className="sp" />
-          <button type="button" className="btn primary" disabled={confidence === null || lock.isPending} onClick={sendLock}>{t('student.lock.button')}</button>
+          <button type="button" className="btn primary" disabled={lock.isPending} onClick={sendLock}>{t('student.lock.button')}</button>
         </div>
       </>
     );
@@ -126,15 +127,14 @@ function Reconsidering({ attemptId, task, onSubmitted }: { attemptId: string; ta
   const initialConfidence = task.initialConfidence ?? 0;
   const [choice, setChoice] = useState<'KEEP' | 'REVISE' | null>(null);
   const [revised, setRevised] = useState<DraftArtifact>(original);
-  const [revisedConfidence, setRevisedConfidence] = useState<number | null>(null);
-  const [keptConfidence, setKeptConfidence] = useState(initialConfidence);
+  const [finalConfidence, setFinalConfidence] = useState(DEFAULT_CONFIDENCE);
   const submitKey = useRef(newKey());
 
   const challenge = useQuery({ queryKey: qk.challenge(attemptId, task.slot), queryFn: () => getChallenge(attemptId, task.slot) });
 
   const submit = useMutation({
     mutationFn: () =>
-      submitTask(attemptId, task.slot, { choice: choice!, finalArtifact: (choice === 'KEEP' ? original : revised) as Artifact, finalConfidence: choice === 'KEEP' ? keptConfidence : revisedConfidence! }, submitKey.current),
+      submitTask(attemptId, task.slot, { choice: choice!, finalArtifact: (choice === 'KEEP' ? original : revised) as Artifact, finalConfidence }, submitKey.current),
     onSuccess: ({ nextSlot }) => onSubmitted(nextSlot),
   });
 
@@ -160,7 +160,11 @@ function Reconsidering({ attemptId, task, onSubmitted }: { attemptId: string; ta
           <LockedAnswer summary={summary} />
         </div>
         <div className="card tight">
-          <ConfidenceSlider value={keptConfidence} onChange={setKeptConfidence} initial={initialConfidence} />
+          <div className="row">
+            <span className="sp" />
+            <span className="s13 muted num">{t('student.final.original', { value: initialConfidence })}</span>
+          </div>
+          <ConfidenceSlider value={finalConfidence} onChange={setFinalConfidence} />
           <span className="s13 sec">{t('student.final.confidenceNote')}</span>
         </div>
         {failure}
@@ -174,7 +178,7 @@ function Reconsidering({ attemptId, task, onSubmitted }: { attemptId: string; ta
 
   if (choice === 'REVISE') {
     const unchanged = sameArtifact(revised, original);
-    const ready = isComplete(task, revised) && revisedConfidence !== null;
+    const ready = isComplete(task, revised);
     return (
       <>
         <PhaseLine phase="RECONSIDER" />
@@ -187,12 +191,10 @@ function Reconsidering({ attemptId, task, onSubmitted }: { attemptId: string; ta
             <span className="sp" />
             <span className="s13 muted num">{t('student.final.original', { value: initialConfidence })}</span>
           </div>
-          <ConfidenceSlider value={revisedConfidence} onChange={setRevisedConfidence} initial={initialConfidence} />
-          {unchanged ? <span className="s13 sec">{t('student.final.confirmAgain')}</span> : null}
+          <ConfidenceSlider value={finalConfidence} onChange={setFinalConfidence} />
         </div>
         {failure}
         <div className="row">
-          <span className="s13 muted">{ready ? null : t('student.final.confirmHint')}</span>
           <span className="sp" />
           <button type="button" className="btn primary" disabled={!ready || submit.isPending} onClick={() => submit.mutate()}>{submitLabel}</button>
         </div>
@@ -247,7 +249,7 @@ export function TaskRunner() {
   const nextAfter = SLOTS[SLOTS.indexOf(slot) + 1];
 
   return (
-    <StudentShell title={t('student.home.title')} progress={<StudentProgress slots={progressFor(slot)} />} actions={<SwitchSide to="teacher" />}>
+    <StudentShell title={t('student.home.title')} progress={<StudentProgress slots={progressFor(slot)} />} actions={<><ResetRun attemptId={attemptId} /><SwitchSide to="teacher" /></>}>
       <BusyNote side="student" />
       {!task.data ? <p className="muted">{t('common.loading')}</p> : null}
       {task.data?.phase === 'SUBMITTED' ? (

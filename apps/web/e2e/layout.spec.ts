@@ -146,6 +146,26 @@ test('a finished student starts a new run, keeps the old one, and can always go 
   await expect(page.getByRole('button', { name: 'Start a new run' })).toHaveCount(0);
 });
 
+test('every bar starts at 50 with one knob, and Reset run goes back to Q1', async ({ page }) => {
+  await startTasks(page);
+  await completeTask(page, 'Q1');
+  await expect(page).toHaveURL(/\/Q2$/);
+  await page.getByRole('button', { name: 'Continue →' }).click();
+  await expect(page.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
+  await page.getByRole('button', { name: 'Lock in answer' }).click();
+  await page.getByRole('button', { name: 'Keep my answer' }).click();
+  await expect(page.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
+  await expect(page.locator('.knob')).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Reset run' }).click();
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page).toHaveURL(/\/Q2$/);
+  await page.getByRole('button', { name: 'Reset run' }).click();
+  await page.getByRole('button', { name: 'Yes, start over' }).click();
+  await expect(page).toHaveURL(/\/Q1$/);
+  await expect(page.getByRole('button', { name: 'Continue →' })).toBeDisabled();
+});
+
 test('the teacher sidebar cannot be collapsed', async ({ page }) => {
   await openTeacher(page);
   await expect(page.getByRole('button', { name: /collapse/i })).toHaveCount(0);

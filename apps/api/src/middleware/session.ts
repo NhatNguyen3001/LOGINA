@@ -5,7 +5,7 @@ import { AppError } from './errors.js';
 import { enforce } from './rate-limit.js';
 
 /** 02-TRD section 4: the API path decides the side, since one session can use both. */
-const STUDENT_ROUTES = [/^\/me\/assignments(\/runs)?$/, /^\/assignments\/[^/]+\/attempts(\/restart)?$/, /^\/attempts\/[^/]+\/tasks(\/|$)/, /^\/attempts\/[^/]+\/feedback$/];
+const STUDENT_ROUTES = [/^\/me\/assignments(\/runs)?$/, /^\/assignments\/[^/]+\/attempts(\/restart)?$/, /^\/attempts\/[^/]+\/tasks(\/|$)/, /^\/attempts\/[^/]+\/(feedback|reset)$/];
 const NEUTRAL_ROUTES = [/^\/me$/, /^\/me\/consent$/, /^\/limits$/];
 
 type Side = 'teacher' | 'student' | 'neutral';

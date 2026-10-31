@@ -74,18 +74,18 @@ describe('Q1 flow', () => {
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalledWith('att1', 'Q1', { draftArtifact: { slot: 'Q1', answerId: 'a1' } }), { timeout: 2000 });
   });
 
-  it('Lock is disabled until confidence is chosen and sends one request on double click', async () => {
+  it('Lock starts ready at 50 and sends one request on double click', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(q1({ draftArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' } }));
     vi.mocked(api.lockTask).mockImplementation(() => new Promise(() => {}));
     await render(<TaskRunner />);
     fireEvent.click(await screen.findByRole('button', { name: 'Continue →' }));
     const lock = screen.getByRole('button', { name: 'Lock in answer' });
-    expect(lock).toBeDisabled();
-    fireEvent.keyDown(screen.getByRole('slider'), { key: 'End' });
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
     fireEvent.click(lock);
     fireEvent.click(lock);
     await waitFor(() => expect(api.lockTask).toHaveBeenCalled());
     expect(api.lockTask).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(api.lockTask).mock.calls[0]![2]).toMatchObject({ initialConfidence: 50 });
   });
 
   it('F-S9 a reload after lock shows the same answer and prompt with no second lock', async () => {
@@ -111,7 +111,7 @@ describe('Q1 flow', () => {
     expect(screen.getByText("You're keeping your answer")).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Submit Q1' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/s/attempts/$id/$slot', params: { id: 'att1', slot: 'Q2' } }));
-    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 70 });
+    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 50 });
   });
 
   it('S4 marks new choices New and originals original', async () => {
@@ -123,12 +123,13 @@ describe('Q1 flow', () => {
     expect(screen.getAllByText('original').length).toBeGreaterThan(0);
   });
 
-  it('S6 an unchanged revise says Keep and requires confidence', async () => {
+  it('S6 an unchanged revise says Keep, with one knob starting at 50', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
     await render(<TaskRunner />);
     fireEvent.click(await screen.findByRole('button', { name: 'Revise my answer' }));
     expect(screen.getByText(/so it will be recorded as/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Submit Q1' })).toBeDisabled();
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
+    expect(document.querySelectorAll('.knob')).toHaveLength(1);
   });
 
   it('the last task goes to results', async () => {

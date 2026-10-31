@@ -198,4 +198,18 @@ describe('me and consent', () => {
     expect(attempt.status).toBe('IN_PROGRESS');
     expect(attempt.slots[0]!.phase).toBe('SUBMITTED');
   });
+
+  it('a reset clears an unfinished run, keeps its rows and files nothing', async () => {
+    const before = RecordedRunsDTO.parse(await (await a.get('/me/assignments/runs')).json()).runs.length;
+    const attempt = AttemptDTO.parse(await (await a.post(`/attempts/${copyAttemptId}/reset`)).json());
+    expect(attempt).toMatchObject({ attemptId: copyAttemptId, status: 'NOT_STARTED' });
+    expect(attempt.slots.every((s) => s.phase === 'REASON')).toBe(true);
+
+    expect((await h.live.db.doc(`researchRows/${researchRowId(copyAttemptId, 'Q1', 2)}`).get()).exists).toBe(true);
+    expect(RecordedRunsDTO.parse(await (await a.get('/me/assignments/runs')).json()).runs).toHaveLength(before);
+  });
+
+  it('a filed run cannot be reset', async () => {
+    expect((await a.post(`/attempts/${copyAttemptId}_run1/reset`)).status).toBe(404);
+  });
 });

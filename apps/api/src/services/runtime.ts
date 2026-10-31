@@ -61,6 +61,17 @@ export async function restartAttempt(db: Firestore, actor: Actor, assignmentId: 
   return startAttempt(db, actor, assignmentId, { run: run + 1 });
 }
 
+/** Clears the current run so it starts again at Q1. Rows from tasks already submitted stay. */
+export async function resetAttempt(db: Firestore, actor: Actor, attemptId: string): Promise<AttemptDTO> {
+  const attempt = await loadAttempt(db, actor, attemptId);
+  const assignmentId = attempt.assignmentId as string | undefined;
+  if (!assignmentId) throw notFound();
+  if (attempt.status === 'COMPLETE') return restartAttempt(db, actor, assignmentId);
+
+  await db.recursiveDelete(db.doc(`attempts/${attemptId}`));
+  return startAttempt(db, actor, assignmentId, attempt.run ? { run: attempt.run } : {});
+}
+
 export async function loadAttempt(db: Firestore, actor: Actor, attemptId: string): Promise<DocumentData> {
   const attempt = await scopedGet(db.doc(`attempts/${attemptId}`), actor.schoolId);
   if (!attempt || attempt.studentId !== actor.uid) throw notFound();

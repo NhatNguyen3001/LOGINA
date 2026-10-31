@@ -451,7 +451,10 @@
     },
     "shell": {
       "home": "Home",
-      "runs": "My runs"
+      "runs": "My runs",
+      "reset": "Reset run",
+      "resetConfirm": "Yes, start over",
+      "resetCancel": "Cancel"
     },
     "home": {
       "title": "Your lesson sets",
@@ -507,8 +510,6 @@
       "original": "Original {{value}}",
       "confidence": "Final confidence",
       "sameAsFirst": "Your answer hasn't changed from your first answer, so it will be recorded as Keep.",
-      "confirmAgain": "Tap the bar to confirm again, even if you keep the same level.",
-      "confirmHint": "Confirm your final confidence to submit",
       "onlyRevision": "This is your only revision for {{slot}}; after you submit, you move on."
     },
     "submit": "Submit {{slot}}",

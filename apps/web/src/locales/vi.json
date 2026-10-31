@@ -451,7 +451,10 @@
     },
     "shell": {
       "home": "Trang chủ",
-      "runs": "Các lần làm"
+      "runs": "Các lần làm",
+      "reset": "Làm lại từ đầu",
+      "resetConfirm": "Có, làm lại",
+      "resetCancel": "Hủy"
     },
     "home": {
       "title": "Bộ bài của em",
@@ -507,8 +510,6 @@
       "original": "Ban đầu {{value}}",
       "confidence": "Mức tự tin cuối cùng",
       "sameAsFirst": "Câu trả lời chưa thay đổi so với bản ban đầu, nên sẽ được ghi là Giữ.",
-      "confirmAgain": "Chạm vào thanh để xác nhận lại, kể cả khi giữ mức cũ.",
-      "confirmHint": "Xác nhận mức tự tin cuối cùng để nộp",
       "onlyRevision": "Đây là lần sửa duy nhất của {{slot}}; sau khi nộp, em chuyển sang bài tiếp theo."
     },
     "submit": "Nộp {{slot}}",

@@ -1,10 +1,11 @@
 import type { KeyboardEvent, PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+export const DEFAULT_CONFIDENCE = 50;
+
 interface ConfidenceSliderProps {
-  value: number | null;
+  value: number;
   onChange: (value: number) => void;
-  initial?: number;
 }
 
 const clamp = (value: number) => Math.min(100, Math.max(0, value));
@@ -20,15 +21,14 @@ const KEY_STEPS: Record<string, (value: number) => number> = {
   End: () => 100,
 };
 
-/** Starts with no value, so a student is never nudged towards a preset number. */
-export function ConfidenceSlider({ value, onChange, initial }: ConfidenceSliderProps) {
+export function ConfidenceSlider({ value, onChange }: ConfidenceSliderProps) {
   const { t } = useTranslation();
 
   const onKeyDown = (event: KeyboardEvent) => {
     const step = KEY_STEPS[event.key];
     if (!step) return;
     event.preventDefault();
-    onChange(clamp(step(value ?? 0)));
+    onChange(clamp(step(value)));
   };
 
   const fromPointer = (event: PointerEvent<HTMLDivElement>) => {
@@ -51,7 +51,7 @@ export function ConfidenceSlider({ value, onChange, initial }: ConfidenceSliderP
       <div className="row">
         <span className="b">{t('student.confidence.label')}</span>
         <span className="sp" />
-        {value === null ? null : <span className="b num">{value}</span>}
+        <span className="b num">{value}</span>
       </div>
       <div
         role="slider"
@@ -59,19 +59,14 @@ export function ConfidenceSlider({ value, onChange, initial }: ConfidenceSliderP
         aria-label={t('student.confidence.label')}
         aria-valuemin={0}
         aria-valuemax={100}
-        {...(value === null ? {} : { 'aria-valuenow': value })}
-        className={`slider ${value === null ? 'empty' : ''}`}
+        aria-valuenow={value}
+        className="slider"
         onKeyDown={onKeyDown}
         onPointerDown={startDrag}
         onPointerMove={drag}
       >
-        {value === null ? null : (
-          <>
-            <span className="fill" style={{ width: `${value}%` }} />
-            <span className="knob" style={{ left: `${value}%` }} />
-          </>
-        )}
-        {initial === undefined ? null : <span className="knob orig" style={{ left: `${initial}%` }} aria-hidden="true" />}
+        <span className="fill" style={{ width: `${value}%` }} />
+        <span className="knob" style={{ left: `${value}%` }} />
       </div>
       <div className="ticks">
         <span>{t('student.confidence.low')}</span>
