@@ -10,7 +10,10 @@ describe('firebase.json', () => {
   it('has no emulators block and points at the rules files', () => {
     const config = repoJson('firebase.json');
     expect(config.emulators).toBeUndefined();
-    expect(config.storage).toEqual({ rules: 'storage.rules' });
+    expect(config.storage).toEqual([
+      { bucket: 'logina-dev-materials', rules: 'storage.rules' },
+      { bucket: 'logina-dev-test', rules: 'storage.rules' },
+    ]);
     expect(config.firestore.map((entry: { database: string }) => entry.database)).toEqual(['(default)', 'logina-test']);
   });
 });
