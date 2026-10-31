@@ -13,6 +13,16 @@ import { ApiError, chooseSufficiency, getLesson, getTasks, newKey } from '@/lib/
 import { jobFinished, qk, useJobPolling } from '@/lib/query';
 import { TaskStatusTag } from './task-status';
 
+function useSecondsSince(start: string | undefined): number | null {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!start) return undefined;
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, [start]);
+  return start ? Math.max(0, Math.floor((now - Date.parse(start)) / 1000)) : null;
+}
+
 const CHOICES = ['REFOCUS', 'ADD_SOURCE', 'LEAVE_EMPTY'] as const;
 const SUFFICIENCY_KIND = { SUFFICIENT: 'pass', UNCERTAIN: 'review', INSUFFICIENT: 'block' } as const;
 
@@ -62,6 +72,7 @@ export function TasksPage() {
   const job = useJobPolling(lesson.data?.activeJobId);
   const finished = jobFinished(job.data);
   const running = Boolean(lesson.data?.activeJobId) && !finished;
+  const seconds = useSecondsSince(running ? job.data?.startedAt : undefined);
   /** Kept in state: reloading the lesson clears activeJobId, and the job with it. */
   const [failure, setFailure] = useState<string | null>(null);
   const tasks = useQuery({ queryKey: qk.tasks(id), queryFn: () => getTasks(id), refetchInterval: running ? 2000 : false });
@@ -88,7 +99,12 @@ export function TasksPage() {
         <h1 className="h1">{t('teacher.t06.title')}</h1>
         <p className="lede">{t('teacher.t06.lede')}</p>
       </div>
-      {running && lesson.data?.aiMode === 'LIVE' ? <Note kind="info">{t('teacher.t06.wait')}</Note> : null}
+      {running && lesson.data?.aiMode === 'LIVE' ? (
+        <Note kind="info">
+          <span>{t('teacher.t06.wait')}</span>
+          {seconds === null ? null : <span className="block num">{t('teacher.t06.elapsed', { minutes: Math.floor(seconds / 60), seconds: seconds % 60 })}</span>}
+        </Note>
+      ) : null}
       {failure !== null && !running ? <Note kind="err">{t(errorKey(failure))}</Note> : null}
       {tasks.isPending ? <LoadingSkeleton /> : null}
       {tasks.isError ? <Note kind="err">{t('errors.generic')}</Note> : null}
@@ -124,7 +140,13 @@ export function TasksPage() {
                       <span className="src">{slot.sourceRefs.join(' · ')}</span>
                     </div>
                   </td>
-                  <td>{slot.draftStatus ? <TaskStatusTag status={slot.draftStatus} /> : <span className="s13 b">{t(running ? 'teacher.t06.drafting' : 'teacher.t06.paused')}</span>}</td>
+                  <td>
+                    <div className="stack">
+                      {slot.draftStatus ? <TaskStatusTag status={slot.draftStatus} /> : null}
+                      {running && slot.progress !== 'READY' ? <span className="s13 b">{t(`teacher.t06.progress.${slot.progress}`)}</span> : null}
+                      {!running && !slot.draftStatus ? <span className="s13 b">{t('teacher.t06.paused')}</span> : null}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

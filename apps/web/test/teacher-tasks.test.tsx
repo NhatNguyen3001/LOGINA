@@ -53,6 +53,7 @@ const render = (ui: React.ReactElement) =>
 const overview = (q4: Partial<TasksOverviewDTO['slots'][number]> = {}): TasksOverviewDTO => ({
   slots: (['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const).map((slot) => ({
     slot,
+    progress: 'READY',
     taskType: 'JUDGMENT_EVIDENCE',
     sufficiency: 'SUFFICIENT',
     sufficiencyNote: `Note ${slot}`,
@@ -119,12 +120,25 @@ describe('T6', () => {
   it('while a job runs, an undrafted task says Drafting and the page says how long it can take', async () => {
     vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
     vi.mocked(api.getJob).mockResolvedValue({ id: 'j', type: 'GENERATE', status: 'RUNNING', steps: [] });
-    vi.mocked(api.getTasks).mockResolvedValue(overview({ sufficiency: null, draftStatus: null }));
+    vi.mocked(api.getTasks).mockResolvedValue(overview({ sufficiency: null, draftStatus: null, progress: 'DRAFTING' }));
     await render(<TasksPage />);
     expect(await screen.findByText('Drafting…')).toBeInTheDocument();
-    expect(screen.getByText('Checking…')).toBeInTheDocument();
     expect(await screen.findByText(/up to 15 minutes/)).toBeInTheDocument();
     expect(screen.queryByText('Paused, waiting for you')).toBeNull();
+  });
+
+  it('while a job runs, each task shows its own step and the running time', async () => {
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
+    vi.mocked(api.getJob).mockResolvedValue({ id: 'j', type: 'GENERATE', status: 'RUNNING', steps: [], startedAt: new Date(Date.now() - 125_000).toISOString() });
+    const slots = overview().slots.map((slot, index) => ({ ...slot, progress: (['READY', 'TRANSLATING', 'CHECKING', 'DRAFTING', 'FAILED'] as const)[index]!, draftStatus: index === 3 ? null : slot.draftStatus }));
+    vi.mocked(api.getTasks).mockResolvedValue({ slots });
+    await render(<TasksPage />);
+    expect(await screen.findByText('Translating…')).toBeInTheDocument();
+    expect(screen.getByText('Checking…')).toBeInTheDocument();
+    expect(screen.getByText('Drafting…')).toBeInTheDocument();
+    expect(screen.getByText('Could not finish')).toBeInTheDocument();
+    expect(await screen.findByText(/2 min 5 s/)).toBeInTheDocument();
+    expect(screen.getByText(/close this tab/)).toBeInTheDocument();
   });
 
   it('a job that timed out says so, and the unfinished task can be regenerated', async () => {

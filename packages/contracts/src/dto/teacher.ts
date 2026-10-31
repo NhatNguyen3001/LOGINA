@@ -83,6 +83,8 @@ export const JobDTO = z
     type: JobType,
     status: JobStatus,
     steps: z.array(z.object({ label: z.string(), status: JobStepStatus }).strict()),
+    /** Lets a screen show the time so far, even after a reload. */
+    startedAt: Timestamp.optional(),
     question: z.object({ kind: z.literal('LANGUAGE_MISMATCH'), detected: Locale, chosen: Locale }).strict().optional(),
     errorCode: JobErrorCode.optional(),
   })
@@ -314,6 +316,7 @@ export const TasksOverviewDTO = z
           sufficiency: Sufficiency.nullable(),
           sufficiencyNote: z.string(),
           sourceRefs: z.array(z.string()),
+          progress: z.enum(['DRAFTING', 'CHECKING', 'TRANSLATING', 'READY', 'FAILED']),
           /** Null until a draft exists for the slot. */
           draftStatus: TaskStatus.nullable(),
           draftId: z.string().optional(),

@@ -20,6 +20,17 @@ import { createJob, toJobDTO } from '../services/jobs.js';
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const TASK_TYPES = { Q1: 'JUDGMENT_EVIDENCE', Q2: 'EVIDENCE_RANKING', Q3: 'COMPARE_TRADEOFF', Q4: 'COUNTERARGUMENT', Q5: 'OPEN_PROPOSAL' } as const;
 const MAX_EXAMPLES = 3;
+
+/** What a task is waiting on, as a teacher would say it. */
+function progressOf(draft: DocumentData | undefined, translation: DocumentData | undefined, uploaded: boolean): TasksOverviewDTO['slots'][number]['progress'] {
+  if (!draft) return 'DRAFTING';
+  if (draft.status === 'GENERATING') return 'DRAFTING';
+  if (draft.status === 'VALIDATING') return 'CHECKING';
+  if (draft.status === 'FAILED') return 'FAILED';
+  if (!uploaded) return 'READY';
+  if (!translation || translation.status === 'WORKING') return 'TRANSLATING';
+  return translation.status === 'FAILED' ? 'FAILED' : 'READY';
+}
 const APPROVABLE = ['MACHINE_PASS', 'REVIEW_REQUIRED'];
 /** Fields of a Q2 to Q5 body that only the server may see. */
 const SERVER_ONLY_BODY = ['acceptedOrders', 'priorities', 'keywordPartitions'];
@@ -77,6 +88,7 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
     const lessonId = c.req.param('id');
     const lesson = await requireLesson(c.var.user.schoolId, lessonId);
     const rows = (await db.collection(`lessons/${lessonId}/taskSufficiency`).get()).docs.map((d) => d.data());
+    const translations = await db.collection(`lessons/${lessonId}/taskTranslations`).get();
     const draftIds = (lesson.currentTaskDraftIds ?? {}) as Record<string, string>;
 
     const slots = await Promise.all(
@@ -90,6 +102,7 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
           sufficiency: row?.assessment ?? null,
           sufficiencyNote: row?.explanationForTeacher ?? '',
           sourceRefs: row?.sourceRefs ? [row.sourceRefs as string] : [],
+          progress: progressOf(draft, translations.docs.find((doc) => doc.id === slot)?.data(), lesson.aiMode === 'LIVE'),
           draftStatus: draft?.status ?? null,
           ...(draftId ? { draftId } : {}),
         };

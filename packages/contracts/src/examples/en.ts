@@ -508,6 +508,7 @@ export const examples = {
         sufficiency: 'SUFFICIENT',
         sufficiencyNote: '1 correct statement, ruling out 3 false ones, 4 evidence cards',
         sourceRefs: ['Table 8.1', 'p. 8 para. 2', 'p. 9'],
+        progress: 'READY',
         draftStatus: 'REVIEW_REQUIRED',
         draftId: 'tdr_q1v3',
       },
@@ -517,6 +518,7 @@ export const examples = {
         sufficiency: 'SUFFICIENT',
         sufficiencyNote: 'Order of influence of 4 factors on the employment shift',
         sourceRefs: ['p. 8 · Section 2'],
+        progress: 'READY',
         draftStatus: 'GENERATING',
       },
       {
@@ -525,6 +527,7 @@ export const examples = {
         sufficiency: 'SUFFICIENT',
         sufficiencyNote: 'Drawbacks of 2 employment options for rural workers',
         sourceRefs: ['p. 9 · paras. 2–3'],
+        progress: 'DRAFTING',
         draftStatus: null,
       },
       {
@@ -534,6 +537,7 @@ export const examples = {
         sufficiencyNote:
           'Lesson 8 has no data on agricultural labor productivity, and the rebuttal needs this evidence.',
         sourceRefs: [],
+        progress: 'DRAFTING',
         draftStatus: null,
       },
       {
@@ -542,6 +546,7 @@ export const examples = {
         sufficiency: 'SUFFICIENT',
         sufficiencyNote: 'Employment context for rural youth',
         sourceRefs: ['pp. 8–9'],
+        progress: 'DRAFTING',
         draftStatus: null,
       },
     ],
