@@ -417,6 +417,8 @@
     "generic": "Có lỗi xảy ra. Cô hãy thử lại nhé.",
     "TRANSLATION_NOT_READY": "Bản dịch của nhiệm vụ này chưa sẵn sàng để phê duyệt.",
     "TRANSLATION_MIXED": "Có nhiệm vụ chưa có bản dịch được duyệt. Cô hãy duyệt bản dịch của mọi nhiệm vụ trước.",
+    "NOT_AN_UPLOAD": "Bài mẫu đã có sẵn hai ngôn ngữ.",
+    "TRANSLATION_NOT_RETRYABLE": "Bản dịch này không cần dịch lại.",
     "TIMED_OUT": "Việc này mất quá lâu nên đã dừng lại. Các bản nháp đã xong vẫn được lưu. Cô hãy chọn một mục bên dưới để soạn tiếp.",
     "AI_FAILED": "Có nhiệm vụ chưa soạn được. Các bản nháp đã xong vẫn được lưu. Cô hãy chọn một mục bên dưới để thử lại.",
     "NOT_FOUND": "Không tìm thấy nội dung này.",

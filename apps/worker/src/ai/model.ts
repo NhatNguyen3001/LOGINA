@@ -37,6 +37,21 @@ export const validatorVersion = (role: Role, config: WorkerConfig, seeded: boole
 const logFailure = (role: Role, attempt: number, failure: 'CALL_FAILED' | 'NOT_JSON' | 'WRONG_SHAPE') =>
   console.warn(JSON.stringify({ event: 'AI_ATTEMPT_FAILED', role, attempt: attempt + 1, failure }));
 
+const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** A call that never answers must not hold a job past its limit. */
+async function withinTime(call: Promise<string>, ms: number): Promise<string | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), ms);
+  });
+  try {
+    return await Promise.race([call.catch(() => null), timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 const PROMPT_VERSION = 'v1';
 /** The bundle sits at a different depth than this source file, so the image sets PROMPT_DIR. */
 const PROMPT_DIR = process.env.PROMPT_DIR ?? fileURLToPath(new URL('../../prompts/', import.meta.url));
@@ -60,7 +75,8 @@ export async function generateStructured<S extends z.ZodType>(
   const request: GenerateRequest = { role, model: modelFor(role, config), parts, responseSchema: z.toJSONSchema(schema) };
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const raw = await genai.generate(request).catch(() => null);
+    if (attempt > 0) await pause(config.aiRetryDelayMs);
+    const raw = await withinTime(genai.generate(request), config.aiCallTimeoutMs);
     if (raw === null) {
       logFailure(role, attempt, 'CALL_FAILED');
       continue;

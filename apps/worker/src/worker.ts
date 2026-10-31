@@ -26,6 +26,8 @@ export interface JobContext {
   lesson: DocumentData;
   mode: AiPath;
   step: <T>(label: string, work: () => Promise<T>) => Promise<T>;
+  /** Tasks run at the same time, so a long step checks again between its AI calls. */
+  checkpoint: () => Promise<void>;
 }
 
 const RUNNABLE = ['QUEUED', 'RUNNING'];
@@ -47,15 +49,20 @@ export function createWorker(deps: WorkerDeps) {
     await jobRef.update({ status: 'RUNNING', startedAt: FieldValue.serverTimestamp() });
 
     const finish = async (update: DocumentData): Promise<void> => {
-      await jobRef.update({ ...update, finishedAt: FieldValue.serverTimestamp() });
+      const cancelled = (await jobRef.get()).data()?.status === 'CANCELLED';
+      await jobRef.update({ ...(cancelled ? {} : update), finishedAt: FieldValue.serverTimestamp() });
       const current = (await lessonRef.get()).data();
       if (current?.activeJobId === jobId) await lessonRef.update({ activeJobId: FieldValue.delete() });
     };
 
-    const step: JobContext['step'] = async (label, work) => {
-      await deps.beforeStep?.();
+    const checkpoint = async (): Promise<void> => {
       if ((await jobRef.get()).data()?.status === 'CANCELLED') throw new JobCancelled();
       if (Date.now() - startedAt > config.deadlineMs) throw new JobFailure('TIMED_OUT');
+    };
+
+    const step: JobContext['step'] = async (label, work) => {
+      await deps.beforeStep?.();
+      await checkpoint();
       const result = await work();
       await jobRef.update({ stepsDone: FieldValue.arrayUnion(label) });
       return result;
@@ -64,7 +71,7 @@ export function createWorker(deps: WorkerDeps) {
     try {
       const mode = resolveAiMode({ aiMode: lesson.aiMode as string }, config);
       if (mode === 'LIVE_DISABLED' && LIVE_REFUSABLE.includes(job.type as string)) throw new JobFailure('LIVE_DISABLED');
-      const context: JobContext = { deps, jobId, job, lesson: { id: lessonRef.id, ...lesson }, mode, step };
+      const context: JobContext = { deps, jobId, job, lesson: { id: lessonRef.id, ...lesson }, mode, step, checkpoint };
 
       if (job.type === 'PARSE') await runParse(context);
       else if (job.type === 'GENERATE') await runGenerate(context);

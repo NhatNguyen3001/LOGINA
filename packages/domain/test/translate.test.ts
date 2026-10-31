@@ -30,6 +30,10 @@ describe('studentTexts', () => {
     expect(texts).not.toContain(q5.challengeCandidates[0]!.challengeId);
   });
 
+  it('includes the feedback labels a student reads on the results page', () => {
+    expect(studentTexts(q5)).toContain(q5.feedback[0]!.relationLabel);
+  });
+
   it('lists a repeated string once', () => {
     const repeated = { ...q5, questionStem: q5.challengeCandidates[0]!.message };
     const texts = studentTexts(repeated);

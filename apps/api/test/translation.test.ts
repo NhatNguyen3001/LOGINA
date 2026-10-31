@@ -71,6 +71,52 @@ describe('translation at Approval 2', () => {
     expect(release.serverBody.keywordPartitions.training).toEqual(expect.arrayContaining(['training', 'đào tạo']));
   });
 
+  it('a translation for an older draft cannot be approved', async () => {
+    const stem = await stored('Q4', { draftId: 'tdr_old' });
+    expect(stem).toBeDefined();
+    const response = await approve('Q4');
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: 'TRANSLATION_NOT_READY' });
+  });
+
+  it('a decision other than accepting does not clear a finding', async () => {
+    await stored('Q4', { status: 'NEEDS_REVIEW', findings: [{ status: 'REVIEW_REQUIRED', findingCode: 'v1-0-SHIFT', text: 'x', explanationForTeacher: 'y' }] });
+    const task = (await approval()).tasks.find((t) => t.slot === 'Q4')!;
+    await a.post(`${url()}/tasks/Q4/dispositions`, { decision: 'REVISE_AND_RERUN', gateId: 'TRANSLATION', findingCode: 'v1-0-SHIFT', baseVersion: task.draftVersion });
+    const response = await approve('Q4');
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: 'UNDISPOSITIONED_REVIEW' });
+  });
+
+  it('an edit is refused while the translation is being worked on', async () => {
+    const stem = await stored('Q3', { status: 'WORKING' });
+    expect((await a.post(`${url()}/tasks/Q3/translation`, { from: stem, to: 'x', translationVersion: 1 })).status).toBe(409);
+  });
+
+  it('an edit to a line that is not in the translation is refused', async () => {
+    await stored('Q3', {});
+    expect((await a.post(`${url()}/tasks/Q3/translation`, { from: 'nope', to: 'x', translationVersion: 1 })).status).toBe(404);
+  });
+
+  it('retry is refused on a healthy translation', async () => {
+    await stored('Q3', {});
+    expect((await a.post(`${url()}/tasks/Q3/translation/retry`)).status).toBe(409);
+  });
+
+  it('a stuck translation can be retried', async () => {
+    await stored('Q3', { status: 'WORKING', updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000) });
+    const task = (await approval()).tasks.find((t) => t.slot === 'Q3')!;
+    expect(task.translation?.stuck).toBe(true);
+    expect((await a.post(`${url()}/tasks/Q3/translation/retry`)).status).toBe(200);
+  });
+
+  it('a blocked translation retries from scratch', async () => {
+    await stored('Q3', { status: 'BLOCKED' });
+    await a.post(`${url()}/tasks/Q3/translation/retry`);
+    const job = h.enqueued.at(-1)!;
+    expect((await h.live.db.doc(`jobs/${job.jobId}`).get()).data()?.fresh).toBe(true);
+  });
+
   it('a stale translation version is rejected', async () => {
     await stored('Q3', { version: 2 });
     const body = { ...(await approveBody('Q3')), translationVersion: 1 };
@@ -104,12 +150,24 @@ describe('translation at Approval 2', () => {
   });
 });
 
+describe('the sample lesson', () => {
+  it('has no translation job, and approval never copies a stray document', async () => {
+    await lesson().update({ aiMode: 'SEEDED' });
+    expect((await a.post(`${url()}/tasks/Q1/translation/retry`)).status).toBe(409);
+    await lesson().update({ aiMode: 'LIVE' });
+  });
+});
+
 describe('what a student gets', () => {
   const release = { translations: { vi: [{ from: 'Stem', to: 'Thân câu' }] } };
 
   it('an approved translation is used in the other language only', () => {
     expect(textsFor({ contentLocale: 'en', aiMode: 'LIVE' }, 'vi', release)).toEqual(release.translations.vi);
     expect(textsFor({ contentLocale: 'en', aiMode: 'LIVE' }, 'en', release)).toEqual([]);
+  });
+
+  it('an empty stored list does not switch off the sample lesson', () => {
+    expect(textsFor({ contentLocale: 'en', aiMode: 'SEEDED' }, 'vi', { translations: { vi: [] } }).length).toBeGreaterThan(0);
   });
 
   it('an older uploaded lesson with no translation stays in its language', () => {

@@ -6,7 +6,7 @@ import { GeneratorOutput, XReasonOutput } from '../ai/schemas.js';
 import { JobFailure } from '../errors.js';
 import type { JobContext } from '../worker.js';
 import { deterministicChecks, saveDraft, saveReport } from './content.js';
-import { translateTask } from './translate.js';
+import { beginTranslation, failTranslation, translateTask } from './translate.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 type Slot = (typeof SLOTS)[number];
@@ -74,13 +74,16 @@ export async function runGenerate(context: JobContext): Promise<void> {
   /** A task the AI can't draft stays open for Regenerate, and the others still run. */
   const draftSlot = (slot: Slot) =>
     context.step(`draft ${slot}`, async () => {
+      await context.checkpoint();
       const { draft, ruleBundle } = await generateStructured(genai, config, {
         role: 'generator',
         schema: GeneratorOutput,
         variables: { slot, locale },
         text,
       });
+      await context.checkpoint();
       const saved = await saveDraft(db, lesson, { ...draft, slot }, ruleBundle as Omit<RuleBundle, 'ruleBundleId'>, 'generator');
+      await beginTranslation(context, slot, saved.draftId);
       const checks = deterministicChecks(draft, ruleBundle as Omit<RuleBundle, 'ruleBundleId'>, evidenceTexts);
       const { gates } = await generateStructured(genai, config, {
         role: 'xreason',
@@ -88,6 +91,7 @@ export async function runGenerate(context: JobContext): Promise<void> {
         variables: { locale },
         text: JSON.stringify({ draft: { ...draft, feedback: undefined }, source: text }),
       });
+      await context.checkpoint();
       await saveReport(db, lesson.id as string, saved, draft, checks, gates, 1, validatorVersion('xreason', config, false));
       const evidence = gates.find((gate) => gate.gateId === 'QG2');
       if (evidence) {
@@ -105,7 +109,9 @@ export async function runGenerate(context: JobContext): Promise<void> {
       await translateTask(context, { ...draft, slot }, saved.draftId);
     });
 
-  const results = await Promise.allSettled((targets.length > 0 ? (targets as Slot[]) : SLOTS).map(draftSlot));
+  const slots = targets.length > 0 ? (targets as Slot[]) : SLOTS;
+  const results = await Promise.allSettled(slots.map(draftSlot));
+  await Promise.all(slots.filter((_, index) => results[index]?.status === 'rejected').map((slot) => failTranslation(context, slot)));
   const failures = results.flatMap((result) => (result.status === 'rejected' ? [result.reason as unknown] : []));
   const serious = failures.find((error) => !(error instanceof JobFailure && error.code === 'AI_FAILED'));
   if (serious) throw serious;

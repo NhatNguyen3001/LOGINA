@@ -11,17 +11,8 @@ import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { ApiError, chooseSufficiency, getLesson, getTasks, newKey } from '@/lib/api';
 import { jobFinished, qk, useJobPolling } from '@/lib/query';
+import { useSecondsSince } from '@/lib/use-seconds-since';
 import { TaskStatusTag } from './task-status';
-
-function useSecondsSince(start: string | undefined): number | null {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    if (!start) return undefined;
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, [start]);
-  return start ? Math.max(0, Math.floor((now - Date.parse(start)) / 1000)) : null;
-}
 
 const CHOICES = ['REFOCUS', 'ADD_SOURCE', 'LEAVE_EMPTY'] as const;
 const SUFFICIENCY_KIND = { SUFFICIENT: 'pass', UNCERTAIN: 'review', INSUFFICIENT: 'block' } as const;
@@ -143,7 +134,7 @@ export function TasksPage() {
                   <td>
                     <div className="stack">
                       {slot.draftStatus ? <TaskStatusTag status={slot.draftStatus} /> : null}
-                      {running && slot.progress !== 'READY' ? <span className="s13 b">{t(`teacher.t06.progress.${slot.progress}`)}</span> : null}
+                      {slot.progress === 'FAILED' || (running && slot.progress !== 'READY') ? <span className="s13 b">{t(`teacher.t06.progress.${slot.progress}`)}</span> : null}
                       {!running && !slot.draftStatus ? <span className="s13 b">{t('teacher.t06.paused')}</span> : null}
                     </div>
                   </td>

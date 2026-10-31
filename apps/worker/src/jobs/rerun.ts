@@ -7,7 +7,7 @@ import { XReasonOutput } from '../ai/schemas.js';
 import { JobFailure } from '../errors.js';
 import type { JobContext } from '../worker.js';
 import { deterministicChecks, saveDraft, saveReport } from './content.js';
-import { runTranslate, translateTask } from './translate.js';
+import { beginTranslation, runTranslate, translateTask } from './translate.js';
 
 const NEEDS_REVIEW = { en: 'Needs teacher review', vi: 'Cần giáo viên xem lại' };
 
@@ -104,10 +104,9 @@ export async function runRerun(context: JobContext): Promise<void> {
           () => needsReview(previous?.gates ?? [], locale),
         )
       : needsReview(previous?.gates ?? [], locale);
+    const before = mode === 'LIVE' ? (await db.doc(`lessons/${lessonId}/taskTranslations/${draft.slot}`).get()).data() : undefined;
+    if (mode === 'LIVE') await beginTranslation(context, draft.slot, draftId);
     await saveReport(db, lessonId, saved, draft, checks, gates, candidateSetVersion, validatorVersion('xreason', config, !runLive));
-    if (mode === 'LIVE') {
-      const before = (await db.doc(`lessons/${lessonId}/taskTranslations/${draft.slot}`).get()).data();
-      await translateTask(context, draft, draftId, before && { texts: before.texts, keywords: before.keywords });
-    }
+    if (mode === 'LIVE') await translateTask(context, draft, draftId, before && { texts: before.texts, keywords: before.keywords });
   }
 }

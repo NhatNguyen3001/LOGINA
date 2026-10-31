@@ -417,6 +417,8 @@
     "generic": "Something went wrong. Please try again.",
     "TRANSLATION_NOT_READY": "The translation for this task isn't ready to approve yet.",
     "TRANSLATION_MIXED": "Some tasks have no approved translation. Approve the translation for every task first.",
+    "NOT_AN_UPLOAD": "The sample lesson already comes in both languages.",
+    "TRANSLATION_NOT_RETRYABLE": "This translation doesn't need a retry.",
     "TIMED_OUT": "This took too long, so it stopped. Finished drafts are saved. Choose an option below to draft the rest.",
     "AI_FAILED": "Some tasks couldn't be drafted. Finished drafts are saved. Choose an option below to try again.",
     "NOT_FOUND": "We can't find that page or item.",

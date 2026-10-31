@@ -38,7 +38,7 @@ export type GeneratorOutput = z.infer<typeof GeneratorOutput>;
 
 export const XReasonOutput = z.object({ gates: ReportFixture.shape.gates });
 
-export const TranslatorOutput = z.object({ texts: z.array(z.string()), keywords: z.record(z.string(), z.array(z.string())) });
+export const TranslatorOutput = z.object({ texts: z.array(z.string().min(1)), keywords: z.record(z.string(), z.array(z.string().trim().min(1))) });
 
 export const TranslationCheckOutput = z.object({
   findings: z.array(

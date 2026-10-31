@@ -141,6 +141,13 @@ describe('T6', () => {
     expect(screen.getByText(/close this tab/)).toBeInTheDocument();
   });
 
+  it('a task that could not finish still shows after the job ends', async () => {
+    const slots = overview().slots.map((slot, index) => ({ ...slot, progress: index === 1 ? ('FAILED' as const) : ('READY' as const) }));
+    vi.mocked(api.getTasks).mockResolvedValue({ slots });
+    await render(<TasksPage />);
+    expect(await screen.findByText('Could not finish')).toBeInTheDocument();
+  });
+
   it('a job that timed out says so, and the unfinished task can be regenerated', async () => {
     vi.mocked(api.getLesson).mockResolvedValueOnce({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
     vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 6, aiMode: 'LIVE' } as unknown as LessonDTO);
@@ -202,6 +209,16 @@ describe('T12 translation', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Which statement?' }), { target: { value: 'Câu nào đúng?' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save and recheck' }));
     await waitFor(() => expect(api.editTranslation).toHaveBeenCalledWith('l1', 'Q1', { from: 'Which statement?', to: 'Câu nào đúng?', translationVersion: 2 }, expect.any(String)));
+  });
+
+  it('a blocked or stuck translation can be retried', async () => {
+    showing('Q1', translation({ status: 'BLOCKED' }));
+    const { unmount } = await render(<ApprovePage />);
+    expect(await screen.findByRole('button', { name: 'Retry translation' })).toBeInTheDocument();
+    unmount();
+    showing('Q1', translation({ status: 'WORKING', stuck: true }));
+    await render(<ApprovePage />);
+    expect(await screen.findByRole('button', { name: 'Retry translation' })).toBeInTheDocument();
   });
 
   it('Q5 shows the keywords for review', async () => {

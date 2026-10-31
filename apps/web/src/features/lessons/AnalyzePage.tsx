@@ -11,6 +11,7 @@ import { answerJob, cancelJob, getLesson, getSourceReview, newKey, startAnalyze 
 import { qk, useJobPolling } from '@/lib/query';
 import { RestartAnalysis } from './RestartAnalysis';
 import { stagePath } from './stage-path';
+import { useSecondsSince } from '@/lib/use-seconds-since';
 
 const FAILED: JobDTO['status'][] = ['FAILED', 'TIMED_OUT'];
 
@@ -30,6 +31,7 @@ export function AnalyzePage() {
   const lesson = useQuery({ queryKey: qk.lesson(id), queryFn: () => getLesson(id) });
   const job = useJobPolling(lesson.data?.activeJobId);
   const status = job.data?.status;
+  const seconds = useSecondsSince(job.data?.startedAt);
 
   useEffect(() => {
     if (status !== 'DONE') return;
@@ -117,7 +119,10 @@ export function AnalyzePage() {
           ))}
         </div>
         <div className="row">
-          <span className="s13 sec grow">{t('teacher.t02.timing')}</span>
+          <span className="s13 sec grow">
+            {t('teacher.t02.timing')}
+            {seconds === null ? null : <span className="block num">{t('teacher.t06.elapsed', { minutes: Math.floor(seconds / 60), seconds: seconds % 60 })}</span>}
+          </span>
           <button type="button" className="btn secondary" disabled={stop.isPending} onClick={() => stop.mutate()}>{t('teacher.t02.stop')}</button>
         </div>
       </div> : null}

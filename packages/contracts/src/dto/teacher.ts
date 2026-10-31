@@ -386,6 +386,8 @@ export const TaskApprovalDTO = z
             translation: z
               .object({
                 status: TranslationStatus,
+                /** Still WORKING long after any job could be running, so a retry is the way out. */
+                stuck: z.boolean(),
                 locale: Locale,
                 version: Version,
                 texts: z.array(z.object({ from: z.string(), to: z.string() }).strict()),

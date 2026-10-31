@@ -50,7 +50,7 @@ export function studentTexts(draft: DraftFixture): string[] {
       ...(draft.generatedE ?? []).map((card) => card.text),
       ...bodyStrings(draft.taskBody),
       ...draft.challengeCandidates.map((candidate) => candidate.message),
-      ...draft.feedback.map((item) => item.text),
+      ...draft.feedback.flatMap((item) => [item.text, item.relationLabel]),
     ]),
   ];
 }

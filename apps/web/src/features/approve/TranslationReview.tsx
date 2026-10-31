@@ -49,7 +49,7 @@ export function TranslationReview({ lessonId, task }: { lessonId: string; task: 
     mutationFn: () => retryTranslation(lessonId, task.slot, newKey()),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.approval(lessonId) }),
   });
-  const canRetry = !translation || translation.status === 'FAILED';
+  const canRetry = !translation || translation.status === 'FAILED' || translation.status === 'BLOCKED' || translation.stuck;
   const blockers = translation?.findings.filter((finding) => finding.status === 'BLOCKER') ?? [];
 
   return (

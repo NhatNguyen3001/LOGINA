@@ -174,6 +174,15 @@ describe('a live lesson while its drafts are still being written', () => {
     expect((await progress())[0]?.progress).toBe('READY');
   });
 
+  it('a quick edit on an upload waits for the running job', async () => {
+    await lesson().update({ aiMode: 'LIVE', activeJobId: 'job_running' });
+    const version = (await lesson().get()).data()?.version as number;
+    const response = await a.post(`/lessons/${lessonId}/edits`, { editScope: 'CONTENT', targetType: 'answerOption', targetId: 'A1', changedRefs: [], baseVersion: version, payload: { optionId: 'A1', text: 'x' }, reason: 'x' });
+    await lesson().update({ aiMode: 'SEEDED', activeJobId: FieldValue.delete() });
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: 'JOB_RUNNING' });
+  });
+
   it('a slot left without a draft can be regenerated', async () => {
     const version = (await lesson().get()).data()?.version as number;
     const response = await a.post(`${base()}/Q5/sufficiency-choice`, { choice: 'REFOCUS', baseVersion: version });

@@ -115,7 +115,7 @@ export const ApproveReq = z
   .strict();
 export type ApproveReq = z.infer<typeof ApproveReq>;
 
-export const TranslationEditReq = z.object({ from: z.string(), to: z.string().min(1), translationVersion: Version }).strict();
+export const TranslationEditReq = z.object({ from: z.string(), to: z.string().trim().min(1), translationVersion: Version }).strict();
 export type TranslationEditReq = z.infer<typeof TranslationEditReq>;
 
 /** The server sets `openAccess`; the demo targets no roster. */
