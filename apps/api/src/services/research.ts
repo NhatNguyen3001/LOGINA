@@ -13,21 +13,16 @@ export interface ResearchSettings {
   participantType: string;
 }
 
-const CARD_WORD = { en: 'Card', vi: 'Thẻ' };
 const LETTERS = 'ABCD';
 
-function lettersFor(release: DocumentData, locale: 'en' | 'vi'): Q1Letters {
+function lettersFor(release: DocumentData): Q1Letters {
   const content = release.publicContent as { answerOptions: { id: string }[]; evidenceOptions: { evidenceId: string }[] };
   const pairs = ((release.teacherContent?.pairs ?? []) as DocumentData[]);
-  const answerAuthoring = (id: string): string => release.answerIdMap[id];
-  const evidenceAuthoring = (id: string): string => release.evidenceIdMap[id];
   return {
-    answerAuthoring,
-    evidenceAuthoring,
     answerLetter: (id) => LETTERS[content.answerOptions.findIndex((a) => a.id === id)] ?? '?',
-    cardLabel: (id) => `${CARD_WORD[locale]} ${content.evidenceOptions.findIndex((e) => e.evidenceId === id) + 1}`,
+    cardLetter: (id) => LETTERS[content.evidenceOptions.findIndex((e) => e.evidenceId === id)] ?? '?',
     relation: (answerId, evidenceId) => {
-      const pair = pairs.find((p) => p.answerOptionId === answerAuthoring(answerId) && p.generatedEId === evidenceAuthoring(evidenceId));
+      const pair = pairs.find((p) => p.answerOptionId === release.answerIdMap[answerId] && p.generatedEId === release.evidenceIdMap[evidenceId]);
       return relationBucket(pair?.pairAlignment as string);
     },
   };
@@ -76,7 +71,7 @@ export function writeResearchRow(
   const hash = materialHash((material.sha256 as string | undefined) || (attempt.lessonId as string));
   const runNumber = ((participant.runs?.[hash]?.[slot] as number | undefined) ?? 0) + 1;
   const locale = lesson.contentLocale as 'en' | 'vi';
-  const letters = lettersFor(release, locale);
+  const letters = lettersFor(release);
   const lockedAt = (task.lockedAt as Timestamp).toDate();
   const openedAt = (task.openedAt as Timestamp | undefined)?.toDate() ?? lockedAt;
   const rowId = researchRowId(attempt.id as string, slot, runNumber);

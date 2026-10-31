@@ -89,7 +89,7 @@ describe('T15 trace', () => {
     const raw = await (await a.get(`/attempts/${attemptId}/trace/Q1`)).json();
     const trace = TraceDTO.parse(raw);
     expect(trace.before.answer).toMatchObject({ letter: 'B', authoringLabel: 'A2' });
-    expect(trace.before.evidence).toMatchObject({ letter: 'Card 3', authoringLabel: 'E3' });
+    expect(trace.before.evidence).toMatchObject({ letter: 'Card C', authoringLabel: 'E3' });
     expect(trace.after.answer).toMatchObject({ letter: 'A', changed: true });
     expect(trace.challenge).toMatchObject({ label: 'TN1', studentChoice: 'REVISE' });
     expect(trace.slotChips[0]).toEqual({ slot: 'Q1', choice: 'REVISE' });
@@ -149,7 +149,7 @@ describe('me and consent', () => {
     const fresh = `${copyAttemptId}`;
     await answerQ1(a, fresh, 1, 2, 0, 0);
     const doc = (await h.live.db.doc(`researchRows/${researchRowId(fresh, 'Q1', 1)}`).get()).data()!;
-    expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B (A2)', first_evidence: 'Card 3 (E3)', first_relation: 'contradicts', final_answer: 'A (A1)', final_relation: 'full', first_confidence: 70, final_confidence: 82, confidence_change: 12, choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-10-v1', exportedAt: null });
+    expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B', first_evidence: 'C', first_relation: 'contradicts', final_answer: 'A', final_relation: 'full', first_confidence: 70, final_confidence: 82, confidence_change: 12, choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-10-v1', exportedAt: null });
     expect(JSON.stringify(doc)).not.toMatch(/Ms\. Lan|@/);
     expect(doc.seconds_to_lock).toBeGreaterThanOrEqual(0);
     expect(doc.material_hash).toHaveLength(12);
@@ -197,5 +197,19 @@ describe('me and consent', () => {
     const attempt = AttemptDTO.parse(await (await a.post(`/assignments/${copyId}/attempts/restart`)).json());
     expect(attempt.status).toBe('IN_PROGRESS');
     expect(attempt.slots[0]!.phase).toBe('SUBMITTED');
+  });
+
+  it('a reset clears an unfinished run, keeps its rows and files nothing', async () => {
+    const before = RecordedRunsDTO.parse(await (await a.get('/me/assignments/runs')).json()).runs.length;
+    const attempt = AttemptDTO.parse(await (await a.post(`/attempts/${copyAttemptId}/reset`)).json());
+    expect(attempt).toMatchObject({ attemptId: copyAttemptId, status: 'NOT_STARTED' });
+    expect(attempt.slots.every((s) => s.phase === 'REASON')).toBe(true);
+
+    expect((await h.live.db.doc(`researchRows/${researchRowId(copyAttemptId, 'Q1', 2)}`).get()).exists).toBe(true);
+    expect(RecordedRunsDTO.parse(await (await a.get('/me/assignments/runs')).json()).runs).toHaveLength(before);
+  });
+
+  it('a filed run cannot be reset', async () => {
+    expect((await a.post(`/attempts/${copyAttemptId}_run1/reset`)).status).toBe(404);
   });
 });

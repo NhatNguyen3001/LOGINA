@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StudentShell } from '@/components/logina/StudentShell';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { SwitchSide } from '@/components/logina/SwitchSide';
@@ -15,7 +16,7 @@ export function StudentHome() {
   const runs = useQuery({ queryKey: qk.recordedRuns(), queryFn: getRecordedRuns });
   return (
     <StudentShell title={t('student.home.title')} actions={<SwitchSide to="teacher" />}>
-      {assignments.isPending ? <p className="muted">{t('common.loading')}</p> : null}
+      {assignments.isPending ? <LoadingSkeleton /> : null}
       {assignments.data?.assignments.length === 0 ? <p className="muted">{t('student.home.empty')}</p> : null}
       {assignments.data?.assignments.map((item) => (
         <Link key={item.assignmentId} to="/s/assignments/$id" params={{ id: item.assignmentId }} className="card tight no-underline">

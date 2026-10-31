@@ -2,6 +2,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ConfidenceSlider } from '@/components/logina/ConfidenceSlider';
+import { PhaseLine } from '@/components/logina/PhaseLine';
 import { Pick } from '@/components/logina/Pick';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
@@ -9,7 +10,7 @@ import { StudentProgress } from '@/components/logina/StudentProgress';
 import { renderWithI18n } from '../utils';
 
 function Controlled({ onChange }: { onChange: (value: number) => void }) {
-  const [value, setValue] = useState<number | null>(null);
+  const [value, setValue] = useState(50);
   return (
     <ConfidenceSlider
       value={value}
@@ -30,15 +31,15 @@ describe('StatusTag', () => {
 });
 
 describe('ConfidenceSlider', () => {
-  it('F-S2 starts empty and supports keyboard steps', async () => {
+  it('F-S2 starts at 50 and supports keyboard steps', async () => {
     const onChange = vi.fn();
     await renderWithI18n(<Controlled onChange={onChange} />);
     const slider = screen.getByRole('slider');
-    expect(slider).not.toHaveAttribute('aria-valuenow');
+    expect(slider).toHaveAttribute('aria-valuenow', '50');
     fireEvent.keyDown(slider, { key: 'ArrowRight' });
-    expect(onChange).toHaveBeenLastCalledWith(1);
+    expect(onChange).toHaveBeenLastCalledWith(51);
     fireEvent.keyDown(slider, { key: 'PageUp' });
-    expect(onChange).toHaveBeenLastCalledWith(11);
+    expect(onChange).toHaveBeenLastCalledWith(61);
     fireEvent.keyDown(slider, { key: 'End' });
     expect(onChange).toHaveBeenLastCalledWith(100);
     fireEvent.keyDown(slider, { key: 'Home' });
@@ -66,6 +67,19 @@ describe('Stepper', () => {
     expect(items[2]).toHaveAttribute('aria-current', 'step');
     expect(items[1]).not.toHaveAttribute('aria-current');
     expect(screen.getAllByText('Done')).toHaveLength(2);
+  });
+});
+
+describe('PhaseLine', () => {
+  it('numbers the steps, ticks the finished ones and marks the current one', async () => {
+    const { container } = await renderWithI18n(<PhaseLine phase="CHALLENGED" />);
+    const items = screen.getAllByRole('listitem');
+    expect(items).toHaveLength(5);
+    expect(items[2]).toHaveAttribute('aria-current', 'step');
+    expect(items[2]).toHaveTextContent('3Think again');
+    expect(items[4]).toHaveTextContent('5Submit');
+    expect(screen.getAllByText('Done')).toHaveLength(2);
+    expect(container.querySelectorAll('.done svg')).toHaveLength(2);
   });
 });
 

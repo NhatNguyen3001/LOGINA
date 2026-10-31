@@ -350,9 +350,9 @@ describe('T14 and T15', () => {
       slotChips: [{ slot: 'Q1', choice: 'REVISE' }, { slot: 'Q2', choice: null }],
       slot: 'Q1',
       questionStem: 'Which statement?',
-      before: { answer: { letter: 'B', authoringLabel: 'A2', text: 'Rises' }, evidence: { letter: 'Card 3', authoringLabel: 'E3', text: 'Says rises' }, confidence: 70, lockedAt: '2026-10-31T03:31:00.000Z', relationLabel: 'Refuted' },
+      before: { answer: { letter: 'B', authoringLabel: 'A2', text: 'Rises' }, evidence: { letter: 'Card C', authoringLabel: 'E3', text: 'Says rises' }, confidence: 70, lockedAt: '2026-10-31T03:31:00.000Z', relationLabel: 'Refuted' },
       challenge: { label: 'TN1', message: 'Compare the figures.', whySelected: 'runs opposite to the source', studentChoice: 'REVISE' },
-      after: { answer: { letter: 'A', authoringLabel: 'A1', text: 'Falls', changed: true }, evidence: { letter: 'Card 1', authoringLabel: 'E1', text: 'Says falls', changed: false }, confidenceBefore: 70, confidenceAfter: 82, submittedAt: '2026-10-31T03:34:00.000Z', relationLabel: 'Fully supports' },
+      after: { answer: { letter: 'A', authoringLabel: 'A1', text: 'Falls', changed: true }, evidence: { letter: 'Card A', authoringLabel: 'E1', text: 'Says falls', changed: false }, confidenceBefore: 70, confidenceAfter: 82, submittedAt: '2026-10-31T03:34:00.000Z', relationLabel: 'Fully supports' },
     } as unknown as TraceDTO);
     await render(<TracePage />);
     expect(await screen.findByText('Compare the figures.')).toBeInTheDocument();

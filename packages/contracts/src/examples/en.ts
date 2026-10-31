@@ -813,7 +813,7 @@ export const examples = {
         text: 'The share of workers in agriculture, forestry and fisheries rises.',
       },
       evidence: {
-        letter: 'Card 3',
+        letter: 'Card C',
         authoringLabel: 'E3',
         text: 'The source says the share of agriculture, forestry and fisheries rises.',
       },
@@ -835,7 +835,7 @@ export const examples = {
         changed: true,
       },
       evidence: {
-        letter: 'Card 1',
+        letter: 'Card A',
         authoringLabel: 'E1',
         text: 'The source says the share of agriculture, forestry and fisheries falls, while industry and construction and services rise.',
         changed: true,
@@ -899,7 +899,7 @@ export const examples = {
   studentChallenge: {
     deliveryId: 'dlv_01JQ1',
     message: TN1.message,
-    lockedSummary: { answerText: `B. ${ANSWER_B}`, evidenceText: `Card 3. ${CARD_3}`, confidence: 70 },
+    lockedSummary: { answerText: `B. ${ANSWER_B}`, evidenceText: `Card C. ${CARD_3}`, confidence: 70 },
   },
 
   submitResult: { slot: 'Q1', recordedChoice: 'REVISE', nextSlot: 'Q2', attemptStatus: 'IN_PROGRESS' },
@@ -908,12 +908,12 @@ export const examples = {
     slot: 'Q1',
     choice: 'REVISE',
     initial: {
-      label: 'B · Card 3',
+      label: 'B · Card C',
       text: 'Share of agriculture, forestry and fisheries rises · card says the share rises',
     },
     challengeMessage: 'Compare the figures at the start and end of the period.',
     final: {
-      label: 'A · Card 1',
+      label: 'A · Card A',
       text: 'Agriculture, forestry and fisheries fall; industry and construction and services rise · card covers both directions',
     },
     confidenceBefore: 70,

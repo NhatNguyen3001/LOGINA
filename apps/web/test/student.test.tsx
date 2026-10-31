@@ -74,18 +74,18 @@ describe('Q1 flow', () => {
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalledWith('att1', 'Q1', { draftArtifact: { slot: 'Q1', answerId: 'a1' } }), { timeout: 2000 });
   });
 
-  it('Lock is disabled until confidence is chosen and sends one request on double click', async () => {
+  it('Lock starts ready at 50 and sends one request on double click', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(q1({ draftArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' } }));
     vi.mocked(api.lockTask).mockImplementation(() => new Promise(() => {}));
     await render(<TaskRunner />);
     fireEvent.click(await screen.findByRole('button', { name: 'Continue →' }));
     const lock = screen.getByRole('button', { name: 'Lock in answer' });
-    expect(lock).toBeDisabled();
-    fireEvent.keyDown(screen.getByRole('slider'), { key: 'End' });
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
     fireEvent.click(lock);
     fireEvent.click(lock);
     await waitFor(() => expect(api.lockTask).toHaveBeenCalled());
     expect(api.lockTask).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(api.lockTask).mock.calls[0]![2]).toMatchObject({ initialConfidence: 50 });
   });
 
   it('F-S9 a reload after lock shows the same answer and prompt with no second lock', async () => {
@@ -111,7 +111,7 @@ describe('Q1 flow', () => {
     expect(screen.getByText("You're keeping your answer")).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Submit Q1' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/s/attempts/$id/$slot', params: { id: 'att1', slot: 'Q2' } }));
-    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 70 });
+    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 50 });
   });
 
   it('S4 marks new choices New and originals original', async () => {
@@ -123,12 +123,13 @@ describe('Q1 flow', () => {
     expect(screen.getAllByText('original').length).toBeGreaterThan(0);
   });
 
-  it('S6 an unchanged revise says Keep and requires confidence', async () => {
+  it('S6 an unchanged revise says Keep, with one knob starting at 50', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
     await render(<TaskRunner />);
     fireEvent.click(await screen.findByRole('button', { name: 'Revise my answer' }));
     expect(screen.getByText(/so it will be recorded as/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Submit Q1' })).toBeDisabled();
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
+    expect(document.querySelectorAll('.knob')).toHaveLength(1);
   });
 
   it('the last task goes to results', async () => {
@@ -176,6 +177,34 @@ describe('Q2 to Q5', () => {
     await render(<Q3Editor body={body} value={{ slot: 'Q3' }} onChange={noop} />);
     expect(screen.getByText('Cost')).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: 'Slower' })).toBeInTheDocument();
+  });
+
+  it('Think again on Q2 lists the cards in the order the student locked', async () => {
+    const taskBody = { cards: [{ cardId: 'c1', text: 'Trade' }, { cardId: 'c2', text: 'Machines' }, { cardId: 'c3', text: 'Cities' }] };
+    const initialArtifact = { slot: 'Q2', orderedCardIds: ['c3', 'c1', 'c2'] };
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q2', phase: 'CHALLENGED', stem: 'Rank them', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+    await render(<TaskRunner />);
+    await screen.findByText('Cities');
+    const ranked = screen.getByText('Cities').closest('ol')!;
+    expect([...ranked.querySelectorAll('li')].map((row) => row.textContent)).toEqual(['1Cities', '2Trade', '3Machines']);
+  });
+
+  it('Think again on Q3 lists every question with the chosen answer', async () => {
+    const taskBody = {
+      options: [{ optionId: 'o1', text: 'Plan A' }, { optionId: 'o2', text: 'Plan B' }],
+      criteria: [{ criterionId: 'c1', text: 'Which costs less?' }, { criterionId: 'c2', text: 'Which is faster?' }],
+      constraints: [{ tradeOffId: 't1', text: 'Slower' }, { tradeOffId: 't2', text: 'Dearer' }],
+    };
+    const initialArtifact = { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o1' }, { criterionId: 'c2', value: 'o2' }], judgmentOptionId: 'o2', tradeOffIds: ['t2'] };
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q3', phase: 'CHALLENGED', stem: 'Which plan?', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+    await render(<TaskRunner />);
+    const answered = (question: string) => screen.getByText(question).parentElement!;
+    expect(await screen.findByText('Which costs less?')).toBeInTheDocument();
+    expect(answered('Which costs less?')).toHaveTextContent('Plan A');
+    expect(answered('Which is faster?')).toHaveTextContent('Plan B');
+    expect(answered('Your decision')).toHaveTextContent('Plan B');
+    expect(answered('What drawbacks do you accept?')).toHaveTextContent('Dearer');
+    expect(screen.queryByText('Slower')).toBeNull();
   });
 
   it('Q4 shows only the slots of the chosen template', async () => {

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { DiffRow } from '@/components/logina/DiffRow';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { errorKey } from '@/i18n';
@@ -23,7 +24,7 @@ export function SourceEditPage() {
     },
   });
 
-  if (!draft.data) return <p className="muted">{t(draft.isError ? 'errors.generic' : 'common.loading')}</p>;
+  if (!draft.data) return draft.isError ? <p className="muted">{t('errors.generic')}</p> : <LoadingSkeleton />;
   const { editedClaims, impact, assignedReleasesUnchanged, approveReady, version } = draft.data;
 
   return (

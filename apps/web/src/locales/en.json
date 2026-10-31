@@ -16,7 +16,7 @@
       "crumb": "Create new",
       "title": "Create a lesson set from your material",
       "lede": "LOGINA reads your material first, asks you about anything unclear, and only then drafts 5 tasks. You approve the source once and the tasks once before assigning.",
-      "material": "1 · Material",
+      "material": "1. Material",
       "chooseFile": "Choose file",
       "useSample": "Use sample material",
       "fileHint": "PDF or Word · up to 20 MB",
@@ -26,9 +26,9 @@
       "requiredError": "This field is required.",
       "language": "Material language",
       "languageHint": "Tasks and Think-again prompts use the material's language. LOGINA does not translate material.",
-      "goalTitle": "2 · Lesson goal",
+      "goalTitle": "2. Lesson goal",
       "goal": "Reasoning goal",
-      "lessonInfo": "3 · Lesson",
+      "lessonInfo": "3. Lesson",
       "lessonTitle": "Lesson set title",
       "class": "Class",
       "subject": "Subject",
@@ -342,9 +342,9 @@
       "changed": "Changed",
       "completed": "Completed {{time}}",
       "release": "{{slot}} release {{release}}",
-      "first": "1 · FIRST ANSWER",
-      "think": "2 · THINK AGAIN",
-      "final": "3 · FINAL ANSWER",
+      "first": "1. FIRST ANSWER",
+      "think": "2. THINK AGAIN",
+      "final": "3. FINAL ANSWER",
       "locked": "Locked in {{time}}",
       "submitted": "Submitted {{time}}",
       "why": "Chosen because: {{reason}}",
@@ -451,7 +451,11 @@
     },
     "shell": {
       "home": "Home",
-      "runs": "My runs"
+      "runs": "My runs",
+      "reset": "Reset run",
+      "resetTitle": "Start over?",
+      "resetConfirm": "Yes, start over",
+      "resetCancel": "Cancel"
     },
     "home": {
       "title": "Your lesson sets",
@@ -472,10 +476,8 @@
     "goneAfterReset": "This set was reset.",
     "openNewSet": "Open the new set",
     "answer": {
-      "chooseStatement": "1 · Choose a statement",
-      "chooseCard": "2 · Choose one card as evidence",
-      "selected": "Selected statement {{answer}} and Card {{card}}",
-      "cardLabel": "Card {{n}}."
+      "chooseStatement": "1. Choose a statement",
+      "chooseCard": "2. Choose one card as evidence"
     },
     "continue": "Continue →",
     "lock": {
@@ -507,8 +509,6 @@
       "original": "Original {{value}}",
       "confidence": "Final confidence",
       "sameAsFirst": "Your answer hasn't changed from your first answer, so it will be recorded as Keep.",
-      "confirmAgain": "Tap the bar to confirm again, even if you keep the same level.",
-      "confirmHint": "Confirm your final confidence to submit",
       "onlyRevision": "This is your only revision for {{slot}}; after you submit, you move on."
     },
     "submit": "Submit {{slot}}",
@@ -594,7 +594,7 @@
     "choice": "Taking part is your choice. The tasks work the same either way.",
     "withdraw": "To withdraw, email your participant code to logina.edu@gmail.com. We will delete your rows.",
     "privacyLink": "Read the full privacy policy →",
-    "agree": "I agree, and I'm 18 or older",
+    "agree": "I agree",
     "decline": "No thanks, just try it",
     "once": "You choose once for this session.",
     "version": "Version {{version}}",

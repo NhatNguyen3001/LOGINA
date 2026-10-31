@@ -90,7 +90,7 @@ export const SubmitResultDTO = z
   .strict();
 export type SubmitResultDTO = z.infer<typeof SubmitResultDTO>;
 
-/** What S7 shows for one answer: "B · Card 3" and a one-line summary. */
+/** What S7 shows for one answer: "B · Card C" and a one-line summary. */
 const FeedbackAnswer = z.object({ label: z.string(), text: z.string() }).strict();
 
 export const StudentFeedbackDTO = z

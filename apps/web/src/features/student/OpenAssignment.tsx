@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StudentShell } from '@/components/logina/StudentShell';
 import { useSessionLocale } from '@/components/logina/TeacherShell';
 import { getMe, newKey, startAttempt } from '@/lib/api';
@@ -30,7 +31,7 @@ export function OpenAssignment() {
       </StudentShell>
     );
   }
-  if (!attempt.data) return <p className="p-6 muted">{t('common.loading')}</p>;
+  if (!attempt.data) return <div className="p-6"><LoadingSkeleton /></div>;
 
   const { attemptId, status, slots } = attempt.data;
   if (status === 'COMPLETE') return <Navigate to="/s/attempts/$id/results" params={{ id: attemptId }} replace />;

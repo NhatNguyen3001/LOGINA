@@ -192,7 +192,7 @@ describe('submit', () => {
     const raw = await (await a.get(`/attempts/${attemptId}/feedback`)).json();
     const feedback = (raw as unknown[]).map((row) => StudentFeedbackDTO.parse(row));
     expect(feedback).toHaveLength(5);
-    expect(feedback[0]).toMatchObject({ initial: { label: 'B · Card 3' }, final: { label: 'A · Card 1' }, confidenceBefore: 70, confidenceAfter: 82 });
+    expect(feedback[0]).toMatchObject({ initial: { label: 'B · Card C' }, final: { label: 'A · Card A' }, confidenceBefore: 70, confidenceAfter: 82 });
     expect(findRestrictedKeys(raw, 'student')).toEqual([]);
   });
 });

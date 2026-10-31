@@ -85,6 +85,8 @@ test('Q2 cards reorder by drag and by the buttons', async ({ page }) => {
   await page.mouse.up();
   await expect(rows.nth(0)).toContainText(lastCard);
 
+  // dnd-kit swallows a click that lands just after a drop; no person is that quick.
+  await page.waitForTimeout(200);
   await rows.nth(0).getByRole('button', { name: /down$/ }).click();
   await expect(rows.nth(1)).toContainText(lastCard);
 });
@@ -144,6 +146,32 @@ test('a finished student starts a new run, keeps the old one, and can always go 
   await expect(page).toHaveURL(/_run1\/results/);
   await expect(page.getByRole('cell', { name: 'Q5', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Start a new run' })).toHaveCount(0);
+});
+
+test('every bar starts at 50 with one knob, and Reset run goes back to Q1', async ({ page }) => {
+  await startTasks(page);
+  await completeTask(page, 'Q1');
+  await expect(page).toHaveURL(/\/Q2$/);
+  await page.getByRole('button', { name: 'Continue →' }).click();
+  await expect(page.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
+  await page.getByRole('button', { name: 'Lock in answer' }).click();
+  await page.getByRole('button', { name: 'Keep my answer' }).click();
+  await expect(page.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
+  await expect(page.locator('.knob')).toHaveCount(1);
+
+  await page.getByRole('button', { name: 'Reset run' }).click();
+  const popup = page.getByRole('dialog', { name: 'Start over?' });
+  await expect(popup).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(popup).toHaveCount(0);
+  await page.getByRole('button', { name: 'Reset run' }).click();
+  await popup.getByRole('button', { name: 'Cancel' }).click();
+  await expect(popup).toHaveCount(0);
+  await expect(page).toHaveURL(/\/Q2$/);
+  await page.getByRole('button', { name: 'Reset run' }).click();
+  await popup.getByRole('button', { name: 'Yes, start over' }).click();
+  await expect(page).toHaveURL(/\/Q1$/);
+  await expect(page.getByRole('button', { name: 'Continue →' })).toBeDisabled();
 });
 
 test('the teacher sidebar cannot be collapsed', async ({ page }) => {

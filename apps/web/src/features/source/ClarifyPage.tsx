@@ -4,6 +4,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiffRow } from '@/components/logina/DiffRow';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { Pick } from '@/components/logina/Pick';
 import { StatusTag } from '@/components/logina/StatusTag';
@@ -129,7 +130,7 @@ export function ClarifyPage() {
   });
 
   if (review.isError || (review.data && review.data.issues.length === 0 && review.data.material.paragraphs.length === 0)) return <RestartAnalysis lessonId={id} />;
-  if (!review.data) return <p className="muted">{t('common.loading')}</p>;
+  if (!review.data) return <LoadingSkeleton />;
 
   const { issues, material, blockersRemaining } = review.data;
   const open = issues.filter((i) => i.state === 'UNRESOLVED');

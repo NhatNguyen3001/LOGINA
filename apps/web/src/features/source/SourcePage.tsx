@@ -2,6 +2,7 @@ import type { SourceReviewDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag, type TagKind } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
@@ -31,7 +32,7 @@ export function SourcePage() {
     window.open(url, '_blank', 'noopener');
   };
 
-  if (!review.data) return <p className="muted">{t('common.loading')}</p>;
+  if (!review.data) return <LoadingSkeleton />;
   const { summaryClaims, teacherDecisions, openGaps, excluded, approveReady, blockersRemaining, readByAI } = review.data;
 
   return (

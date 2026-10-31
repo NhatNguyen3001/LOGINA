@@ -126,7 +126,7 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
       const e = content.evidenceOptions.findIndex((x) => x.evidenceId === artifact.evidenceId);
       return {
         answer: { letter: LETTERS[a] ?? '', authoringLabel: release.answerIdMap[artifact.answerId] ?? '', text: content.answerOptions[a]?.text ?? '' },
-        evidence: { letter: e >= 0 ? `${cardWord} ${e + 1}` : '', authoringLabel: release.evidenceIdMap[artifact.evidenceId] ?? '', text: content.evidenceOptions[e]?.text ?? '' },
+        evidence: { letter: e >= 0 ? `${cardWord} ${LETTERS[e]}` : '', authoringLabel: release.evidenceIdMap[artifact.evidenceId] ?? '', text: content.evidenceOptions[e]?.text ?? '' },
       };
     };
     const before = option(task.initialArtifact as DocumentData);
