@@ -29,6 +29,7 @@ LOGINA turns a lesson source into a set of five reasoning tasks. AI reads the ma
 ## Contents
 
 - [How it works](#how-it-works)
+- [Screenshots](#screenshots)
 - [Architecture](#architecture)
 - [Tech stack](#tech-stack)
 - [Repository layout](#repository-layout)
@@ -69,6 +70,20 @@ Each of the five tasks follows the same steps:
 | Q5 | Proposal | Writes a short proposal and the reason for it |
 
 LOGINA does not grade or rank students, and it makes no claims about learning gains from click data.
+
+## Screenshots
+
+| Choose a side, with no sign-in | Review what AI flagged in the material |
+|---|---|
+| ![Entry page with buttons to try LOGINA as a teacher or a student](docs/screenshots/entry.png) | ![Clarify material screen showing the source beside the points to resolve](docs/screenshots/teacher-clarify.png) |
+
+| Answer on your own | Think again with one approved prompt |
+|---|---|
+| ![Q1 with a chosen statement and evidence card](docs/screenshots/student-answer.png) | ![Think again screen showing the locked answer and a prompt, with keep and revise buttons](docs/screenshots/student-think-again.png) |
+
+**Track how the class responded**
+
+![Tracking dashboard with keep or revise counts and confidence from first to final answer for each task](docs/screenshots/teacher-tracking.png)
 
 ## Architecture
 
