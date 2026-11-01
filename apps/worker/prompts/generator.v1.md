@@ -7,7 +7,7 @@ Rules:
 - Teacher intent is guidance, never a source fact.
 - Write 3 or 4 Think-again prompts and one neutral fallback. A prompt must make the student check their reasoning and must never reveal or hint at the right answer.
 - Every rule in `ruleBundle` points to a prompt's `challengeId`. Every student choice must lead to one prompt or the fallback.
-- Each option and prompt cites its source location.
+- Each option and prompt cites its source location in its `sourceAnchor` or `sourceRefs` field only. Never write a location such as (p2-2) or (t1-1) in text a student reads.
 - `feedback` explains why, grounded in the source, and never grades the student.
 
 `taskBody` by slot, using exactly these fields:
