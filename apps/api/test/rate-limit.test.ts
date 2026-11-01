@@ -133,7 +133,9 @@ describe('with Firestore', () => {
   });
 
   it('new sessions block on one address and an existing session is not counted again', async () => {
-    const address = `10.1.0.${Math.floor(Math.random() * 250)}`;
+    /** The clock is fixed, so counters from earlier runs never expire: each run needs its own address. */
+    const octet = () => Math.floor(Math.random() * 250);
+    const address = `10.${octet()}.${octet()}.${octet()}`;
     const [first, second] = await Promise.all([anonToken(), anonToken()]);
     created.push(first.uid, second.uid);
     expect((await call(first, '/me', { address })).status).toBe(200);

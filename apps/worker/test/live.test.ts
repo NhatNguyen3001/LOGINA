@@ -283,10 +283,9 @@ describe('translateTask', () => {
     lessons.push(id);
     const ref = live.db.doc(`lessons/${id}/taskTranslations/Q5`);
     await ref.set({ slot: 'Q5', draftId: 'tdr_1', version: 1, status: 'WORKING', texts: [{ from: 'x', to: 'lời cô' }], keywords: {}, findings: [] });
-    const genai = stubGenai({ translator, translationCheck: () => { void ref.update({ version: 5 }); return { findings: [] }; } });
+    const genai = stubGenai({ translator, translationCheck: async () => { await ref.update({ version: 5 }); return { findings: [] }; } });
     const deps = { db: live.db, bucket: live.bucket, genai, config: testWorkerConfig(), loadFixture };
     await translateTask({ deps, lesson: { id, contentLocale: 'en' } }, q5, 'tdr_1');
-    await new Promise((resolve) => setTimeout(resolve, 300));
     expect((await ref.get()).data()?.texts).toEqual([{ from: 'x', to: 'lời cô' }]);
   });
 
