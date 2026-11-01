@@ -78,6 +78,26 @@ table.t tr:last-child td{border-bottom:0}
 /* teacher app shell */
 .app{display:grid;grid-template-columns:240px minmax(0,1fr)}
 .side{background:var(--surface);border-right:1px solid var(--line);padding:24px 16px 20px;display:flex;flex-direction:column;gap:6px}
+.side-head{display:flex;align-items:center;justify-content:space-between;padding:0 4px 18px;min-height:48px}
+.side-head .logo,.side-head .logo-home .logo{padding:0}
+.sidebar-toggle-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;border:0;background:none;color:var(--ink-3);cursor:pointer;transition:color .15s,background-color .15s}
+.sidebar-toggle-btn:hover{color:var(--navy);background:var(--subtle)}
+.shell-topbar{display:flex;align-items:center;gap:12px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.teacher-topbar{padding:10px 48px}
+.student-topbar{padding:10px 24px}
+.sidebar-toggle-open{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s}
+.sidebar-toggle-open .ico{width:16px;height:16px}
+.sidebar-toggle-open:hover{border-color:var(--accent);background:var(--subtle);color:var(--navy)}
+
+@media (min-width:861px){
+  .app.sidebar-collapsed{grid-template-columns:minmax(0,1fr)}
+  .app.sidebar-collapsed .side{display:none}
+  .stu-app.sidebar-collapsed{grid-template-columns:minmax(0,1fr)}
+  .stu-app.sidebar-collapsed .stu-side{display:none}
+}
+@media (max-width:860px){
+  .sidebar-toggle-btn,.sidebar-toggle-open,.shell-topbar{display:none !important}
+}
 .logo{display:flex;align-items:center;gap:10px;padding:0 4px 18px}
 .logo .mk{width:30px;height:30px;display:block;flex:none}
 .logo .mk svg{width:100%;height:100%;display:block}
@@ -263,7 +283,7 @@ a.card:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:trans
 .spin{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--line-strong);border-top-color:var(--accent);animation:spin .9s linear infinite;vertical-align:-2px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes drawer-in{from{transform:translateX(100%)}}
-@keyframes toast-in{from{opacity:0;transform:translateY(-16px)}}
+@keyframes toast-in{from{opacity:0;transform:translateY(16px)}}
 @keyframes toast-time{from{transform:scaleX(1)}}
 .bone{display:block;height:12px;border-radius:6px;background:var(--gray);animation:bone 1.4s ease-in-out infinite}
 .bone.head{width:40%;height:18px}
@@ -284,7 +304,8 @@ a.card:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:trans
 .ibtn:hover{background:var(--subtle);color:var(--navy);border-color:var(--control)}
 .ibtn .ico{width:16px;height:16px}
 .btn .cnt{font-size:12px;font-weight:700;background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-line);border-radius:999px;padding:0 7px}
-.toast-slot{position:fixed;left:50%;top:20px;z-index:40;transform:translateX(-50%);width:min(520px,calc(100vw - 32px));pointer-events:none}
+.toast-slot{position:fixed;right:24px;bottom:24px;z-index:50;width:min(440px,calc(100vw - 32px));pointer-events:none}
+@media (max-width:860px){.toast-slot{right:16px;bottom:16px}}
 .toast{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;padding:16px 14px 18px 18px;border-radius:12px;background:var(--green);color:var(--on-accent);box-shadow:0 12px 32px rgba(24,33,47,.28);pointer-events:auto}
 .toast-ic{width:36px;height:36px;flex:none;display:grid;place-items:center;border-radius:50%;background:var(--on-accent);color:var(--green)}
 .toast-ic .ico{width:20px;height:20px;stroke-width:3}
@@ -408,7 +429,7 @@ a.card:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:trans
 .login-points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:15px}
 .login-points li{display:flex;gap:10px;align-items:flex-start}
 .login-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:48px 24px}
-.login-card{width:100%;max-width:400px;padding:28px;gap:16px}
+.login-card{width:100%;max-width:460px;padding:28px;gap:16px}
 .pw{display:flex;gap:8px}.pw .input{flex:1}
 .ibtn.eye{width:40px;height:40px;flex:none}
 .policy{padding-block:28px 48px;display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.65}
@@ -454,7 +475,7 @@ a.task:hover{background:var(--subtle)}
 .np:first-child{border-top:0}
 .ni{width:40px;height:40px;border-radius:10px;background:var(--navy-bg);color:var(--navy);display:grid;place-items:center}
 .ni .ico{width:20px;height:20px}
-@media (max-width:860px){.login{grid-template-columns:minmax(0,1fr)}.login-brand{border-right:0;border-bottom:1px solid var(--line);padding:20px}.login-side{padding:16px}.login-h{font-size:24px}}
+@media (max-width:860px){.login{grid-template-columns:minmax(0,1fr)}.login-brand{border-right:0;border-bottom:1px solid var(--line);padding:20px}.login-side{padding:16px}.login-card{padding:20px}.login-h{font-size:24px}}
 
 @media (max-width:860px) and (max-height:760px){.how{display:none}}
 @media (max-width:860px){.how{font-size:14px;gap:8px}}

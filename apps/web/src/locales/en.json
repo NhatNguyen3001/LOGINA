@@ -483,7 +483,9 @@
     "policies": "Policies",
     "draft": "Draft",
     "menu": "Menu",
-    "back": "Back"
+    "back": "Back",
+    "hideToolbar": "Hide sidebar",
+    "showToolbar": "Show sidebar"
   },
   "demo": {
     "jumpSampleOnly": "Sample lesson only",

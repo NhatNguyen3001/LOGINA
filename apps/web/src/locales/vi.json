@@ -369,7 +369,7 @@
       "keepOrRevise": "Giữ / Sửa",
       "avgConfidence": "Tự tin TB trước → sau",
       "prompts": "Câu Thử nghĩ thêm đã giao",
-      "disclaimer": "Tỉ lệ Sửa, tự tin tăng hay chọn đúng không đủ để kết luận học sinh học tốt hơn. Cần thiết kế đánh giá riêng.",
+      "disclaimer": "Tỉ lệ sửa, tự tin tăng hay chọn đúng không đủ để kết luận học sinh học tốt hơn. Cần thiết kế đánh giá riêng.",
       "participants": "Người tham gia",
       "code": "Mã người tham gia",
       "progress": "Tiến độ",
@@ -483,7 +483,9 @@
     "policies": "Chính sách",
     "draft": "Bản nháp",
     "menu": "Trình đơn",
-    "back": "Quay lại"
+    "back": "Quay lại",
+    "hideToolbar": "Ẩn thanh công cụ",
+    "showToolbar": "Hiện thanh công cụ"
   },
   "demo": {
     "jumpSampleOnly": "Chỉ cho bộ bài mẫu",

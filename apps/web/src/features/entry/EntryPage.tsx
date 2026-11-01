@@ -54,9 +54,8 @@ export function EntryPage() {
         </div>
         <div className="login-side">
           <div className="card login-card">
-            <div className="row">
-              <h2 className="text-2xl font-semibold">{t('entry.title')}</h2>
-              <span className="sp" />
+            <div className="row items-center justify-between flex-nowrap">
+              <h2 className="text-lg sm:text-2xl font-semibold whitespace-nowrap">{t('entry.title')}</h2>
               <LangSwitch />
             </div>
             <div className="stack">
