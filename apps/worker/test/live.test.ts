@@ -3,6 +3,7 @@ import { loadFixture, studentTexts, type DraftFixture } from '@logina/domain';
 import { liveSetup, testSchoolId, type LiveProject } from '@logina/test-utils';
 import { z } from 'zod';
 import { generateStructured, modelFor } from '../src/ai/model.js';
+import { generatorSchema } from '../src/ai/schemas.js';
 import { translateTask } from '../src/jobs/translate.js';
 import { testWorkerConfig } from '../src/config.js';
 import { createWorker, type WorkerDeps } from '../src/worker.js';
@@ -199,6 +200,23 @@ describe('live ANALYZE', () => {
     const { lessonId, jobId } = await setup();
     await worker(stubGenai({ reader: reading('en'), analyzer: analysis })).runJob(jobId);
     expect((await live.db.doc(`lessons/${lessonId}`).get()).data()?.stage).toBe('SOURCE_REVIEW');
+  });
+});
+
+describe('generator output', () => {
+  it.each([['Q2', 'q2'], ['Q3', 'q3'], ['Q4', 'q4-v4'], ['Q5', 'q5']] as const)('%s accepts the shape students need', (slot, name) => {
+    const parsed = generatorSchema(slot).safeParse({ draft: loadFixture(name, 'en'), ruleBundle: loadFixture(`rule-bundles/${slot.toLowerCase()}` as 'rule-bundles/q2', 'en') });
+    expect(parsed.error?.issues ?? []).toEqual([]);
+  });
+
+  it('a made-up task body is refused', () => {
+    const draft = { ...(loadFixture('q2', 'en') as DraftFixture), taskBody: { targetClaim: 'x', evidenceOptions: [] } };
+    expect(generatorSchema('Q2').safeParse({ draft, ruleBundle: loadFixture('rule-bundles/q2', 'en') }).success).toBe(false);
+  });
+
+  it('Q1 has no task body', () => {
+    const parsed = generatorSchema('Q1').safeParse({ draft: loadFixture('q1-v4', 'en'), ruleBundle: loadFixture('rule-bundles/q1', 'en') });
+    expect(parsed.error?.issues ?? []).toEqual([]);
   });
 });
 
@@ -405,12 +423,12 @@ describe('live GENERATE and RERUN', () => {
   });
 
   it('a task the AI cannot draft does not stop the next one', async () => {
-    const inner = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') } });
+    const inner = stubGenai({ xreason: { gates: gates('PASS') } });
     const genai: StubGenai = {
       ...inner,
       generate: async (request) => {
         if (request.role === 'generator' && JSON.stringify(request.parts).includes('Task slot: Q1')) throw new Error('down');
-        return inner.generate(request);
+        return request.role === 'generator' ? JSON.stringify(forSlot(request)) : inner.generate(request);
       },
     };
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -484,11 +502,14 @@ describe('live GENERATE and RERUN', () => {
     warn.mockRestore();
   });
 
+  const q2 = { draft: loadFixture('q2', 'en'), ruleBundle: loadFixture('rule-bundles/q2', 'en') };
+  const forSlot = (request: { parts: unknown }) => (JSON.stringify(request.parts).includes('Task slot: Q2') ? q2 : { draft: q1, ruleBundle: bundle });
+
   it('tasks are drafted at the same time, not one after another', async () => {
     let started = 0;
     let release!: () => void;
     const both = new Promise<void>((resolve) => { release = resolve; });
-    const inner = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    const inner = stubGenai({ xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
     const genai: StubGenai = {
       ...inner,
       generate: async (request) => {
@@ -496,6 +517,7 @@ describe('live GENERATE and RERUN', () => {
           started += 1;
           if (started === 2) release();
           await both;
+          return JSON.stringify(forSlot(request));
         }
         return inner.generate(request);
       },

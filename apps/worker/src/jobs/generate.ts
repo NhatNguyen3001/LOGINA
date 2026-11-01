@@ -2,7 +2,7 @@ import type { DocumentData } from 'firebase-admin/firestore';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { DraftFixture, FixtureName, ReportFixture, RuleBundle } from '@logina/domain';
 import { generateStructured, validatorVersion } from '../ai/model.js';
-import { GeneratorOutput, XReasonOutput } from '../ai/schemas.js';
+import { generatorSchema, XReasonOutput } from '../ai/schemas.js';
 import { JobFailure } from '../errors.js';
 import type { JobContext } from '../worker.js';
 import { deterministicChecks, saveDraft, saveReport } from './content.js';
@@ -77,7 +77,7 @@ export async function runGenerate(context: JobContext): Promise<void> {
       await context.checkpoint();
       const { draft, ruleBundle } = await generateStructured(genai, config, {
         role: 'generator',
-        schema: GeneratorOutput,
+        schema: generatorSchema(slot),
         variables: { slot, locale },
         text,
       });

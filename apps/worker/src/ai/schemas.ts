@@ -1,3 +1,4 @@
+import { Q2TaskBody, Q3TaskBody, Q4TaskBody, Q5TaskBody, type Slot } from '@logina/contracts';
 import { z } from 'zod';
 import { DraftFixture, ReportFixture, RuleBundleFixture } from '@logina/domain';
 
@@ -33,8 +34,20 @@ export const AnalyzerOutput = z.object({
   ),
 });
 
-export const GeneratorOutput = z.object({ draft: DraftFixture, ruleBundle: RuleBundleFixture });
-export type GeneratorOutput = z.infer<typeof GeneratorOutput>;
+/** What the student screens read, plus the scoring data only the server sees. */
+const TASK_BODIES = {
+  Q2: Q2TaskBody.extend({ acceptedOrders: z.array(z.array(z.string())).min(1) }),
+  Q3: Q3TaskBody.extend({ priorities: z.record(z.string(), z.array(z.string())) }),
+  Q4: Q4TaskBody,
+  Q5: Q5TaskBody.extend({ keywordPartitions: z.record(z.string(), z.array(z.string().trim().min(1)).min(1)) }),
+};
+
+/** Without a shape per task, the model invents one that no student screen can show. */
+export const generatorSchema = (slot: Slot) =>
+  z.object({
+    draft: slot === 'Q1' ? DraftFixture : DraftFixture.extend({ taskBody: TASK_BODIES[slot] }),
+    ruleBundle: RuleBundleFixture,
+  });
 
 export const XReasonOutput = z.object({ gates: ReportFixture.shape.gates });
 
