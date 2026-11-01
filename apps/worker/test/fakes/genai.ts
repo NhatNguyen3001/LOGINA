@@ -13,7 +13,7 @@ export function stubGenai(responses: Record<string, unknown | (() => unknown)> =
       calls.push(request);
       if (!(request.role in responses)) throw new Error(`No stub for ${request.role}`);
       const answer = responses[request.role];
-      return JSON.stringify(typeof answer === 'function' ? (answer as () => unknown)() : answer);
+      return JSON.stringify(typeof answer === 'function' ? await (answer as () => unknown)() : answer);
     },
   };
 }
