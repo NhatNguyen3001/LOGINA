@@ -25,7 +25,7 @@ function Gates({ gates }: { gates: TeacherTaskPreviewDTO['gates'] }) {
       <span className="small b sec">{t('teacher.t07.gates')}</span>
       {gates.map((gate) => (
         <div key={gate.gateId} className="qg">
-          <span className="id">{gate.gateId}</span>
+          <span className="id">{t(`teacher.gateName.${gate.gateId}`)}</span>
           <div className="stack">
             <StatusTag kind={GATE_KIND[gate.status]}>{t(`teacher.gate.${gate.status}`)}</StatusTag>
             <span className="s13 sec">{gate.explanationForTeacher}</span>
@@ -244,7 +244,7 @@ function Q1Body({ lessonId, preview }: { lessonId: string; preview: TeacherTaskP
             </div>
             {answer.inlineFinding ? (
               <div className="inline-find">
-                <StatusTag kind="review">{answer.inlineFinding.gateId}</StatusTag>
+                <StatusTag kind="review">{t(`teacher.gateName.${answer.inlineFinding.gateId}`)}</StatusTag>
                 <span>{answer.inlineFinding.explanationForTeacher}</span>
               </div>
             ) : null}

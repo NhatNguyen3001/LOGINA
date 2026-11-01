@@ -57,6 +57,7 @@ export function TranslationReview({ lessonId, task }: { lessonId: string; task: 
       <div className="row">
         <h3 className="s15 b">{t('teacher.t12.translation.title', { slot: task.slot })}</h3>
         <span className="sp" />
+        {translation?.texts.length ? <span className="s13 sec num">{t('teacher.t12.translation.lines', { count: translation.texts.length })}</span> : null}
         {translation ? <StatusTag kind={STATUS_KIND[translation.status]}>{t(`teacher.t12.translation.status.${translation.status}`)}</StatusTag> : null}
       </div>
       {canRetry ? (
@@ -68,9 +69,13 @@ export function TranslationReview({ lessonId, task }: { lessonId: string; task: 
       {blockers.map((finding) => (
         <Note key={finding.findingCode} kind="err">{finding.explanationForTeacher}</Note>
       ))}
-      {translation?.texts.map(({ from, to }) => (
-        <Line key={`${from}-${to}`} lessonId={lessonId} slot={task.slot} translation={translation} from={from} to={to} />
-      ))}
+      {translation?.texts.length ? (
+        <div className="pair-scroll" role="region" tabIndex={0} aria-label={t('teacher.t12.translation.linesRegion', { slot: task.slot })}>
+          {translation.texts.map(({ from, to }) => (
+            <Line key={`${from}-${to}`} lessonId={lessonId} slot={task.slot} translation={translation} from={from} to={to} />
+          ))}
+        </div>
+      ) : null}
       {translation && Object.keys(translation.keywords).length > 0 ? (
         <div className="well stack">
           <span className="small b sec">{t('teacher.t12.translation.keywords')}</span>

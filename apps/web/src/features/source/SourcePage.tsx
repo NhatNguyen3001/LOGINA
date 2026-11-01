@@ -7,7 +7,7 @@ import { Note } from '@/components/logina/Note';
 import { StatusTag, type TagKind } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
-import { ApiError, approveSource, getMaterialViewUrl, getSourceReview, newKey } from '@/lib/api';
+import { ApiError, approveSource, getLesson, getMaterialViewUrl, getSourceReview, newKey } from '@/lib/api';
 import { qk } from '@/lib/query';
 
 const STATUS_KIND: Record<SourceReviewDTO['summaryClaims'][number]['status'], TagKind> = { VERIFIED: 'pass', CONTEXT_ONLY: 'neutral', INSUFFICIENT: 'review', EXCLUDED: 'stale' };
@@ -22,7 +22,8 @@ export function SourcePage() {
   const approve = useMutation({
     mutationFn: () => approveSource(id, review.data!.version, newKey()),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: qk.lesson(id) });
+      /** The wait screen reads the running job from this copy, so it has to be fresh when the screen opens. */
+      await queryClient.fetchQuery({ queryKey: qk.lesson(id), queryFn: () => getLesson(id) }).catch(() => undefined);
       await navigate({ to: '/t/lessons/$id/tasks', params: { id } });
     },
   });

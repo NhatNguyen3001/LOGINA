@@ -11,6 +11,7 @@ import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { ApiError, chooseSufficiency, getLesson, getTasks, newKey } from '@/lib/api';
 import { jobFinished, qk, useJobPolling } from '@/lib/query';
+import { readableSourceRefs } from '@/lib/source-refs';
 import { useSecondsSince } from '@/lib/use-seconds-since';
 import { TaskStatusTag } from './task-status';
 
@@ -77,6 +78,8 @@ export function TasksPage() {
   const slots = tasks.data?.slots ?? [];
   const ready = slots.filter((s) => s.draftStatus).length;
   const paused = slots.find((s) => s.sufficiency !== 'SUFFICIENT' && !s.draftStatus);
+  /** Approval 2 reads every draft and its check, so it can't open before those exist. */
+  const canApprove = !running && slots.length > 0 && ready === slots.length;
 
   return (
     <>
@@ -106,7 +109,7 @@ export function TasksPage() {
           <span className="s13 sec num">{t('teacher.t06.ready', { ready, total: slots.length })}</span>
         </div>
         <div className="tbl-wrap">
-          <table className="t">
+          <table className="t stack-sm">
             <thead>
               <tr>
                 <th>{t('student.result.task')}</th>
@@ -120,7 +123,7 @@ export function TasksPage() {
                   <td>
                     {slot.draftStatus ? <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: slot.slot }} className="lnk">{t(`teacher.taskType.${slot.slot}`)}</Link> : <span className="b">{t(`teacher.taskType.${slot.slot}`)}</span>}
                   </td>
-                  <td>
+                  <td data-label={t('teacher.t06.enough')}>
                     <div className="stack">
                       {slot.sufficiency ? (
                         <StatusTag kind={SUFFICIENCY_KIND[slot.sufficiency]}>{t(`teacher.t06.sufficiency.${slot.sufficiency}`)}</StatusTag>
@@ -128,10 +131,10 @@ export function TasksPage() {
                         <StatusTag kind="neutral">{t(running ? 'teacher.t06.checking' : 'teacher.t06.notChecked')}</StatusTag>
                       )}
                       <span className="s13">{slot.sufficiencyNote}</span>
-                      <span className="src">{slot.sourceRefs.join(' · ')}</span>
+                      <span className="src">{readableSourceRefs(slot.sourceRefs, t)}</span>
                     </div>
                   </td>
-                  <td>
+                  <td data-label={t('teacher.t06.draft')}>
                     <div className="stack">
                       {slot.draftStatus ? <TaskStatusTag status={slot.draftStatus} /> : null}
                       {slot.progress === 'FAILED' || (running && slot.progress !== 'READY') ? <span className="s13 b">{t(`teacher.t06.progress.${slot.progress}`)}</span> : null}
@@ -146,8 +149,9 @@ export function TasksPage() {
       </div> : null}
       {paused && lesson.data && !running ? <Q4Decision lessonId={id} slot={paused.slot} version={lesson.data.version} /> : null}
       <div className="row">
+        {canApprove ? null : <span className="s13 sec">{t('teacher.t06.approvalWhy')}</span>}
         <span className="sp" />
-        <Link to="/t/lessons/$id/approve" params={{ id }} className="btn primary">{t('teacher.goApproval')}</Link>
+        {canApprove ? <Link to="/t/lessons/$id/approve" params={{ id }} className="btn primary">{t('teacher.goApproval')}</Link> : <button type="button" className="btn primary" disabled>{t('teacher.goApproval')}</button>}
       </div>
     </>
   );

@@ -286,6 +286,17 @@ describe('T5', () => {
     expect(api.approveSource).toHaveBeenCalledWith('l1', 4, expect.any(String));
   });
 
+  it('the running job is loaded before the wait screen opens', async () => {
+    vi.mocked(api.getSourceReview).mockResolvedValue(review({ approveReady: true, blockersRemaining: 0 }));
+    vi.mocked(api.approveSource).mockResolvedValue({ sourceModelVersionId: 's', version: 1, jobId: 'j' });
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', stage: 'GENERATE_PREVIEW', activeJobId: 'j' } as LessonDTO);
+    await render(<SourcePage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Approve source (Approval 1)' }));
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    expect(api.getLesson).toHaveBeenCalledWith('l1');
+    expect(vi.mocked(api.getLesson).mock.invocationCallOrder[0]!).toBeLessThan(navigate.mock.invocationCallOrder[0]!);
+  });
+
   it('material read by AI shows the notice and the original link', async () => {
     vi.mocked(api.getSourceReview).mockResolvedValue(review({ readByAI: true }));
     await render(<SourcePage />);

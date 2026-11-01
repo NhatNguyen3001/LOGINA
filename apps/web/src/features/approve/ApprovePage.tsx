@@ -1,7 +1,7 @@
 import type { Slot, TaskApprovalDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
@@ -14,27 +14,51 @@ import { TaskStatusTag } from '@/features/tasks/task-status';
 import { TranslationReview } from './TranslationReview';
 
 type Task = TaskApprovalDTO['tasks'][number];
+type Finding = Task['decisionsNeeded'][number];
 
-function Decision({ lessonId, task, finding }: { lessonId: string; task: Task; finding: Task['decisionsNeeded'][number] }) {
+/** A check can raise one warning under several codes; the teacher decides it once. */
+const groupFindings = (findings: Finding[]): Finding[][] => {
+  const groups = new Map<string, Finding[]>();
+  for (const finding of findings) {
+    const key = `${finding.gateId}|${finding.explanationForTeacher}`;
+    groups.set(key, [...(groups.get(key) ?? []), finding]);
+  }
+  return [...groups.values()];
+};
+
+function Decision({ lessonId, task, findings }: { lessonId: string; task: Task; findings: Finding[] }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const reasonId = useId();
+  const [accepting, setAccepting] = useState(false);
   const [reason, setReason] = useState('');
+  const first = findings[0]!;
   const accept = useMutation({
-    mutationFn: () => sendDisposition(lessonId, task.slot, { decision: 'TEACHER_ACCEPT_WITH_REASON', gateId: finding.gateId, findingCode: finding.findingCode, reason, baseVersion: task.draftVersion }, newKey()),
+    mutationFn: () => Promise.all(findings.map(({ gateId, findingCode }) => sendDisposition(lessonId, task.slot, { decision: 'TEACHER_ACCEPT_WITH_REASON', gateId, findingCode, reason, baseVersion: task.draftVersion }, newKey()))),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.approval(lessonId) }),
   });
+  const fix = <Link to="/t/lessons/$id/tasks/$slot" params={{ id: lessonId, slot: task.slot }} className="lnk">{t('teacher.t12.fix')}</Link>;
 
   return (
     <div className="well stack">
-      <StatusTag kind="review">{finding.gateId}</StatusTag>
-      <span className="s13">{finding.explanationForTeacher}</span>
-      <label className="small b sec" htmlFor={`reason-${task.slot}`}>{t('teacher.t12.acceptWarning')}</label>
-      <textarea id={`reason-${task.slot}`} className="textarea" value={reason} onChange={(event) => setReason(event.target.value)} />
-      <span className="small muted">{t('teacher.t12.stillSays')}</span>
-      <div className="row">
-        <button type="button" className="btn secondary sm" disabled={!reason.trim() || accept.isPending} onClick={() => accept.mutate()}>{t('teacher.t12.saveDecision')}</button>
-        <Link to="/t/lessons/$id/tasks/$slot" params={{ id: lessonId, slot: task.slot }} className="lnk">{t('teacher.t12.fix')}</Link>
-      </div>
+      <StatusTag kind="review">{t(`teacher.gateName.${first.gateId}`)}</StatusTag>
+      <span className="s13">{first.explanationForTeacher}</span>
+      {accepting ? (
+        <>
+          <label className="small b sec" htmlFor={reasonId}>{t('teacher.t12.acceptWarning')}</label>
+          <textarea id={reasonId} className="textarea" value={reason} onChange={(event) => setReason(event.target.value)} />
+          <span className="small muted">{t('teacher.t12.stillSays')}</span>
+          <div className="row">
+            <button type="button" className="btn secondary sm" disabled={!reason.trim() || accept.isPending} onClick={() => accept.mutate()}>{t('teacher.t12.saveDecision')}</button>
+            {fix}
+          </div>
+        </>
+      ) : (
+        <div className="row">
+          <button type="button" className="btn secondary sm" onClick={() => setAccepting(true)}>{t('teacher.t12.acceptWithReason')}</button>
+          {fix}
+        </div>
+      )}
     </div>
   );
 }
@@ -102,7 +126,17 @@ export function ApprovePage() {
   });
   const [selected, setSelected] = useState<Slot | null>(null);
 
-  if (!approval.data) return approval.isError ? <p className="muted">{t('errors.generic')}</p> : <LoadingSkeleton />;
+  if (!approval.data) {
+    if (approval.error instanceof ApiError && approval.error.code === 'TASKS_NOT_READY') {
+      return (
+        <div className="stack">
+          <Note kind="info">{t('teacher.t12.notReady')}</Note>
+          <Link to="/t/lessons/$id/tasks" params={{ id }} className="btn secondary self-start">{t('teacher.t12.backToTasks')}</Link>
+        </div>
+      );
+    }
+    return approval.isError ? <p className="muted">{t('errors.generic')}</p> : <LoadingSkeleton />;
+  }
   const { tasks } = approval.data;
   const approved = tasks.filter((x) => x.approvedAt).length;
   const allApproved = approved === tasks.length;
@@ -130,7 +164,7 @@ export function ApprovePage() {
           <span className="s13 sec num">{t('teacher.t12.approved', { count: approved })}</span>
         </div>
         <div className="tbl-wrap">
-          <table className="t">
+          <table className="t stack-sm">
             <thead>
               <tr>
                 <th>{t('student.result.task')}</th>
@@ -143,26 +177,26 @@ export function ApprovePage() {
               {tasks.map((task) => (
                 <tr key={task.slot}>
                   <td className="b">{t(`teacher.taskType.${task.slot}`)}</td>
-                  <td>
+                  <td data-label={t('teacher.t12.results')}>
                     <div className="stack">
                       <TaskStatusTag status={task.status} />
                       {task.acceptedWarning ? <StatusTag kind="teacher">{t('teacher.t12.decided')}</StatusTag> : null}
                       {blockingGates(task).map((gate) => (
                         <div key={gate.gateId} className="stack">
-                          <span className="s13">{`${gate.gateId} · ${gate.explanationForTeacher}`}</span>
+                          <span className="s13">{`${t(`teacher.gateName.${gate.gateId}`)} · ${gate.explanationForTeacher}`}</span>
                           <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: task.slot }} className="btn secondary sm self-start">{t('teacher.t12.openToFix')}</Link>
                         </div>
                       ))}
-                      {task.decisionsNeeded.filter((finding) => finding.overridable).map((finding) => (
-                        <Decision key={`${finding.gateId}-${finding.findingCode}`} lessonId={id} task={task} finding={finding} />
+                      {groupFindings(task.decisionsNeeded.filter((finding) => finding.overridable)).map((findings) => (
+                        <Decision key={`${findings[0]!.gateId}-${findings[0]!.findingCode}`} lessonId={id} task={task} findings={findings} />
                       ))}
                     </div>
                   </td>
-                  <td>
+                  <td data-label={t('teacher.t12.preview')}>
                     <div className="small num">{t('teacher.t07.version', { version: task.draftVersion })}</div>
                     <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: task.slot }} className="lnk">{t('teacher.t12.view')}</Link>
                   </td>
-                  <td>
+                  <td data-label={t('teacher.t12.approval')}>
                     {task.approvedAt ? (
                       <StatusTag kind="teacher">{task.releaseLabel}</StatusTag>
                     ) : (
