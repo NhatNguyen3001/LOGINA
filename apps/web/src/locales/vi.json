@@ -25,7 +25,7 @@
       "required": "(bắt buộc)",
       "requiredError": "Cô hãy điền mục này.",
       "language": "Ngôn ngữ học liệu",
-      "languageHint": "Nhiệm vụ và câu Thử nghĩ thêm dùng đúng ngôn ngữ của học liệu. LOGINA không dịch học liệu.",
+      "languageHint": "Nhiệm vụ và câu Thử nghĩ thêm được viết bằng ngôn ngữ của học liệu. Với tệp tải lên, LOGINA soạn thêm bản dịch để cô duyệt ở Duyệt 2.",
       "goalTitle": "2. Mục tiêu bài học",
       "goal": "Mục tiêu suy luận",
       "lessonInfo": "3. Bài học",
@@ -168,6 +168,20 @@
       "FAILED": "Kiểm tra lỗi",
       "SUPERSEDED": "Đã thay thế"
     },
+    "gateName": {
+      "QG1": "Mục tiêu dạy học",
+      "QG2": "Căn cứ nguồn",
+      "QG3": "Phương án sai",
+      "QG4": "Vai trò minh chứng",
+      "QG5": "Câu Thử nghĩ thêm",
+      "QG6": "Tính nhất quán",
+      "TRANSLATION": "Bản dịch"
+    },
+    "sourceRef": {
+      "para": "tr. {{page}}, đoạn {{n}}",
+      "table": "tr. {{page}}, bảng {{n}}",
+      "figure": "tr. {{page}}, hình {{n}}"
+    },
     "gate": {
       "PASS": "Đạt",
       "REVIEW_REQUIRED": "Cần xem lại",
@@ -181,6 +195,7 @@
       "enough": "Đủ căn cứ",
       "draft": "Bản nháp",
       "paused": "Tạm dừng, chờ cô",
+      "approvalWhy": "Có thể đến Duyệt 2 khi cả 5 bản nháp đã sẵn sàng.",
       "drafting": "Đang soạn…",
       "checking": "Đang kiểm tra…",
       "notChecked": "Chưa kiểm tra",
@@ -286,6 +301,9 @@
       "approval": "Duyệt",
       "decided": "Đã có quyết định",
       "openToFix": "Mở để sửa",
+      "notReady": "Mỗi nhiệm vụ cần có bản nháp trước khi đến Duyệt 2.",
+      "backToTasks": "Quay lại danh sách nhiệm vụ",
+      "acceptWithReason": "Chấp nhận kèm lý do",
       "acceptWarning": "Chấp nhận cảnh báo, ghi lý do",
       "stillSays": "Kết quả máy vẫn ghi “Cần xem lại”, không đổi thành “Đạt”. Quyết định được lưu kèm tên và thời gian.",
       "saveDecision": "Lưu quyết định",
@@ -309,6 +327,9 @@
         "retry": "Dịch lại",
         "missing": "Nhiệm vụ này chưa có bản dịch.",
         "keywords": "Từ khóa chọn câu hỏi Thử nghĩ thêm",
+        "lines_one": "{{count}} dòng",
+        "lines": "{{count}} dòng",
+        "linesRegion": "Các dòng của {{slot}}",
         "status": {
           "WORKING": "Đang dịch…",
           "READY": "Đã kiểm tra",

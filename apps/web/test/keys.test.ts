@@ -24,6 +24,8 @@ describe('translation keys', () => {
     const families: Record<string, string[]> = {
       'teacher.status': ['NONE', 'GENERATING', 'VALIDATING', 'BLOCKED', 'REVIEW_REQUIRED', 'MACHINE_PASS', 'STALE', 'FAILED', 'APPROVED', 'SUPERSEDED'],
       'teacher.gate': ['PASS', 'REVIEW_REQUIRED', 'BLOCKER'],
+      'teacher.gateName': ['QG1', 'QG2', 'QG3', 'QG4', 'QG5', 'QG6', 'TRANSLATION'],
+      'teacher.sourceRef': ['para', 'table', 'figure'],
       'teacher.t05.claimStatus': ['VERIFIED', 'CONTEXT_ONLY', 'INSUFFICIENT', 'EXCLUDED'],
       'teacher.t03.severity': ['BLOCKER', 'REVIEW'],
       'teacher.t06.sufficiency': ['SUFFICIENT', 'UNCERTAIN', 'INSUFFICIENT'],

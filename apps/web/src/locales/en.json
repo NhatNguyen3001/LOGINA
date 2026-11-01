@@ -25,7 +25,7 @@
       "required": "(required)",
       "requiredError": "This field is required.",
       "language": "Material language",
-      "languageHint": "Tasks and Think-again prompts use the material's language. LOGINA does not translate material.",
+      "languageHint": "Tasks and Think-again prompts are written in the material's language. For an uploaded file, LOGINA also drafts a translation for you to approve at Approval 2.",
       "goalTitle": "2. Lesson goal",
       "goal": "Reasoning goal",
       "lessonInfo": "3. Lesson",
@@ -168,6 +168,20 @@
       "FAILED": "Check failed",
       "SUPERSEDED": "Replaced"
     },
+    "gateName": {
+      "QG1": "Teaching goal",
+      "QG2": "Source support",
+      "QG3": "Wrong options",
+      "QG4": "Evidence roles",
+      "QG5": "Think-again prompts",
+      "QG6": "Coherence",
+      "TRANSLATION": "Translation"
+    },
+    "sourceRef": {
+      "para": "p. {{page}}, para. {{n}}",
+      "table": "p. {{page}}, table {{n}}",
+      "figure": "p. {{page}}, figure {{n}}"
+    },
     "gate": {
       "PASS": "Pass",
       "REVIEW_REQUIRED": "Needs review",
@@ -181,6 +195,7 @@
       "enough": "Enough evidence",
       "draft": "Draft",
       "paused": "Paused, waiting for you",
+      "approvalWhy": "You can go to Approval 2 once all 5 drafts are ready.",
       "drafting": "Drafting…",
       "checking": "Checking…",
       "notChecked": "Not checked",
@@ -286,6 +301,9 @@
       "approval": "Approval",
       "decided": "Decided",
       "openToFix": "Open to fix",
+      "notReady": "Every task needs a draft before Approval 2.",
+      "backToTasks": "Back to the tasks",
+      "acceptWithReason": "Accept with a reason",
       "acceptWarning": "Accept warning, give a reason",
       "stillSays": "The machine result still says “Needs review”, not “Pass”. The decision is saved with your name and the time.",
       "saveDecision": "Save decision",
@@ -309,6 +327,9 @@
         "retry": "Retry translation",
         "missing": "This task has no translation yet.",
         "keywords": "Keywords that choose the Think again prompt",
+        "lines_one": "{{count}} line",
+        "lines": "{{count}} lines",
+        "linesRegion": "Lines in {{slot}}",
         "status": {
           "WORKING": "Translating…",
           "READY": "Checked",

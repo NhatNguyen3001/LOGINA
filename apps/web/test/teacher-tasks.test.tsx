@@ -117,6 +117,34 @@ describe('T6', () => {
     expect(screen.getAllByText('Paused, waiting for you')).toHaveLength(1);
   });
 
+  it('Approval 2 opens once all five drafts are ready', async () => {
+    await render(<TasksPage />);
+    expect(await screen.findByRole('link', { name: 'Go to Approval 2' })).toBeInTheDocument();
+    expect(screen.queryByText(/once all 5 drafts are ready/)).toBeNull();
+  });
+
+  it('Approval 2 stays closed and says why while a draft is missing', async () => {
+    vi.mocked(api.getTasks).mockResolvedValue(overview({ sufficiency: 'UNCERTAIN', draftStatus: null }));
+    await render(<TasksPage />);
+    expect(await screen.findByRole('button', { name: 'Go to Approval 2' })).toBeDisabled();
+    expect(screen.queryByRole('link', { name: 'Go to Approval 2' })).toBeNull();
+    expect(screen.getByText(/once all 5 drafts are ready/)).toBeInTheDocument();
+  });
+
+  it('Approval 2 stays closed while a job runs, even with five drafts', async () => {
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
+    vi.mocked(api.getJob).mockResolvedValue({ id: 'j', type: 'GENERATE', status: 'RUNNING', steps: [] });
+    await render(<TasksPage />);
+    expect(await screen.findByRole('button', { name: 'Go to Approval 2' })).toBeDisabled();
+  });
+
+  it('source locations read as pages and paragraphs, and internal IDs are left out', async () => {
+    const slots = overview().slots.map((slot) => ({ ...slot, sourceRefs: ['p1-4 · t2-1 · se_c1_0 · Table 8.1'] }));
+    vi.mocked(api.getTasks).mockResolvedValue({ slots });
+    await render(<TasksPage />);
+    expect(await screen.findAllByText('p. 1, para. 4 · p. 2, table 1 · Table 8.1')).toHaveLength(5);
+  });
+
   it('while a job runs, an undrafted task says Drafting and the page says how long it can take', async () => {
     vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
     vi.mocked(api.getJob).mockResolvedValue({ id: 'j', type: 'GENERATE', status: 'RUNNING', steps: [] });
@@ -181,6 +209,15 @@ describe('T12 translation', () => {
     await render(<ApprovePage />);
     expect(await screen.findByText('Which statement?')).toBeInTheDocument();
     expect(screen.getByText('Nhận định nào?')).toBeInTheDocument();
+  });
+
+  it('a long translation keeps its lines in one scrollable box', async () => {
+    showing('Q1', translation());
+    await render(<ApprovePage />);
+    const box = await screen.findByRole('region', { name: 'Lines in Q1' });
+    expect(box).toHaveAttribute('tabindex', '0');
+    expect(box).toHaveTextContent('Which statement?');
+    expect(screen.getByText('1 line')).toBeInTheDocument();
   });
 
   it('a failed translation can be retried, and the task cannot be approved', async () => {
@@ -377,10 +414,48 @@ describe('T10', () => {
 describe('T12 and T13', () => {
   const finding = { gateId: 'QG1', findingCode: 'TREND', explanationForTeacher: 'May be too easy', overridable: true } as const;
 
+  it('a draft still missing shows the way back, not an error', async () => {
+    vi.mocked(api.getApproval).mockRejectedValue(new api.ApiError(409, 'TASKS_NOT_READY'));
+    await render(<ApprovePage />);
+    expect(await screen.findByText(/Every task needs a draft/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back to the tasks' })).toBeInTheDocument();
+    expect(screen.queryByText('Something went wrong. Please try again.')).toBeNull();
+  });
+
+  it('a check has a plain name, not a code', async () => {
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { decisionsNeeded: [finding] })], contentManifestHash: 'h', canApprove: true });
+    await render(<ApprovePage />);
+    expect(await screen.findByText('Teaching goal')).toBeInTheDocument();
+    expect(screen.queryByText('QG1')).toBeNull();
+  });
+
+  it('the reason box opens only when the teacher chooses to accept', async () => {
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { decisionsNeeded: [finding] })], contentManifestHash: 'h', canApprove: true });
+    await render(<ApprovePage />);
+    expect(await screen.findByText('May be too easy')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Accept warning, give a reason')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Accept with a reason' }));
+    expect(screen.getByLabelText('Accept warning, give a reason')).toBeInTheDocument();
+  });
+
+  it('the same warning on one check appears once, and the decision covers both', async () => {
+    const twin = { ...finding, findingCode: 'CLUE' };
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { decisionsNeeded: [finding, twin] })], contentManifestHash: 'h', canApprove: true });
+    await render(<ApprovePage />);
+    expect(await screen.findAllByText('May be too easy')).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Accept with a reason' }));
+    fireEvent.change(screen.getByLabelText('Accept warning, give a reason'), { target: { value: 'Fits' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save decision' }));
+    await waitFor(() => expect(api.sendDisposition).toHaveBeenCalledTimes(2));
+    expect(api.sendDisposition).toHaveBeenCalledWith('l1', 'Q1', expect.objectContaining({ findingCode: 'TREND' }), expect.any(String));
+    expect(api.sendDisposition).toHaveBeenCalledWith('l1', 'Q1', expect.objectContaining({ findingCode: 'CLUE' }), expect.any(String));
+  });
+
   it('a warning needs a reason, and approve waits for it', async () => {
     vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { decisionsNeeded: [finding] }), approvalTask('Q2'), approvalTask('Q3'), approvalTask('Q4'), approvalTask('Q5')], contentManifestHash: 'h', canApprove: false });
     await render(<ApprovePage />);
     expect(await screen.findByRole('button', { name: 'Approve Q1' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Accept with a reason' }));
     const save = screen.getByRole('button', { name: 'Save decision' });
     expect(save).toBeDisabled();
     fireEvent.change(screen.getByLabelText('Accept warning, give a reason'), { target: { value: 'Fits' } });

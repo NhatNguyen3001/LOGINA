@@ -60,6 +60,7 @@ test('the full teacher path, from the sample to tracking', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Task approval' })).toBeVisible();
   await expectAccessible(page, 'T12');
 
+  await page.getByRole('button', { name: 'Accept with a reason' }).click();
   await page.getByLabel('Accept warning, give a reason').fill('Fits this class');
   await page.getByRole('button', { name: 'Save decision' }).click();
 

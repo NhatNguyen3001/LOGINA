@@ -132,7 +132,7 @@ table.t tr:last-child td{border-bottom:0}
 .cand{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 .cand .msg{font-size:14px;font-weight:500;padding:10px 12px;background:var(--subtle);border-radius:8px}
 .cand.fb{border-style:dashed}
-.qg{display:grid;grid-template-columns:52px minmax(0,1fr);gap:4px 10px;padding:12px 0;border-top:1px solid var(--line)}
+.qg{display:grid;grid-template-columns:104px minmax(0,1fr);gap:4px 10px;padding:12px 0;border-top:1px solid var(--line)}
 .qg:first-of-type{border-top:0}
 .qg .id{font-weight:700;font-size:12px;color:var(--ink-3);padding-top:3px}
 .route{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-size:13px}
@@ -220,6 +220,9 @@ table.t tr:last-child td{border-bottom:0}
 .slider .knob{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);transform:translate(-50%,-50%)}
 .trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .pair-line{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-top:12px;border-top:1px solid var(--line)}
+.pair-scroll{display:flex;flex-direction:column;gap:12px;max-height:440px;overflow-y:auto;padding-right:8px}
+.pair-scroll .pair-line:first-child{border-top:0;padding-top:0}
+.pair-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .journey{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:stretch}
 .journey .arrow{display:grid;place-items:center;color:var(--ink-3)}
 
@@ -513,4 +516,12 @@ a.task:hover{background:var(--subtle)}
   .cmp-row{grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
   .cmp-row > .m{grid-column:1 / -1}
   .h1{font-size:22px}
+}
+@media (max-width:640px){
+  table.t.stack-sm,table.t.stack-sm tbody,table.t.stack-sm tr,table.t.stack-sm td{display:block;width:100%}
+  table.t.stack-sm thead{display:none}
+  table.t.stack-sm tr{border-bottom:1px solid var(--line);padding:6px 0}
+  table.t.stack-sm tr:last-child{border-bottom:0}
+  table.t.stack-sm td{border-bottom:0;padding:6px 14px}
+  table.t.stack-sm td[data-label]::before{content:attr(data-label);display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:4px}
 }

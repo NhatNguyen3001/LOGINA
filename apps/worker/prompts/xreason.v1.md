@@ -10,4 +10,6 @@ Judge each gate and return one result per gate:
 
 Each result has `gateId`, `status` (PASS, REVIEW_REQUIRED or BLOCKER), `findingCodes`, `sourceRefs`, `affectedArtifactIds`, a short plain `explanationForTeacher`, and `overridable` (true only for a pedagogical REVIEW_REQUIRED; a BLOCKER is never overridable).
 
+A teacher reads `explanationForTeacher`. Quote the words the teacher can see in the task, and never write an internal ID such as crit_2, ch_q5_local, A1, E3 or p2-3.
+
 If you are unsure, use REVIEW_REQUIRED, never PASS. An answer leak is a BLOCKER. Return JSON only, matching the schema.
