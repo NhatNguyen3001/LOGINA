@@ -32,7 +32,7 @@ const q4Combos: LockFacts[] = [
   { 'q4.misfitSlotId': 'needed' },
   { 'q4.misfitSlotId': 'none' },
 ];
-const q5Combos: LockFacts[] = ['training', 'business', 'living', 'other'].map((p) => ({ 'q5.keywordPartition': p }));
+const q5Combos: LockFacts[] = ['s1', 's2', 's3', 'none'].map((id) => ({ 'q5.openStarterId': id }));
 
 const allCombos = { q1: q1Combos, q2: q2Combos, q3: q3Combos, q4: q4Combos, q5: q5Combos };
 const draftFor = { q1: 'q1-v4', q2: 'q2', q3: 'q3', q4: 'q4-v4', q5: 'q5' } as const;
@@ -77,6 +77,20 @@ describe.each(['en', 'vi'] as const)('fixture logic in %s', (locale) => {
     const facts = buildLockFacts({ slot: 'Q4', placements }, { answers: {}, evidence: {}, pairs: {} }, { slotFits });
     expect(facts).toEqual({ 'q4.misfitSlotId': 'shown' });
     expect(selectChallenge(bundle('q4', locale), facts).challengeId).toBe('TN1');
+  });
+
+  it('Q5: every starter has a word list', () => {
+    const body = (loadFixture('q5', locale) as DraftFixture).taskBody as { starters: { starterId: string }[]; keywordPartitions: Record<string, string[]> };
+    for (const { starterId } of body.starters) expect(body.keywordPartitions[starterId]!.length).toBeGreaterThan(0);
+  });
+
+  it('Q5: the first sentence that is marked or misses its words gets its prompt', () => {
+    const keywordPartitions = { s1: ['skill'], s2: ['income'] };
+    const labels = { answers: {}, evidence: {}, pairs: {} };
+    const marked = buildLockFacts({ slot: 'Q5', answers: [{ starterId: 's1', text: 'Skills' }, { starterId: 's2', text: 'unsure', declared: 'DONT_KNOW' }] }, labels, { keywordPartitions });
+    expect(marked).toEqual({ 'q5.openStarterId': 's2' });
+    expect(selectChallenge(bundle('q5', locale), marked).challengeId).toBe('TN2');
+    expect(buildLockFacts({ slot: 'Q5', answers: [{ starterId: 's1', text: 'skills' }, { starterId: 's2', text: 'income' }] }, labels, { keywordPartitions })).toEqual({ 'q5.openStarterId': 'none' });
   });
 
   it('the Q1 pair table matches what the selector picks', () => {

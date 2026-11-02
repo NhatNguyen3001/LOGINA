@@ -70,12 +70,13 @@ const blockersIn = (report: DocumentData): number => (report.gates as DocumentDa
 const canApprove = (doc: DocumentData, report: DocumentData): boolean =>
   APPROVABLE.includes(doc.status as string) && blockersIn(report) === 0;
 
-/** Scoring data a teacher reads: the Q3 reason the source supports, and the Q4 blank a card fits. */
+/** Scoring data a teacher reads: the Q3 reason the source supports, the Q4 blank a card fits, and the Q5 word lists. */
 function taskLabels(body: DocumentData): Record<string, string> {
   const supported = ((body.supportedReasons ?? []) as string[]).map((id) => [id, 'SUPPORTED']);
   const labelOf = (slotId: string) => (body.slots as { slotId: string; label: string }[]).find((slot) => slot.slotId === slotId)?.label ?? slotId;
   const fits = Object.entries((body.slotFits ?? {}) as Record<string, string[]>).flatMap(([slotId, cards]) => cards.map((card) => [card, labelOf(slotId)]));
-  return Object.fromEntries([...supported, ...fits]);
+  const words = Object.entries((body.keywordPartitions ?? {}) as Record<string, string[]>).map(([starterId, list]) => [starterId, list.join(', ')]);
+  return Object.fromEntries([...supported, ...fits, ...words]);
 }
 
 function publicBody(body: DocumentData): DocumentData {

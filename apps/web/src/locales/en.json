@@ -118,7 +118,7 @@
       "Q2": "Q2 · Rank cards",
       "Q3": "Q3 · Trade-off",
       "Q4": "Q4 · Counterargument",
-      "Q5": "Q5 · Write a proposal"
+      "Q5": "Q5 · Finish the sentences"
     },
     "t03": {
       "crumb": "Clarify material",
@@ -542,7 +542,7 @@
       "Q2": "Q2 Rank cards",
       "Q3": "Q3 Trade-off",
       "Q4": "Q4 Counterargument",
-      "Q5": "Q5 Proposal"
+      "Q5": "Q5 Sentences"
     },
     "phase": {
       "think": "Think again and final answer",
@@ -627,8 +627,9 @@
       "choose": "Choose…"
     },
     "q5": {
-      "proposal": "Your proposal",
-      "reason": "Your reason"
+      "placeholder": "Type a word or short phrase",
+      "dontKnow": "I don't know how to answer",
+      "notEnough": "I think there isn't enough evidence"
     },
     "result": {
       "title": "You've completed all 5 tasks",
@@ -663,8 +664,7 @@
       "tradeOff": "Choose what it gives up to continue.",
       "whyCost": "Choose a reason to continue.",
       "blanks": "Fill every blank to continue.",
-      "proposal": "Write your proposal to continue.",
-      "reason": "Write your reason to continue."
+      "starters": "Finish every sentence, or tap a button, to continue."
     }
   },
   "entry": {

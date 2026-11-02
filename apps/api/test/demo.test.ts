@@ -84,14 +84,14 @@ describe('demo menu', () => {
     expect((await client.post('/demo/simulate-class', { assignmentId: assignment!.assignmentId })).status).toBe(200);
     const attempts = await h.live.db.collection('attempts').where('schoolId', '==', client.workspace.schoolId).get();
     const tasks = await Promise.all(attempts.docs.map((attempt) => attempt.ref.collection('tasks').get()));
-    return tasks.flatMap((t) => t.docs.map((d) => ({ slot: d.id, ...d.data() }))) as unknown as { slot: string; initialConfidence: number; initialArtifact: { proposal: string } }[];
+    return tasks.flatMap((t) => t.docs.map((d) => ({ slot: d.id, ...d.data() }))) as unknown as { slot: string; initialConfidence: number; initialArtifact: { answers: { text: string }[] } }[];
   };
 
   it('simulate class on a LIVE lesson submits 7 attempts built from its own content', async () => {
     const live = await h.client();
     const tasks = await simulateLive(live);
     expect(tasks).toHaveLength(35);
-    expect(tasks.filter((t) => t.slot === 'Q5').every((t) => t.initialArtifact.proposal.length <= 120)).toBe(true);
+    expect(tasks.filter((t) => t.slot === 'Q5').every((t) => t.initialArtifact.answers.every((a) => a.text.length <= 120))).toBe(true);
     const [assignment] = await assignmentsOf(live);
     const tracking = ClassTrackingDTO.parse(await (await live.get(`/assignments/${assignment!.assignmentId}/tracking`)).json());
     expect(tracking.counts).toEqual({ started: 7, complete: 7 });

@@ -66,7 +66,7 @@ Each of the five tasks follows the same steps:
 | Q2 | Rank cards | Drags the cards into order, strongest first |
 | Q3 | Trade-off | Chooses a path, what it gives up, and why that cost comes with it |
 | Q4 | Counterargument | Places cards from a shared set into one argument, with more cards than blanks |
-| Q5 | Proposal | Writes a short proposal and the reason for it |
+| Q5 | Sentences | Finishes three sentences from the source in a word or short phrase, or marks one as unsure or lacking evidence |
 
 Students can switch language at any time. All task content changes with it, and their answers stay the same. A translation only reaches students after a teacher approves it.
 

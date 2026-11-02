@@ -3,13 +3,10 @@ import { normalizeText } from './normalize.js';
 import type { LockFacts } from './rules.js';
 import { buildQ1Facts, type Q1Labels } from './selector.js';
 
-const OTHER_PARTITION = 'other';
-
-function keywordPartition(text: string, partitions: Record<string, string[]>): string {
+const hasKeyword = (text: string, words: string[]): boolean => {
   const normalized = normalizeText(text).toLowerCase();
-  const match = Object.entries(partitions).find(([, words]) => words.some((word) => normalized.includes(word.toLowerCase())));
-  return match?.[0] ?? OTHER_PARTITION;
-}
+  return words.some((word) => normalized.includes(word.toLowerCase()));
+};
 
 /** The observable facts of a locked answer. Q1 is expected in authoring IDs. */
 /** The scoring data in a release's server-only body. */
@@ -34,6 +31,6 @@ export function buildLockFacts(artifact: Artifact, labels: Q1Labels, { keywordPa
       return { 'q4.misfitSlotId': misfit?.slotId ?? 'none' };
     }
     case 'Q5':
-      return { 'q5.keywordPartition': keywordPartition(`${artifact.proposal} ${artifact.reason}`, keywordPartitions) };
+      return { 'q5.openStarterId': artifact.answers.find((a) => a.declared || !hasKeyword(a.text, keywordPartitions[a.starterId] ?? []))?.starterId ?? 'none' };
   }
 }

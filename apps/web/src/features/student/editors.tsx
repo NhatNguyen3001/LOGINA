@@ -203,24 +203,49 @@ export function Q4Editor({ body, value, onChange }: EditorProps<'Q4', Q4TaskBody
   );
 }
 
-function CountedField({ id, label, value, max, onChange }: { id: string; label: string; value: string; max: number; onChange: (next: string) => void }) {
+const DECLARATIONS = [
+  { kind: 'DONT_KNOW', key: 'student.q5.dontKnow' },
+  { kind: 'NOT_ENOUGH', key: 'student.q5.notEnough' },
+] as const;
+
+type Q5Answer = Extract<Artifact, { slot: 'Q5' }>['answers'][number];
+
+function StarterField({ id, lead, answer, max, onChange }: { id: string; lead: string; answer: Q5Answer | undefined; max: number; onChange: (next: Q5Answer | null) => void }) {
+  const { t } = useTranslation();
+  const typed = answer?.declared ? '' : (answer?.text ?? '');
   return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <textarea id={id} className="textarea" maxLength={max} value={value} onChange={(event) => onChange(event.target.value)} />
-      <span className="hint num">{`${value.length}/${max}`}</span>
+    <div className="card tight starter">
+      <label htmlFor={id} className="b s15">{lead}</label>
+      <input id={id} className="input" maxLength={max} disabled={Boolean(answer?.declared)} placeholder={t('student.q5.placeholder')} value={typed} onChange={(event) => onChange(event.target.value ? { starterId: id, text: event.target.value } : null)} />
+      <div className="row">
+        {DECLARATIONS.map(({ kind, key }) => (
+          <button key={kind} type="button" className={`word-card s13 ${answer?.declared === kind ? 'on' : ''}`} aria-pressed={answer?.declared === kind} onClick={() => onChange(answer?.declared === kind ? null : { starterId: id, text: t(key), declared: kind })}>{t(key)}</button>
+        ))}
+        <span className="sp" />
+        <span className="hint num">{`${typed.length}/${max}`}</span>
+      </div>
     </div>
   );
 }
 
 export function Q5Editor({ body, value, onChange }: EditorProps<'Q5', Q5TaskBody>) {
-  const { t } = useTranslation();
-  const max = body.maxCharsPerField;
+  const answers = value.answers ?? [];
+  const answerTo = (id: string) => answers.find((a) => a.starterId === id);
+
+  /** Kept in the order of the sentences, because that order decides the Think-again prompt. */
+  const save = (id: string, next: Q5Answer | null) => {
+    onChange({ ...value, answers: body.starters.flatMap(({ starterId }) => {
+      const answer = starterId === id ? next : answerTo(starterId);
+      return answer ? [answer] : [];
+    }) });
+  };
+
   return (
     <>
       <p className="s15 sec">{body.instructions}</p>
-      <CountedField id="proposal" label={t('student.q5.proposal')} value={value.proposal ?? ''} max={max} onChange={(proposal) => onChange({ ...value, proposal })} />
-      <CountedField id="reason" label={t('student.q5.reason')} value={value.reason ?? ''} max={max} onChange={(reason) => onChange({ ...value, reason })} />
+      {body.starters.map(({ starterId, text }) => (
+        <StarterField key={starterId} id={starterId} lead={text} answer={answerTo(starterId)} max={body.maxCharsPerField} onChange={(next) => save(starterId, next)} />
+      ))}
     </>
   );
 }
@@ -240,7 +265,7 @@ export function isComplete(task: StudentTaskDTO, value: DraftArtifact): value is
   if (value.slot === 'Q2') return Boolean(value.orderedCardIds?.length);
   if (value.slot === 'Q3') return Boolean(value.judgmentOptionId && value.tradeOffId && value.reasonId);
   if (value.slot === 'Q4' && task.slot === 'Q4') return task.taskBody.slots.every((s) => value.placements?.some((x) => x.slotId === s.slotId));
-  if (value.slot === 'Q5') return Boolean(value.proposal?.trim() && value.reason?.trim());
+  if (value.slot === 'Q5' && task.slot === 'Q5') return task.taskBody.starters.every((s) => value.answers?.some((a) => a.starterId === s.starterId && a.text.trim()));
   return false;
 }
 
@@ -256,10 +281,7 @@ export function missingKey(task: StudentTaskDTO, value: DraftArtifact): string |
     return value.reasonId ? null : 'student.need.whyCost';
   }
   if (value.slot === 'Q4') return isComplete(task, value) ? null : 'student.need.blanks';
-  if (value.slot === 'Q5') {
-    if (!value.proposal?.trim()) return 'student.need.proposal';
-    return value.reason?.trim() ? null : 'student.need.reason';
-  }
+  if (value.slot === 'Q5') return isComplete(task, value) ? null : 'student.need.starters';
   return null;
 }
 
@@ -267,6 +289,7 @@ export function emptyDraft(task: StudentTaskDTO): DraftArtifact {
   const saved = task.draftArtifact;
   if (task.slot === 'Q2') return { slot: 'Q2', orderedCardIds: task.taskBody.cards.map((c) => c.cardId), ...saved } as DraftArtifact;
   if (task.slot === 'Q4') return { slot: 'Q4', placements: [], ...saved } as DraftArtifact;
+  if (task.slot === 'Q5') return { slot: 'Q5', answers: [], ...saved } as DraftArtifact;
   return saved ?? { slot: task.slot };
 }
 

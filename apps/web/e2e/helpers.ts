@@ -21,8 +21,8 @@ export async function completeTask(page: Page, slot: string): Promise<void> {
     }
   }
   if (slot === 'Q5') {
-    await page.locator('#proposal').fill('Offer vocational training in the district.');
-    await page.locator('#reason').fill('The share of workers in services is rising.');
+    const inputs = page.locator('.starter input');
+    for (let i = 0; i < (await inputs.count()); i += 1) await inputs.nth(i).fill('vocational training');
   }
   await page.getByRole('button', { name: 'Continue →' }).click();
   await page.getByRole('slider').focus();

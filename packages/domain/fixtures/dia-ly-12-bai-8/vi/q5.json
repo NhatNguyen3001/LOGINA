@@ -2,31 +2,40 @@
   "slot": "Q5",
   "taskType": "OPEN_PROPOSAL",
   "draftVersion": 3,
-  "questionStem": "Một xã có thể làm một việc gì để tạo việc làm phù hợp cho thanh niên nông thôn? Em hãy viết một đề xuất và một lí do.",
+  "questionStem": "Em hãy hoàn thành ba câu sau dựa trên điều nguồn nói về việc làm cho thanh niên nông thôn.",
   "taskBody": {
-    "instructions": "Viết một đề xuất ngắn và một lí do, mỗi phần tối đa 120 kí tự.",
+    "instructions": "Dùng một từ hoặc cụm từ ngắn, tối đa 120 ký tự mỗi câu.",
     "maxCharsPerField": 120,
+    "starters": [
+      {
+        "starterId": "s1",
+        "text": "Nhiều việc ở nhà máy khó với thanh niên nông thôn vì..."
+      },
+      {
+        "starterId": "s2",
+        "text": "Thanh niên ở lại địa phương thường phải đánh đổi..."
+      },
+      {
+        "starterId": "s3",
+        "text": "Việc làm phù hợp cho thanh niên nông thôn phụ thuộc vào đào tạo nghề, doanh nghiệp địa phương và..."
+      }
+    ],
     "keywordPartitions": {
-      "training": [
-        "đào tạo",
-        "học nghề",
-        "dạy nghề",
+      "s1": [
         "kĩ năng",
-        "kỹ năng"
+        "tay nghề",
+        "đào tạo"
       ],
-      "business": [
-        "doanh nghiệp",
-        "làng nghề",
-        "nhà máy",
-        "công ty",
-        "kinh doanh"
+      "s2": [
+        "thu nhập",
+        "lương",
+        "học nghề",
+        "thăng tiến"
       ],
-      "living": [
+      "s3": [
+        "điều kiện sống",
         "đời sống",
-        "nhà ở",
-        "đường",
-        "trường",
-        "y tế"
+        "nhà ở"
       ]
     }
   },
@@ -36,44 +45,44 @@
       "label": "TN1",
       "isNeutralFallback": false,
       "primaryFunction": "BASIS_CHECK",
-      "challengeTarget": "EVIDENCE_SUFFICIENCY",
-      "purposeForTeacher": "Đào tạo",
-      "whenShownForTeacher": "Khi đề xuất nói về đào tạo",
+      "challengeTarget": "SOURCE_DIRECTION",
+      "purposeForTeacher": "Việc ở nhà máy",
+      "whenShownForTeacher": "Khi câu đầu được đánh dấu hoặc chưa dùng đến nguồn",
       "sourceAnchor": "tr. 9 · đoạn 4",
-      "message": "Sau khi học xong, những bạn trẻ này sẽ làm việc ở đâu?"
+      "message": "Câu nào trong nguồn nói về việc làm ở nhà máy? Câu đó nói gì về người lao động?"
     },
     {
       "challengeId": "TN2",
       "label": "TN2",
       "isNeutralFallback": false,
       "primaryFunction": "BASIS_CHECK",
-      "challengeTarget": "EVIDENCE_SUFFICIENCY",
-      "purposeForTeacher": "Doanh nghiệp địa phương",
-      "whenShownForTeacher": "Khi đề xuất nói về doanh nghiệp địa phương",
+      "challengeTarget": "SOURCE_DIRECTION",
+      "purposeForTeacher": "Ở lại quê",
+      "whenShownForTeacher": "Khi câu thứ hai được đánh dấu hoặc chưa dùng đến nguồn",
       "sourceAnchor": "tr. 9 · đoạn 4",
-      "message": "Người lao động ở cơ sở này cần biết làm những gì?"
+      "message": "Em hãy tìm đoạn nói về việc ở lại địa phương. Đoạn đó nói hướng này đi kèm điều gì?"
     },
     {
       "challengeId": "TN3",
       "label": "TN3",
       "isNeutralFallback": false,
       "primaryFunction": "BASIS_CHECK",
-      "challengeTarget": "RELEVANCE",
-      "purposeForTeacher": "Điều kiện sống",
-      "whenShownForTeacher": "Khi đề xuất nói về điều kiện sống",
+      "challengeTarget": "SOURCE_DIRECTION",
+      "purposeForTeacher": "Việc làm phụ thuộc vào đâu",
+      "whenShownForTeacher": "Khi câu thứ ba được đánh dấu hoặc chưa dùng đến nguồn",
       "sourceAnchor": "tr. 9 · đoạn 4",
-      "message": "Việc này giúp thanh niên có việc làm như thế nào, chứ không chỉ sống tốt hơn?"
+      "message": "Em hãy đọc đoạn cuối của nguồn. Nguồn còn nói việc làm phụ thuộc vào điều gì nữa?"
     },
     {
       "challengeId": "FB",
       "label": "Câu dự phòng",
       "isNeutralFallback": true,
-      "primaryFunction": "CLARIFICATION",
+      "primaryFunction": "BASIS_CHECK",
       "challengeTarget": "CLARIFY_MISSING",
       "purposeForTeacher": "Kiểm tra lại, trung lập",
       "whenShownForTeacher": "Khi không câu nào ở trên khớp",
       "sourceAnchor": "tr. 8–9",
-      "message": "Em hãy đọc lại lí do. Lí do đó dựa trên phần nào của nguồn?"
+      "message": "Em hãy đọc lại các câu trả lời. Mỗi câu dựa vào phần nào của nguồn?"
     }
   ],
   "neutralFallbackId": "FB",
@@ -93,9 +102,9 @@
   },
   "feedback": [
     {
-      "optionId": "proposal",
-      "relationLabel": "Đề xuất mở",
-      "text": "Nguồn gắn việc làm của thanh niên nông thôn với đào tạo nghề, doanh nghiệp địa phương và điều kiện sống. Không có một đề xuất đúng duy nhất."
+      "optionId": "starters",
+      "relationLabel": "Dựa vào nguồn",
+      "text": "Nguồn gắn việc ở nhà máy với kĩ năng chưa được đào tạo, việc ở lại quê với thu nhập thấp hơn và ít cơ hội học nghề, còn việc làm phù hợp với đào tạo nghề, doanh nghiệp địa phương và điều kiện sống tốt hơn."
     }
   ]
 }

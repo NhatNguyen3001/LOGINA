@@ -52,30 +52,26 @@ describe('compareArtifacts', () => {
     expect(compareArtifacts(q4(['s1', 'a']), q4(['s1', 'b']))).toEqual({ revised: true, changedElements: ['placements'] });
   });
 
-  const q5 = (proposal: string, reason: string, basis?: string): Artifact => ({
-    slot: 'Q5',
-    proposal,
-    reason,
-    ...(basis === undefined ? {} : { basis }),
-  });
+  const q5 = (...answers: string[]): Artifact => ({ slot: 'Q5', answers: answers.map((text, index) => ({ starterId: `s${index + 1}`, text })) });
 
   it('Q5 whitespace-only change is KEEP', () => {
-    expect(compareArtifacts(q5('Tăng việc làm', 'Vì  lao động'), q5(' Tăng  việc làm ', 'Vì lao động')).revised).toBe(false);
+    expect(compareArtifacts(q5('Vì  lao động'), q5(' Vì lao động ')).revised).toBe(false);
   });
 
   it('Q5 NFD and NFC forms are KEEP', () => {
-    expect(compareArtifacts(q5('thu\u0309y sa\u0309n', 'r'), q5('thủy sản', 'r')).revised).toBe(false);
+    expect(compareArtifacts(q5('thu\u0309y sa\u0309n'), q5('thủy sản')).revised).toBe(false);
   });
 
-  it('Q5 changing the reason is REVISE', () => {
-    expect(compareArtifacts(q5('p', 'r1'), q5('p', 'r2')).changedElements).toEqual(['reason']);
+  it('Q5 changing a sentence is REVISE', () => {
+    expect(compareArtifacts(q5('a', 'b'), q5('a', 'c')).changedElements).toEqual(['answers']);
   });
 
-  it('Q5 a missing basis equals an empty basis', () => {
-    expect(compareArtifacts(q5('p', 'r'), q5('p', 'r', ' ')).revised).toBe(false);
+  it('Q5 replacing an answer with a button is REVISE', () => {
+    const marked: Artifact = { slot: 'Q5', answers: [{ starterId: 's1', text: 'a', declared: 'DONT_KNOW' }] };
+    expect(compareArtifacts(q5('a'), marked).revised).toBe(true);
   });
 
   it('artifacts from different slots throw', () => {
-    expect(() => compareArtifacts(q1('a', 'e'), q5('p', 'r'))).toThrow();
+    expect(() => compareArtifacts(q1('a', 'e'), q5('p'))).toThrow();
   });
 });

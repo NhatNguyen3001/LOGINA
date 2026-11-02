@@ -110,8 +110,11 @@ export function artifactSummary(artifact: Artifact, release: DocumentData): { an
       evidenceText: content.evidenceOptions.find((e) => e.evidenceId === artifact.evidenceId)?.text ?? '',
     };
   }
-  if (artifact.slot === 'Q5') return { answerText: artifact.proposal };
   const body = (release.publicContent as DocumentData).taskBody as DocumentData;
+  if (artifact.slot === 'Q5') {
+    const lead = (id: string) => (body.starters as { starterId: string; text: string }[]).find((s) => s.starterId === id)?.text ?? '';
+    return { answerText: artifact.answers.map((a) => `${lead(a.starterId)} ${a.text}`).join(' ') };
+  }
   if (artifact.slot === 'Q2') {
     const cards = body.cards as { cardId: string; text: string }[];
     return { answerText: artifact.orderedCardIds.map((id) => cards.find((card) => card.cardId === id)?.text ?? '').join(' > ') };

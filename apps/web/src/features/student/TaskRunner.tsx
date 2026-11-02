@@ -1,4 +1,4 @@
-import type { Artifact, DraftArtifact, Phase, Q2Artifact, Q2TaskBody, Q3Artifact, Q3TaskBody, Q5Artifact, Slot, StudentChallengeDTO, StudentTaskDTO } from '@logina/contracts';
+import type { Artifact, DraftArtifact, Phase, Q2Artifact, Q2TaskBody, Q3Artifact, Q3TaskBody, Q5Artifact, Q5TaskBody, Slot, StudentChallengeDTO, StudentTaskDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
@@ -93,18 +93,15 @@ function LockedQ3({ body, answer }: { body: Q3TaskBody; answer: Q3Artifact }) {
   );
 }
 
-function LockedQ5({ answer }: { answer: Q5Artifact }) {
-  const { t } = useTranslation();
+function LockedQ5({ body, answer }: { body: Q5TaskBody; answer: Q5Artifact }) {
   return (
     <dl className="ans stacked">
-      <div className="ln">
-        <dt>{t('student.q5.proposal')}</dt>
-        <dd>{answer.proposal}</dd>
-      </div>
-      <div className="ln">
-        <dt>{t('student.q5.reason')}</dt>
-        <dd>{answer.reason}</dd>
-      </div>
+      {answer.answers.map(({ starterId, text }) => (
+        <div key={starterId} className="ln">
+          <dt>{body.starters.find((starter) => starter.starterId === starterId)?.text}</dt>
+          <dd>{text}</dd>
+        </div>
+      ))}
     </dl>
   );
 }
@@ -201,7 +198,7 @@ function Reconsidering({ attemptId, task, onSubmitted, onPhase }: { attemptId: s
     task.slot === 'Q2' && original.slot === 'Q2' ? <LockedQ2 body={task.taskBody} answer={original} />
     : task.slot === 'Q3' && original.slot === 'Q3' ? <LockedQ3 body={task.taskBody} answer={original} />
     : task.slot === 'Q4' && original.slot === 'Q4' ? <FilledFrame body={task.taskBody} placements={original.placements} />
-    : task.slot === 'Q5' && original.slot === 'Q5' ? <LockedQ5 answer={original} />
+    : task.slot === 'Q5' && original.slot === 'Q5' ? <LockedQ5 body={task.taskBody} answer={original} />
     : <LockedAnswer summary={challenge.data.lockedSummary} />;
   const missing = missingKey(task, answer);
 

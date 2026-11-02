@@ -55,7 +55,7 @@ export function answerColumns(artifact: Artifact, letters: Q1Letters): AnswerCol
     case 'Q4':
       return { answer: artifact.placements.map((p) => `${p.slotId}=${p.cardId}`).join(', '), evidence: null, relation: null };
     case 'Q5':
-      return { answer: `${artifact.proposal} | ${artifact.reason}`, evidence: null, relation: null };
+      return { answer: artifact.answers.map((a) => `${a.starterId}=${a.declared ?? a.text}`).join(' | '), evidence: null, relation: null };
   }
 }
 

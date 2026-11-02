@@ -591,6 +591,14 @@ describe('generateStructured', () => {
     expect(deterministicChecks(draft, bundle as never, []).find((c) => c.checkId === 'STRUCT')?.status).toBe('FAIL');
   });
 
+  it('blocks a Q5 starter with no word list', () => {
+    const bundle = { slot: 'Q5', version: 1, fallbackChallengeId: 'FB', candidates: [] };
+    const check = (taskBody: object) =>
+      deterministicChecks({ slot: 'Q5', challengeCandidates: [{ challengeId: 'FB', isNeutralFallback: true }], taskBody } as unknown as DraftFixture, bundle as never, []).find((c) => c.checkId === 'STRUCT')?.status;
+    expect(check({ starters: [{ starterId: 's1' }], keywordPartitions: { s1: ['a'] } })).toBe('PASS');
+    expect(check({ starters: [{ starterId: 's1' }], keywordPartitions: { s2: ['a'] } })).toBe('FAIL');
+  });
+
   it('blocks a Q4 with no spare card or a blank missing from the sentence', () => {
     const bundle = { slot: 'Q4', version: 1, fallbackChallengeId: 'FB', candidates: [] };
     const check = (taskBody: object) =>

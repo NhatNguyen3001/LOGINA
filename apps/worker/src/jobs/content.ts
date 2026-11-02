@@ -112,6 +112,15 @@ const q4Structured = ({ frame = '', slots = [], cards = [], slotFits = {} }: Q4B
   cards.length > slots.length &&
   slots.every(({ slotId }) => frame.includes(`[${slotId}]`) && cards.some(({ cardId }) => slotFits[slotId]?.includes(cardId)));
 
+interface Q5Body {
+  starters?: { starterId: string }[];
+  keywordPartitions?: Record<string, string[]>;
+}
+
+/** A starter with no word list could never send a student back to the source. */
+const q5Structured = ({ starters = [], keywordPartitions = {} }: Q5Body): boolean =>
+  starters.length > 0 && starters.every(({ starterId }) => (keywordPartitions[starterId]?.length ?? 0) > 0);
+
 /** The checks code can settle. They run for real in every mode. */
 export function deterministicChecks(draft: DraftFixture, bundle: Bundle, evidenceTexts: string[]) {
   const candidates = draft.challengeCandidates;
@@ -133,6 +142,7 @@ export function deterministicChecks(draft: DraftFixture, bundle: Bundle, evidenc
   }
   if (draft.slot === 'Q3') results.push(check('STRUCT', 'Each option has a drawback, each with exactly 1 supported reason', q3Structured(draft.taskBody as Q3Body)));
   if (draft.slot === 'Q4') results.push(check('STRUCT', 'Every blank is in the sentence and has a card that fits, with spare cards', q4Structured(draft.taskBody as Q4Body)));
+  if (draft.slot === 'Q5') results.push(check('STRUCT', 'Every sentence has a word list', q5Structured(draft.taskBody as Q5Body)));
   if (evidenceTexts.length > 0) {
     const options = [...(draft.answerOptions ?? []).map((a) => a.text), ...(draft.generatedE ?? []).map((e) => e.text)];
     const added = options.flatMap((text) => detectNewFacts(text, evidenceTexts));

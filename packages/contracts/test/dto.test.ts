@@ -114,7 +114,7 @@ describe('student DTOs', () => {
       slots: [{ slotId: 's1', label: 'y' }],
       cards: [{ cardId: 'c1', text: 'z' }, { cardId: 'c2', text: 'w' }],
     };
-    const q5 = { instructions: 'x', maxCharsPerField: 120 };
+    const q5 = { instructions: 'x', maxCharsPerField: 120, starters: [{ starterId: 's1', text: 'y' }] };
     expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q3', taskBody: q3 })).not.toThrow();
     expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q4', taskBody: q4 })).not.toThrow();
     expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q5', taskBody: q5 })).not.toThrow();
@@ -205,16 +205,12 @@ describe('requests', () => {
     expect(() => LockReq.parse({ ...lockBody, initialConfidence: 101 })).toThrow();
   });
 
-  it('Q5 artifact rejects proposal over 120 characters', () => {
-    expect(() => Q5Artifact.parse({ slot: 'Q5', proposal: 'x'.repeat(121), reason: 'y' })).toThrow();
+  it('Q5 artifact rejects an answer over 120 characters', () => {
+    expect(() => Q5Artifact.parse({ slot: 'Q5', answers: [{ starterId: 's1', text: 'x'.repeat(121) }] })).toThrow();
   });
 
   it('Q5 artifact accepts 120', () => {
-    expect(() => Q5Artifact.parse({ slot: 'Q5', proposal: 'x'.repeat(120), reason: 'y' })).not.toThrow();
-  });
-
-  it('Q5 artifact rejects reason over 120 characters', () => {
-    expect(() => Q5Artifact.parse({ slot: 'Q5', proposal: 'x', reason: 'y'.repeat(121) })).toThrow();
+    expect(() => Q5Artifact.parse({ slot: 'Q5', answers: [{ starterId: 's1', text: 'x'.repeat(120) }] })).not.toThrow();
   });
 
   it('artifacts are strict', () => {
