@@ -46,7 +46,7 @@ test('the full teacher path, from the sample to tracking', async ({ page }) => {
   await expect(page.getByText('Q4 needs your decision')).toBeVisible({ timeout: 60_000 });
   await expectAccessible(page, 'T6');
   await page.getByRole('button', { name: 'Regenerate Q4 with this choice' }).click();
-  await expect(page.getByRole('link', { name: /Q4 · Counterargument template/ })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole('link', { name: /Q4 · Counterargument/ })).toBeVisible({ timeout: 60_000 });
 
   await page.getByRole('link', { name: /Q1 · Statement \+ evidence/ }).click();
   await expect(page.getByText('STRUCTURE CHECKS')).toBeVisible();

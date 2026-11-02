@@ -32,9 +32,7 @@ export type Q3Artifact = z.infer<typeof Q3Artifact>;
 export const Q4Artifact = z
   .object({
     slot: z.literal('Q4'),
-    templateId: z.string(),
-    slots: z.array(z.object({ slotId: z.string(), choiceId: z.string() }).strict()),
-    activeSlotIds: z.array(z.string()).optional(),
+    placements: z.array(z.object({ slotId: z.string(), cardId: z.string() }).strict()),
   })
   .strict();
 export type Q4Artifact = z.infer<typeof Q4Artifact>;

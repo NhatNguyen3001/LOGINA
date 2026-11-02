@@ -117,7 +117,7 @@
       "Q1": "Q1 · Statement + evidence",
       "Q2": "Q2 · Rank cards",
       "Q3": "Q3 · Trade-off",
-      "Q4": "Q4 · Counterargument template",
+      "Q4": "Q4 · Counterargument",
       "Q5": "Q5 · Write a proposal"
     },
     "t03": {
@@ -620,9 +620,11 @@
       "waitCost": "Choose what it gives up first."
     },
     "q4": {
-      "template": "Choose a template",
-      "choose": "Choose…",
-      "blank": "Blank {{n}}"
+      "cards": "Cards",
+      "cardsHint": "There are more cards than blanks, and each card can be used once.",
+      "chooseCard": "Choose a card first",
+      "placeHere": "Tap to place the card here",
+      "choose": "Choose…"
     },
     "q5": {
       "proposal": "Your proposal",
@@ -660,7 +662,6 @@
       "decide": "Choose a path to continue.",
       "tradeOff": "Choose what it gives up to continue.",
       "whyCost": "Choose a reason to continue.",
-      "template": "Choose a template to continue.",
       "blanks": "Fill every blank to continue.",
       "proposal": "Write your proposal to continue.",
       "reason": "Write your reason to continue."

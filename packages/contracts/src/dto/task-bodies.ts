@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Public parts of the Q2 to Q5 task bodies (05-Backend-Schema section 5.6). These are typed and strict on
- * purpose: a loose `taskBody` would let `acceptedOrders`, `supportedReasons` or `keywordPartitions` through.
+ * purpose: a loose `taskBody` would let `acceptedOrders`, `supportedReasons`, `slotFits` or `keywordPartitions` through.
  */
 
 export const Q2TaskBody = z
@@ -33,22 +33,11 @@ export type Q3TaskBody = z.infer<typeof Q3TaskBody>;
 
 export const Q4TaskBody = z
   .object({
-    templates: z.array(
-      z
-        .object({
-          templateId: z.string(),
-          text: z.string(),
-          slots: z.array(
-            z
-              .object({
-                slotId: z.string(),
-                choices: z.array(z.object({ choiceId: z.string(), text: z.string() }).strict()),
-              })
-              .strict(),
-          ),
-        })
-        .strict(),
-    ),
+    /** The argument, with a [slotId] token for each blank. */
+    frame: z.string(),
+    slots: z.array(z.object({ slotId: z.string(), label: z.string() }).strict()),
+    /** One shared set, with more cards than blanks. */
+    cards: z.array(z.object({ cardId: z.string(), text: z.string() }).strict()),
   })
   .strict();
 export type Q4TaskBody = z.infer<typeof Q4TaskBody>;

@@ -42,27 +42,14 @@ describe('compareArtifacts', () => {
     expect(compareArtifacts(q3('o1', 't1', 'r1'), q3('o2', 't2', 'r2')).changedElements).toEqual(['judgment', 'tradeOff', 'reason']);
   });
 
-  const q4 = (templateId: string, slots: [string, string][], activeSlotIds?: string[]): Artifact => ({
-    slot: 'Q4',
-    templateId,
-    slots: slots.map(([slotId, choiceId]) => ({ slotId, choiceId })),
-    ...(activeSlotIds ? { activeSlotIds } : {}),
+  const q4 = (...placements: [string, string][]): Artifact => ({ slot: 'Q4', placements: placements.map(([slotId, cardId]) => ({ slotId, cardId })) });
+
+  it('Q4 ignores the order placements arrive in', () => {
+    expect(compareArtifacts(q4(['s1', 'a'], ['s2', 'b']), q4(['s2', 'b'], ['s1', 'a'])).revised).toBe(false);
   });
 
-  it('Q4 ignores inactive slots', () => {
-    const before = q4('t1', [['s1', 'a'], ['s2', 'x']], ['s1']);
-    const after = q4('t1', [['s1', 'a'], ['s2', 'y']], ['s1']);
-    expect(compareArtifacts(before, after).revised).toBe(false);
-  });
-
-  it('Q4 counts a change in an active slot', () => {
-    const before = q4('t1', [['s1', 'a']], ['s1']);
-    const after = q4('t1', [['s1', 'b']], ['s1']);
-    expect(compareArtifacts(before, after)).toEqual({ revised: true, changedElements: ['slots'] });
-  });
-
-  it('Q4 changing the template is REVISE', () => {
-    expect(compareArtifacts(q4('t1', [], []), q4('t2', [], [])).changedElements).toEqual(['template']);
+  it('Q4 counts a different card in a blank', () => {
+    expect(compareArtifacts(q4(['s1', 'a']), q4(['s1', 'b']))).toEqual({ revised: true, changedElements: ['placements'] });
   });
 
   const q5 = (proposal: string, reason: string, basis?: string): Artifact => ({

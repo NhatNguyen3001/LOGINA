@@ -57,30 +57,36 @@
       {
         "slot": "Q4",
         "initial": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S2"
+              "cardId": "C2"
             },
             {
               "slotId": "missing",
-              "choiceId": "M2"
+              "cardId": "C4"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
         "initialConfidence": 55,
         "choice": "REVISE",
         "final": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S1"
+              "cardId": "C1"
             },
             {
               "slotId": "missing",
-              "choiceId": "M1"
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
@@ -160,30 +166,36 @@
       {
         "slot": "Q4",
         "initial": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S1"
+              "cardId": "C1"
             },
             {
               "slotId": "missing",
-              "choiceId": "M1"
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
         "initialConfidence": 70,
         "choice": "KEEP",
         "final": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S1"
+              "cardId": "C1"
             },
             {
               "slotId": "missing",
-              "choiceId": "M1"
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
@@ -263,30 +275,36 @@
       {
         "slot": "Q4",
         "initial": {
-          "templateId": "M2",
-          "slots": [
+          "placements": [
             {
-              "slotId": "still",
-              "choiceId": "S3"
+              "slotId": "shown",
+              "cardId": "C1"
             },
             {
-              "slotId": "conclusion",
-              "choiceId": "C1"
+              "slotId": "missing",
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C6"
             }
           ]
         },
         "initialConfidence": 60,
         "choice": "KEEP",
         "final": {
-          "templateId": "M2",
-          "slots": [
+          "placements": [
             {
-              "slotId": "still",
-              "choiceId": "S3"
+              "slotId": "shown",
+              "cardId": "C1"
             },
             {
-              "slotId": "conclusion",
-              "choiceId": "C1"
+              "slotId": "missing",
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C6"
             }
           ]
         },
@@ -366,30 +384,36 @@
       {
         "slot": "Q4",
         "initial": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S1"
+              "cardId": "C1"
             },
             {
               "slotId": "missing",
-              "choiceId": "M2"
+              "cardId": "C4"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
         "initialConfidence": 50,
         "choice": "REVISE",
         "final": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S1"
+              "cardId": "C1"
             },
             {
               "slotId": "missing",
-              "choiceId": "M1"
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
@@ -469,30 +493,36 @@
       {
         "slot": "Q4",
         "initial": {
-          "templateId": "M2",
-          "slots": [
+          "placements": [
             {
-              "slotId": "still",
-              "choiceId": "S4"
+              "slotId": "shown",
+              "cardId": "C2"
             },
             {
-              "slotId": "conclusion",
-              "choiceId": "C2"
+              "slotId": "missing",
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C6"
             }
           ]
         },
         "initialConfidence": 45,
         "choice": "REVISE",
         "final": {
-          "templateId": "M2",
-          "slots": [
+          "placements": [
             {
-              "slotId": "still",
-              "choiceId": "S3"
+              "slotId": "shown",
+              "cardId": "C1"
             },
             {
-              "slotId": "conclusion",
-              "choiceId": "C1"
+              "slotId": "missing",
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
@@ -572,30 +602,36 @@
       {
         "slot": "Q4",
         "initial": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S1"
+              "cardId": "C1"
             },
             {
               "slotId": "missing",
-              "choiceId": "M1"
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
         "initialConfidence": 80,
         "choice": "KEEP",
         "final": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S1"
+              "cardId": "C1"
             },
             {
               "slotId": "missing",
-              "choiceId": "M1"
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
@@ -675,30 +711,36 @@
       {
         "slot": "Q4",
         "initial": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S2"
+              "cardId": "C2"
             },
             {
               "slotId": "missing",
-              "choiceId": "M1"
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },
         "initialConfidence": 45,
         "choice": "REVISE",
         "final": {
-          "templateId": "M1",
-          "slots": [
+          "placements": [
             {
               "slotId": "shown",
-              "choiceId": "S1"
+              "cardId": "C1"
             },
             {
               "slotId": "missing",
-              "choiceId": "M1"
+              "cardId": "C3"
+            },
+            {
+              "slotId": "needed",
+              "cardId": "C5"
             }
           ]
         },

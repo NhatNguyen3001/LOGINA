@@ -27,10 +27,10 @@ const q3Combos: LockFacts[] = ['O1', 'O2'].flatMap((id) =>
   ['true', 'false'].map((supported) => ({ 'q3.judgmentOptionId': id, 'q3.reasonSupported': supported })),
 );
 const q4Combos: LockFacts[] = [
-  { 'q4.templateId': 'M1', 'q4.firstChoiceId': 'S1' },
-  { 'q4.templateId': 'M1', 'q4.firstChoiceId': 'S2' },
-  { 'q4.templateId': 'M2', 'q4.firstChoiceId': 'S3' },
-  { 'q4.templateId': 'M2', 'q4.firstChoiceId': 'S4' },
+  { 'q4.misfitSlotId': 'shown' },
+  { 'q4.misfitSlotId': 'missing' },
+  { 'q4.misfitSlotId': 'needed' },
+  { 'q4.misfitSlotId': 'none' },
 ];
 const q5Combos: LockFacts[] = ['training', 'business', 'living', 'other'].map((p) => ({ 'q5.keywordPartition': p }));
 
@@ -56,8 +56,27 @@ describe.each(['en', 'vi'] as const)('fixture logic in %s', (locale) => {
   });
 
   it('Q3: a reason the source does not support gets the prompt that sends the student back', () => {
-    const facts = buildLockFacts({ slot: 'Q3', judgmentOptionId: 'O1', tradeOffId: 'D1', reasonId: 'R2' }, { answers: {}, evidence: {}, pairs: {} }, {}, ['R1']);
+    const facts = buildLockFacts({ slot: 'Q3', judgmentOptionId: 'O1', tradeOffId: 'D1', reasonId: 'R2' }, { answers: {}, evidence: {}, pairs: {} }, { supportedReasons: ['R1'] });
     expect(selectChallenge(bundle('q3', locale), facts).challengeId).toBe('TN1');
+  });
+
+  it('Q4: every blank is in the sentence and has a card that fits, with spare cards', () => {
+    for (const name of ['q4-v3', 'q4-v4'] as const) {
+      const body = (loadFixture(name, locale) as DraftFixture).taskBody as { frame: string; slots: { slotId: string }[]; cards: { cardId: string }[]; slotFits: Record<string, string[]> };
+      expect(body.cards.length).toBeGreaterThan(body.slots.length);
+      for (const { slotId } of body.slots) {
+        expect(body.frame).toContain(`[${slotId}]`);
+        expect(body.slotFits[slotId]!.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('Q4: mixing up share and number gets the share or number prompt', () => {
+    const slotFits = { shown: ['C1'], missing: ['C3'], needed: ['C5'] };
+    const placements = [{ slotId: 'shown', cardId: 'C2' }, { slotId: 'missing', cardId: 'C4' }, { slotId: 'needed', cardId: 'C5' }];
+    const facts = buildLockFacts({ slot: 'Q4', placements }, { answers: {}, evidence: {}, pairs: {} }, { slotFits });
+    expect(facts).toEqual({ 'q4.misfitSlotId': 'shown' });
+    expect(selectChallenge(bundle('q4', locale), facts).challengeId).toBe('TN1');
   });
 
   it('the Q1 pair table matches what the selector picks', () => {

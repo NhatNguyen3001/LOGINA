@@ -33,7 +33,7 @@ function progressOf(draft: DocumentData | undefined, translation: DocumentData |
 }
 const APPROVABLE = ['MACHINE_PASS', 'REVIEW_REQUIRED'];
 /** Fields of a Q2 to Q5 body that only the server may see. */
-const SERVER_ONLY_BODY = ['acceptedOrders', 'supportedReasons', 'keywordPartitions'];
+const SERVER_ONLY_BODY = ['acceptedOrders', 'supportedReasons', 'slotFits', 'keywordPartitions'];
 
 export interface LoadedDraft {
   id: string;
@@ -69,6 +69,14 @@ const blockersIn = (report: DocumentData): number => (report.gates as DocumentDa
 
 const canApprove = (doc: DocumentData, report: DocumentData): boolean =>
   APPROVABLE.includes(doc.status as string) && blockersIn(report) === 0;
+
+/** Scoring data a teacher reads: the Q3 reason the source supports, and the Q4 blank a card fits. */
+function taskLabels(body: DocumentData): Record<string, string> {
+  const supported = ((body.supportedReasons ?? []) as string[]).map((id) => [id, 'SUPPORTED']);
+  const labelOf = (slotId: string) => (body.slots as { slotId: string; label: string }[]).find((slot) => slot.slotId === slotId)?.label ?? slotId;
+  const fits = Object.entries((body.slotFits ?? {}) as Record<string, string[]>).flatMap(([slotId, cards]) => cards.map((card) => [card, labelOf(slotId)]));
+  return Object.fromEntries([...supported, ...fits]);
+}
 
 function publicBody(body: DocumentData): DocumentData {
   return Object.fromEntries(Object.entries(body).filter(([key]) => !SERVER_ONLY_BODY.includes(key)));
@@ -129,7 +137,7 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
       canApprove: canApprove(doc, report),
     };
     if (slot !== 'Q1') {
-      const teacherLabels = Object.fromEntries(((doc.taskBody.supportedReasons ?? []) as string[]).map((id) => [id, 'SUPPORTED']));
+      const teacherLabels = taskLabels(doc.taskBody as DocumentData);
       return respond(c, TeacherTaskSummaryDTO, { ...shared, slot, taskType: doc.taskType, taskBody: { ...publicBody(doc.taskBody), teacherLabels } } as never);
     }
 

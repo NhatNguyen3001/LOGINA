@@ -10,8 +10,7 @@ export type FactField =
   | 'q3.judgmentOptionId'
   | 'q3.tradeOffId'
   | 'q3.reasonSupported'
-  | 'q4.templateId'
-  | 'q4.firstChoiceId'
+  | 'q4.misfitSlotId'
   | 'q5.keywordPartition';
 
 export interface Condition {

@@ -99,6 +99,19 @@ const q3Structured = ({ options = [], tradeOffs = [], supportedReasons = [] }: Q
   options.every((option) => tradeOffs.some((tradeOff) => tradeOff.optionId === option.optionId)) &&
   tradeOffs.every(({ reasons }) => reasons.length >= 2 && reasons.filter((reason) => supportedReasons.includes(reason.reasonId)).length === 1);
 
+interface Q4Body {
+  frame?: string;
+  slots?: { slotId: string }[];
+  cards?: { cardId: string }[];
+  slotFits?: Record<string, string[]>;
+}
+
+/** Every blank is in the sentence and has a card that fits, and there are more cards than blanks. */
+const q4Structured = ({ frame = '', slots = [], cards = [], slotFits = {} }: Q4Body): boolean =>
+  slots.length > 0 &&
+  cards.length > slots.length &&
+  slots.every(({ slotId }) => frame.includes(`[${slotId}]`) && cards.some(({ cardId }) => slotFits[slotId]?.includes(cardId)));
+
 /** The checks code can settle. They run for real in every mode. */
 export function deterministicChecks(draft: DraftFixture, bundle: Bundle, evidenceTexts: string[]) {
   const candidates = draft.challengeCandidates;
@@ -119,6 +132,7 @@ export function deterministicChecks(draft: DraftFixture, bundle: Bundle, evidenc
     );
   }
   if (draft.slot === 'Q3') results.push(check('STRUCT', 'Each option has a drawback, each with exactly 1 supported reason', q3Structured(draft.taskBody as Q3Body)));
+  if (draft.slot === 'Q4') results.push(check('STRUCT', 'Every blank is in the sentence and has a card that fits, with spare cards', q4Structured(draft.taskBody as Q4Body)));
   if (evidenceTexts.length > 0) {
     const options = [...(draft.answerOptions ?? []).map((a) => a.text), ...(draft.generatedE ?? []).map((e) => e.text)];
     const added = options.flatMap((text) => detectNewFacts(text, evidenceTexts));

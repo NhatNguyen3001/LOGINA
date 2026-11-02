@@ -369,7 +369,7 @@ describe('T7, T9 and T11', () => {
 
   it('a blocked task opens its prompts with an inline editor, and fallback cannot be edited', async () => {
     params.slot = 'Q4';
-    vi.mocked(api.getPreview).mockResolvedValue({ slot: 'Q4', draftId: 'd4', draftVersion: 3, taskType: 'COUNTERARGUMENT', status: 'BLOCKED', questionStem: 'Rebut', gates: [], exampleChallenges: preview().exampleChallenges, blockers: 1, canApprove: false, taskBody: { templates: [], teacherLabels: {} } } as never);
+    vi.mocked(api.getPreview).mockResolvedValue({ slot: 'Q4', draftId: 'd4', draftVersion: 3, taskType: 'COUNTERARGUMENT', status: 'BLOCKED', questionStem: 'Rebut', gates: [], exampleChallenges: preview().exampleChallenges, blockers: 1, canApprove: false, taskBody: { frame: 'A [s1]', slots: [], cards: [], teacherLabels: {} } } as never);
     vi.mocked(api.getChallenges).mockResolvedValue({ slot: 'Q4', draftVersion: 3, candidateSetVersion: 1, challenges: [
       { challengeId: 'TN2', label: 'TN2', purpose: 'Enough', whenShown: 'x', message: 'Productivity rose.', isFallback: false, sourceAnchor: 'p. 8' },
       { challengeId: 'FB', label: 'Fallback', purpose: 'Neutral', whenShown: 'y', message: 'Check once more.', isFallback: true, sourceAnchor: 'p. 8' },

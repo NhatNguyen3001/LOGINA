@@ -3,6 +3,7 @@ import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } 
 import { CSS } from '@dnd-kit/utilities';
 import type { Artifact, DraftArtifact, Q2TaskBody, Q3TaskBody, Q4TaskBody, Q5TaskBody, StudentTaskDTO } from '@logina/contracts';
 import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pick } from '@/components/logina/Pick';
 
@@ -142,34 +143,62 @@ export function Q3Editor({ body, value, onChange, original }: EditorProps<'Q3', 
   );
 }
 
+/** The argument with the student's cards in it, standing out from the frame's own words. */
+export function FilledFrame({ body, placements }: { body: Q4TaskBody; placements: { slotId: string; cardId: string }[] }) {
+  const textOf = (slotId: string) => {
+    const cardId = placements.find((x) => x.slotId === slotId)?.cardId;
+    return body.cards.find((x) => x.cardId === cardId)?.text;
+  };
+  return (
+    <p className="ans fills">
+      {body.frame.split(/(\[[^\]]+\])/).map((part, index) => {
+        const slotId = /^\[(.+)\]$/.exec(part)?.[1];
+        return slotId ? <mark key={index}>{textOf(slotId) ?? '____'}</mark> : part;
+      })}
+    </p>
+  );
+}
+
 export function Q4Editor({ body, value, onChange }: EditorProps<'Q4', Q4TaskBody>) {
   const { t } = useTranslation();
-  const template = body.templates.find((x) => x.templateId === value.templateId);
-  const slots = value.slots ?? [];
+  const [held, setHeld] = useState<string | null>(null);
+  const placements = value.placements ?? [];
+  const cardIn = (slotId: string) => placements.find((x) => x.slotId === slotId)?.cardId;
+  const free = body.cards.filter((card) => !placements.some((x) => x.cardId === card.cardId));
 
-  const fill = (slotId: string, choiceId: string) => onChange({ ...value, slots: [...slots.filter((s) => s.slotId !== slotId), { slotId, choiceId }] });
+  /** Kept in the order of the blanks, because that order decides the Think-again prompt. */
+  const save = (slotId: string, cardId: string | null) => {
+    const next = (id: string) => (id === slotId ? cardId : cardIn(id));
+    onChange({ ...value, placements: body.slots.flatMap(({ slotId: id }) => (next(id) ? [{ slotId: id, cardId: next(id)! }] : [])) });
+  };
+
+  const tapBlank = (slotId: string) => {
+    if (held) save(slotId, held);
+    else if (cardIn(slotId)) save(slotId, null);
+    setHeld(null);
+  };
 
   return (
     <>
-      <h2 className="s15 b">{t('student.q4.template')}</h2>
-      <div className="stack" role="radiogroup" aria-label={t('student.q4.template')}>
-        {body.templates.map(({ templateId, text }) => (
-          <Pick key={templateId} name="template" value={templateId} checked={value.templateId === templateId} onSelect={(id) => onChange({ slot: 'Q4', templateId: id, slots: [] })}>
-            {text}
-          </Pick>
+      <FilledFrame body={body} placements={placements} />
+      <h2 className="s15 b">{t('student.q4.cards')}</h2>
+      <p className="s13 sec">{t('student.q4.cardsHint')}</p>
+      <div className="card-bank">
+        {free.map(({ cardId, text }) => (
+          <button key={cardId} type="button" className={`word-card ${held === cardId ? 'on' : ''}`} aria-pressed={held === cardId} onClick={() => setHeld(held === cardId ? null : cardId)}>{text}</button>
         ))}
       </div>
-      {template?.slots.map(({ slotId, choices }, index) => (
-        <div key={slotId} className="field">
-          <label htmlFor={slotId}>{t('student.q4.blank', { n: index + 1 })}</label>
-          <select id={slotId} className="select" value={slots.find((s) => s.slotId === slotId)?.choiceId ?? ''} onChange={(event) => fill(slotId, event.target.value)}>
-            <option value="" disabled>{t('student.q4.choose')}</option>
-            {choices.map(({ choiceId, text }) => (
-              <option key={choiceId} value={choiceId}>{text}</option>
-            ))}
-          </select>
-        </div>
-      ))}
+      {body.slots.map(({ slotId, label }) => {
+        const card = body.cards.find((x) => x.cardId === cardIn(slotId));
+        return (
+          <div key={slotId} className="field">
+            <span className="b" id={`blank-${slotId}`}>{label}</span>
+            <button type="button" aria-describedby={`blank-${slotId}`} className={`blank ${card ? 'full' : held ? 'ready' : ''}`} onClick={() => tapBlank(slotId)}>
+              {card?.text ?? t(held ? 'student.q4.placeHere' : 'student.q4.chooseCard')}
+            </button>
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -210,10 +239,7 @@ export function isComplete(task: StudentTaskDTO, value: DraftArtifact): value is
   if (value.slot === 'Q1') return Boolean(value.answerId && value.evidenceId);
   if (value.slot === 'Q2') return Boolean(value.orderedCardIds?.length);
   if (value.slot === 'Q3') return Boolean(value.judgmentOptionId && value.tradeOffId && value.reasonId);
-  if (value.slot === 'Q4' && task.slot === 'Q4') {
-    const template = task.taskBody.templates.find((x) => x.templateId === value.templateId);
-    return Boolean(template) && template!.slots.every((s) => value.slots?.some((x) => x.slotId === s.slotId));
-  }
+  if (value.slot === 'Q4' && task.slot === 'Q4') return task.taskBody.slots.every((s) => value.placements?.some((x) => x.slotId === s.slotId));
   if (value.slot === 'Q5') return Boolean(value.proposal?.trim() && value.reason?.trim());
   return false;
 }
@@ -229,10 +255,7 @@ export function missingKey(task: StudentTaskDTO, value: DraftArtifact): string |
     if (!value.tradeOffId) return 'student.need.tradeOff';
     return value.reasonId ? null : 'student.need.whyCost';
   }
-  if (value.slot === 'Q4' && task.slot === 'Q4') {
-    if (!value.templateId) return 'student.need.template';
-    return isComplete(task, value) ? null : 'student.need.blanks';
-  }
+  if (value.slot === 'Q4') return isComplete(task, value) ? null : 'student.need.blanks';
   if (value.slot === 'Q5') {
     if (!value.proposal?.trim()) return 'student.need.proposal';
     return value.reason?.trim() ? null : 'student.need.reason';
@@ -243,7 +266,7 @@ export function missingKey(task: StudentTaskDTO, value: DraftArtifact): string |
 export function emptyDraft(task: StudentTaskDTO): DraftArtifact {
   const saved = task.draftArtifact;
   if (task.slot === 'Q2') return { slot: 'Q2', orderedCardIds: task.taskBody.cards.map((c) => c.cardId), ...saved } as DraftArtifact;
-  if (task.slot === 'Q4') return { slot: 'Q4', slots: [], ...saved } as DraftArtifact;
+  if (task.slot === 'Q4') return { slot: 'Q4', placements: [], ...saved } as DraftArtifact;
   return saved ?? { slot: task.slot };
 }
 
