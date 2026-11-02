@@ -16,4 +16,6 @@ HTMLDialogElement.prototype.showModal ??= function showModal(this: HTMLDialogEle
   this.open = true;
 };
 
+window.scrollTo = () => {};
+
 afterEach(cleanup);

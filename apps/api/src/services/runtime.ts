@@ -1,7 +1,7 @@
 import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/firestore';
 import { Artifact, type AttemptDTO, type StudentChallengeDTO, type SubmitResultDTO } from '@logina/contracts';
 import { AppError, decodeNested, moveTree, newId, scopedGet, writeOnce } from '@logina/db';
-import { buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle } from '@logina/domain';
+import { applyTexts, buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle, type TextPair } from '@logina/domain';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const LETTERS = 'ABCD';
@@ -146,6 +146,8 @@ export async function lockTask(
   attemptId: string,
   slot: string,
   { artifact, initialConfidence, secondsOnTask, answerChanges }: { artifact: Artifact; initialConfidence: number; secondsOnTask?: number | undefined; answerChanges?: AnswerChange[] | undefined },
+  /** Reuses what this call already loaded, so the reply costs no second read of the release. */
+  inLanguage: (attempt: DocumentData, release: DocumentData) => Promise<{ release: DocumentData; texts: TextPair[] }> = async (_, shown) => ({ release: shown, texts: [] }),
 ): Promise<StudentChallengeDTO> {
   const attempt = await loadAttempt(db, actor, attemptId);
   const release = await loadRelease(db, attempt, slot);
@@ -161,11 +163,11 @@ export async function lockTask(
 
   const taskRef = db.doc(`attempts/${attemptId}/tasks/${slot}`);
   const deliveryId = newId('dlv');
-  return db.runTransaction(async (tx) => {
+  const stored = await db.runTransaction(async (tx) => {
     const task = (await tx.get(taskRef)).data()!;
     if (task.lockedAt) {
       const existing = (await tx.get(taskRef.collection('deliveries').doc(task.deliveryId as string))).data()!;
-      return toChallengeDTO(task, existing, task.deliveryId as string, release);
+      return { task, delivery: existing, deliveryId: task.deliveryId as string };
     }
     const delivery = {
       challengeId: chosen.challengeId,
@@ -189,8 +191,11 @@ export async function lockTask(
     });
     writeOnce(tx, taskRef.collection('deliveries').doc(deliveryId), delivery);
     if (attempt.status === 'NOT_STARTED') tx.update(db.doc(`attempts/${attemptId}`), { status: 'IN_PROGRESS' });
-    return toChallengeDTO({ initialArtifact: artifact, initialConfidence }, delivery, deliveryId, release);
+    return { task: { initialArtifact: artifact, initialConfidence }, delivery, deliveryId };
   });
+
+  const shown = await inLanguage(attempt, release);
+  return toChallengeDTO(stored.task, { ...stored.delivery, renderedMessage: applyTexts(stored.delivery.renderedMessage as string, shown.texts) }, stored.deliveryId, shown.release);
 }
 
 export async function submitTask(

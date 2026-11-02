@@ -1,11 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Layers } from 'lucide-react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { applySessionLocale, setUserLocaleSaver } from '@/i18n';
-import { getMe, updateMe } from '@/lib/api';
-import { qk, queryClient } from '@/lib/query';
+import { useSessionLocale } from '@/lib/use-session-locale';
 import { BusyNote } from './BusyNote';
 import { DemoMenu } from './DemoMenu';
 import { LangSwitch } from './LangSwitch';
@@ -14,21 +11,6 @@ import { Logo } from './Logo';
 import { MenuButton } from './MenuButton';
 import { SwitchSide } from './SwitchSide';
 import { Toast } from './Toast';
-
-/** Applies the saved language once the session is known, and saves later switches. */
-export function useSessionLocale(): void {
-  const me = useQuery({ queryKey: qk.me(), queryFn: getMe });
-  const uiLocale = me.data?.uiLocale;
-  useEffect(() => {
-    if (!uiLocale) return;
-    void applySessionLocale(uiLocale);
-    setUserLocaleSaver(async (lang) => {
-      await updateMe({ uiLocale: lang });
-      /** Questions and answers come from the server in the saved language. */
-      await queryClient.invalidateQueries();
-    });
-  }, [uiLocale]);
-}
 
 export function TeacherShell({ lessonId, assignmentId, children }: { lessonId?: string; assignmentId?: string; children: ReactNode }) {
   const { t } = useTranslation();

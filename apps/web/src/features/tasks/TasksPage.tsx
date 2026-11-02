@@ -50,7 +50,7 @@ function Q4Decision({ lessonId, slot, version }: { lessonId: string; slot: Slot;
       {send.isError ? <Note kind="err">{t(errorKey(send.error instanceof ApiError ? send.error.code : ''))}</Note> : null}
       <div className="row">
         <span className="sp" />
-        <button type="button" className="btn primary sm" disabled={send.isPending} onClick={() => send.mutate()}>{t('teacher.t06.regenerate', { slot })}</button>
+        <button type="button" className="btn primary sm" aria-busy={send.isPending} disabled={send.isPending} onClick={() => send.mutate()}>{t('teacher.t06.regenerate', { slot })}</button>
       </div>
     </div>
   );

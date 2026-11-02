@@ -5,7 +5,13 @@ import { getJob } from './api';
 const JOB_POLL_MS = 1500;
 const FINISHED: JobDTO['status'][] = ['DONE', 'FAILED', 'TIMED_OUT', 'CANCELLED'];
 
-export const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } });
+/** A refusal will not change, but a dropped connection often will, so that gets one more try. */
+const worthRetrying = (failures: number, error: unknown): boolean => {
+  const { status } = error as { status?: number };
+  return failures < 1 && (status === undefined || status >= 500);
+};
+
+export const queryClient = new QueryClient({ defaultOptions: { queries: { retry: worthRetrying, retryDelay: 800, refetchOnWindowFocus: false } } });
 
 export const qk = {
   me: () => ['me'] as const,

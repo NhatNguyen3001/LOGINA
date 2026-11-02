@@ -73,7 +73,7 @@ export function LogicPage() {
           </div>
           <p className="s13 sec">{t('teacher.t08.invalidates')}</p>
           {save.isError ? <Note kind="err">{t(errorKey(save.error instanceof ApiError ? save.error.code : ''))}</Note> : null}
-          <button type="button" className="btn primary self-start" disabled={!challengeId || !message.trim() || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
+          <button type="button" className="btn primary self-start" aria-busy={save.isPending} disabled={!challengeId || !message.trim() || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         </div>
       ) : null}
     </>

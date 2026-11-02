@@ -53,7 +53,7 @@ function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, o
       <textarea id={`prompt-${challengeId}`} className="textarea" value={value} onChange={(event) => setValue(event.target.value)} />
       {save.isError ? <Note kind="err">{t(errorKey(save.error instanceof ApiError ? save.error.code : ''))}</Note> : null}
       <div className="row">
-        <button type="button" className="btn primary sm" disabled={!value.trim() || value === message || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
+        <button type="button" className="btn primary sm" aria-busy={save.isPending} disabled={!value.trim() || value === message || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         <button type="button" className="btn secondary sm" onClick={onClose}>{t('common.cancel')}</button>
       </div>
     </div>
@@ -145,7 +145,7 @@ function TryCase({ lessonId, slot, preview }: { lessonId: string; slot: Slot; pr
           <button key={id} type="button" className={`chip ${evidenceId === id ? 'on' : ''}`} aria-pressed={evidenceId === id} onClick={() => setEvidenceId(id)}>{id}</button>
         ))}
         <span className="sp" />
-        <button type="button" className="btn secondary sm" disabled={!answerId || !evidenceId || run.isPending} onClick={() => run.mutate()}>{t('teacher.t07.tryRun')}</button>
+        <button type="button" className="btn secondary sm" aria-busy={run.isPending} disabled={!answerId || !evidenceId || run.isPending} onClick={() => run.mutate()}>{t('teacher.t07.tryRun')}</button>
       </div>
       {run.data ? (
         <div className="well stack">
@@ -215,7 +215,7 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
       ) : null}
       {save.isError && !refused && !conflict && code !== 'RATE_LIMITED' ? <Note kind="err">{t(errorKey(code))}</Note> : null}
       <div className="row">
-        <button type="button" className="btn primary sm" disabled={!value.trim() || value === text || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
+        <button type="button" className="btn primary sm" aria-busy={save.isPending} disabled={!value.trim() || value === text || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         <button type="button" className="btn secondary sm" onClick={onClose}>{t('common.cancel')}</button>
       </div>
     </div>
@@ -363,7 +363,7 @@ export function PreviewPage() {
           <div className="row">
             <span className="tag stale">{t('teacher.t11.cantApprove', { slot })}</span>
             <span className="sp" />
-            <button type="button" className="btn primary sm" disabled={rerun.isPending} onClick={() => rerun.mutate()}>{t('common.retry')}</button>
+            <button type="button" className="btn primary sm" aria-busy={rerun.isPending} disabled={rerun.isPending} onClick={() => rerun.mutate()}>{t('common.retry')}</button>
           </div>
         </div>
       ) : null}

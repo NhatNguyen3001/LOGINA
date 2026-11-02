@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StudentShell } from '@/components/logina/StudentShell';
 import { StatusTag } from '@/components/logina/StatusTag';
-import { useSessionLocale } from '@/components/logina/TeacherShell';
+import { useSessionLocale } from '@/lib/use-session-locale';
 import { getMyAssignments, getRecordedRuns } from '@/lib/api';
 import { qk } from '@/lib/query';
 

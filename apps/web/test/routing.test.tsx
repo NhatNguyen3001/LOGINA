@@ -144,10 +144,10 @@ describe('opening an assignment', () => {
 });
 
 describe('consent', () => {
-  it('both buttons have identical classes and the text covers the study', async () => {
+  it('agreeing is the only action and the text covers the study', async () => {
     await renderWithI18n(withQuery(<Consent onDone={() => {}} />));
-    const agree = await screen.findByRole('button', { name: 'I agree' });
-    expect(agree.className).toBe(screen.getByRole('button', { name: 'No thanks, just try it' }).className);
+    await screen.findByRole('button', { name: 'I agree' });
+    expect(screen.queryByRole('button', { name: /No thanks/ })).toBeNull();
     for (const text of [/Q5/, /2 years/, /withdraw/]) expect(screen.getAllByText(text).length).toBeGreaterThan(0);
   });
 
@@ -159,11 +159,4 @@ describe('consent', () => {
     expect(vi.mocked(api.sendConsent).mock.calls[0]?.[0]).toEqual({ consentVersion: '2026-11-v1', choice: 'AGREED' });
   });
 
-  it('decline goes straight on', async () => {
-    vi.mocked(api.sendConsent).mockResolvedValue({ consent: 'DECLINED' });
-    const onDone = vi.fn();
-    await renderWithI18n(withQuery(<Consent onDone={onDone} />));
-    fireEvent.click(await screen.findByRole('button', { name: 'No thanks, just try it' }));
-    await waitFor(() => expect(onDone).toHaveBeenCalled());
-  });
 });

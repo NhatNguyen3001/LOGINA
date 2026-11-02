@@ -188,7 +188,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
             ))}
           </ol>
           <p className="small muted">{t('teacher.t01.structureNote')}</p>
-          <button type="submit" className="btn primary block" disabled={analyze.isPending || !classId}>{t('teacher.t01.analyze')}</button>
+          <button type="submit" className="btn primary block" aria-busy={analyze.isPending} disabled={analyze.isPending || !classId}>{t('teacher.t01.analyze')}</button>
           {classId ? null : <p className="hint">{t(me.isError ? 'errors.generic' : 'common.loading')}</p>}
         </div>
       </div>

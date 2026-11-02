@@ -4,7 +4,8 @@ import { completeTask } from './helpers';
 const startTasks = async (page: Page) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Try as student' }).click();
-  await page.getByRole('button', { name: 'No thanks, just try it' }).click();
+  await page.getByRole('button', { name: 'I agree' }).click();
+  await page.getByRole('button', { name: 'Continue to the tasks' }).click();
   await expect(page).toHaveURL(/\/Q1$/);
 };
 

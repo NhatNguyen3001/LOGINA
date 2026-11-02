@@ -1,28 +1,37 @@
 import { Outlet, createRootRoute, createRoute, createRouter, useNavigate, useParams } from '@tanstack/react-router';
-import type { ReactElement } from 'react';
-import { TeacherShell, useSessionLocale } from '@/components/logina/TeacherShell';
+import { Suspense, lazy, type ComponentType } from 'react';
+import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { usePageTitle } from '@/lib/page-title';
+import { useSessionLocale } from '@/lib/use-session-locale';
 import { EntryPage } from '@/features/entry/EntryPage';
-import { LegalPage } from '@/features/legal/LegalPage';
-import { ApprovePage } from '@/features/approve/ApprovePage';
-import { AssignPage } from '@/features/approve/AssignPage';
-import { AnalyzePage } from '@/features/lessons/AnalyzePage';
-import { CreateLesson } from '@/features/lessons/CreateLesson';
-import { LessonRedirect } from '@/features/lessons/LessonRedirect';
-import { LessonsHome } from '@/features/lessons/LessonsHome';
-import { TracePage } from '@/features/tracking/TracePage';
-import { TrackingPage } from '@/features/tracking/TrackingPage';
-import { LogicPage } from '@/features/tasks/LogicPage';
-import { PreviewPage } from '@/features/tasks/PreviewPage';
-import { TasksPage } from '@/features/tasks/TasksPage';
-import { SourceEditPage } from '@/features/source/SourceEditPage';
-import { ClarifyPage } from '@/features/source/ClarifyPage';
-import { SourcePage } from '@/features/source/SourcePage';
-import { Consent } from '@/features/student/Consent';
-import { OpenAssignment } from '@/features/student/OpenAssignment';
-import { ResultDetail, ResultSet } from '@/features/student/ResultSet';
-import { StudentHome } from '@/features/student/StudentHome';
-import { TaskRunner } from '@/features/student/TaskRunner';
+
+/** Each side loads only its own code, so a student never downloads the teacher screens. */
+function screen<K extends string, P extends object>(load: () => Promise<Record<K, ComponentType<P>>>, name: K) {
+  return lazy(async () => ({ default: (await load())[name] }));
+}
+
+const TeacherShell = screen(() => import('@/components/logina/TeacherShell'), 'TeacherShell');
+const LegalPage = screen(() => import('@/features/legal/LegalPage'), 'LegalPage');
+const ApprovePage = screen(() => import('@/features/approve/ApprovePage'), 'ApprovePage');
+const AssignPage = screen(() => import('@/features/approve/AssignPage'), 'AssignPage');
+const AnalyzePage = screen(() => import('@/features/lessons/AnalyzePage'), 'AnalyzePage');
+const CreateLesson = screen(() => import('@/features/lessons/CreateLesson'), 'CreateLesson');
+const LessonRedirect = screen(() => import('@/features/lessons/LessonRedirect'), 'LessonRedirect');
+const LessonsHome = screen(() => import('@/features/lessons/LessonsHome'), 'LessonsHome');
+const TracePage = screen(() => import('@/features/tracking/TracePage'), 'TracePage');
+const TrackingPage = screen(() => import('@/features/tracking/TrackingPage'), 'TrackingPage');
+const LogicPage = screen(() => import('@/features/tasks/LogicPage'), 'LogicPage');
+const PreviewPage = screen(() => import('@/features/tasks/PreviewPage'), 'PreviewPage');
+const TasksPage = screen(() => import('@/features/tasks/TasksPage'), 'TasksPage');
+const SourceEditPage = screen(() => import('@/features/source/SourceEditPage'), 'SourceEditPage');
+const ClarifyPage = screen(() => import('@/features/source/ClarifyPage'), 'ClarifyPage');
+const SourcePage = screen(() => import('@/features/source/SourcePage'), 'SourcePage');
+const Consent = screen(() => import('@/features/student/Consent'), 'Consent');
+const OpenAssignment = screen(() => import('@/features/student/OpenAssignment'), 'OpenAssignment');
+const ResultDetail = screen(() => import('@/features/student/ResultSet'), 'ResultDetail');
+const ResultSet = screen(() => import('@/features/student/ResultSet'), 'ResultSet');
+const StudentHome = screen(() => import('@/features/student/StudentHome'), 'StudentHome');
+const TaskRunner = screen(() => import('@/features/student/TaskRunner'), 'TaskRunner');
 
 function Root() {
   usePageTitle();
@@ -31,9 +40,18 @@ function Root() {
 
 const rootRoute = createRootRoute({ component: Root });
 
-type Screen = () => ReactElement;
+type Screen = ComponentType;
 
-const page = (path: string, component: Screen) => createRoute({ getParentRoute: () => rootRoute, path, component });
+const page = (path: string, Content: Screen) =>
+  createRoute({
+    getParentRoute: () => rootRoute,
+    path,
+    component: () => (
+      <Suspense fallback={<div className="p-6"><LoadingSkeleton /></div>}>
+        <Content />
+      </Suspense>
+    ),
+  });
 
 /** Wraps a screen in the teacher shell; a lesson route passes its ID so the side switch opens that lesson. */
 const teacher = (path: string, Screen: Screen) =>
@@ -93,4 +111,4 @@ const routeTree = rootRoute.addChildren([
   page('/s/attempts/$id/$slot', TaskRunner),
 ]);
 
-export const router = createRouter({ routeTree });
+export const router = createRouter({ routeTree, scrollRestoration: true });

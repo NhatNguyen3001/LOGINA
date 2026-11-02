@@ -29,7 +29,7 @@ function Line({ lessonId, slot, translation, from, to }: { lessonId: string; slo
       {editing ? (
         <div className="stack">
           <textarea className="textarea" aria-label={from} lang={translation.locale} value={value} onChange={(event) => setValue(event.target.value)} />
-          <button type="button" className="btn secondary sm self-start" disabled={!value.trim() || value === to || save.isPending} onClick={() => save.mutate()}>{t('teacher.t12.translation.save')}</button>
+          <button type="button" className="btn secondary sm self-start" aria-busy={save.isPending} disabled={!value.trim() || value === to || save.isPending} onClick={() => save.mutate()}>{t('teacher.t12.translation.save')}</button>
         </div>
       ) : (
         <div className="stack">
@@ -63,7 +63,7 @@ export function TranslationReview({ lessonId, task }: { lessonId: string; task: 
       {canRetry ? (
         <div className="row">
           <span className="s13 sec grow">{t('teacher.t12.translation.missing')}</span>
-          <button type="button" className="btn secondary sm" disabled={retry.isPending} onClick={() => retry.mutate()}>{t('teacher.t12.translation.retry')}</button>
+          <button type="button" className="btn secondary sm" aria-busy={retry.isPending} disabled={retry.isPending} onClick={() => retry.mutate()}>{t('teacher.t12.translation.retry')}</button>
         </div>
       ) : null}
       {blockers.map((finding) => (
