@@ -33,7 +33,7 @@ describe('translation keys', () => {
       'student.status': ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETE'],
       'teacher.taskType': ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'],
       'student.progress': ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'],
-      'student.need': ['statement', 'card', 'decide', 'tradeOff', 'whyCost', 'blanks', 'proposal', 'reason'],
+      'student.need': ['statement', 'card', 'decide', 'tradeOff', 'whyCost', 'blanks', 'starters'],
       'student.save': ['saving', 'failed'],
       'teacher.t12.why': ['blockers', 'warnings', 'status', 'confirm'],
       'entry.how': ['add', 'draft', 'approve', 'think'],

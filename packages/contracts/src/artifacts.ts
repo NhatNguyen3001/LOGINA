@@ -40,9 +40,8 @@ export type Q4Artifact = z.infer<typeof Q4Artifact>;
 export const Q5Artifact = z
   .object({
     slot: z.literal('Q5'),
-    proposal: z.string().max(120),
-    reason: z.string().max(120),
-    basis: z.string().optional(),
+    /** A button stores its label as `text`, so results read naturally in the student's language. */
+    answers: z.array(z.object({ starterId: z.string(), text: z.string().max(120), declared: z.enum(['DONT_KNOW', 'NOT_ENOUGH']).optional() }).strict()),
   })
   .strict();
 export type Q5Artifact = z.infer<typeof Q5Artifact>;

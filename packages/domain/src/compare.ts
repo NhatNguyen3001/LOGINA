@@ -27,9 +27,8 @@ function changedElements(initial: Artifact, final: Artifact): string[] {
     const placed = (a: Artifact & { slot: 'Q4' }) => a.placements.map((p) => `${p.slotId}=${p.cardId}`).sort();
     mark('placements', sameJson(placed(initial), placed(final)));
   } else if (initial.slot === 'Q5' && final.slot === 'Q5') {
-    mark('proposal', normalizeText(initial.proposal) === normalizeText(final.proposal));
-    mark('reason', normalizeText(initial.reason) === normalizeText(final.reason));
-    mark('basis', normalizeText(initial.basis ?? '') === normalizeText(final.basis ?? ''));
+    const said = (a: Artifact & { slot: 'Q5' }) => a.answers.map((x) => `${x.starterId}=${x.declared ?? normalizeText(x.text)}`).sort();
+    mark('answers', sameJson(said(initial), said(final)));
   } else {
     throw new Error(`compareArtifacts: slot mismatch ${initial.slot} and ${final.slot}`);
   }

@@ -46,6 +46,8 @@ export const Q5TaskBody = z
   .object({
     instructions: z.string(),
     maxCharsPerField: z.literal(120),
+    /** Short sentences from the source for the student to finish. */
+    starters: z.array(z.object({ starterId: z.string(), text: z.string() }).strict()),
   })
   .strict();
 export type Q5TaskBody = z.infer<typeof Q5TaskBody>;

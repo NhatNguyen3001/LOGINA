@@ -78,8 +78,7 @@ function randomTasks(lessonId: string, n: number, releases: Record<string, Docum
       const cards = shuffleForRelease(String(random()), (body.cards as { cardId: string }[]).map((c) => c.cardId));
       return { placements: (body.slots as { slotId: string }[]).map((s, i) => ({ slotId: s.slotId, cardId: cards[i]! })) };
     }
-    const text = (release.publicContent.questionStem as string).slice(0, MAX_TEXT);
-    return { proposal: text, reason: text };
+    return { answers: (body.starters as { starterId: string; text: string }[]).map((s) => ({ starterId: s.starterId, text: s.text.slice(0, MAX_TEXT) })) };
   };
 
   return SLOTS.map((slot) => {

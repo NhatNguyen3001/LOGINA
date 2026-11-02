@@ -118,7 +118,7 @@
       "Q2": "Q2 · Xếp thẻ",
       "Q3": "Q3 · Đánh đổi",
       "Q4": "Q4 · Phản biện",
-      "Q5": "Q5 · Viết đề xuất"
+      "Q5": "Q5 · Hoàn thành câu"
     },
     "t03": {
       "crumb": "Làm rõ học liệu",
@@ -542,7 +542,7 @@
       "Q2": "Q2 Xếp thẻ",
       "Q3": "Q3 Đánh đổi",
       "Q4": "Q4 Phản biện",
-      "Q5": "Q5 Đề xuất"
+      "Q5": "Q5 Hoàn thành câu"
     },
     "phase": {
       "think": "Thử nghĩ thêm và trả lời cuối",
@@ -627,8 +627,9 @@
       "choose": "Chọn…"
     },
     "q5": {
-      "proposal": "Đề xuất của em",
-      "reason": "Lý do của em"
+      "placeholder": "Nhập một từ hoặc cụm từ ngắn",
+      "dontKnow": "Em chưa biết cách trả lời",
+      "notEnough": "Em cho rằng chưa đủ dữ kiện"
     },
     "result": {
       "title": "Em đã hoàn thành cả 5 nhiệm vụ",
@@ -663,8 +664,7 @@
       "tradeOff": "Chọn điều phải đánh đổi để tiếp tục.",
       "whyCost": "Chọn một lí do để tiếp tục.",
       "blanks": "Điền mọi chỗ trống để tiếp tục.",
-      "proposal": "Viết đề xuất của em để tiếp tục.",
-      "reason": "Viết lý do của em để tiếp tục."
+      "starters": "Hoàn thành mọi câu, hoặc chạm một nút, để tiếp tục."
     }
   },
   "entry": {

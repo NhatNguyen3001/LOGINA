@@ -293,14 +293,16 @@ describe('Q2 to Q5', () => {
     expect(sentence.querySelectorAll('mark')).toHaveLength(2);
   });
 
-  it('Think again on Q5 shows both the proposal and the reason', async () => {
-    const initialArtifact = { slot: 'Q5', proposal: 'Open trade courses', reason: 'Many jobs need training' };
-    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q5', phase: 'CHALLENGED', stem: 'Propose', draftArtifact: null, taskBody: { instructions: 'Write', maxCharsPerField: 120 }, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+  const q5Body = { instructions: 'Write.', maxCharsPerField: 120 as const, starters: [{ starterId: 's1', text: 'Jobs depend on...' }, { starterId: 's2', text: 'Staying gives up...' }] };
+
+  it('Think again on Q5 lists each sentence with its answer', async () => {
+    const initialArtifact = { slot: 'Q5', answers: [{ starterId: 's1', text: 'skills' }, { starterId: 's2', text: "I don't know how to answer", declared: 'DONT_KNOW' }] };
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q5', phase: 'CHALLENGED', stem: 'Finish', draftArtifact: null, taskBody: q5Body, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
     const locked = await lockedAnswer();
-    expect(locked.getByText('Open trade courses')).toBeInTheDocument();
-    expect(locked.getByText('Many jobs need training')).toBeInTheDocument();
-    expect(locked.getByText('Your reason')).toBeInTheDocument();
+    expect(locked.getByText('Jobs depend on...')).toBeInTheDocument();
+    expect(locked.getByText('skills')).toBeInTheDocument();
+    expect(locked.getByText("I don't know how to answer")).toBeInTheDocument();
   });
 
   it('Think again on Q2 lists the cards in the order the student locked', async () => {
@@ -368,10 +370,36 @@ describe('Q2 to Q5', () => {
   });
 
   it('Q5 counts characters and stops at 120', async () => {
-    const body = { instructions: 'Write.', maxCharsPerField: 120 as const };
-    await render(<Q5Editor body={body} value={{ slot: 'Q5', proposal: 'abc' }} onChange={noop} />);
+    await render(<Q5Editor body={q5Body} value={{ slot: 'Q5', answers: [{ starterId: 's1', text: 'abc' }] }} onChange={noop} />);
     expect(screen.getByText('3/120')).toBeInTheDocument();
     expect(screen.getAllByRole('textbox')[0]).toHaveAttribute('maxLength', '120');
+  });
+
+  it('Q5 keeps answers in the order of the sentences', async () => {
+    const onChange = vi.fn();
+    await render(<Q5Editor body={q5Body} value={{ slot: 'Q5', answers: [{ starterId: 's2', text: 'b' }] }} onChange={onChange} />);
+    fireEvent.change(screen.getByLabelText('Jobs depend on...'), { target: { value: 'a' } });
+    expect(onChange).toHaveBeenCalledWith({ slot: 'Q5', answers: [{ starterId: 's1', text: 'a' }, { starterId: 's2', text: 'b' }] });
+  });
+
+  it('a Q5 button replaces typed text and locks the box, and tapping it again clears it', async () => {
+    const onChange = vi.fn();
+    const label = "I don't know how to answer";
+    const { unmount } = await render(<Q5Editor body={q5Body} value={{ slot: 'Q5', answers: [{ starterId: 's1', text: 'abc' }] }} onChange={onChange} />);
+    fireEvent.click(screen.getAllByRole('button', { name: label })[0]!);
+    expect(onChange).toHaveBeenCalledWith({ slot: 'Q5', answers: [{ starterId: 's1', text: label, declared: 'DONT_KNOW' }] });
+    unmount();
+    await render(<Q5Editor body={q5Body} value={{ slot: 'Q5', answers: [{ starterId: 's1', text: label, declared: 'DONT_KNOW' }] }} onChange={onChange} />);
+    expect(screen.getByLabelText('Jobs depend on...')).toBeDisabled();
+    fireEvent.click(screen.getAllByRole('button', { name: label })[0]!);
+    expect(onChange).toHaveBeenLastCalledWith({ slot: 'Q5', answers: [] });
+  });
+
+  it('Q5 needs every sentence finished or marked', () => {
+    const task = { slot: 'Q5', taskBody: q5Body } as unknown as StudentTaskDTO;
+    expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: 'a' }] })).toBe(false);
+    expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: '   ' }, { starterId: 's2', text: 'b' }] })).toBe(false);
+    expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: 'a' }, { starterId: 's2', text: 'unsure', declared: 'DONT_KNOW' }] })).toBe(true);
   });
 });
 

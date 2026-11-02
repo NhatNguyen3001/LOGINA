@@ -10,9 +10,9 @@
       "when": {
         "all": [
           {
-            "field": "q5.keywordPartition",
+            "field": "q5.openStarterId",
             "op": "eq",
-            "value": "training"
+            "value": "s1"
           }
         ]
       },
@@ -28,9 +28,9 @@
       "when": {
         "all": [
           {
-            "field": "q5.keywordPartition",
+            "field": "q5.openStarterId",
             "op": "eq",
-            "value": "business"
+            "value": "s2"
           }
         ]
       },
@@ -46,9 +46,9 @@
       "when": {
         "all": [
           {
-            "field": "q5.keywordPartition",
+            "field": "q5.openStarterId",
             "op": "eq",
-            "value": "living"
+            "value": "s3"
           }
         ]
       },

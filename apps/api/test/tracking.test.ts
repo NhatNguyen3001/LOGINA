@@ -14,7 +14,7 @@ const artifacts: [string, object][] = [
   ['Q2', { slot: 'Q2', orderedCardIds: ['K1', 'K2', 'K3', 'K4'] }],
   ['Q3', { slot: 'Q3', judgmentOptionId: 'O1', tradeOffId: 'D1', reasonId: 'R1' }],
   ['Q4', { slot: 'Q4', placements: [{ slotId: 'shown', cardId: 'C1' }, { slotId: 'missing', cardId: 'C3' }, { slotId: 'needed', cardId: 'C5' }] }],
-  ['Q5', { slot: 'Q5', proposal: 'Open trade courses', reason: 'Many jobs need training' }],
+  ['Q5', { slot: 'Q5', answers: [{ starterId: 's1', text: 'they need skills' }, { starterId: 's2', text: 'steady income' }, { starterId: 's3', text: 'better living conditions' }] }],
 ];
 
 async function answerQ1(client: Client, attempt: string, answerIndex: number, cardIndex: number, finalAnswer: number, finalCard: number) {
@@ -175,8 +175,8 @@ describe('me and consent', () => {
     const last = StudentTaskDTO.parse(await (await a.get(`/attempts/${copyAttemptId}/tasks/Q5`)).json());
     expect(last.submittedSlots).toEqual(['Q1', 'Q2', 'Q3', 'Q4', 'Q5']);
     const doc = (await h.live.db.doc(`researchRows/${researchRowId(copyAttemptId, 'Q5', 1)}`).get()).data()!;
-    expect(doc.first_answer).toContain('Open trade courses');
-    expect(doc.first_answer).toContain('Many jobs need training');
+    expect(doc.first_answer).toContain('steady income');
+    expect(doc.first_answer).toContain('better living conditions');
     expect(doc.first_evidence).toBeNull();
   });
 

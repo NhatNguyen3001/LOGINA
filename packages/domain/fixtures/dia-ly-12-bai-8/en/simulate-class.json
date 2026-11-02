@@ -95,14 +95,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Open short trade courses at the commune center",
-          "reason": "Many new jobs need trained workers"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "they need skills people have not been trained for"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "initialConfidence": 70,
         "choice": "KEEP",
         "final": {
-          "proposal": "Open short trade courses at the commune center",
-          "reason": "Many new jobs need trained workers"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "they need skills people have not been trained for"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "finalConfidence": 70
       }
@@ -204,14 +228,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Support a local craft business",
-          "reason": "Young people could work near home"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "the pay is low"
+            },
+            {
+              "starterId": "s2",
+              "text": "a chance to learn a trade"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "initialConfidence": 60,
         "choice": "KEEP",
         "final": {
-          "proposal": "Support a local craft business",
-          "reason": "Young people could work near home"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "the pay is low"
+            },
+            {
+              "starterId": "s2",
+              "text": "a chance to learn a trade"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "finalConfidence": 65
       }
@@ -313,14 +361,39 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Improve the road to the industrial zone",
-          "reason": "Better living conditions keep youth here"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "they are far from home"
+            },
+            {
+              "starterId": "s2",
+              "text": "I don't know how to answer",
+              "declared": "DONT_KNOW"
+            },
+            {
+              "starterId": "s3",
+              "text": "good roads"
+            }
+          ]
         },
         "initialConfidence": 55,
         "choice": "REVISE",
         "final": {
-          "proposal": "Open short trade courses at the commune center",
-          "reason": "Many new jobs need trained workers"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "they need skills people have not been trained for"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "finalConfidence": 60
       }
@@ -422,14 +495,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Open short trade courses at the commune center",
-          "reason": "Many new jobs need trained workers"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "they need skills people have not been trained for"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "initialConfidence": 65,
         "choice": "KEEP",
         "final": {
-          "proposal": "Open short trade courses at the commune center",
-          "reason": "Many new jobs need trained workers"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "they need skills people have not been trained for"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "finalConfidence": 70
       }
@@ -531,14 +628,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Support a local craft business",
-          "reason": "Young people could work near home"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "the pay is low"
+            },
+            {
+              "starterId": "s2",
+              "text": "a chance to learn a trade"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "initialConfidence": 70,
         "choice": "KEEP",
         "final": {
-          "proposal": "Support a local craft business",
-          "reason": "Young people could work near home"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "the pay is low"
+            },
+            {
+              "starterId": "s2",
+              "text": "a chance to learn a trade"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "finalConfidence": 75
       }
@@ -640,14 +761,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Open short trade courses at the commune center",
-          "reason": "Many new jobs need trained workers"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "they need skills people have not been trained for"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "initialConfidence": 75,
         "choice": "KEEP",
         "final": {
-          "proposal": "Open short trade courses at the commune center",
-          "reason": "Many new jobs need trained workers"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "they need skills people have not been trained for"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "better living conditions"
+            }
+          ]
         },
         "finalConfidence": 80
       }
@@ -749,14 +894,40 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Improve the road to the industrial zone",
-          "reason": "Better living conditions keep youth here"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "I think there isn't enough evidence",
+              "declared": "NOT_ENOUGH"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "good roads"
+            }
+          ]
         },
         "initialConfidence": 50,
         "choice": "KEEP",
         "final": {
-          "proposal": "Improve the road to the industrial zone",
-          "reason": "Better living conditions keep youth here"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "I think there isn't enough evidence",
+              "declared": "NOT_ENOUGH"
+            },
+            {
+              "starterId": "s2",
+              "text": "steady income"
+            },
+            {
+              "starterId": "s3",
+              "text": "good roads"
+            }
+          ]
         },
         "finalConfidence": 55
       }

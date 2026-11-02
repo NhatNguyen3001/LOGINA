@@ -60,7 +60,7 @@ describe('translation at Approval 2', () => {
     const body = await approveBody('Q5');
     expect((await a.post(`${url()}/tasks/Q5/approve`, body)).status).toBe(409);
     await a.post(`${url()}/tasks/Q5/dispositions`, { decision: 'TEACHER_ACCEPT_WITH_REASON', gateId: 'TRANSLATION', findingCode: 'MEANING_SHIFT', reason: 'Reads fine', baseVersion: task.draftVersion });
-    await translation('Q5').update({ keywords: { training: ['đào tạo'] } });
+    await translation('Q5').update({ keywords: { s1: ['đào tạo'] } });
     expect((await a.post(`${url()}/tasks/Q5/approve`, body)).status).toBe(200);
   });
 
@@ -68,7 +68,7 @@ describe('translation at Approval 2', () => {
     const draft = (await lesson().get()).data()?.currentTaskDraftIds.Q5 as string;
     const release = decodeNested((await lesson().collection('taskReleases').doc(`rel_${draft}`).get()).data()!);
     expect(release.translations.vi[0].to).toMatch(/^vi /);
-    expect(release.serverBody.keywordPartitions.training).toEqual(expect.arrayContaining(['training', 'đào tạo']));
+    expect(release.serverBody.keywordPartitions.s1).toEqual(expect.arrayContaining(['skill', 'đào tạo']));
   });
 
   it('a translation for an older draft cannot be approved', async () => {

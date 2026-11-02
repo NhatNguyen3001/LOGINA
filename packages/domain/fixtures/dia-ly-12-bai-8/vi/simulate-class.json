@@ -95,14 +95,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Mở lớp học nghề ngắn hạn ở xã",
-          "reason": "Nhiều việc mới cần lao động qua đào tạo"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "cần kĩ năng mà họ chưa được đào tạo"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "initialConfidence": 70,
         "choice": "KEEP",
         "final": {
-          "proposal": "Mở lớp học nghề ngắn hạn ở xã",
-          "reason": "Nhiều việc mới cần lao động qua đào tạo"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "cần kĩ năng mà họ chưa được đào tạo"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "finalConfidence": 70
       }
@@ -204,14 +228,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Hỗ trợ một cơ sở làng nghề",
-          "reason": "Thanh niên có thể làm việc gần nhà"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "lương thấp"
+            },
+            {
+              "starterId": "s2",
+              "text": "cơ hội học nghề"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "initialConfidence": 60,
         "choice": "KEEP",
         "final": {
-          "proposal": "Hỗ trợ một cơ sở làng nghề",
-          "reason": "Thanh niên có thể làm việc gần nhà"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "lương thấp"
+            },
+            {
+              "starterId": "s2",
+              "text": "cơ hội học nghề"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "finalConfidence": 65
       }
@@ -313,14 +361,39 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Sửa đường đến khu công nghiệp",
-          "reason": "Điều kiện sống tốt hơn giữ chân thanh niên"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "xa nhà"
+            },
+            {
+              "starterId": "s2",
+              "text": "Em chưa biết cách trả lời",
+              "declared": "DONT_KNOW"
+            },
+            {
+              "starterId": "s3",
+              "text": "đường sá tốt"
+            }
+          ]
         },
         "initialConfidence": 55,
         "choice": "REVISE",
         "final": {
-          "proposal": "Mở lớp học nghề ngắn hạn ở xã",
-          "reason": "Nhiều việc mới cần lao động qua đào tạo"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "cần kĩ năng mà họ chưa được đào tạo"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "finalConfidence": 60
       }
@@ -422,14 +495,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Mở lớp học nghề ngắn hạn ở xã",
-          "reason": "Nhiều việc mới cần lao động qua đào tạo"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "cần kĩ năng mà họ chưa được đào tạo"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "initialConfidence": 65,
         "choice": "KEEP",
         "final": {
-          "proposal": "Mở lớp học nghề ngắn hạn ở xã",
-          "reason": "Nhiều việc mới cần lao động qua đào tạo"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "cần kĩ năng mà họ chưa được đào tạo"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "finalConfidence": 70
       }
@@ -531,14 +628,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Hỗ trợ một cơ sở làng nghề",
-          "reason": "Thanh niên có thể làm việc gần nhà"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "lương thấp"
+            },
+            {
+              "starterId": "s2",
+              "text": "cơ hội học nghề"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "initialConfidence": 70,
         "choice": "KEEP",
         "final": {
-          "proposal": "Hỗ trợ một cơ sở làng nghề",
-          "reason": "Thanh niên có thể làm việc gần nhà"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "lương thấp"
+            },
+            {
+              "starterId": "s2",
+              "text": "cơ hội học nghề"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "finalConfidence": 75
       }
@@ -640,14 +761,38 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Mở lớp học nghề ngắn hạn ở xã",
-          "reason": "Nhiều việc mới cần lao động qua đào tạo"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "cần kĩ năng mà họ chưa được đào tạo"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "initialConfidence": 75,
         "choice": "KEEP",
         "final": {
-          "proposal": "Mở lớp học nghề ngắn hạn ở xã",
-          "reason": "Nhiều việc mới cần lao động qua đào tạo"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "cần kĩ năng mà họ chưa được đào tạo"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "điều kiện sống tốt hơn"
+            }
+          ]
         },
         "finalConfidence": 80
       }
@@ -749,14 +894,40 @@
       {
         "slot": "Q5",
         "initial": {
-          "proposal": "Sửa đường đến khu công nghiệp",
-          "reason": "Điều kiện sống tốt hơn giữ chân thanh niên"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "Em cho rằng chưa đủ dữ kiện",
+              "declared": "NOT_ENOUGH"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "đường sá tốt"
+            }
+          ]
         },
         "initialConfidence": 50,
         "choice": "KEEP",
         "final": {
-          "proposal": "Sửa đường đến khu công nghiệp",
-          "reason": "Điều kiện sống tốt hơn giữ chân thanh niên"
+          "answers": [
+            {
+              "starterId": "s1",
+              "text": "Em cho rằng chưa đủ dữ kiện",
+              "declared": "NOT_ENOUGH"
+            },
+            {
+              "starterId": "s2",
+              "text": "thu nhập ổn định"
+            },
+            {
+              "starterId": "s3",
+              "text": "đường sá tốt"
+            }
+          ]
         },
         "finalConfidence": 55
       }

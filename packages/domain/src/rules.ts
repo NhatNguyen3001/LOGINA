@@ -11,7 +11,7 @@ export type FactField =
   | 'q3.tradeOffId'
   | 'q3.reasonSupported'
   | 'q4.misfitSlotId'
-  | 'q5.keywordPartition';
+  | 'q5.openStarterId';
 
 export interface Condition {
   field: FactField;
