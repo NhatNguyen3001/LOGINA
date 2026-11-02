@@ -8,6 +8,8 @@ const LETTERS = 'ABCD';
 
 import { loadResearchFacts, writeResearchRow, type ResearchSettings } from './research.js';
 
+type AnswerChange = { at: number; change: string };
+
 export interface Actor {
   schoolId: string;
   uid: string;
@@ -143,7 +145,7 @@ export async function lockTask(
   actor: Actor,
   attemptId: string,
   slot: string,
-  { artifact, initialConfidence }: { artifact: Artifact; initialConfidence: number },
+  { artifact, initialConfidence, secondsOnTask, answerChanges }: { artifact: Artifact; initialConfidence: number; secondsOnTask?: number | undefined; answerChanges?: AnswerChange[] | undefined },
 ): Promise<StudentChallengeDTO> {
   const attempt = await loadAttempt(db, actor, attemptId);
   const release = await loadRelease(db, attempt, slot);
@@ -182,6 +184,8 @@ export async function lockTask(
       initialConfidence,
       lockedAt: FieldValue.serverTimestamp(),
       deliveryId,
+      ...(secondsOnTask === undefined ? {} : { secondsOnTask }),
+      ...(answerChanges ? { answerChanges } : {}),
     });
     writeOnce(tx, taskRef.collection('deliveries').doc(deliveryId), delivery);
     if (attempt.status === 'NOT_STARTED') tx.update(db.doc(`attempts/${attemptId}`), { status: 'IN_PROGRESS' });
@@ -194,7 +198,7 @@ export async function submitTask(
   actor: Actor,
   attemptId: string,
   slot: string,
-  { choice, finalArtifact, finalConfidence, secondsToFirstChange }: { choice: 'KEEP' | 'REVISE'; finalArtifact: Artifact; finalConfidence: number; secondsToFirstChange?: number | undefined },
+  { choice, finalArtifact, finalConfidence, secondsToFirstChange, answerChanges }: { choice: 'KEEP' | 'REVISE'; finalArtifact: Artifact; finalConfidence: number; secondsToFirstChange?: number | undefined; answerChanges?: AnswerChange[] | undefined },
   research?: ResearchSettings,
 ): Promise<SubmitResultDTO & { researchRowId?: string }> {
   const attempt = await loadAttempt(db, actor, attemptId);
@@ -236,7 +240,7 @@ export async function submitTask(
 
     const researchRowId =
       facts && research && participant?.consent === 'AGREED' && delivery
-        ? writeResearchRow(db, tx, { facts, participant, settings: research, slot, task, delivery, final, finalConfidence, choice: recordedChoice, changedElements, secondsToFirstChange, now: new Date() })
+        ? writeResearchRow(db, tx, { facts, participant, settings: research, slot, task, delivery, final, finalConfidence, choice: recordedChoice, changedElements, secondsToFirstChange, answerChanges, now: new Date() })
         : undefined;
 
     const next = SLOTS[SLOTS.indexOf(slot as (typeof SLOTS)[number]) + 1];

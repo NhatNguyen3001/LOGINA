@@ -1,7 +1,7 @@
 import type { Artifact, DraftArtifact, Phase, Q2Artifact, Q2TaskBody, Q3Artifact, Q3TaskBody, Q5Artifact, Q5TaskBody, Slot, StudentChallengeDTO, StudentTaskDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BusyNote } from '@/components/logina/BusyNote';
 import { ConfidenceSlider, DEFAULT_CONFIDENCE } from '@/components/logina/ConfidenceSlider';
@@ -16,7 +16,8 @@ import { useSessionLocale } from '@/components/logina/TeacherShell';
 import { ApiError, getChallenge, getStudentTask, lockTask, newKey, saveDraft, submitTask } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { errorKey } from '@/i18n';
-import { ArtifactEditor, FilledFrame, emptyDraft, isComplete, missingKey, sameArtifact } from './editors';
+import { ArtifactEditor, FilledFrame, describeChange, emptyDraft, isComplete, missingKey, sameArtifact } from './editors';
+import { createTrace, type TaskTrace } from './use-task-trace';
 import { useAutosave } from './use-autosave';
 import { useLessonTitle } from './use-lesson-title';
 
@@ -106,7 +107,7 @@ function LockedQ5({ body, answer }: { body: Q5TaskBody; answer: Q5Artifact }) {
   );
 }
 
-function Answering({ attemptId, task, onLocked, onPhase }: { attemptId: string; task: StudentTaskDTO; onLocked: () => void; onPhase: (phase: Phase) => void }) {
+function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: string; task: StudentTaskDTO; trace: TaskTrace; onLocked: () => void; onPhase: (phase: Phase) => void }) {
   const { t } = useTranslation();
   const [draft, setDraft] = useState<DraftArtifact>(() => emptyDraft(task));
   const [locking, setLocking] = useState(false);
@@ -116,8 +117,11 @@ function Answering({ attemptId, task, onLocked, onPhase }: { attemptId: string; 
   const saveState = useAutosave(draft, (draftArtifact) => saveDraft(attemptId, task.slot, { draftArtifact }));
 
   const lock = useMutation({
-    mutationFn: () => lockTask(attemptId, task.slot, { artifact: draft as Artifact, initialConfidence: confidence }, lockKey.current),
-    onSuccess: onLocked,
+    mutationFn: () => lockTask(attemptId, task.slot, { artifact: draft as Artifact, initialConfidence: confidence, secondsOnTask: trace.seconds(), answerChanges: trace.changes() }, lockKey.current),
+    onSuccess: () => {
+      trace.clearChanges();
+      onLocked();
+    },
     onError: () => {
       lockSent.current = false;
     },
@@ -131,6 +135,11 @@ function Answering({ attemptId, task, onLocked, onPhase }: { attemptId: string; 
   };
 
   useEffect(() => onPhase(locking ? 'CONFIDENCE_1' : 'REASON'), [locking, onPhase]);
+
+  const change = (next: DraftArtifact) => {
+    describeChange(task, draft, next).forEach(trace.record);
+    setDraft(next);
+  };
 
   const complete = isComplete(task, draft);
   const missing = missingKey(task, draft);
@@ -155,7 +164,7 @@ function Answering({ attemptId, task, onLocked, onPhase }: { attemptId: string; 
   return (
     <>
       <h1 className="stem">{task.stem}</h1>
-      <ArtifactEditor task={task} value={draft} onChange={setDraft} />
+      <ArtifactEditor task={task} value={draft} onChange={change} />
       <TaskActions note={<>{missing ? <span className="s13 sec">{t(missing)}</span> : null}{saveStatus}</>}>
         <button type="button" className="btn primary" disabled={!complete} onClick={() => setLocking(true)}>{t('student.continue')}</button>
       </TaskActions>
@@ -163,7 +172,7 @@ function Answering({ attemptId, task, onLocked, onPhase }: { attemptId: string; 
   );
 }
 
-function Reconsidering({ attemptId, task, onSubmitted, onPhase }: { attemptId: string; task: StudentTaskDTO; onSubmitted: (next: Slot | undefined) => void; onPhase: (phase: Phase) => void }) {
+function Reconsidering({ attemptId, task, trace, onSubmitted, onPhase }: { attemptId: string; task: StudentTaskDTO; trace: TaskTrace; onSubmitted: (next: Slot | undefined) => void; onPhase: (phase: Phase) => void }) {
   const { t } = useTranslation();
   const original = task.initialArtifact!;
   const [answer, setAnswer] = useState<DraftArtifact>(original);
@@ -183,12 +192,18 @@ function Reconsidering({ attemptId, task, onSubmitted, onPhase }: { attemptId: s
   const unchanged = sameArtifact(answer, original);
   const submit = useMutation({
     mutationFn: () =>
-      submitTask(attemptId, task.slot, { choice: unchanged ? 'KEEP' : 'REVISE', finalArtifact: answer as Artifact, finalConfidence, ...(firstChange.current === null ? {} : { secondsToFirstChange: firstChange.current }) }, submitKey.current),
-    onSuccess: ({ nextSlot }) => onSubmitted(nextSlot),
+      submitTask(attemptId, task.slot, { choice: unchanged ? 'KEEP' : 'REVISE', finalArtifact: answer as Artifact, finalConfidence, answerChanges: trace.changes(), ...(firstChange.current === null ? {} : { secondsToFirstChange: firstChange.current }) }, submitKey.current),
+    onSuccess: ({ nextSlot }) => {
+      trace.finish();
+      onSubmitted(nextSlot);
+    },
   });
+
+  const log = (next: DraftArtifact) => describeChange(task, answer, next).forEach(trace.record);
 
   /** How long the prompt took to move the student, so the first change counts even if they go back. */
   const change = (next: DraftArtifact) => {
+    log(next);
     firstChange.current ??= Math.round((Date.now() - (promptShownAt.current ?? Date.now())) / 1000);
     setAnswer(next);
   };
@@ -212,7 +227,10 @@ function Reconsidering({ attemptId, task, onSubmitted, onPhase }: { attemptId: s
       <div className="row">
         <button type="button" className="lnk jump" aria-expanded={showLocked} onClick={() => setShowLocked(!showLocked)}>{t('student.think.showLocked')}</button>
         <span className="sp" />
-        <button type="button" className="lnk jump" disabled={unchanged} onClick={() => setAnswer(original)}>{t('student.think.restore')}</button>
+        <button type="button" className="lnk jump" disabled={unchanged} onClick={() => {
+          log(original);
+          setAnswer(original);
+        }}>{t('student.think.restore')}</button>
       </div>
       {showLocked ? lockedAnswer : null}
       <h1 className="stem">{task.stem}</h1>
@@ -238,6 +256,12 @@ export function TaskRunner() {
   const task = useQuery({ queryKey: qk.attemptTask(attemptId, slot), queryFn: () => getStudentTask(attemptId, slot) });
   const lesson = useLessonTitle(attemptId);
   const [stepPhase, setStepPhase] = useState<Phase>('REASON');
+  const trace = useMemo(() => createTrace(attemptId, slot), [attemptId, slot]);
+  const ready = Boolean(task.data) && task.data?.phase !== 'SUBMITTED';
+
+  useEffect(() => {
+    if (ready) trace.start();
+  }, [ready, trace]);
 
   const onSubmitted = (next: Slot | undefined) => {
     if (next) void navigate({ to: '/s/attempts/$id/$slot', params: { id: attemptId, slot: next } });
@@ -262,9 +286,9 @@ export function TaskRunner() {
         <button type="button" className="btn primary" onClick={() => onSubmitted(nextAfter)}>{t('student.continue')}</button>
       ) : null}
       {task.data && task.data.phase !== 'SUBMITTED' && !task.data.initialArtifact ? (
-        <Answering key={slot} attemptId={attemptId} task={task.data} onLocked={() => void queryClient.invalidateQueries({ queryKey: qk.attemptTask(attemptId, slot) })} onPhase={setStepPhase} />
+        <Answering key={slot} attemptId={attemptId} task={task.data} trace={trace} onLocked={() => void queryClient.invalidateQueries({ queryKey: qk.attemptTask(attemptId, slot) })} onPhase={setStepPhase} />
       ) : null}
-      {task.data && task.data.phase !== 'SUBMITTED' && task.data.initialArtifact ? <Reconsidering key={slot} attemptId={attemptId} task={task.data} onSubmitted={onSubmitted} onPhase={setStepPhase} /> : null}
+      {task.data && task.data.phase !== 'SUBMITTED' && task.data.initialArtifact ? <Reconsidering key={slot} attemptId={attemptId} task={task.data} trace={trace} onSubmitted={onSubmitted} onPhase={setStepPhase} /> : null}
     </StudentShell>
   );
 }

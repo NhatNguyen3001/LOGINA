@@ -47,6 +47,8 @@ const row = {
   seconds_to_lock: 95,
   seconds_to_submit: 140,
   seconds_to_first_change: 50,
+  started_at: '2026-11-02 14:01:35',
+  answer_changes: '0:12 A; 0:31 B',
 };
 
 describe('rate limits', () => {

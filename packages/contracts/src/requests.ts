@@ -132,11 +132,16 @@ export type AssignReq = z.infer<typeof AssignReq>;
 export const DraftReq = z.object({ draftArtifact: DraftArtifact }).strict();
 export type DraftReq = z.infer<typeof DraftReq>;
 
-export const LockReq = z.object({ artifact: Artifact, initialConfidence: Confidence }).strict();
+/** One change to an answer. `at` is seconds since the task appeared. */
+const AnswerChange = z.object({ at: z.number().int().nonnegative(), change: z.string().max(120) }).strict();
+const AnswerChanges = z.array(AnswerChange).max(200);
+
+/** Sent by the browser. The API turns `secondsOnTask` into a time on its own clock. */
+export const LockReq = z.object({ artifact: Artifact, initialConfidence: Confidence, secondsOnTask: z.number().int().nonnegative().optional(), answerChanges: AnswerChanges.optional() }).strict();
 export type LockReq = z.infer<typeof LockReq>;
 
 /** `secondsToFirstChange` is set only if the student changed something after the prompt appeared. */
-export const SubmitReq = z.object({ choice: KeepRevise, finalArtifact: Artifact, finalConfidence: Confidence, secondsToFirstChange: z.number().int().nonnegative().optional() }).strict();
+export const SubmitReq = z.object({ choice: KeepRevise, finalArtifact: Artifact, finalConfidence: Confidence, secondsToFirstChange: z.number().int().nonnegative().optional(), answerChanges: AnswerChanges.optional() }).strict();
 export type SubmitReq = z.infer<typeof SubmitReq>;
 
 export const UpdateMeReq = z.object({ uiLocale: Locale }).strict();

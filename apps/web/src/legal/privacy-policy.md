@@ -13,7 +13,7 @@ Bản trình diễn không có tài khoản, và mỗi trình duyệt có một 
 | Phiên ẩn danh | Mã ngẫu nhiên cho mỗi trình duyệt, không gắn với tên hay email | Mọi người dùng |
 | Tài khoản (không có trong bản trình diễn) | Họ tên, email, vai trò, lớp, trường | Giáo viên, học sinh |
 | Học liệu và bài soạn | Tệp tải lên, nội dung AI đọc được, quyết định của giáo viên, nhiệm vụ đã duyệt | Giáo viên |
-| Bài làm | Lựa chọn, mức tự tin và thời gian trước và sau câu “Thử nghĩ thêm” | Học sinh |
+| Bài làm | Lựa chọn, mỗi lần đổi câu trả lời, mức tự tin và thời gian trước và sau câu “Thử nghĩ thêm” | Học sinh |
 | Đồng ý nghiên cứu | Lựa chọn của bạn, phiên bản văn bản và thời điểm | Học sinh, người dùng bản trình diễn |
 | Dữ liệu nghiên cứu | Mỗi nhiệm vụ một dòng: mã người tham gia, câu trả lời, mức tự tin, thời gian, ngôn ngữ, bài viết Q5 nguyên văn. Chỉ ghi khi bạn đồng ý | Người tham gia đã đồng ý |
 | Hoạt động của giáo viên | Duyệt, sửa, giao bài, chấp nhận cảnh báo | Giáo viên |
@@ -37,6 +37,7 @@ Gemini trên Google Cloud Vertex AI đọc tệp của giáo viên, soạn nháp
 |---|---|---|
 | Phiên ẩn danh | IndexedDB | Giữ không gian làm việc riêng của bạn. Trình duyệt mới hoặc xóa dữ liệu trang sẽ tạo không gian mới |
 | Đã xem hướng dẫn demo | localStorage | Để hướng dẫn không hiện lại |
+| Thời gian làm bài | sessionStorage | Giữ thời gian làm bài khi tải lại trang, đến lúc nộp |
 
 Không có cookie quảng cáo, phân tích hay của bên thứ ba, nên LOGINA không hiển thị hộp chọn cookie.
 
@@ -85,7 +86,7 @@ The demo has no accounts, and each browser has its own private workspace. Names 
 | Anonymous session | A random ID for each browser, not linked to a name or email | All users |
 | Account (not in the demo) | Name, email, role, class, school | Teachers, students |
 | Materials and lessons | Uploaded files, the text AI read from them, teacher decisions, approved tasks | Teachers |
-| Answers | Choices, confidence and timing before and after "Think again" | Students |
+| Answers | Choices, each change of answer, confidence and timing before and after "Think again" | Students |
 | Research consent | Your choice, the text version and the time | Students, demo users |
 | Research data | One row per task: participant code, answers, confidence, timing, language, your Q5 text as typed. Recorded only if you agree | Participants who agreed |
 | Teacher activity | Approvals, edits, assignments, warnings accepted | Teachers |
@@ -109,6 +110,7 @@ Gemini on Google Cloud Vertex AI reads teachers' files, drafts tasks and checks 
 |---|---|---|
 | Anonymous session | IndexedDB | Keeps your private workspace. A new browser or cleared site data starts a new one |
 | Demo tour seen | localStorage | Stops the tour showing again |
+| Task timing | sessionStorage | Keeps your task timing through a reload, until you submit |
 
 There are no advertising, analytics or third-party cookies, so LOGINA shows no cookie prompt.
 

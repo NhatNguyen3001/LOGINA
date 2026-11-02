@@ -27,6 +27,10 @@ export const relationBucket = (pairAlignment: string): (typeof RELATION)[keyof t
 export const researchTime = (date: Date): string =>
   date.toLocaleString('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' });
 
+/** `0:12 A; 0:31 B`, in the order they happened. */
+export const formatChanges = (changes: { at: number; change: string }[]): string =>
+  changes.map(({ at, change }) => `${Math.floor(at / 60)}:${String(at % 60).padStart(2, '0')} ${change}`).join('; ');
+
 export interface Q1Letters {
   answerLetter: (runtimeId: string) => string;
   cardLetter: (runtimeId: string) => string;
