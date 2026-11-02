@@ -3,7 +3,8 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import type { MeDTO, StudentTaskDTO } from '@logina/contracts';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskRunner } from '@/features/student/TaskRunner';
-import { Q2Editor, Q3Editor, Q4Editor, Q5Editor, isComplete, missingKey } from '@/features/student/editors';
+import { Q2Editor, Q3Editor, Q4Editor, Q5Editor, describeChange, isComplete, missingKey } from '@/features/student/editors';
+import { createTrace } from '@/features/student/use-task-trace';
 import { ResultSet } from '@/features/student/ResultSet';
 import * as api from '@/lib/api';
 import { renderWithI18n } from './utils';
@@ -400,6 +401,76 @@ describe('Q2 to Q5', () => {
     expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: 'a' }] })).toBe(false);
     expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: '   ' }, { starterId: 's2', text: 'b' }] })).toBe(false);
     expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: 'a' }, { starterId: 's2', text: 'unsure', declared: 'DONT_KNOW' }] })).toBe(true);
+  });
+});
+
+describe('answer trace', () => {
+  beforeEach(() => sessionStorage.clear());
+
+  const opened = () => q1({ draftArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' } });
+
+  it('sends every change before locking, and the time on the task', async () => {
+    vi.mocked(api.getStudentTask).mockResolvedValue(q1());
+    vi.mocked(api.lockTask).mockResolvedValue({} as never);
+    await render(<TaskRunner />);
+    await screen.findByRole('radio', { name: /First statement/ });
+    choose('First statement');
+    choose('Second statement');
+    fireEvent.click(screen.getAllByRole('radio')[2]!);
+    fireEvent.click(screen.getByRole('button', { name: 'Continue →' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Lock in answer' }));
+    await waitFor(() => expect(api.lockTask).toHaveBeenCalled());
+    const sent = vi.mocked(api.lockTask).mock.calls[0]![2];
+    expect(sent.answerChanges?.map((c) => c.change)).toEqual(['A', 'B', 'Card A']);
+    expect(sent.secondsOnTask).toBeGreaterThanOrEqual(0);
+  });
+
+  it('keeps the start and earlier changes through a reload', async () => {
+    sessionStorage.setItem('logina.trace.att1.Q1', JSON.stringify({ startedAt: Date.now() - 30_000, changes: [{ at: 12, change: 'A' }] }));
+    vi.mocked(api.getStudentTask).mockResolvedValue(opened());
+    vi.mocked(api.lockTask).mockResolvedValue({} as never);
+    await render(<TaskRunner />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Continue →' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Lock in answer' }));
+    await waitFor(() => expect(api.lockTask).toHaveBeenCalled());
+    const sent = vi.mocked(api.lockTask).mock.calls[0]![2];
+    expect(sent.answerChanges).toEqual([{ at: 12, change: 'A' }]);
+    expect(sent.secondsOnTask).toBeGreaterThanOrEqual(30);
+  });
+
+  it('sends changes after the prompt on submit, then clears the trace', async () => {
+    vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
+    vi.mocked(api.submitTask).mockResolvedValue({ slot: 'Q1', recordedChoice: 'REVISE', nextSlot: 'Q2', attemptStatus: 'IN_PROGRESS' });
+    await render(<TaskRunner />);
+    await screen.findByRole('button', { name: 'Submit Q1' });
+    choose('Second statement');
+    fireEvent.click(screen.getByRole('button', { name: 'Back to your first answer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Submit Q1' }));
+    await waitFor(() => expect(navigate).toHaveBeenCalled());
+    expect(vi.mocked(api.submitTask).mock.calls[0]![2].answerChanges?.map((c) => c.change)).toEqual(['B', 'A']);
+    expect(sessionStorage.getItem('logina.trace.att1.Q1')).toBeNull();
+  });
+
+  it('never logs the words a student types', () => {
+    const task = { slot: 'Q5', taskBody: { starters: [] } } as unknown as StudentTaskDTO;
+    expect(describeChange(task, { slot: 'Q5', answers: [] }, { slot: 'Q5', answers: [{ starterId: 's1', text: 'secret words' }] })).toEqual(['s1']);
+    expect(describeChange(task, { slot: 'Q5', answers: [] }, { slot: 'Q5', answers: [{ starterId: 's1', text: 'x', declared: 'DONT_KNOW' }] })).toEqual(['s1=DONT_KNOW']);
+  });
+
+  it('logs typing in one sentence as one change', () => {
+    const trace = createTrace('a', 'Q5');
+    trace.start();
+    trace.record('s1');
+    trace.record('s1');
+    trace.record('s2');
+    expect(trace.changes().map((c) => c.change)).toEqual(['s1', 's2']);
+  });
+
+  it('names Q3 and Q4 changes for a researcher', () => {
+    const q3 = { slot: 'Q3' } as StudentTaskDTO;
+    expect(describeChange(q3, { slot: 'Q3', judgmentOptionId: 'O1' }, { slot: 'Q3', judgmentOptionId: 'O1', tradeOffId: 'D1' })).toEqual(['cost=D1']);
+    const q4 = { slot: 'Q4' } as StudentTaskDTO;
+    expect(describeChange(q4, { slot: 'Q4', placements: [{ slotId: 'a', cardId: 'c1' }] }, { slot: 'Q4', placements: [] })).toEqual(['a=empty']);
   });
 });
 

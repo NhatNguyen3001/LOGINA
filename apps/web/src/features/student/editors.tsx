@@ -293,6 +293,38 @@ export function emptyDraft(task: StudentTaskDTO): DraftArtifact {
   return saved ?? { slot: task.slot };
 }
 
+/** What just changed, as researchers read it: option letters on Q1, IDs elsewhere, never the words a student types. */
+export function describeChange(task: StudentTaskDTO, before: DraftArtifact, after: DraftArtifact): string[] {
+  if (task.slot === 'Q1' && before.slot === 'Q1' && after.slot === 'Q1') {
+    const letter = (items: { id: string }[], id: string) => letterOf(items.findIndex((item) => item.id === id));
+    return [
+      ...(after.answerId && after.answerId !== before.answerId ? [letter(task.answers, after.answerId)] : []),
+      ...(after.evidenceId && after.evidenceId !== before.evidenceId ? [`Card ${letter(task.evidence, after.evidenceId)}`] : []),
+    ];
+  }
+  if (before.slot === 'Q2' && after.slot === 'Q2') return [`order=${(after.orderedCardIds ?? []).join('>')}`];
+  if (before.slot === 'Q3' && after.slot === 'Q3') {
+    return [
+      ...(after.judgmentOptionId !== before.judgmentOptionId ? [`path=${after.judgmentOptionId}`] : []),
+      ...(after.tradeOffId && after.tradeOffId !== before.tradeOffId ? [`cost=${after.tradeOffId}`] : []),
+      ...(after.reasonId && after.reasonId !== before.reasonId ? [`reason=${after.reasonId}`] : []),
+    ];
+  }
+  if (before.slot === 'Q4' && after.slot === 'Q4') {
+    const cardIn = (value: typeof after, slotId: string) => value.placements?.find((x) => x.slotId === slotId)?.cardId;
+    const slots = [...new Set([...(before.placements ?? []), ...(after.placements ?? [])].map((x) => x.slotId))];
+    return slots.filter((id) => cardIn(before, id) !== cardIn(after, id)).map((id) => `${id}=${cardIn(after, id) ?? 'empty'}`);
+  }
+  if (before.slot === 'Q5' && after.slot === 'Q5') {
+    const answerTo = (value: typeof after, id: string) => value.answers?.find((a) => a.starterId === id);
+    const ids = [...new Set([...(before.answers ?? []), ...(after.answers ?? [])].map((a) => a.starterId))];
+    return ids
+      .filter((id) => answerTo(before, id)?.text !== answerTo(after, id)?.text)
+      .map((id) => (answerTo(after, id)?.declared ? `${id}=${answerTo(after, id)!.declared}` : id));
+  }
+  return [];
+}
+
 /** Compares answers, ignoring key order and array order where order means nothing. */
 export const sameArtifact = (a: DraftArtifact, b: DraftArtifact): boolean => {
   const stable = (value: unknown): unknown => {

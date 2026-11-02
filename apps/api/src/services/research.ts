@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { FieldValue, type DocumentData, type Firestore, type Timestamp, type Transaction } from 'firebase-admin/firestore';
 import { Artifact, ResearchRow } from '@logina/contracts';
 import { decodeNested } from '@logina/db';
-import { answerColumns, buildResearchRow, materialHash, relationBucket, researchTime, type Q1Letters } from '@logina/domain';
+import { answerColumns, buildResearchRow, formatChanges, materialHash, relationBucket, researchTime, type Q1Letters } from '@logina/domain';
 
 /** A Reset reuses attempt IDs, so the run number keeps each run's row. Hashed, so no uid reaches the Sheet. */
 export const researchRowId = (attemptId: string, slot: string, runNumber: number): string =>
@@ -64,10 +64,11 @@ export function writeResearchRow(
     choice: 'KEEP' | 'REVISE';
     changedElements: string[];
     secondsToFirstChange?: number | undefined;
+    answerChanges?: { at: number; change: string }[] | undefined;
     now: Date;
   },
 ): string {
-  const { facts, participant, settings, slot, task, delivery, final, finalConfidence, choice, changedElements, secondsToFirstChange, now } = input;
+  const { facts, participant, settings, slot, task, delivery, final, finalConfidence, choice, changedElements, secondsToFirstChange, answerChanges = [], now } = input;
   const { attempt, release, lesson, material, school } = facts;
   const hash = materialHash((material.sha256 as string | undefined) || (attempt.lessonId as string));
   const runNumber = ((participant.runs?.[hash]?.[slot] as number | undefined) ?? 0) + 1;
@@ -75,6 +76,9 @@ export function writeResearchRow(
   const letters = lettersFor(release);
   const lockedAt = (task.lockedAt as Timestamp).toDate();
   const openedAt = (task.openedAt as Timestamp | undefined)?.toDate() ?? lockedAt;
+  /** From the browser when it was sent, so loading time doesn't count as thinking time. */
+  const secondsToLock = (task.secondsOnTask as number | undefined) ?? Math.max(0, Math.round((lockedAt.getTime() - openedAt.getTime()) / 1000));
+  const changes = formatChanges([...((task.answerChanges ?? []) as { at: number; change: string }[]), ...answerChanges]);
   const rowId = researchRowId(attempt.id as string, slot, runNumber);
 
   const row = ResearchRow.parse(
@@ -105,9 +109,11 @@ export function writeResearchRow(
       changed: changedElements.join(', '),
       final_confidence: finalConfidence,
       submitted_at: researchTime(now),
-      seconds_to_lock: Math.max(0, Math.round((lockedAt.getTime() - openedAt.getTime()) / 1000)),
+      seconds_to_lock: secondsToLock,
       seconds_to_submit: Math.max(0, Math.round((now.getTime() - lockedAt.getTime()) / 1000)),
       seconds_to_first_change: secondsToFirstChange ?? null,
+      started_at: researchTime(new Date(lockedAt.getTime() - secondsToLock * 1000)),
+      answer_changes: changes || null,
     }),
   );
 

@@ -699,7 +699,7 @@
     "aboutTitle": "What the study is about",
     "about": "We want to understand how people think again about their answers and their confidence after a short prompt.",
     "recordTitle": "What we record",
-    "record": "We record your choices before and after the prompt, your confidence, when you lock in, when you first change your answer, when you submit, and what you write in Q5.",
+    "record": "We record your choices before and after the prompt, your confidence, when you start, each time you change your answer, when you lock in and submit, and what you write in Q5.",
     "namesTitle": "No names",
     "names": "We don't ask for your name or email. Please don't type personal details in your written answer.",
     "dataTitle": "Where the data goes",
