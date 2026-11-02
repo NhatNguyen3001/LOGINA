@@ -53,7 +53,7 @@ export function answerColumns(artifact: Artifact, letters: Q1Letters): AnswerCol
     case 'Q3':
       return { answer: `${artifact.judgmentOptionId}; gives up ${artifact.tradeOffId}; reason ${artifact.reasonId}`, evidence: null, relation: null };
     case 'Q4':
-      return { answer: `${artifact.templateId}: ${artifact.slots.map((s) => s.choiceId).join(', ')}`, evidence: null, relation: null };
+      return { answer: artifact.placements.map((p) => `${p.slotId}=${p.cardId}`).join(', '), evidence: null, relation: null };
     case 'Q5':
       return { answer: `${artifact.proposal} | ${artifact.reason}`, evidence: null, relation: null };
   }

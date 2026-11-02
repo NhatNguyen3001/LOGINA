@@ -86,7 +86,7 @@ describe('T1', () => {
   it('shows the fixed Q1 to Q5 structure read-only, and the class name', async () => {
     await render(<CreateLesson />);
     expect(await screen.findByText('12A3')).toBeInTheDocument();
-    expect(screen.getByText('Q4 · Counterargument template')).toBeInTheDocument();
+    expect(screen.getByText('Q4 · Counterargument')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /add|remove/i })).toBeNull();
   });
 

@@ -3,72 +3,59 @@
   "taskType": "COUNTERARGUMENT",
   "questionStem": "Someone says: “Rural labor is shrinking, so agriculture is weakening.” Build a reply from what the source actually shows.",
   "taskBody": {
-    "templates": [
+    "frame": "The source shows that [shown], but it does not show [missing]. We would need [needed] before saying agriculture is weakening.",
+    "slots": [
       {
-        "templateId": "M1",
-        "text": "The source shows that [shown], but that does not tell us [missing].",
-        "slots": [
-          {
-            "slotId": "shown",
-            "choices": [
-              {
-                "choiceId": "S1",
-                "text": "the share of workers in this sector fell"
-              },
-              {
-                "choiceId": "S2",
-                "text": "the number of workers fell"
-              }
-            ]
-          },
-          {
-            "slotId": "missing",
-            "choices": [
-              {
-                "choiceId": "M1",
-                "text": "whether the number of workers or the output fell"
-              },
-              {
-                "choiceId": "M2",
-                "text": "why the share changed"
-              }
-            ]
-          }
-        ]
+        "slotId": "shown",
+        "label": "What the source shows"
       },
       {
-        "templateId": "M2",
-        "text": "This sector still has [still], so [conclusion].",
-        "slots": [
-          {
-            "slotId": "still",
-            "choices": [
-              {
-                "choiceId": "S3",
-                "text": "a large share of workers"
-              },
-              {
-                "choiceId": "S4",
-                "text": "higher incomes"
-              }
-            ]
-          },
-          {
-            "slotId": "conclusion",
-            "choices": [
-              {
-                "choiceId": "C1",
-                "text": "a smaller share alone does not show it is weaker"
-              },
-              {
-                "choiceId": "C2",
-                "text": "it is growing fast"
-              }
-            ]
-          }
-        ]
+        "slotId": "missing",
+        "label": "What it does not show"
+      },
+      {
+        "slotId": "needed",
+        "label": "What you would need to know"
       }
-    ]
+    ],
+    "cards": [
+      {
+        "cardId": "C2",
+        "text": "the number of workers in agriculture fell"
+      },
+      {
+        "cardId": "C5",
+        "text": "figures on farm output"
+      },
+      {
+        "cardId": "C4",
+        "text": "why the share of services rose"
+      },
+      {
+        "cardId": "C1",
+        "text": "the share of workers in agriculture fell"
+      },
+      {
+        "cardId": "C6",
+        "text": "the share of workers in services"
+      },
+      {
+        "cardId": "C3",
+        "text": "whether farm output fell"
+      }
+    ],
+    "slotFits": {
+      "shown": [
+        "C1"
+      ],
+      "missing": [
+        "C3",
+        "C2"
+      ],
+      "needed": [
+        "C5"
+      ]
+    }
   },
   "neutralFallbackId": "FB",
   "dependencyManifest": {
@@ -105,7 +92,7 @@
       "primaryFunction": "COUNTERPOINT",
       "challengeTarget": "SOURCE_DIRECTION",
       "purposeForTeacher": "Share or number",
-      "whenShownForTeacher": "When the reply starts from the number of workers",
+      "whenShownForTeacher": "When the first blank has a card the source does not show",
       "sourceAnchor": "p. 8 · Table 8.1",
       "message": "Does Table 8.1 give the number of workers, or their share?"
     },
@@ -116,7 +103,7 @@
       "primaryFunction": "COUNTERPOINT",
       "challengeTarget": "EVIDENCE_SUFFICIENCY",
       "purposeForTeacher": "What is still missing",
-      "whenShownForTeacher": "When the reply uses the first template",
+      "whenShownForTeacher": "When the last blank does not name what is needed",
       "sourceAnchor": "p. 8 · Table 8.1",
       "message": "Have you thought about whether labor productivity rose?"
     },
@@ -127,7 +114,7 @@
       "primaryFunction": "COUNTERPOINT",
       "challengeTarget": "RELEVANCE",
       "purposeForTeacher": "Stay with the source",
-      "whenShownForTeacher": "When the reply says something the source does not show",
+      "whenShownForTeacher": "When the middle blank does not name what is missing",
       "sourceAnchor": "p. 8 · para. 2",
       "message": "Which sentence in the source supports the part you filled in?"
     },
@@ -137,10 +124,10 @@
       "isNeutralFallback": false,
       "primaryFunction": "COUNTERPOINT",
       "challengeTarget": "EVIDENCE_SUFFICIENCY",
-      "purposeForTeacher": "Still a large share",
-      "whenShownForTeacher": "When the reply uses the second template",
+      "purposeForTeacher": "Whole claim",
+      "whenShownForTeacher": "When no card is out of place",
       "sourceAnchor": "p. 8 · para. 2",
-      "message": "A large share today: does that answer the claim about weakening?"
+      "message": "Read your reply again. Does it answer the whole claim, or only part of it?"
     },
     {
       "challengeId": "FB",

@@ -10,9 +10,9 @@
       "when": {
         "all": [
           {
-            "field": "q4.firstChoiceId",
+            "field": "q4.misfitSlotId",
             "op": "eq",
-            "value": "S2"
+            "value": "shown"
           }
         ]
       },
@@ -28,9 +28,9 @@
       "when": {
         "all": [
           {
-            "field": "q4.firstChoiceId",
+            "field": "q4.misfitSlotId",
             "op": "eq",
-            "value": "S4"
+            "value": "missing"
           }
         ]
       },
@@ -46,9 +46,9 @@
       "when": {
         "all": [
           {
-            "field": "q4.templateId",
+            "field": "q4.misfitSlotId",
             "op": "eq",
-            "value": "M1"
+            "value": "needed"
           }
         ]
       },
@@ -64,9 +64,9 @@
       "when": {
         "all": [
           {
-            "field": "q4.templateId",
+            "field": "q4.misfitSlotId",
             "op": "eq",
-            "value": "M2"
+            "value": "none"
           }
         ]
       },

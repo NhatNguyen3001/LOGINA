@@ -591,6 +591,16 @@ describe('generateStructured', () => {
     expect(deterministicChecks(draft, bundle as never, []).find((c) => c.checkId === 'STRUCT')?.status).toBe('FAIL');
   });
 
+  it('blocks a Q4 with no spare card or a blank missing from the sentence', () => {
+    const bundle = { slot: 'Q4', version: 1, fallbackChallengeId: 'FB', candidates: [] };
+    const check = (taskBody: object) =>
+      deterministicChecks({ slot: 'Q4', challengeCandidates: [{ challengeId: 'FB', isNeutralFallback: true }], taskBody } as unknown as DraftFixture, bundle as never, []).find((c) => c.checkId === 'STRUCT')?.status;
+    const good = { frame: 'It shows [a].', slots: [{ slotId: 'a' }], cards: [{ cardId: 'c1' }, { cardId: 'c2' }], slotFits: { a: ['c1'] } };
+    expect(check(good)).toBe('PASS');
+    expect(check({ ...good, cards: [{ cardId: 'c1' }] })).toBe('FAIL');
+    expect(check({ ...good, frame: 'It shows nothing.' })).toBe('FAIL');
+  });
+
   it('picks READER_MODEL for reader, GENERATOR_MODEL for generator, ANALYZER_MODEL for analyzer, XREASON_MODEL for xreason', () => {
     const config = testWorkerConfig({ readerModel: 'r', generatorModel: 'g', analyzerModel: 'a', xreasonModel: 'x' });
     expect(['reader', 'generator', 'analyzer', 'xreason'].map((role) => modelFor(role as 'reader', config))).toEqual(['r', 'g', 'a', 'x']);

@@ -1,4 +1,4 @@
-import type { Artifact, DraftArtifact, Phase, Q2Artifact, Q2TaskBody, Q3Artifact, Q3TaskBody, Q4Artifact, Q4TaskBody, Q5Artifact, Slot, StudentChallengeDTO, StudentTaskDTO } from '@logina/contracts';
+import type { Artifact, DraftArtifact, Phase, Q2Artifact, Q2TaskBody, Q3Artifact, Q3TaskBody, Q5Artifact, Slot, StudentChallengeDTO, StudentTaskDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
@@ -16,7 +16,7 @@ import { useSessionLocale } from '@/components/logina/TeacherShell';
 import { ApiError, getChallenge, getStudentTask, lockTask, newKey, saveDraft, submitTask } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { errorKey } from '@/i18n';
-import { ArtifactEditor, emptyDraft, isComplete, missingKey, sameArtifact } from './editors';
+import { ArtifactEditor, FilledFrame, emptyDraft, isComplete, missingKey, sameArtifact } from './editors';
 import { useAutosave } from './use-autosave';
 import { useLessonTitle } from './use-lesson-title';
 
@@ -90,23 +90,6 @@ function LockedQ3({ body, answer }: { body: Q3TaskBody; answer: Q3Artifact }) {
         <dd>{tradeOff?.reasons.find((reason) => reason.reasonId === answer.reasonId)?.text}</dd>
       </div>
     </dl>
-  );
-}
-
-/** The finished sentence, with what the student picked standing out from the template's own words. */
-function LockedQ4({ body, answer }: { body: Q4TaskBody; answer: Q4Artifact }) {
-  const template = body.templates.find((x) => x.templateId === answer.templateId);
-  const chosen = (slotId: string) => {
-    const choiceId = answer.slots.find((x) => x.slotId === slotId)?.choiceId;
-    return template?.slots.find((x) => x.slotId === slotId)?.choices.find((x) => x.choiceId === choiceId)?.text;
-  };
-  return (
-    <p className="ans fills">
-      {template?.text.split(/(\[[^\]]+\])/).map((part, index) => {
-        const slotId = /^\[(.+)\]$/.exec(part)?.[1];
-        return slotId ? <mark key={index}>{chosen(slotId) ?? part}</mark> : part;
-      })}
-    </p>
   );
 }
 
@@ -217,7 +200,7 @@ function Reconsidering({ attemptId, task, onSubmitted, onPhase }: { attemptId: s
   const lockedAnswer =
     task.slot === 'Q2' && original.slot === 'Q2' ? <LockedQ2 body={task.taskBody} answer={original} />
     : task.slot === 'Q3' && original.slot === 'Q3' ? <LockedQ3 body={task.taskBody} answer={original} />
-    : task.slot === 'Q4' && original.slot === 'Q4' ? <LockedQ4 body={task.taskBody} answer={original} />
+    : task.slot === 'Q4' && original.slot === 'Q4' ? <FilledFrame body={task.taskBody} placements={original.placements} />
     : task.slot === 'Q5' && original.slot === 'Q5' ? <LockedQ5 answer={original} />
     : <LockedAnswer summary={challenge.data.lockedSummary} />;
   const missing = missingKey(task, answer);

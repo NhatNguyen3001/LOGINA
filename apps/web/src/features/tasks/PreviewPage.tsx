@@ -101,7 +101,7 @@ function SummaryBody({ preview }: { preview: TeacherTaskSummaryDTO }) {
       : preview.slot === 'Q3'
         ? [...preview.taskBody.options.map((o) => ({ id: o.optionId, text: o.text })), ...preview.taskBody.tradeOffs.flatMap((x) => [{ id: x.tradeOffId, text: x.text }, ...x.reasons.map((r) => ({ id: r.reasonId, text: r.text }))])]
         : preview.slot === 'Q4'
-          ? preview.taskBody.templates.map((x) => ({ id: x.templateId, text: x.text }))
+          ? [{ id: 'F', text: preview.taskBody.frame }, ...preview.taskBody.cards.map((x) => ({ id: x.cardId, text: x.text }))]
           : [];
   return (
     <>

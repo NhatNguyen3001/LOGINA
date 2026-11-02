@@ -75,8 +75,8 @@ function randomTasks(lessonId: string, n: number, releases: Record<string, Docum
       return { judgmentOptionId: option, tradeOffId: tradeOff.tradeOffId, reasonId: pick(tradeOff.reasons).reasonId };
     }
     if (slot === 'Q4') {
-      const template = pick(body.templates as { templateId: string; slots: { slotId: string; choices: { choiceId: string }[] }[] }[]);
-      return { templateId: template.templateId, slots: template.slots.map((s) => ({ slotId: s.slotId, choiceId: pick(s.choices).choiceId })) };
+      const cards = shuffleForRelease(String(random()), (body.cards as { cardId: string }[]).map((c) => c.cardId));
+      return { placements: (body.slots as { slotId: string }[]).map((s, i) => ({ slotId: s.slotId, cardId: cards[i]! })) };
     }
     const text = (release.publicContent.questionStem as string).slice(0, MAX_TEXT);
     return { proposal: text, reason: text };

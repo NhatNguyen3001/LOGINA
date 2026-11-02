@@ -30,7 +30,7 @@ export function applyTexts<T>(value: T, pairs: TextPair[]): T {
   return walk(value) as T;
 }
 
-const SERVER_ONLY = ['acceptedOrders', 'supportedReasons', 'keywordPartitions'];
+const SERVER_ONLY = ['acceptedOrders', 'supportedReasons', 'slotFits', 'keywordPartitions'];
 
 function bodyStrings(value: unknown): string[] {
   if (typeof value === 'string') return [value];

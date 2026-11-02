@@ -110,13 +110,16 @@ describe('student DTOs', () => {
       tradeOffs: [{ tradeOffId: 't1', optionId: 'o1', text: 'z', reasons: [{ reasonId: 'r1', text: 'y' }] }],
     };
     const q4 = {
-      templates: [{ templateId: 't1', text: 'x', slots: [{ slotId: 's1', choices: [{ choiceId: 'c1', text: 'y' }] }] }],
+      frame: 'x [s1]',
+      slots: [{ slotId: 's1', label: 'y' }],
+      cards: [{ cardId: 'c1', text: 'z' }, { cardId: 'c2', text: 'w' }],
     };
     const q5 = { instructions: 'x', maxCharsPerField: 120 };
     expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q3', taskBody: q3 })).not.toThrow();
     expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q4', taskBody: q4 })).not.toThrow();
     expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q5', taskBody: q5 })).not.toThrow();
     expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q3', taskBody: { ...q3, supportedReasons: [] } })).toThrow();
+    expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q4', taskBody: { ...q4, slotFits: {} } })).toThrow();
     expect(() => StudentTaskDTO.parse({ ...shared, slot: 'Q5', taskBody: { ...q5, keywordPartitions: [] } })).toThrow();
   });
 

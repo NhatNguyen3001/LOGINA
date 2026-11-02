@@ -284,8 +284,8 @@ describe('Q2 to Q5', () => {
   });
 
   it('Think again on Q4 shows the finished sentence, not the blanks', async () => {
-    const taskBody = { templates: [{ templateId: 't1', text: 'The source shows [shown], but not [missing].', slots: [{ slotId: 'shown', choices: [{ choiceId: 's1', text: 'a fall' }] }, { slotId: 'missing', choices: [{ choiceId: 'm1', text: 'why' }] }] }] };
-    const initialArtifact = { slot: 'Q4', templateId: 't1', slots: [{ slotId: 'shown', choiceId: 's1' }, { slotId: 'missing', choiceId: 'm1' }] };
+    const taskBody = { frame: 'The source shows [shown], but not [missing].', slots: [{ slotId: 'shown', label: 'Shows' }, { slotId: 'missing', label: 'Gap' }], cards: [{ cardId: 'c1', text: 'a fall' }, { cardId: 'c2', text: 'why' }, { cardId: 'c3', text: 'a rise' }] };
+    const initialArtifact = { slot: 'Q4', placements: [{ slotId: 'shown', cardId: 'c1' }, { slotId: 'missing', cardId: 'c2' }] };
     vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q4', phase: 'CHALLENGED', stem: 'Reply', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
     const sentence = (await lockedAnswer()).getByText('a fall').closest('p')!;
@@ -322,14 +322,49 @@ describe('Q2 to Q5', () => {
     expect(locked.getByText('It uses more staff')).toBeInTheDocument();
   });
 
-  it('Q4 shows only the slots of the chosen template', async () => {
-    const body = { templates: [
-      { templateId: 't1', text: 'First', slots: [{ slotId: 's1', choices: [{ choiceId: 'c1', text: 'Alpha' }] }] },
-      { templateId: 't2', text: 'Second', slots: [{ slotId: 's2', choices: [{ choiceId: 'c2', text: 'Beta' }] }] },
-    ] };
-    await render(<Q4Editor body={body} value={{ slot: 'Q4', templateId: 't2' }} onChange={noop} />);
-    expect(screen.getByRole('option', { name: 'Beta' })).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'Alpha' })).toBeNull();
+  const q4Body = {
+    frame: 'It shows [a] but not [b].',
+    slots: [{ slotId: 'a', label: 'Shows' }, { slotId: 'b', label: 'Gap' }],
+    cards: [{ cardId: 'c1', text: 'Alpha' }, { cardId: 'c2', text: 'Beta' }, { cardId: 'c3', text: 'Gamma' }],
+  };
+  const blank = (text: string) => screen.getByRole('button', { name: text, description: /./ });
+
+  it('Q4 places a held card in a blank', async () => {
+    const onChange = vi.fn();
+    await render(<Q4Editor body={q4Body} value={{ slot: 'Q4', placements: [] }} onChange={onChange} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Beta' }));
+    fireEvent.click(screen.getAllByRole('button', { name: 'Tap to place the card here' })[1]!);
+    expect(onChange).toHaveBeenCalledWith({ slot: 'Q4', placements: [{ slotId: 'b', cardId: 'c2' }] });
+  });
+
+  it('Q4 keeps placements in the order of the blanks', async () => {
+    const onChange = vi.fn();
+    await render(<Q4Editor body={q4Body} value={{ slot: 'Q4', placements: [{ slotId: 'b', cardId: 'c2' }] }} onChange={onChange} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Alpha' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Tap to place the card here' }));
+    expect(onChange).toHaveBeenCalledWith({ slot: 'Q4', placements: [{ slotId: 'a', cardId: 'c1' }, { slotId: 'b', cardId: 'c2' }] });
+  });
+
+  it('Q4 takes a used card out of the set, and a filled blank swaps its card', async () => {
+    const onChange = vi.fn();
+    await render(<Q4Editor body={q4Body} value={{ slot: 'Q4', placements: [{ slotId: 'a', cardId: 'c1' }] }} onChange={onChange} />);
+    expect(document.querySelectorAll('.word-card')).toHaveLength(2);
+    fireEvent.click(screen.getByRole('button', { name: 'Gamma' }));
+    fireEvent.click(blank('Alpha'));
+    expect(onChange).toHaveBeenCalledWith({ slot: 'Q4', placements: [{ slotId: 'a', cardId: 'c3' }] });
+  });
+
+  it('Q4 returns a card when its blank is tapped with nothing held', async () => {
+    const onChange = vi.fn();
+    await render(<Q4Editor body={q4Body} value={{ slot: 'Q4', placements: [{ slotId: 'a', cardId: 'c1' }] }} onChange={onChange} />);
+    fireEvent.click(blank('Alpha'));
+    expect(onChange).toHaveBeenCalledWith({ slot: 'Q4', placements: [] });
+  });
+
+  it('Q4 needs every blank filled', () => {
+    const task = { slot: 'Q4', taskBody: q4Body } as unknown as StudentTaskDTO;
+    expect(isComplete(task, { slot: 'Q4', placements: [{ slotId: 'a', cardId: 'c1' }] })).toBe(false);
+    expect(isComplete(task, { slot: 'Q4', placements: [{ slotId: 'a', cardId: 'c1' }, { slotId: 'b', cardId: 'c2' }] })).toBe(true);
   });
 
   it('Q5 counts characters and stops at 120', async () => {

@@ -117,7 +117,7 @@
       "Q1": "Q1 · Nhận định + căn cứ",
       "Q2": "Q2 · Xếp thẻ",
       "Q3": "Q3 · Đánh đổi",
-      "Q4": "Q4 · Mẫu phản biện",
+      "Q4": "Q4 · Phản biện",
       "Q5": "Q5 · Viết đề xuất"
     },
     "t03": {
@@ -620,9 +620,11 @@
       "waitCost": "Hãy chọn điều phải đánh đổi trước."
     },
     "q4": {
-      "template": "Chọn một mẫu",
-      "choose": "Chọn…",
-      "blank": "Chỗ trống {{n}}"
+      "cards": "Thẻ",
+      "cardsHint": "Số thẻ nhiều hơn số chỗ trống, và mỗi thẻ chỉ dùng một lần.",
+      "chooseCard": "Hãy chọn một thẻ trước",
+      "placeHere": "Chạm để đặt thẻ vào đây",
+      "choose": "Chọn…"
     },
     "q5": {
       "proposal": "Đề xuất của em",
@@ -660,7 +662,6 @@
       "decide": "Chọn một hướng để tiếp tục.",
       "tradeOff": "Chọn điều phải đánh đổi để tiếp tục.",
       "whyCost": "Chọn một lí do để tiếp tục.",
-      "template": "Chọn một mẫu để tiếp tục.",
       "blanks": "Điền mọi chỗ trống để tiếp tục.",
       "proposal": "Viết đề xuất của em để tiếp tục.",
       "reason": "Viết lý do của em để tiếp tục."

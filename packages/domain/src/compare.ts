@@ -24,13 +24,8 @@ function changedElements(initial: Artifact, final: Artifact): string[] {
     mark('tradeOff', initial.tradeOffId === final.tradeOffId);
     mark('reason', initial.reasonId === final.reasonId);
   } else if (initial.slot === 'Q4' && final.slot === 'Q4') {
-    mark('template', initial.templateId === final.templateId);
-    const active = (a: Artifact & { slot: 'Q4' }) =>
-      a.slots
-        .filter((s) => !a.activeSlotIds || a.activeSlotIds.includes(s.slotId))
-        .map((s) => `${s.slotId}=${s.choiceId}`)
-        .sort();
-    if (initial.templateId === final.templateId) mark('slots', sameJson(active(initial), active(final)));
+    const placed = (a: Artifact & { slot: 'Q4' }) => a.placements.map((p) => `${p.slotId}=${p.cardId}`).sort();
+    mark('placements', sameJson(placed(initial), placed(final)));
   } else if (initial.slot === 'Q5' && final.slot === 'Q5') {
     mark('proposal', normalizeText(initial.proposal) === normalizeText(final.proposal));
     mark('reason', normalizeText(initial.reason) === normalizeText(final.reason));

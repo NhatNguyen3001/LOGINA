@@ -15,9 +15,10 @@ export async function completeTask(page: Page, slot: string): Promise<void> {
     }
   }
   if (slot === 'Q4') {
-    await page.getByRole('radiogroup').getByRole('radio').first().check({ force: true });
-    const selects = page.locator('select');
-    for (let i = 0; i < (await selects.count()); i += 1) await selects.nth(i).selectOption({ index: 1 });
+    for (let i = 0; i < (await page.locator('.blank').count()); i += 1) {
+      await page.locator('.word-card').first().click();
+      await page.locator('.blank:not(.full)').first().click();
+    }
   }
   if (slot === 'Q5') {
     await page.locator('#proposal').fill('Offer vocational training in the district.');

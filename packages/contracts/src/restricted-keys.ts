@@ -23,6 +23,7 @@ export const RESTRICTED_KEYS: { all: RegExp[]; student: RegExp[] } = {
     /^storagePath$/,
     /^acceptedOrders$/,
     /^supportedReasons$/,
+    /^slotFits$/,
     /^keywordPartitions$/,
     /^error$/,
   ],

@@ -1,5 +1,5 @@
 import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/firestore';
-import { Artifact, type AttemptDTO, type Q4TaskBody, type StudentChallengeDTO, type SubmitResultDTO } from '@logina/contracts';
+import { Artifact, type AttemptDTO, type StudentChallengeDTO, type SubmitResultDTO } from '@logina/contracts';
 import { AppError, decodeNested, moveTree, newId, scopedGet, writeOnce } from '@logina/db';
 import { buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle } from '@logina/domain';
 
@@ -102,8 +102,6 @@ function q1Labels(release: DocumentData): Q1Labels {
   };
 }
 
-type Q4Template = Q4TaskBody['templates'][number];
-
 export function artifactSummary(artifact: Artifact, release: DocumentData): { answerText: string; evidenceText?: string } {
   if (artifact.slot === 'Q1') {
     const content = release.publicContent as { answerOptions: { id: string; text: string }[]; evidenceOptions: { evidenceId: string; text: string }[] };
@@ -123,12 +121,11 @@ export function artifactSummary(artifact: Artifact, release: DocumentData): { an
     const tradeOff = (body.tradeOffs as { tradeOffId: string; text: string; reasons: { reasonId: string; text: string }[] }[]).find((t) => t.tradeOffId === artifact.tradeOffId);
     return { answerText: [option?.text, tradeOff?.text, tradeOff?.reasons.find((r) => r.reasonId === artifact.reasonId)?.text].filter(Boolean).join(' · ') };
   }
-  const template = (body.templates as Q4Template[]).find((x) => x.templateId === artifact.templateId);
   const chosen = (slotId: string) => {
-    const choiceId = artifact.slots.find((x) => x.slotId === slotId)?.choiceId;
-    return template?.slots.find((x) => x.slotId === slotId)?.choices.find((x) => x.choiceId === choiceId)?.text;
+    const cardId = artifact.placements.find((x) => x.slotId === slotId)?.cardId;
+    return (body.cards as { cardId: string; text: string }[]).find((x) => x.cardId === cardId)?.text;
   };
-  return { answerText: (template?.text ?? '').replace(/\[([^\]]+)\]/g, (blank, slotId: string) => chosen(slotId) ?? blank) };
+  return { answerText: (body.frame as string).replace(/\[([^\]]+)\]/g, (blank, slotId: string) => chosen(slotId) ?? blank) };
 }
 
 const toChallengeDTO = (taskDoc: DocumentData, delivery: DocumentData, deliveryId: string, release: DocumentData): StudentChallengeDTO => ({
@@ -151,7 +148,7 @@ export async function lockTask(
   const authoring = toAuthoring(artifact, release);
 
   const bundle = (await db.doc(`lessons/${attempt.lessonId as string}/ruleBundles/${release.ruleBundleId as string}`).get()).data() as RuleBundle;
-  const facts = buildLockFacts(authoring, slot === 'Q1' ? q1Labels(release) : { answers: {}, evidence: {}, pairs: {} }, release.serverBody?.keywordPartitions, release.serverBody?.supportedReasons);
+  const facts = buildLockFacts(authoring, slot === 'Q1' ? q1Labels(release) : { answers: {}, evidence: {}, pairs: {} }, release.serverBody);
   const selection = selectChallenge(bundle, facts);
   const candidates = (release.teacherContent as { candidates: DocumentData[] }).candidates;
   const chosen = candidates.find((c) => c.challengeId === selection.challengeId);

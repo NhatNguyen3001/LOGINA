@@ -19,9 +19,9 @@ Rules:
 - Q1: leave it out.
 - Q2: `cards` (4 items with `cardId` and `text`), `basis` (what to rank them by), `acceptedOrders` (each acceptable order as a list of `cardId`s).
 - Q3: `options` (2 items with `optionId` and `text`; neither is the right answer), `tradeOffs` (2 for each option, with `tradeOffId`, `optionId`, `text` naming what that option gives up, and `reasons`: 3 items with `reasonId` and `text`, each saying why that cost comes with that option), `supportedReasons` (the one `reasonId` per trade-off the source supports; the other two must sound plausible, but the source must not support them).
-- Q4: `templates` (with `templateId`, `text` containing [slotId] blanks, and `slots`, each with `slotId` and `choices` of `choiceId` and `text`).
+- Q4: `frame` (one argument with a [slotId] token for each of 3 blanks), `slots` (with `slotId` and a plain `label` saying what the blank is for), `cards` (6 items with `cardId` and `text`; every card must read correctly in a blank, and the spare cards must sound plausible, such as mixing up two measures or being true but off the point), `slotFits` (for each `slotId`, the `cardId`s that fit it).
 - Q5: `instructions`, `maxCharsPerField` set to 120, `keywordPartitions` (named groups of words a student might write).
 
-Rules in `ruleBundle` test these fields only, with `eq` or `in` and string values: Q2 `q2.firstCardId`; Q3 `q3.judgmentOptionId`, `q3.tradeOffId`, `q3.reasonSupported` (the string `true` or `false`, so one prompt can send back a student whose reason the source does not support); Q4 `q4.templateId`, `q4.firstChoiceId`; Q5 `q5.keywordPartition`, whose values are the group names in `keywordPartitions`.
+Rules in `ruleBundle` test these fields only, with `eq` or `in` and string values: Q2 `q2.firstCardId`; Q3 `q3.judgmentOptionId`, `q3.tradeOffId`, `q3.reasonSupported` (the string `true` or `false`, so one prompt can send back a student whose reason the source does not support); Q4 `q4.misfitSlotId`, whose values are a `slotId` holding a card that does not fit, or `none`; Q5 `q5.keywordPartition`, whose values are the group names in `keywordPartitions`.
 
 Return JSON only, matching the schema.
