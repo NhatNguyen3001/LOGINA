@@ -64,7 +64,7 @@ Each of the five tasks follows the same steps:
 |---|---|---|
 | Q1 | Statement | Chooses a statement and the evidence card that supports it |
 | Q2 | Rank cards | Drags the cards into order, strongest first |
-| Q3 | Compare | Compares options on each criterion, decides, and names the drawbacks accepted |
+| Q3 | Trade-off | Chooses a path, what it gives up, and why that cost comes with it |
 | Q4 | Counterargument | Builds an argument from a template |
 | Q5 | Proposal | Writes a short proposal and the reason for it |
 

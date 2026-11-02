@@ -33,7 +33,7 @@ function progressOf(draft: DocumentData | undefined, translation: DocumentData |
 }
 const APPROVABLE = ['MACHINE_PASS', 'REVIEW_REQUIRED'];
 /** Fields of a Q2 to Q5 body that only the server may see. */
-const SERVER_ONLY_BODY = ['acceptedOrders', 'priorities', 'keywordPartitions'];
+const SERVER_ONLY_BODY = ['acceptedOrders', 'supportedReasons', 'keywordPartitions'];
 
 export interface LoadedDraft {
   id: string;
@@ -129,7 +129,8 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
       canApprove: canApprove(doc, report),
     };
     if (slot !== 'Q1') {
-      return respond(c, TeacherTaskSummaryDTO, { ...shared, slot, taskType: doc.taskType, taskBody: { ...publicBody(doc.taskBody), teacherLabels: {} } } as never);
+      const teacherLabels = Object.fromEntries(((doc.taskBody.supportedReasons ?? []) as string[]).map((id) => [id, 'SUPPORTED']));
+      return respond(c, TeacherTaskSummaryDTO, { ...shared, slot, taskType: doc.taskType, taskBody: { ...publicBody(doc.taskBody), teacherLabels } } as never);
     }
 
     const cards = (await db.collection(`lessons/${lesson.id as string}/taskDrafts/${id}/generatedE`).get()).docs.map((d) => d.data());

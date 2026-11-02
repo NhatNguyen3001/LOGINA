@@ -1,3 +1,4 @@
+import { buildLockFacts } from '../src/facts.js';
 import { describe, expect, it } from 'vitest';
 import { assignRuntimeIds } from '../src/shuffle.js';
 import { aggregateGates, type QualityGate } from '../src/gates.js';
@@ -23,7 +24,7 @@ const q1Combos: LockFacts[] = ['A1', 'A2', 'A3', 'A4'].flatMap((answerId) =>
 );
 const q2Combos: LockFacts[] = ['K1', 'K2', 'K3', 'K4'].map((id) => ({ 'q2.firstCardId': id }));
 const q3Combos: LockFacts[] = ['O1', 'O2'].flatMap((id) =>
-  ['0', '1', '2', '3', '4'].map((count) => ({ 'q3.judgmentOptionId': id, 'q3.tradeOffCount': count })),
+  ['true', 'false'].map((supported) => ({ 'q3.judgmentOptionId': id, 'q3.reasonSupported': supported })),
 );
 const q4Combos: LockFacts[] = [
   { 'q4.templateId': 'M1', 'q4.firstChoiceId': 'S1' },
@@ -47,6 +48,16 @@ describe.each(['en', 'vi'] as const)('fixture logic in %s', (locale) => {
     for (const facts of allCombos[name]) {
       expect(known).toContain(selectChallenge(bundle(name, locale), facts).challengeId);
     }
+  });
+
+  it('Q3: every trade-off has exactly one reason the source supports', () => {
+    const body = (loadFixture('q3', locale) as DraftFixture).taskBody as { tradeOffs: { reasons: { reasonId: string }[] }[]; supportedReasons: string[] };
+    for (const { reasons } of body.tradeOffs) expect(reasons.filter((r) => body.supportedReasons.includes(r.reasonId))).toHaveLength(1);
+  });
+
+  it('Q3: a reason the source does not support gets the prompt that sends the student back', () => {
+    const facts = buildLockFacts({ slot: 'Q3', judgmentOptionId: 'O1', tradeOffId: 'D1', reasonId: 'R2' }, { answers: {}, evidence: {}, pairs: {} }, {}, ['R1']);
+    expect(selectChallenge(bundle('q3', locale), facts).challengeId).toBe('TN1');
   });
 
   it('the Q1 pair table matches what the selector picks', () => {

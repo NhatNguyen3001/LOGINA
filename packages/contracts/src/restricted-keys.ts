@@ -22,7 +22,7 @@ export const RESTRICTED_KEYS: { all: RegExp[]; student: RegExp[] } = {
     /^irrelevanceReason$/,
     /^storagePath$/,
     /^acceptedOrders$/,
-    /^priorities$/,
+    /^supportedReasons$/,
     /^keywordPartitions$/,
     /^error$/,
   ],

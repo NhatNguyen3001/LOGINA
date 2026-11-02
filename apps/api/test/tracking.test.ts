@@ -12,7 +12,7 @@ let copyId: string;
 
 const artifacts: [string, object][] = [
   ['Q2', { slot: 'Q2', orderedCardIds: ['K1', 'K2', 'K3', 'K4'] }],
-  ['Q3', { slot: 'Q3', comparisons: [{ criterionId: 'C1', value: 'O1' }], judgmentOptionId: 'O1', tradeOffIds: ['D1'] }],
+  ['Q3', { slot: 'Q3', judgmentOptionId: 'O1', tradeOffId: 'D1', reasonId: 'R1' }],
   ['Q4', { slot: 'Q4', templateId: 'M1', slots: [{ slotId: 'shown', choiceId: 'S1' }, { slotId: 'missing', choiceId: 'M1' }] }],
   ['Q5', { slot: 'Q5', proposal: 'Open trade courses', reason: 'Many jobs need training' }],
 ];

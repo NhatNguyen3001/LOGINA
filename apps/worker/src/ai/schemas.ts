@@ -37,7 +37,7 @@ export const AnalyzerOutput = z.object({
 /** What the student screens read, plus the scoring data only the server sees. */
 const TASK_BODIES = {
   Q2: Q2TaskBody.extend({ acceptedOrders: z.array(z.array(z.string())).min(1) }),
-  Q3: Q3TaskBody.extend({ priorities: z.record(z.string(), z.array(z.string())) }),
+  Q3: Q3TaskBody.extend({ supportedReasons: z.array(z.string()).min(1) }),
   Q4: Q4TaskBody,
   Q5: Q5TaskBody.extend({ keywordPartitions: z.record(z.string(), z.array(z.string().trim().min(1)).min(1)) }),
 };

@@ -22,9 +22,9 @@ export type Q2Artifact = z.infer<typeof Q2Artifact>;
 export const Q3Artifact = z
   .object({
     slot: z.literal('Q3'),
-    comparisons: z.array(z.object({ criterionId: z.string(), value: z.string() }).strict()),
     judgmentOptionId: z.string(),
-    tradeOffIds: z.array(z.string()),
+    tradeOffId: z.string(),
+    reasonId: z.string(),
   })
   .strict();
 export type Q3Artifact = z.infer<typeof Q3Artifact>;

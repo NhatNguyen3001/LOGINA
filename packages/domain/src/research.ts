@@ -50,10 +50,8 @@ export function answerColumns(artifact: Artifact, letters: Q1Letters): AnswerCol
       };
     case 'Q2':
       return { answer: artifact.orderedCardIds.join(' > '), evidence: null, relation: null };
-    case 'Q3': {
-      const comparisons = artifact.comparisons.map((c) => `${c.criterionId}=${c.value}`).join(', ');
-      return { answer: `${artifact.judgmentOptionId}; ${comparisons}; accepts ${artifact.tradeOffIds.join(', ') || 'none'}`, evidence: null, relation: null };
-    }
+    case 'Q3':
+      return { answer: `${artifact.judgmentOptionId}; gives up ${artifact.tradeOffId}; reason ${artifact.reasonId}`, evidence: null, relation: null };
     case 'Q4':
       return { answer: `${artifact.templateId}: ${artifact.slots.map((s) => s.choiceId).join(', ')}`, evidence: null, relation: null };
     case 'Q5':

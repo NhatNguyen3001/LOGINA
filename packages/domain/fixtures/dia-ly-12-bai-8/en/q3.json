@@ -2,7 +2,7 @@
   "slot": "Q3",
   "taskType": "COMPARE_TRADEOFF",
   "draftVersion": 2,
-  "questionStem": "A young rural worker is choosing between two paths. Compare them, choose one, and name the drawback you accept.",
+  "questionStem": "A young rural worker is choosing between two paths. Choose the one you would advise, what it gives up, and why that cost comes with it.",
   "taskBody": {
     "options": [
       {
@@ -14,59 +14,102 @@
         "text": "Stay home and work in services, a craft village or farming with a side job"
       }
     ],
-    "criteria": [
-      {
-        "criterionId": "C1",
-        "text": "Steady income"
-      },
-      {
-        "criterionId": "C2",
-        "text": "Being near family and community"
-      },
-      {
-        "criterionId": "C3",
-        "text": "Chances to learn a trade"
-      }
-    ],
-    "constraints": [
+    "tradeOffs": [
       {
         "tradeOffId": "D1",
-        "text": "Living far from family"
+        "optionId": "O1",
+        "text": "Living far from family",
+        "reasons": [
+          {
+            "reasonId": "R2",
+            "text": "Factories do not let workers go back to visit their families."
+          },
+          {
+            "reasonId": "R1",
+            "text": "The steadier factory work is in cities and industrial zones, so taking it means moving away from home."
+          },
+          {
+            "reasonId": "R3",
+            "text": "Young workers care less about family once they have steady pay."
+          }
+        ]
       },
       {
         "tradeOffId": "D2",
-        "text": "High living costs"
+        "optionId": "O1",
+        "text": "High living costs",
+        "reasons": [
+          {
+            "reasonId": "R5",
+            "text": "Factory pay is lower than income from farming."
+          },
+          {
+            "reasonId": "R6",
+            "text": "Workers must pay for training before they can start."
+          },
+          {
+            "reasonId": "R4",
+            "text": "This path means living in a city or industrial zone, where the source says living costs are high."
+          }
+        ]
       },
       {
         "tradeOffId": "D3",
-        "text": "Lower, irregular income"
+        "optionId": "O2",
+        "text": "Lower, irregular income",
+        "reasons": [
+          {
+            "reasonId": "R7",
+            "text": "The work near home is services, a craft village or farming with a side job, where the source says income is often lower and irregular."
+          },
+          {
+            "reasonId": "R9",
+            "text": "Living near family always costs more than living in a city."
+          },
+          {
+            "reasonId": "R8",
+            "text": "Rural workers are not allowed to take factory jobs."
+          }
+        ]
       },
       {
         "tradeOffId": "D4",
-        "text": "Fewer chances to move up"
+        "optionId": "O2",
+        "text": "Fewer chances to learn a trade or move up",
+        "reasons": [
+          {
+            "reasonId": "R11",
+            "text": "Training is only for people who have already left their home area."
+          },
+          {
+            "reasonId": "R10",
+            "text": "The source links staying in the home area with fewer chances to learn a trade or move up, so being close to home comes at that cost."
+          },
+          {
+            "reasonId": "R12",
+            "text": "People who work near home do not need new skills."
+          }
+        ]
       }
     ],
-    "priorities": {
-      "O1": [
-        "C1",
-        "C3"
-      ],
-      "O2": [
-        "C2"
-      ]
-    }
+    "supportedReasons": [
+      "R1",
+      "R4",
+      "R7",
+      "R10"
+    ]
   },
   "challengeCandidates": [
     {
       "challengeId": "TN1",
       "label": "TN1",
       "isNeutralFallback": false,
-      "primaryFunction": "TRADEOFF_CHECK",
-      "challengeTarget": "CLARIFY_MISSING",
-      "purposeForTeacher": "Naming a cost",
-      "whenShownForTeacher": "When no drawback is chosen",
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "SOURCE_DIRECTION",
+      "purposeForTeacher": "Checking the reason",
+      "whenShownForTeacher": "When the chosen reason is not one the source supports",
       "sourceAnchor": "p. 9 · paras. 2–3",
-      "message": "The source names drawbacks for both paths. Which one comes with the path you chose?"
+      "message": "Read the paragraph about the path you chose again. Does it say this is why the drawback happens?"
     },
     {
       "challengeId": "TN2",
@@ -89,17 +132,6 @@
       "whenShownForTeacher": "When the stay-home path is chosen",
       "sourceAnchor": "p. 9 · paras. 2–3",
       "message": "The source says income on this path is often lower and irregular. Does your choice take that into account?"
-    },
-    {
-      "challengeId": "TN4",
-      "label": "TN4",
-      "isNeutralFallback": false,
-      "primaryFunction": "TRADEOFF_CHECK",
-      "challengeTarget": "RELEVANCE",
-      "purposeForTeacher": "Which drawback matters most",
-      "whenShownForTeacher": "When three or more drawbacks are chosen",
-      "sourceAnchor": "p. 9 · paras. 2–3",
-      "message": "You accepted several drawbacks. Which one would matter most to this young worker?"
     },
     {
       "challengeId": "FB",
@@ -130,7 +162,7 @@
     {
       "optionId": "O1",
       "relationLabel": "A choice with trade-offs",
-      "text": "The source gives both paths gains and drawbacks. Neither is the right answer; what counts is naming what your choice gives up."
+      "text": "The source gives both paths gains and drawbacks. Neither is the right answer; what counts is seeing what your choice gives up and why that cost comes with it."
     }
   ]
 }

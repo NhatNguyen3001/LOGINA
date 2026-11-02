@@ -99,7 +99,7 @@ function SummaryBody({ preview }: { preview: TeacherTaskSummaryDTO }) {
     preview.slot === 'Q2'
       ? preview.taskBody.cards.map((c) => ({ id: c.cardId, text: c.text }))
       : preview.slot === 'Q3'
-        ? [...preview.taskBody.options.map((o) => ({ id: o.optionId, text: o.text })), ...preview.taskBody.criteria.map((c) => ({ id: c.criterionId, text: c.text }))]
+        ? [...preview.taskBody.options.map((o) => ({ id: o.optionId, text: o.text })), ...preview.taskBody.tradeOffs.flatMap((x) => [{ id: x.tradeOffId, text: x.text }, ...x.reasons.map((r) => ({ id: r.reasonId, text: r.text }))])]
         : preview.slot === 'Q4'
           ? preview.taskBody.templates.map((x) => ({ id: x.templateId, text: x.text }))
           : [];
@@ -111,7 +111,7 @@ function SummaryBody({ preview }: { preview: TeacherTaskSummaryDTO }) {
           <span className="k">{id}</span>
           <div>
             <div className="m">{text}</div>
-            {labels[id] ? <div className="meta"><span className="tag neutral">{labels[id]}</span></div> : null}
+            {labels[id] ? <div className="meta"><span className="tag neutral">{labels[id] === 'SUPPORTED' ? t('teacher.t07.supportedReason') : labels[id]}</span></div> : null}
           </div>
           <span />
         </div>

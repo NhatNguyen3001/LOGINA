@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { Artifact, type MeDTO, type StudentTaskDTO } from '@logina/contracts';
+import type { MeDTO, StudentTaskDTO } from '@logina/contracts';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TaskRunner } from '@/features/student/TaskRunner';
-import { Q2Editor, Q3Editor, Q4Editor, Q5Editor, emptyDraft, isComplete } from '@/features/student/editors';
+import { Q2Editor, Q3Editor, Q4Editor, Q5Editor, isComplete, missingKey } from '@/features/student/editors';
 import { ResultSet } from '@/features/student/ResultSet';
 import * as api from '@/lib/api';
 import { renderWithI18n } from './utils';
@@ -238,34 +238,49 @@ describe('Q2 to Q5', () => {
     expect(onChange).toHaveBeenCalledWith({ slot: 'Q2', orderedCardIds: ['k2', 'k1'] });
   });
 
-  it('Q3 requires every criterion and a decision', () => {
-    const task = { slot: 'Q3', taskBody: { options: [], criteria: [{ criterionId: 'c1', text: 'x' }, { criterionId: 'c2', text: 'y' }], constraints: [] } } as unknown as StudentTaskDTO;
-    expect(isComplete(task, { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o' }], judgmentOptionId: 'o', tradeOffIds: [] })).toBe(false);
-    expect(isComplete(task, { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o' }, { criterionId: 'c2', value: 'o' }], tradeOffIds: [] })).toBe(false);
-    expect(isComplete(task, { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o' }, { criterionId: 'c2', value: 'o' }], judgmentOptionId: 'o', tradeOffIds: [] })).toBe(true);
+  const q3Body = {
+    options: [{ optionId: 'o1', text: 'Plan A' }, { optionId: 'o2', text: 'Plan B' }],
+    tradeOffs: [
+      { tradeOffId: 't1', optionId: 'o1', text: 'Slower', reasons: [{ reasonId: 'r1', text: 'It needs more steps' }, { reasonId: 'r2', text: 'It is cursed' }] },
+      { tradeOffId: 't2', optionId: 'o2', text: 'Dearer', reasons: [{ reasonId: 'r3', text: 'It uses more staff' }] },
+    ],
+  };
+
+  it('Q3 needs a path, a cost and a reason', () => {
+    const task = { slot: 'Q3', taskBody: q3Body } as unknown as StudentTaskDTO;
+    expect(isComplete(task, { slot: 'Q3', judgmentOptionId: 'o1' })).toBe(false);
+    expect(isComplete(task, { slot: 'Q3', judgmentOptionId: 'o1', tradeOffId: 't1' })).toBe(false);
+    expect(isComplete(task, { slot: 'Q3', judgmentOptionId: 'o1', tradeOffId: 't1', reasonId: 'r1' })).toBe(true);
+    expect(missingKey(task, { slot: 'Q3', judgmentOptionId: 'o1' })).toBe('student.need.tradeOff');
   });
 
-  it('a Q3 answer with no drawback ticked is still a valid artifact', () => {
-    const task = { slot: 'Q3', draftArtifact: null, taskBody: { options: [], criteria: [], constraints: [] } } as unknown as StudentTaskDTO;
-    const draft = { ...emptyDraft(task), comparisons: [{ criterionId: 'c1', value: 'o' }], judgmentOptionId: 'o' };
-    expect(Artifact.safeParse(draft).success).toBe(true);
+  it('Q3 shows only the costs of the chosen path and the reasons of the chosen cost', async () => {
+    await render(<Q3Editor body={q3Body} value={{ slot: 'Q3', judgmentOptionId: 'o1', tradeOffId: 't1' }} onChange={noop} />);
+    expect(screen.getByRole('radio', { name: 'Slower' })).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: 'Dearer' })).toBeNull();
+    expect(screen.getByRole('radio', { name: 'It needs more steps' })).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: 'It uses more staff' })).toBeNull();
   });
 
-  it('Q3 shows options, criteria and trade-offs', async () => {
-    const body = { options: [{ optionId: 'o1', text: 'Plan A' }], criteria: [{ criterionId: 'c1', text: 'Cost' }], constraints: [{ tradeOffId: 't1', text: 'Slower' }] };
-    await render(<Q3Editor body={body} value={{ slot: 'Q3' }} onChange={noop} />);
-    expect(screen.getByRole('group', { name: 'Cost' })).toBeInTheDocument();
-    expect(screen.getByRole('checkbox', { name: 'Slower' })).toBeInTheDocument();
+  it('Q3 asks for a path before showing costs', async () => {
+    await render(<Q3Editor body={q3Body} value={{ slot: 'Q3' }} onChange={noop} />);
+    expect(screen.getByText('Choose a path first.')).toBeInTheDocument();
+    expect(screen.getByText('Choose what it gives up first.')).toBeInTheDocument();
   });
 
-  it('Q3 asks each criterion once, and a screen reader still hears the full option', async () => {
-    const options = [{ optionId: 'o1', text: 'Plan A' }, { optionId: 'o2', text: 'Plan B' }];
-    const criteria = [{ criterionId: 'c1', text: 'Cost' }, { criterionId: 'c2', text: 'Speed' }];
-    await render(<Q3Editor body={{ options, criteria, constraints: [] }} value={{ slot: 'Q3' }} onChange={noop} />);
-    const cost = screen.getByRole('group', { name: 'Cost' });
-    expect(within(cost).getAllByRole('radio')).toHaveLength(2);
-    expect(within(cost).getByRole('radio', { name: /Plan B/ })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'Speed' })).toBeInTheDocument();
+  it('changing the Q3 path clears the cost and the reason', async () => {
+    const onChange = vi.fn();
+    await render(<Q3Editor body={q3Body} value={{ slot: 'Q3', judgmentOptionId: 'o1', tradeOffId: 't1', reasonId: 'r1' }} onChange={onChange} />);
+    fireEvent.click(screen.getByRole('radio', { name: /Plan B/ }));
+    expect(onChange).toHaveBeenCalledWith({ slot: 'Q3', judgmentOptionId: 'o2' });
+  });
+
+  it('changing the Q3 cost clears the reason', async () => {
+    const onChange = vi.fn();
+    const body = { ...q3Body, tradeOffs: [...q3Body.tradeOffs, { tradeOffId: 't3', optionId: 'o1', text: 'Riskier', reasons: [] }] };
+    await render(<Q3Editor body={body} value={{ slot: 'Q3', judgmentOptionId: 'o1', tradeOffId: 't1', reasonId: 'r1' }} onChange={onChange} />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Riskier' }));
+    expect(onChange).toHaveBeenCalledWith({ slot: 'Q3', judgmentOptionId: 'o1', tradeOffId: 't3' });
   });
 
   it('Think again on Q4 shows the finished sentence, not the blanks', async () => {
@@ -297,22 +312,14 @@ describe('Q2 to Q5', () => {
     expect([...ranked.querySelectorAll('li')].map((row) => row.textContent)).toEqual(['1Cities', '2Trade', '3Machines']);
   });
 
-  it('Think again on Q3 lists every question with the chosen answer', async () => {
-    const taskBody = {
-      options: [{ optionId: 'o1', text: 'Plan A' }, { optionId: 'o2', text: 'Plan B' }],
-      criteria: [{ criterionId: 'c1', text: 'Which costs less?' }, { criterionId: 'c2', text: 'Which is faster?' }],
-      constraints: [{ tradeOffId: 't1', text: 'Slower' }, { tradeOffId: 't2', text: 'Dearer' }],
-    };
-    const initialArtifact = { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o1' }, { criterionId: 'c2', value: 'o2' }], judgmentOptionId: 'o2', tradeOffIds: ['t2'] };
-    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q3', phase: 'CHALLENGED', stem: 'Which plan?', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+  it('Think again on Q3 lists the path, the cost and the reason', async () => {
+    const initialArtifact = { slot: 'Q3', judgmentOptionId: 'o2', tradeOffId: 't2', reasonId: 'r3' };
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q3', phase: 'CHALLENGED', stem: 'Which plan?', draftArtifact: null, taskBody: q3Body, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
     const locked = await lockedAnswer();
-    const answered = (question: string) => locked.getByText(question).parentElement!;
-    expect(answered('Which costs less?')).toHaveTextContent('Plan A');
-    expect(answered('Which is faster?')).toHaveTextContent('Plan B');
-    expect(answered('Your decision')).toHaveTextContent('Plan B');
-    expect(answered('What drawbacks do you accept?')).toHaveTextContent('Dearer');
-    expect(locked.queryByText('Slower')).toBeNull();
+    expect(locked.getByText('Plan B')).toBeInTheDocument();
+    expect(locked.getByText('Dearer')).toBeInTheDocument();
+    expect(locked.getByText('It uses more staff')).toBeInTheDocument();
   });
 
   it('Q4 shows only the slots of the chosen template', async () => {

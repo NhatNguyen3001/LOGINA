@@ -2,7 +2,7 @@ import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/fi
 import { Hono } from 'hono';
 import { ApproveReq, ApproveResultDTO, DispositionReq, JobDTO, TaskApprovalDTO, TranslationEditReq } from '@logina/contracts';
 import { AppError, auditRepo, decodeNested, encodeNested, lessonsRepo, newId, previewViewsRepo, writeOnce } from '@logina/db';
-import { assignRuntimeIds, checkApproval, type QualityGate, shuffleAvoiding } from '@logina/domain';
+import { assignRuntimeIds, checkApproval, type QualityGate, shuffleAvoiding, shuffleForRelease } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { requireBaseVersion } from '../middleware/base-version.js';
 import { withIdempotency } from '../middleware/idempotency.js';
@@ -10,16 +10,20 @@ import { respond } from '../middleware/respond.js';
 import { createJob, toJobDTO } from '../services/jobs.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
-const SERVER_ONLY_BODY = ['acceptedOrders', 'priorities', 'keywordPartitions'];
+const SERVER_ONLY_BODY = ['acceptedOrders', 'supportedReasons', 'keywordPartitions'];
 
 const iso = (value: { toDate: () => Date } | undefined): string | undefined => value?.toDate().toISOString();
 
 const publicBody = (body: DocumentData | undefined): DocumentData | undefined =>
   body && Object.fromEntries(Object.entries(body).filter(([key]) => !SERVER_ONLY_BODY.includes(key)));
 
-/** What students get: no server-only keys, and Q2 cards out of their accepted order. */
+/** What students get: no server-only keys, Q2 cards out of their accepted order, and Q3 reasons in no telling order. */
 function studentBody(releaseId: string, body: DocumentData): DocumentData | undefined {
   const visible = publicBody(body);
+  if (visible?.tradeOffs) {
+    const tradeOffs = (visible.tradeOffs as DocumentData[]).map((tradeOff) => ({ ...tradeOff, reasons: shuffleForRelease(`${releaseId}:${tradeOff.tradeOffId as string}`, tradeOff.reasons as DocumentData[]) }));
+    return { ...visible, tradeOffs };
+  }
   if (!visible?.cards) return visible;
   const cards = visible.cards as { cardId: string }[];
   const accepted = ((body.acceptedOrders ?? []) as (string[] | { order: string[] })[]).map((order) => (Array.isArray(order) ? order : order.order));

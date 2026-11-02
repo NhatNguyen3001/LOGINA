@@ -32,26 +32,14 @@ describe('compareArtifacts', () => {
     expect(compareArtifacts(before, after)).toEqual({ revised: true, changedElements: ['order'] });
   });
 
-  const q3 = (value: string, judgmentOptionId: string, tradeOffIds: string[]): Artifact => ({
-    slot: 'Q3',
-    comparisons: [{ criterionId: 'c1', value }],
-    judgmentOptionId,
-    tradeOffIds,
-  });
+  const q3 = (judgmentOptionId: string, tradeOffId: string, reasonId: string): Artifact => ({ slot: 'Q3', judgmentOptionId, tradeOffId, reasonId });
 
-  it('Q3 trade-off set order does not matter', () => {
-    expect(compareArtifacts(q3('v', 'o1', ['t1', 't2']), q3('v', 'o1', ['t2', 't1']))).toEqual({
-      revised: false,
-      changedElements: [],
-    });
+  it('Q3 with the same path, cost and reason is unchanged', () => {
+    expect(compareArtifacts(q3('o1', 't1', 'r1'), q3('o1', 't1', 'r1'))).toEqual({ revised: false, changedElements: [] });
   });
 
   it('Q3 reports each changed element', () => {
-    expect(compareArtifacts(q3('v', 'o1', ['t1']), q3('w', 'o2', ['t2'])).changedElements).toEqual([
-      'comparisons',
-      'judgment',
-      'tradeOffs',
-    ]);
+    expect(compareArtifacts(q3('o1', 't1', 'r1'), q3('o2', 't2', 'r2')).changedElements).toEqual(['judgment', 'tradeOff', 'reason']);
   });
 
   const q4 = (templateId: string, slots: [string, string][], activeSlotIds?: string[]): Artifact => ({

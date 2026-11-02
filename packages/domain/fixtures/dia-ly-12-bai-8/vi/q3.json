@@ -2,7 +2,7 @@
   "slot": "Q3",
   "taskType": "COMPARE_TRADEOFF",
   "draftVersion": 2,
-  "questionStem": "Một thanh niên nông thôn đang cân nhắc hai hướng. Em hãy so sánh, chọn một hướng và nêu hạn chế em chấp nhận.",
+  "questionStem": "Một thanh niên nông thôn đang cân nhắc hai hướng. Em hãy chọn hướng em khuyên, điều hướng đó phải đánh đổi, và lí do có sự đánh đổi ấy.",
   "taskBody": {
     "options": [
       {
@@ -14,59 +14,102 @@
         "text": "Ở lại quê làm dịch vụ, làng nghề hoặc nông nghiệp kết hợp nghề phụ"
       }
     ],
-    "criteria": [
-      {
-        "criterionId": "C1",
-        "text": "Thu nhập ổn định"
-      },
-      {
-        "criterionId": "C2",
-        "text": "Gần gia đình và cộng đồng"
-      },
-      {
-        "criterionId": "C3",
-        "text": "Cơ hội học nghề"
-      }
-    ],
-    "constraints": [
+    "tradeOffs": [
       {
         "tradeOffId": "D1",
-        "text": "Sống xa gia đình"
+        "optionId": "O1",
+        "text": "Sống xa gia đình",
+        "reasons": [
+          {
+            "reasonId": "R2",
+            "text": "Nhà máy không cho công nhân về thăm gia đình."
+          },
+          {
+            "reasonId": "R1",
+            "text": "Công việc nhà máy ổn định hơn nằm ở thành phố và khu công nghiệp, nên nhận việc đồng nghĩa với rời quê."
+          },
+          {
+            "reasonId": "R3",
+            "text": "Thanh niên ít quan tâm đến gia đình hơn khi đã có lương ổn định."
+          }
+        ]
       },
       {
         "tradeOffId": "D2",
-        "text": "Chi phí sinh hoạt cao"
+        "optionId": "O1",
+        "text": "Chi phí sinh hoạt cao",
+        "reasons": [
+          {
+            "reasonId": "R5",
+            "text": "Lương nhà máy thấp hơn thu nhập từ làm nông."
+          },
+          {
+            "reasonId": "R6",
+            "text": "Công nhân phải tự trả tiền đào tạo trước khi bắt đầu làm việc."
+          },
+          {
+            "reasonId": "R4",
+            "text": "Hướng này nghĩa là sống ở thành phố hoặc khu công nghiệp, nơi nguồn nói chi phí sinh hoạt cao."
+          }
+        ]
       },
       {
         "tradeOffId": "D3",
-        "text": "Thu nhập thấp hơn và không đều"
+        "optionId": "O2",
+        "text": "Thu nhập thấp hơn và không đều",
+        "reasons": [
+          {
+            "reasonId": "R7",
+            "text": "Việc ở quê là dịch vụ, làng nghề hoặc làm nông kết hợp nghề phụ, nơi nguồn nói thu nhập thường thấp và không đều."
+          },
+          {
+            "reasonId": "R9",
+            "text": "Sống gần gia đình luôn tốn kém hơn sống ở thành phố."
+          },
+          {
+            "reasonId": "R8",
+            "text": "Lao động nông thôn không được phép làm việc ở nhà máy."
+          }
+        ]
       },
       {
         "tradeOffId": "D4",
-        "text": "Ít cơ hội thăng tiến"
+        "optionId": "O2",
+        "text": "Ít cơ hội học nghề và thăng tiến",
+        "reasons": [
+          {
+            "reasonId": "R11",
+            "text": "Đào tạo nghề chỉ dành cho người đã rời quê."
+          },
+          {
+            "reasonId": "R10",
+            "text": "Nguồn gắn việc ở lại địa phương với ít cơ hội học nghề và thăng tiến hơn, nên gần quê phải đổi lấy điều đó."
+          },
+          {
+            "reasonId": "R12",
+            "text": "Người làm việc gần nhà không cần kĩ năng mới."
+          }
+        ]
       }
     ],
-    "priorities": {
-      "O1": [
-        "C1",
-        "C3"
-      ],
-      "O2": [
-        "C2"
-      ]
-    }
+    "supportedReasons": [
+      "R1",
+      "R4",
+      "R7",
+      "R10"
+    ]
   },
   "challengeCandidates": [
     {
       "challengeId": "TN1",
       "label": "TN1",
       "isNeutralFallback": false,
-      "primaryFunction": "TRADEOFF_CHECK",
-      "challengeTarget": "CLARIFY_MISSING",
-      "purposeForTeacher": "Nêu cái giá phải trả",
-      "whenShownForTeacher": "Khi không chọn hạn chế nào",
+      "primaryFunction": "BASIS_CHECK",
+      "challengeTarget": "SOURCE_DIRECTION",
+      "purposeForTeacher": "Kiểm tra lí do",
+      "whenShownForTeacher": "Khi lí do được chọn không phải điều nguồn ủng hộ",
       "sourceAnchor": "tr. 9 · đoạn 2–3",
-      "message": "Nguồn nêu hạn chế của cả hai hướng. Hạn chế nào đi kèm hướng em đã chọn?"
+      "message": "Em hãy đọc lại đoạn về hướng em đã chọn. Đoạn đó có nói đây là lí do của hạn chế này không?"
     },
     {
       "challengeId": "TN2",
@@ -89,17 +132,6 @@
       "whenShownForTeacher": "Khi chọn hướng ở lại quê",
       "sourceAnchor": "tr. 9 · đoạn 2–3",
       "message": "Nguồn nói thu nhập ở hướng này thường thấp hơn và không đều. Lựa chọn của em đã tính đến điều đó chưa?"
-    },
-    {
-      "challengeId": "TN4",
-      "label": "TN4",
-      "isNeutralFallback": false,
-      "primaryFunction": "TRADEOFF_CHECK",
-      "challengeTarget": "RELEVANCE",
-      "purposeForTeacher": "Hạn chế nào quan trọng nhất",
-      "whenShownForTeacher": "Khi chọn từ ba hạn chế trở lên",
-      "sourceAnchor": "tr. 9 · đoạn 2–3",
-      "message": "Em chấp nhận nhiều hạn chế. Hạn chế nào quan trọng nhất với người thanh niên này?"
     },
     {
       "challengeId": "FB",
@@ -130,7 +162,7 @@
     {
       "optionId": "O1",
       "relationLabel": "Lựa chọn có đánh đổi",
-      "text": "Nguồn nêu cả lợi ích và hạn chế của hai hướng. Không hướng nào là đáp án đúng; điều quan trọng là nêu được lựa chọn của em phải đánh đổi gì."
+      "text": "Nguồn nêu cả lợi ích và hạn chế của hai hướng. Không hướng nào là đáp án đúng; điều quan trọng là thấy được lựa chọn của em phải đánh đổi gì và vì sao có sự đánh đổi đó."
     }
   ]
 }
