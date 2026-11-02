@@ -58,8 +58,7 @@ Each of the five tasks follows the same steps:
 
 1. **Answer on your own.**
 2. **Lock in** the answer and record a confidence level.
-3. **Think again** with one teacher-approved prompt. It does not say whether the answer is right.
-4. **Final answer:** keep or revise it, record confidence again, and submit.
+3. **Think again and final answer:** see one teacher-approved prompt above the full task, with the first answer still selected. The prompt does not say whether the answer is right. Change the answer or leave it, record confidence again, and submit. A changed answer counts as Revise, and an unchanged one as Keep.
 
 | Task | Name | What the student does |
 |---|---|---|

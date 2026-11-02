@@ -57,16 +57,18 @@ test('the first-answer bar follows a drag, past the end of the bar too', async (
   await dragBar(page, page.getByRole('slider'));
 });
 
-test('the final-answer bar drags on both Keep and Revise', async ({ page }) => {
+test('the final-answer bar drags, and a changed answer says Revise', async ({ page }) => {
   await startTasks(page);
   await answerQ1(page);
   await page.getByRole('slider').focus();
   await page.keyboard.press('End');
   await page.getByRole('button', { name: 'Lock in answer' }).click();
-  await page.getByRole('button', { name: 'Keep my answer' }).click();
+  await expect(page.getByText('This will be recorded as Keep.')).toBeVisible();
   await dragBar(page, page.getByRole('slider'));
-  await page.getByRole('button', { name: /Revise answer/ }).click();
-  await dragBar(page, page.getByRole('slider'));
+  await page.getByRole('radio').nth(1).check({ force: true });
+  await expect(page.getByText('This will be recorded as Revise.')).toBeVisible();
+  await page.getByRole('button', { name: 'Back to your first answer' }).click();
+  await expect(page.getByText('This will be recorded as Keep.')).toBeVisible();
 });
 
 test('Q2 cards reorder by drag and by the buttons', async ({ page }) => {
@@ -160,7 +162,6 @@ test('the first bar starts at 50, the final bar at the first confidence, and Res
   await expect(page.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
   await page.getByRole('slider').press('PageUp');
   await page.getByRole('button', { name: 'Lock in answer' }).click();
-  await page.getByRole('button', { name: 'Keep my answer' }).click();
   await expect(page.getByRole('slider')).toHaveAttribute('aria-valuenow', '60');
   await expect(page.locator('.knob')).toHaveCount(1);
 

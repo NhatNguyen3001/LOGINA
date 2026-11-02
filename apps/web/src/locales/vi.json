@@ -57,7 +57,9 @@
       "needChoice": "Cần cô chọn",
       "failed": "Phân tích chưa xong.",
       "notAnalyzed": "Bài này chưa được phân tích",
-      "notAnalyzedNote": "Việc phân tích đã dừng hoặc chưa xong. Cô có thể chạy lại."
+      "notAnalyzedNote": "Việc phân tích đã dừng hoặc chưa xong. Cô có thể chạy lại.",
+      "showThoughts_one": "Xem {{count}} suy nghĩ của AI",
+      "showThoughts": "Xem {{count}} suy nghĩ của AI"
     },
     "t05": {
       "readByAiNotice": "LOGINA đã đọc tệp này bằng AI. Cô hãy đối chiếu đoạn trích và số liệu với bản gốc trước khi duyệt.",
@@ -528,8 +530,7 @@
     "resetDoneBody": "Bạn đã trở về từ đầu."
   },
   "student": {
-    "new": "Mới",
-    "original": "ban đầu",
+    "original": "Câu trả lời ban đầu",
     "confidence": {
       "low": "0 · Chưa chắc",
       "high": "Rất chắc · 100",
@@ -543,8 +544,7 @@
       "Q5": "Q5 Đề xuất"
     },
     "phase": {
-      "think": "Thử nghĩ thêm",
-      "final": "Câu trả lời cuối",
+      "think": "Thử nghĩ thêm và trả lời cuối",
       "answer": "Tự trả lời",
       "lock": "Chốt"
     },
@@ -590,27 +590,19 @@
       "back": "← Quay lại"
     },
     "think": {
-      "locked": "CÂU TRẢ LỜI ĐÃ CHỐT CỦA EM",
+      "showLocked": "Xem câu trả lời đã chốt",
+      "restore": "Quay về câu trả lời ban đầu",
       "statement": "Nhận định",
       "card": "Thẻ căn cứ",
       "answer": "Câu trả lời",
-      "stays": "Bản này được giữ nguyên để em so sánh với bản cuối.",
       "title": "Thử nghĩ thêm",
-      "note": "Câu này giúp em kiểm tra lại, không cho biết câu trả lời đúng hay sai.",
-      "question": "Em muốn giữ câu trả lời hay sửa lại?"
+      "note": "Câu này giúp em kiểm tra lại, không cho biết câu trả lời đúng hay sai."
     },
     "keep": "Giữ câu trả lời",
     "revise": "Sửa câu trả lời",
     "final": {
-      "keepTitle": "Em giữ câu trả lời của mình",
-      "readOnly": "Chỉ đọc",
-      "unchanged": "Giữ nguyên",
-      "changeMind": "Đổi ý: Sửa câu trả lời",
-      "confidenceNote": "Mức tự tin thay đổi được ghi riêng, không tính là sửa câu trả lời.",
-      "reviseTitle": "Sửa câu trả lời của em",
-      "confidence": "Mức tự tin cuối cùng",
-      "sameAsFirst": "Câu trả lời chưa thay đổi so với bản ban đầu, nên sẽ được ghi là Giữ.",
-      "onlyRevision": "Đây là lần sửa duy nhất của {{slot}}; sau khi nộp, em chuyển sang bài tiếp theo."
+      "willKeep": "Câu trả lời chưa thay đổi, nên sẽ được ghi là Giữ.",
+      "willRevise": "Em đã đổi câu trả lời, nên sẽ được ghi là Sửa."
     },
     "submit": "Nộp {{slot}}",
     "q2": {
@@ -701,7 +693,7 @@
     "aboutTitle": "Nghiên cứu tìm hiểu gì",
     "about": "Chúng tôi muốn hiểu cách mọi người nghĩ lại về câu trả lời và mức tự tin của mình sau một gợi ý ngắn.",
     "recordTitle": "Chúng tôi ghi lại gì",
-    "record": "Chúng tôi ghi lại lựa chọn của em trước và sau gợi ý, mức tự tin, thời điểm chốt và nộp, và câu trả lời em viết ở Q5.",
+    "record": "Chúng tôi ghi lại lựa chọn của em trước và sau gợi ý, mức tự tin, thời điểm chốt, lần đổi câu trả lời đầu tiên và lúc nộp, và câu trả lời em viết ở Q5.",
     "namesTitle": "Không ghi tên",
     "names": "Chúng tôi không hỏi tên hay email của em. Em đừng gõ thông tin cá nhân vào câu trả lời viết.",
     "dataTitle": "Dữ liệu đi đâu",

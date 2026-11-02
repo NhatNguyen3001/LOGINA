@@ -42,6 +42,7 @@ export const ResearchRow = z
     submitted_at: z.string(),
     seconds_to_lock: z.number().nonnegative(),
     seconds_to_submit: z.number().nonnegative(),
+    seconds_to_first_change: z.number().nonnegative().nullable(),
   })
   .strict();
 export type ResearchRow = z.infer<typeof ResearchRow>;

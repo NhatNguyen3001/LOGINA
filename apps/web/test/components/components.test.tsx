@@ -74,30 +74,18 @@ describe('PhaseLine', () => {
   it('numbers the steps, ticks the finished ones and marks the current one', async () => {
     const { container } = await renderWithI18n(<PhaseLine phase="CHALLENGED" />);
     const items = screen.getAllByRole('listitem');
-    expect(items).toHaveLength(4);
+    expect(items).toHaveLength(3);
     expect(items[2]).toHaveAttribute('aria-current', 'step');
-    expect(items[2]).toHaveTextContent('3Think again');
-    expect(items[3]).toHaveTextContent('4Final answer');
+    expect(items[2]).toHaveTextContent('3Think again and final answer');
     expect(screen.getAllByText('Done')).toHaveLength(2);
     expect(container.querySelectorAll('.done svg')).toHaveLength(2);
   });
 });
 
 describe('Pick', () => {
-  it('new shows New and orig shows original', async () => {
-    await renderWithI18n(
-      <>
-        <Pick name="a" value="1" state="new" checked={false} onSelect={() => {}}>One</Pick>
-        <Pick name="a" value="2" state="orig" checked={false} onSelect={() => {}}>Two</Pick>
-      </>,
-    );
-    expect(screen.getByText('New')).toBeInTheDocument();
-    expect(screen.getByText('original')).toBeInTheDocument();
-  });
-
-  it('new shows Mới in Vietnamese', async () => {
-    await renderWithI18n(<Pick name="a" value="1" state="new" checked={false} onSelect={() => {}}>One</Pick>, { lang: 'vi' });
-    expect(screen.getByText('Mới')).toBeInTheDocument();
+  it('orig names the first answer', async () => {
+    await renderWithI18n(<Pick name="a" value="2" state="orig" checked={false} onSelect={() => {}}>Two</Pick>);
+    expect(screen.getByText('Your first answer')).toBeInTheDocument();
   });
 
   it('is a real radio, so the keyboard works', async () => {

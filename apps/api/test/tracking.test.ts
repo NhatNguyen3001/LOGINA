@@ -21,7 +21,7 @@ async function answerQ1(client: Client, attempt: string, answerIndex: number, ca
   const task = StudentTaskDTO.parse(await (await client.get(`/attempts/${attempt}/tasks/Q1`)).json()) as Extract<StudentTaskDTO, { slot: 'Q1' }>;
   const artifact = (i: number, j: number) => ({ slot: 'Q1', answerId: task.answers[i]!.id, evidenceId: task.evidence[j]!.id });
   await client.post(`/attempts/${attempt}/tasks/Q1/lock`, { artifact: artifact(answerIndex, cardIndex), initialConfidence: 70 });
-  await client.post(`/attempts/${attempt}/tasks/Q1/submit`, { choice: 'REVISE', finalArtifact: artifact(finalAnswer, finalCard), finalConfidence: 82 });
+  await client.post(`/attempts/${attempt}/tasks/Q1/submit`, { choice: 'REVISE', finalArtifact: artifact(finalAnswer, finalCard), finalConfidence: 82, secondsToFirstChange: 9 });
 }
 
 beforeAll(async () => {
@@ -114,7 +114,7 @@ describe('research row IDs', () => {
 describe('me and consent', () => {
   it('new session has consentRequired true and the demo menu', async () => {
     const me = MeDTO.parse(await (await a.get('/me')).json());
-    expect(me).toMatchObject({ uid: a.session.uid, consentRequired: true, demoMenu: true, role: 'demo', currentConsentVersion: '2026-10-v1' });
+    expect(me).toMatchObject({ uid: a.session.uid, consentRequired: true, demoMenu: true, role: 'demo', currentConsentVersion: '2026-11-v1' });
   });
 
   it('PATCH /me saves uiLocale on the workspace and rejects other values', async () => {
@@ -134,13 +134,13 @@ describe('me and consent', () => {
   });
 
   it('agreeing issues a code and clears consentRequired', async () => {
-    const result = ConsentResultDTO.parse(await (await a.post('/me/consent', { consentVersion: '2026-10-v1', choice: 'AGREED' })).json());
+    const result = ConsentResultDTO.parse(await (await a.post('/me/consent', { consentVersion: '2026-11-v1', choice: 'AGREED' })).json());
     expect(result.participantCode).toMatch(/^P-[A-Z0-9]{4}$/);
     expect(MeDTO.parse(await (await a.get('/me')).json())).toMatchObject({ consentRequired: false, participantCode: result.participantCode });
   });
 
   it('a different choice on the same version is 409', async () => {
-    expect((await a.post('/me/consent', { consentVersion: '2026-10-v1', choice: 'DECLINED' })).status).toBe(409);
+    expect((await a.post('/me/consent', { consentVersion: '2026-11-v1', choice: 'DECLINED' })).status).toBe(409);
   });
 
   it('agreed submit writes one row with every column and no name', async () => {
@@ -149,7 +149,7 @@ describe('me and consent', () => {
     const fresh = `${copyAttemptId}`;
     await answerQ1(a, fresh, 1, 2, 0, 0);
     const doc = (await h.live.db.doc(`researchRows/${researchRowId(fresh, 'Q1', 1)}`).get()).data()!;
-    expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B', first_evidence: 'C', first_relation: 'contradicts', final_answer: 'A', final_relation: 'full', first_confidence: 70, final_confidence: 82, confidence_change: 12, choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-10-v1', exportedAt: null });
+    expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B', first_evidence: 'C', first_relation: 'contradicts', final_answer: 'A', final_relation: 'full', first_confidence: 70, final_confidence: 82, confidence_change: 12, seconds_to_first_change: 9, choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-11-v1', exportedAt: null });
     expect(JSON.stringify(doc)).not.toMatch(/Ms\. Lan|@/);
     expect(doc.seconds_to_lock).toBeGreaterThanOrEqual(0);
     expect(doc.material_hash).toHaveLength(12);

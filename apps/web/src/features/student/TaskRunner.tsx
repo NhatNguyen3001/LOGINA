@@ -1,7 +1,6 @@
 import type { Artifact, DraftArtifact, Phase, Q2Artifact, Q2TaskBody, Q3Artifact, Q3TaskBody, Q4Artifact, Q4TaskBody, Q5Artifact, Slot, StudentChallengeDTO, StudentTaskDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import { Lock, Pencil } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BusyNote } from '@/components/logina/BusyNote';
@@ -10,7 +9,6 @@ import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { ResetRun } from '@/components/logina/ResetRun';
 import { SaveStatus } from '@/components/logina/SaveStatus';
-import { StatusTag } from '@/components/logina/StatusTag';
 import { StickyActionBar } from '@/components/logina/StickyActionBar';
 import { StudentProgress } from '@/components/logina/StudentProgress';
 import { StudentShell } from '@/components/logina/StudentShell';
@@ -193,20 +191,32 @@ function Answering({ attemptId, task, onLocked, onPhase }: { attemptId: string; 
 function Reconsidering({ attemptId, task, onSubmitted, onPhase }: { attemptId: string; task: StudentTaskDTO; onSubmitted: (next: Slot | undefined) => void; onPhase: (phase: Phase) => void }) {
   const { t } = useTranslation();
   const original = task.initialArtifact!;
-  const [choice, setChoice] = useState<'KEEP' | 'REVISE' | null>(null);
-  const [revised, setRevised] = useState<DraftArtifact>(original);
+  const [answer, setAnswer] = useState<DraftArtifact>(original);
   const [finalConfidence, setFinalConfidence] = useState(task.initialConfidence ?? DEFAULT_CONFIDENCE);
+  const [showLocked, setShowLocked] = useState(false);
   const submitKey = useRef(newKey());
+  const promptShownAt = useRef<number | null>(null);
+  const firstChange = useRef<number | null>(null);
 
   const challenge = useQuery({ queryKey: qk.challenge(attemptId, task.slot), queryFn: () => getChallenge(attemptId, task.slot) });
 
-  useEffect(() => onPhase(choice === 'KEEP' ? 'CONFIDENCE_2' : choice === 'REVISE' ? 'RECONSIDER' : 'CHALLENGED'), [choice, onPhase]);
+  useEffect(() => onPhase('CHALLENGED'), [onPhase]);
+  useEffect(() => {
+    if (challenge.data) promptShownAt.current ??= Date.now();
+  }, [challenge.data]);
 
+  const unchanged = sameArtifact(answer, original);
   const submit = useMutation({
     mutationFn: () =>
-      submitTask(attemptId, task.slot, { choice: choice!, finalArtifact: (choice === 'KEEP' ? original : revised) as Artifact, finalConfidence }, submitKey.current),
+      submitTask(attemptId, task.slot, { choice: unchanged ? 'KEEP' : 'REVISE', finalArtifact: answer as Artifact, finalConfidence, ...(firstChange.current === null ? {} : { secondsToFirstChange: firstChange.current }) }, submitKey.current),
     onSuccess: ({ nextSlot }) => onSubmitted(nextSlot),
   });
+
+  /** How long the prompt took to move the student, so the first change counts even if they go back. */
+  const change = (next: DraftArtifact) => {
+    firstChange.current ??= Math.round((Date.now() - (promptShownAt.current ?? Date.now())) / 1000);
+    setAnswer(next);
+  };
 
   if (!challenge.data) return <LoadingSkeleton />;
   const lockedAnswer =
@@ -215,83 +225,30 @@ function Reconsidering({ attemptId, task, onSubmitted, onPhase }: { attemptId: s
     : task.slot === 'Q4' && original.slot === 'Q4' ? <LockedQ4 body={task.taskBody} answer={original} />
     : task.slot === 'Q5' && original.slot === 'Q5' ? <LockedQ5 answer={original} />
     : <LockedAnswer summary={challenge.data.lockedSummary} />;
-  const submitLabel = t('student.submit', { slot: task.slot });
-  const failure = submit.isError ? <Note kind="err">{t(errorText(submit.error))}</Note> : null;
-
-  if (choice === 'KEEP') {
-    return (
-      <>
-        <div className="row">
-          <h1 className="stem grow">{t('student.final.keepTitle')}</h1>
-          <StatusTag kind="neutral">{t('student.final.readOnly')}</StatusTag>
-        </div>
-        <div className="card">
-          <div className="row">
-            <StatusTag kind="neutral">{t('student.final.unchanged')}</StatusTag>
-            <span className="sp" />
-            <button type="button" className="btn choice sm" onClick={() => setChoice('REVISE')}>
-              <Pencil className="ico" aria-hidden="true" />
-              {t('student.final.changeMind')}
-            </button>
-          </div>
-          {lockedAnswer}
-        </div>
-        <div className="card tight">
-          <ConfidenceSlider value={finalConfidence} onChange={setFinalConfidence} />
-          <span className="s13 sec">{t('student.final.confidenceNote')}</span>
-        </div>
-        {failure}
-        <TaskActions>
-          <button type="button" className="btn primary" disabled={submit.isPending} onClick={() => submit.mutate()}>{submitLabel}</button>
-        </TaskActions>
-      </>
-    );
-  }
-
-  if (choice === 'REVISE') {
-    const unchanged = sameArtifact(revised, original);
-    const ready = isComplete(task, revised);
-    const missing = missingKey(task, revised);
-    return (
-      <>
-        <h1 className="stem">{t('student.final.reviseTitle')}</h1>
-        <ArtifactEditor task={task} value={revised} onChange={setRevised} original={original} />
-        {unchanged ? <Note kind="info">{t('student.final.sameAsFirst')}</Note> : <Note kind="info">{t('student.final.onlyRevision', { slot: task.slot })}</Note>}
-        <div className="card tight">
-          <span className="b">{t('student.final.confidence')}</span>
-          <ConfidenceSlider value={finalConfidence} onChange={setFinalConfidence} />
-        </div>
-        {failure}
-        <TaskActions note={missing ? <span className="s13 sec">{t(missing)}</span> : null}>
-          <button type="button" className="btn primary" disabled={!ready || submit.isPending} onClick={() => submit.mutate()}>{submitLabel}</button>
-        </TaskActions>
-      </>
-    );
-  }
+  const missing = missingKey(task, answer);
 
   return (
     <>
-      <div className="stack">
-        <span className="small b muted">{t('student.think.locked')}</span>
-        {lockedAnswer}
-        <span className="small muted">{t('student.think.stays')}</span>
-      </div>
       <div className="bubble-tn">
         <span className="small b text-navy">{t('student.think.title')}</span>
         <p className="say">{challenge.data.message}</p>
         <span className="s13 muted">{t('student.think.note')}</span>
       </div>
-      <h2 className="s15 b">{t('student.think.question')}</h2>
-      <div className="egrid">
-        <button type="button" className="btn choice" onClick={() => setChoice('REVISE')}>
-          <Pencil className="ico" aria-hidden="true" />
-          {t('student.revise')}
-        </button>
-        <button type="button" className="btn choice" onClick={() => setChoice('KEEP')}>
-          <Lock className="ico" aria-hidden="true" />
-          {t('student.keep')}
-        </button>
+      <div className="row">
+        <button type="button" className="lnk jump" aria-expanded={showLocked} onClick={() => setShowLocked(!showLocked)}>{t('student.think.showLocked')}</button>
+        <span className="sp" />
+        <button type="button" className="lnk jump" disabled={unchanged} onClick={() => setAnswer(original)}>{t('student.think.restore')}</button>
       </div>
+      {showLocked ? lockedAnswer : null}
+      <h1 className="stem">{task.stem}</h1>
+      <ArtifactEditor task={task} value={answer} onChange={change} original={original} />
+      <div className="card tight">
+        <ConfidenceSlider value={finalConfidence} onChange={setFinalConfidence} />
+      </div>
+      {submit.isError ? <Note kind="err">{t(errorText(submit.error))}</Note> : null}
+      <TaskActions note={<span className="s13 sec">{t(missing ?? (unchanged ? 'student.final.willKeep' : 'student.final.willRevise'))}</span>}>
+        <button type="button" className="btn primary" disabled={!isComplete(task, answer) || submit.isPending} onClick={() => submit.mutate()}>{t('student.submit', { slot: task.slot })}</button>
+      </TaskActions>
     </>
   );
 }

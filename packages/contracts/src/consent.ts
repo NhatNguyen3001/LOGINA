@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CURRENT_CONSENT_VERSION = '2026-10-v1';
+export const CURRENT_CONSENT_VERSION = '2026-11-v1';
 
 export const ConsentChoice = z.enum(['AGREED', 'DECLINED']);
 export type ConsentChoice = z.infer<typeof ConsentChoice>;

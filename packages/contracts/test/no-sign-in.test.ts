@@ -17,7 +17,7 @@ const row = {
   participant_code: 'P-7K2M',
   participant_type: 'judge',
   is_simulated: false,
-  consent_version: '2026-10-v1',
+  consent_version: '2026-11-v1',
   consent_at: '2026-11-02 14:03:10',
   interface_language: 'en',
   material_hash: 'a3f9c2e81b04',
@@ -46,6 +46,7 @@ const row = {
   submitted_at: '2026-11-02 14:07:20',
   seconds_to_lock: 95,
   seconds_to_submit: 140,
+  seconds_to_first_change: 50,
 };
 
 describe('rate limits', () => {
@@ -74,8 +75,8 @@ describe('consent', () => {
     expect(() => ConsentResultDTO.parse({ consent: 'AGREED', participantCode: 'P-7K2M' })).not.toThrow();
   });
 
-  it('the current consent version is 2026-10-v1', () => {
-    expect(CURRENT_CONSENT_VERSION).toBe('2026-10-v1');
+  it('the current consent version is 2026-11-v1', () => {
+    expect(CURRENT_CONSENT_VERSION).toBe('2026-11-v1');
   });
 
   it('MeDTO has no dataNoticeRequired', () => {

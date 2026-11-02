@@ -85,6 +85,8 @@ export const JobDTO = z
     steps: z.array(z.object({ label: z.string(), status: JobStepStatus }).strict()),
     /** Lets a screen show the time so far, even after a reload. */
     startedAt: Timestamp.optional(),
+    /** What the model thought, in English. `at` is seconds since the job started. */
+    trace: z.array(z.object({ step: z.string(), at: z.number().int().nonnegative(), title: z.string(), text: z.string() }).strict()).optional(),
     question: z.object({ kind: z.literal('LANGUAGE_MISMATCH'), detected: Locale, chosen: Locale }).strict().optional(),
     errorCode: JobErrorCode.optional(),
   })

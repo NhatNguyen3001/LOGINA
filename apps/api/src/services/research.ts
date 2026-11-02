@@ -63,10 +63,11 @@ export function writeResearchRow(
     finalConfidence: number;
     choice: 'KEEP' | 'REVISE';
     changedElements: string[];
+    secondsToFirstChange?: number | undefined;
     now: Date;
   },
 ): string {
-  const { facts, participant, settings, slot, task, delivery, final, finalConfidence, choice, changedElements, now } = input;
+  const { facts, participant, settings, slot, task, delivery, final, finalConfidence, choice, changedElements, secondsToFirstChange, now } = input;
   const { attempt, release, lesson, material, school } = facts;
   const hash = materialHash((material.sha256 as string | undefined) || (attempt.lessonId as string));
   const runNumber = ((participant.runs?.[hash]?.[slot] as number | undefined) ?? 0) + 1;
@@ -106,6 +107,7 @@ export function writeResearchRow(
       submitted_at: researchTime(now),
       seconds_to_lock: Math.max(0, Math.round((lockedAt.getTime() - openedAt.getTime()) / 1000)),
       seconds_to_submit: Math.max(0, Math.round((now.getTime() - lockedAt.getTime()) / 1000)),
+      seconds_to_first_change: secondsToFirstChange ?? null,
     }),
   );
 

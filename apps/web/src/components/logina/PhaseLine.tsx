@@ -2,16 +2,16 @@ import type { Phase } from '@logina/contracts';
 import { Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const STEPS = ['answer', 'lock', 'think', 'final'] as const;
+const STEPS = ['answer', 'lock', 'think'] as const;
 
 const STEP_OF: Record<Phase, number> = {
   REASON: 0,
   CONFIDENCE_1: 1,
   LOCKED: 2,
   CHALLENGED: 2,
-  RECONSIDER: 3,
-  CONFIDENCE_2: 3,
-  SUBMITTED: 4,
+  RECONSIDER: 2,
+  CONFIDENCE_2: 2,
+  SUBMITTED: 3,
 };
 
 export function PhaseLine({ phase }: { phase: Phase }) {

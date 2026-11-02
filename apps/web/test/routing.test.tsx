@@ -25,7 +25,7 @@ vi.mock('@/lib/auth', () => ({ ensureSession: vi.fn(async () => {}), idToken: vi
 
 const withQuery = (ui: React.ReactElement) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{ui}</QueryClientProvider>;
 
-const me = { uid: 'u', role: 'demo', displayName: 'x', schoolId: 's', classIds: ['c'], uiLocale: 'en', demoMenu: true, consentRequired: true, currentConsentVersion: '2026-10-v1' } as MeDTO;
+const me = { uid: 'u', role: 'demo', displayName: 'x', schoolId: 's', classIds: ['c'], uiLocale: 'en', demoMenu: true, consentRequired: true, currentConsentVersion: '2026-11-v1' } as MeDTO;
 
 beforeEach(() => {
   navigate.mockReset();
@@ -156,7 +156,7 @@ describe('consent', () => {
     await renderWithI18n(withQuery(<Consent onDone={() => {}} />));
     fireEvent.click(await screen.findByRole('button', { name: 'I agree' }));
     expect(await screen.findByText('P-7K2M')).toBeInTheDocument();
-    expect(vi.mocked(api.sendConsent).mock.calls[0]?.[0]).toEqual({ consentVersion: '2026-10-v1', choice: 'AGREED' });
+    expect(vi.mocked(api.sendConsent).mock.calls[0]?.[0]).toEqual({ consentVersion: '2026-11-v1', choice: 'AGREED' });
   });
 
   it('decline goes straight on', async () => {
