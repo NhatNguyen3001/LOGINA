@@ -195,7 +195,7 @@ function Reconsidering({ attemptId, task, onSubmitted, onPhase }: { attemptId: s
   const original = task.initialArtifact!;
   const [choice, setChoice] = useState<'KEEP' | 'REVISE' | null>(null);
   const [revised, setRevised] = useState<DraftArtifact>(original);
-  const [finalConfidence, setFinalConfidence] = useState(DEFAULT_CONFIDENCE);
+  const [finalConfidence, setFinalConfidence] = useState(task.initialConfidence ?? DEFAULT_CONFIDENCE);
   const submitKey = useRef(newKey());
 
   const challenge = useQuery({ queryKey: qk.challenge(attemptId, task.slot), queryFn: () => getChallenge(attemptId, task.slot) });

@@ -174,7 +174,14 @@ describe('Q1 flow', () => {
     expect(screen.getByText("You're keeping your answer")).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Submit Q1' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/s/attempts/$id/$slot', params: { id: 'att1', slot: 'Q2' } }));
-    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 50 });
+    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 70 });
+  });
+
+  it('Keep starts the final confidence at the first confidence', async () => {
+    vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
+    await render(<TaskRunner />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Keep my answer' }));
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '70');
   });
 
   it('S4 marks new choices New and originals original', async () => {
@@ -186,12 +193,12 @@ describe('Q1 flow', () => {
     expect(screen.getAllByText('original').length).toBeGreaterThan(0);
   });
 
-  it('S6 an unchanged revise says Keep, with one knob starting at 50', async () => {
+  it('S6 an unchanged revise says Keep, with one knob starting at the first confidence', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
     await render(<TaskRunner />);
     fireEvent.click(await screen.findByRole('button', { name: 'Revise answer' }));
     expect(screen.getByText(/so it will be recorded as/)).toBeInTheDocument();
-    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '70');
     expect(document.querySelectorAll('.knob')).toHaveLength(1);
   });
 
