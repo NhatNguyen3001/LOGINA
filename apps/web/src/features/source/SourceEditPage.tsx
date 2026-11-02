@@ -71,7 +71,7 @@ export function SourceEditPage() {
         <div className="card sticky">
           {assignedReleasesUnchanged.length > 0 ? <p className="s13">{t('teacher.t10.assigned', { releases: assignedReleasesUnchanged.map((x) => `${x.classLabel} ${x.releaseLabel}`).join(', ') })}</p> : null}
           {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
-          <button type="button" className="btn primary block" disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t10.approve', { version })}</button>
+          <button type="button" className="btn primary block" aria-busy={approve.isPending} disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t10.approve', { version })}</button>
           <Link to="/t/lessons/$id/tasks" params={{ id }} className="btn secondary block">{t('teacher.t10.cancel')}</Link>
         </div>
       </div>

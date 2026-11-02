@@ -61,6 +61,18 @@ afterAll(async () => {
 describe('switching language on the sample lesson', () => {
   const stem = (loadFixture('q1-v4', 'vi') as DraftFixture).questionStem;
 
+  it('the lock reply comes in the student language, the same as asking for the prompt again', async () => {
+    const attemptId = await freshAttempt();
+    const { answers, evidence } = (await task(attemptId)) as Extract<StudentTaskDTO, { slot: 'Q1' }>;
+    const { reply, asked } = await inVietnamese(async () => {
+      const locked = await (await lock(attemptId, q1(answers[0]!.id, evidence[0]!.id))).json();
+      return { reply: StudentChallengeDTO.parse(locked), asked: await (await a.get(`/attempts/${attemptId}/tasks/Q1/challenge`)).json() };
+    });
+    const english = StudentChallengeDTO.parse(await (await a.get(`/attempts/${attemptId}/tasks/Q1/challenge`)).json());
+    expect(reply).toEqual(asked);
+    expect(reply.message).not.toBe(english.message);
+  });
+
   it('questions, options and cards change, and every ID and the order stay the same', async () => {
     const attemptId = await freshAttempt();
     const before = (await task(attemptId)) as Extract<StudentTaskDTO, { slot: 'Q1' }>;

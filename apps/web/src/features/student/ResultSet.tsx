@@ -6,7 +6,7 @@ import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StudentProgress } from '@/components/logina/StudentProgress';
 import { StudentShell } from '@/components/logina/StudentShell';
-import { useSessionLocale } from '@/components/logina/TeacherShell';
+import { useSessionLocale } from '@/lib/use-session-locale';
 import { ApiError, getFeedback, getMyAssignments, newKey, restartAttempt } from '@/lib/api';
 import { qk, queryClient } from '@/lib/query';
 import { errorKey } from '@/i18n';
@@ -76,7 +76,7 @@ export function ResultSet() {
             </div>
           </div>
           {current ? (
-            <button type="button" className="btn primary" disabled={restart.isPending} onClick={() => restart.mutate(current.assignmentId)}>
+            <button type="button" className="btn primary" aria-busy={restart.isPending} disabled={restart.isPending} onClick={() => restart.mutate(current.assignmentId)}>
               {t('student.result.newRun')}
             </button>
           ) : null}

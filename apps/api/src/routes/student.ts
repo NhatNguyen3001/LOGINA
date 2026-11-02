@@ -91,7 +91,8 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
     '/attempts/:id/tasks/:slot/lock',
     withIdempotency(db, async (c) => {
       const request = await body(await c.req.json(), LockReq);
-      const challenge = await lockTask(db, c.var.user, c.req.param('id') as string, c.req.param('slot') as string, request);
+      const { schoolId } = c.var.user;
+      const challenge = await lockTask(db, c.var.user, c.req.param('id') as string, c.req.param('slot') as string, request, (attempt, release) => inStudentLanguage(schoolId, attempt, release));
       return respond(c, StudentChallengeDTO, challenge);
     }),
   );

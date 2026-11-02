@@ -24,7 +24,7 @@ export function RestartAnalysis({ lessonId }: { lessonId: string }) {
       <p className="lede">{t('teacher.t02.notAnalyzedNote')}</p>
       {restart.isError ? <Note kind="err">{t(errorKey(restart.error instanceof ApiError ? restart.error.code : ''))}</Note> : null}
       <div className="row">
-        <button type="button" className="btn primary" disabled={restart.isPending} onClick={() => restart.mutate()}>{t('teacher.t01.analyze')}</button>
+        <button type="button" className="btn primary" aria-busy={restart.isPending} disabled={restart.isPending} onClick={() => restart.mutate()}>{t('teacher.t01.analyze')}</button>
         <Link to="/t/lessons/new" className="btn secondary">{t('lessons.new')}</Link>
       </div>
     </div>

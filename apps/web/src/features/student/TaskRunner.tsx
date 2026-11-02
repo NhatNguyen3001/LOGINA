@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BusyNote } from '@/components/logina/BusyNote';
 import { ConfidenceSlider, DEFAULT_CONFIDENCE } from '@/components/logina/ConfidenceSlider';
+import { LoadFailed } from '@/components/logina/LoadFailed';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { ResetRun } from '@/components/logina/ResetRun';
@@ -12,7 +13,7 @@ import { SaveStatus } from '@/components/logina/SaveStatus';
 import { StickyActionBar } from '@/components/logina/StickyActionBar';
 import { StudentProgress } from '@/components/logina/StudentProgress';
 import { StudentShell } from '@/components/logina/StudentShell';
-import { useSessionLocale } from '@/components/logina/TeacherShell';
+import { useSessionLocale } from '@/lib/use-session-locale';
 import { ApiError, getChallenge, getStudentTask, lockTask, newKey, saveDraft, submitTask } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { errorKey } from '@/i18n';
@@ -107,7 +108,7 @@ function LockedQ5({ body, answer }: { body: Q5TaskBody; answer: Q5Artifact }) {
   );
 }
 
-function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: string; task: StudentTaskDTO; trace: TaskTrace; onLocked: () => void; onPhase: (phase: Phase) => void }) {
+function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: string; task: StudentTaskDTO; trace: TaskTrace; onLocked: (challenge: StudentChallengeDTO, answer: Artifact, confidence: number) => void; onPhase: (phase: Phase) => void }) {
   const { t } = useTranslation();
   const [draft, setDraft] = useState<DraftArtifact>(() => emptyDraft(task));
   const [locking, setLocking] = useState(false);
@@ -118,9 +119,9 @@ function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: s
 
   const lock = useMutation({
     mutationFn: () => lockTask(attemptId, task.slot, { artifact: draft as Artifact, initialConfidence: confidence, secondsOnTask: trace.seconds(), answerChanges: trace.changes() }, lockKey.current),
-    onSuccess: () => {
+    onSuccess: (challenge) => {
       trace.clearChanges();
-      onLocked();
+      onLocked(challenge, draft as Artifact, confidence);
     },
     onError: () => {
       lockSent.current = false;
@@ -148,14 +149,14 @@ function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: s
   if (locking) {
     return (
       <>
-        <h1 className="stem">{t('student.lock.question')}</h1>
+        <h1 className="stem" tabIndex={-1}>{t('student.lock.question')}</h1>
         <ConfidenceSlider value={confidence} onChange={setConfidence} />
         <p className="s13 sec">{t('student.lock.hint')}</p>
         <p className="s13 sec">{t('student.lock.note')}</p>
         {lock.isError ? <Note kind="err">{t(errorText(lock.error))}</Note> : null}
         <TaskActions note={saveStatus}>
           <button type="button" className="btn secondary" onClick={() => setLocking(false)}>{t('student.lock.back')}</button>
-          <button type="button" className="btn primary" disabled={lock.isPending} onClick={sendLock}>{t('student.lock.button')}</button>
+          <button type="button" className="btn primary" aria-busy={lock.isPending} disabled={lock.isPending} onClick={sendLock}>{t('student.lock.button')}</button>
         </TaskActions>
       </>
     );
@@ -163,7 +164,7 @@ function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: s
 
   return (
     <>
-      <h1 className="stem">{task.stem}</h1>
+      <h1 className="stem" tabIndex={-1}>{task.stem}</h1>
       <ArtifactEditor task={task} value={draft} onChange={change} />
       <TaskActions note={<>{missing ? <span className="s13 sec">{t(missing)}</span> : null}{saveStatus}</>}>
         <button type="button" className="btn primary" disabled={!complete} onClick={() => setLocking(true)}>{t('student.continue')}</button>
@@ -182,9 +183,17 @@ function Reconsidering({ attemptId, task, trace, onSubmitted, onPhase }: { attem
   const promptShownAt = useRef<number | null>(null);
   const firstChange = useRef<number | null>(null);
 
-  const challenge = useQuery({ queryKey: qk.challenge(attemptId, task.slot), queryFn: () => getChallenge(attemptId, task.slot) });
+  const queryClient = useQueryClient();
+  /** A student's prompt never changes, so it is only asked for again after a language switch. */
+  const challenge = useQuery({ queryKey: qk.challenge(attemptId, task.slot), queryFn: () => getChallenge(attemptId, task.slot), staleTime: Infinity });
 
   useEffect(() => onPhase('CHALLENGED'), [onPhase]);
+
+  /** The next task is ready before Submit, so moving on is instant. */
+  useEffect(() => {
+    const next = SLOTS[SLOTS.indexOf(task.slot) + 1];
+    if (next) void queryClient.prefetchQuery({ queryKey: qk.attemptTask(attemptId, next), queryFn: () => getStudentTask(attemptId, next) });
+  }, [attemptId, queryClient, task.slot]);
   useEffect(() => {
     if (challenge.data) promptShownAt.current ??= Date.now();
   }, [challenge.data]);
@@ -208,7 +217,7 @@ function Reconsidering({ attemptId, task, trace, onSubmitted, onPhase }: { attem
     setAnswer(next);
   };
 
-  if (!challenge.data) return <LoadingSkeleton />;
+  if (!challenge.data) return challenge.isError ? <LoadFailed onRetry={() => void challenge.refetch()} /> : <LoadingSkeleton />;
   const lockedAnswer =
     task.slot === 'Q2' && original.slot === 'Q2' ? <LockedQ2 body={task.taskBody} answer={original} />
     : task.slot === 'Q3' && original.slot === 'Q3' ? <LockedQ3 body={task.taskBody} answer={original} />
@@ -233,14 +242,14 @@ function Reconsidering({ attemptId, task, trace, onSubmitted, onPhase }: { attem
         }}>{t('student.think.restore')}</button>
       </div>
       {showLocked ? lockedAnswer : null}
-      <h1 className="stem">{task.stem}</h1>
+      <h1 className="stem" tabIndex={-1}>{task.stem}</h1>
       <ArtifactEditor task={task} value={answer} onChange={change} original={original} />
       <div className="card tight">
         <ConfidenceSlider value={finalConfidence} onChange={setFinalConfidence} />
       </div>
       {submit.isError ? <Note kind="err">{t(errorText(submit.error))}</Note> : null}
       <TaskActions note={<span className="s13 sec">{t(missing ?? (unchanged ? 'student.final.willKeep' : 'student.final.willRevise'))}</span>}>
-        <button type="button" className="btn primary" disabled={!isComplete(task, answer) || submit.isPending} onClick={() => submit.mutate()}>{t('student.submit', { slot: task.slot })}</button>
+        <button type="button" className="btn primary" aria-busy={submit.isPending} disabled={!isComplete(task, answer) || submit.isPending} onClick={() => submit.mutate()}>{t('student.submit', { slot: task.slot })}</button>
       </TaskActions>
     </>
   );
@@ -263,15 +272,37 @@ export function TaskRunner() {
     if (ready) trace.start();
   }, [ready, trace]);
 
+  const step = task.data?.phase === 'SUBMITTED' ? 'done' : task.data?.initialArtifact ? 'think' : task.data ? 'answer' : 'loading';
+
+  /** No page load happens between these steps, so the student and a screen reader are moved to the new one. */
+  useEffect(() => {
+    if (step === 'loading') return;
+    window.scrollTo(0, 0);
+    document.querySelector<HTMLElement>('.stem')?.focus({ preventScroll: true });
+  }, [slot, step]);
+
+  const onLocked = (challenge: StudentChallengeDTO, initialArtifact: Artifact, initialConfidence: number) => {
+    queryClient.setQueryData(qk.challenge(attemptId, slot), challenge);
+    queryClient.setQueryData<StudentTaskDTO>(qk.attemptTask(attemptId, slot), (old) => old && { ...old, phase: 'CHALLENGED', initialArtifact, initialConfidence });
+  };
+
   const onSubmitted = (next: Slot | undefined) => {
+    if (next) queryClient.setQueryData<StudentTaskDTO>(qk.attemptTask(attemptId, next), (old) => old && { ...old, submittedSlots: [...old.submittedSlots, slot] });
     if (next) void navigate({ to: '/s/attempts/$id/$slot', params: { id: attemptId, slot: next } });
     else void navigate({ to: '/s/attempts/$id/results', params: { id: attemptId } });
   };
 
-  if (task.isError) {
+  if (task.isError && !task.data) {
+    if (task.error instanceof ApiError && task.error.status === 404) {
+      return (
+        <StudentShell title={t('student.goneAfterReset')}>
+          <Link to="/s/assignments" className="btn primary">{t('student.openNewSet')}</Link>
+        </StudentShell>
+      );
+    }
     return (
-      <StudentShell title={t('student.goneAfterReset')}>
-        <Link to="/s/assignments" className="btn primary">{t('student.openNewSet')}</Link>
+      <StudentShell lesson={lesson}>
+        <LoadFailed onRetry={() => void task.refetch()} />
       </StudentShell>
     );
   }
@@ -285,10 +316,16 @@ export function TaskRunner() {
       {task.data?.phase === 'SUBMITTED' ? (
         <button type="button" className="btn primary" onClick={() => onSubmitted(nextAfter)}>{t('student.continue')}</button>
       ) : null}
-      {task.data && task.data.phase !== 'SUBMITTED' && !task.data.initialArtifact ? (
-        <Answering key={slot} attemptId={attemptId} task={task.data} trace={trace} onLocked={() => void queryClient.invalidateQueries({ queryKey: qk.attemptTask(attemptId, slot) })} onPhase={setStepPhase} />
+      {step === 'answer' ? (
+        <div key={`${slot}-answer`} className="step-in">
+          <Answering attemptId={attemptId} task={task.data!} trace={trace} onLocked={onLocked} onPhase={setStepPhase} />
+        </div>
       ) : null}
-      {task.data && task.data.phase !== 'SUBMITTED' && task.data.initialArtifact ? <Reconsidering key={slot} attemptId={attemptId} task={task.data} trace={trace} onSubmitted={onSubmitted} onPhase={setStepPhase} /> : null}
+      {step === 'think' ? (
+        <div key={`${slot}-think`} className="step-in">
+          <Reconsidering attemptId={attemptId} task={task.data!} trace={trace} onSubmitted={onSubmitted} onPhase={setStepPhase} />
+        </div>
+      ) : null}
     </StudentShell>
   );
 }

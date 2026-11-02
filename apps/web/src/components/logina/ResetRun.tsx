@@ -32,7 +32,7 @@ export function ResetRun({ attemptId }: { attemptId: string }) {
           <div className="row">
             <span className="sp" />
             <button type="button" className="btn secondary" disabled={reset.isPending} onClick={() => setAsking(false)}>{t('student.shell.resetCancel')}</button>
-            <button type="button" className="btn primary" disabled={reset.isPending} onClick={() => reset.mutate()}>{t('student.shell.resetConfirm')}</button>
+            <button type="button" className="btn primary" aria-busy={reset.isPending} disabled={reset.isPending} onClick={() => reset.mutate()}>{t('student.shell.resetConfirm')}</button>
           </div>
         </dialog>
       ) : null}

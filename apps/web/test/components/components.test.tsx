@@ -61,12 +61,16 @@ describe('ConfidenceSlider', () => {
 });
 
 describe('Stepper', () => {
-  it('marks the current step with aria-current and done steps with hidden text', async () => {
-    await renderWithI18n(<Stepper current={2} />);
+  it('marks the current step, ticks the finished ones, and names both approvals', async () => {
+    const { container } = await renderWithI18n(<Stepper current={2} />);
     const items = screen.getAllByRole('listitem');
+    expect(items).toHaveLength(5);
     expect(items[2]).toHaveAttribute('aria-current', 'step');
-    expect(items[1]).not.toHaveAttribute('aria-current');
+    expect(items[2]).toHaveTextContent('Check source');
     expect(screen.getAllByText('Done')).toHaveLength(2);
+    expect(screen.getByText('Approval 1')).toBeInTheDocument();
+    expect(screen.getByText('Approval 2')).toBeInTheDocument();
+    expect(container.querySelector('.steps-now')).toHaveTextContent('Step 3 of 5: Check source');
   });
 });
 

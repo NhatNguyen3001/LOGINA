@@ -1,6 +1,6 @@
 import { CURRENT_CONSENT_VERSION } from '@logina/contracts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Clock, EyeOff, FlaskConical, HandHeart, Sheet, UserRound, Users, type LucideIcon } from 'lucide-react';
+import { ChevronDown, EyeOff, FlaskConical, HandHeart, Sheet, type LucideIcon } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,14 +11,18 @@ import { qk } from '@/lib/query';
 import { errorKey } from '@/i18n';
 import { ApiError } from '@/lib/api';
 
+/** What a person needs in order to decide stays open. Everything else is one tap away. */
 const POINTS: { icon: LucideIcon; title: string; lines: string[] }[] = [
   { icon: FlaskConical, title: 'aboutTitle', lines: ['about'] },
   { icon: Sheet, title: 'recordTitle', lines: ['record'] },
   { icon: EyeOff, title: 'namesTitle', lines: ['names'] },
-  { icon: Users, title: 'dataTitle', lines: ['data', 'limit'] },
-  { icon: UserRound, title: 'whoTitle', lines: ['who'] },
-  { icon: Clock, title: 'keptTitle', lines: ['kept'] },
   { icon: HandHeart, title: 'choiceTitle', lines: ['choice', 'withdraw'] },
+];
+
+const DETAILS: { title: string; lines: string[] }[] = [
+  { title: 'dataTitle', lines: ['data', 'limit'] },
+  { title: 'keptTitle', lines: ['kept'] },
+  { title: 'whoTitle', lines: ['who'] },
 ];
 
 export function Consent({ onDone }: { onDone: () => void }) {
@@ -28,7 +32,7 @@ export function Consent({ onDone }: { onDone: () => void }) {
   const [code, setCode] = useState<string | null>(null);
 
   const choose = useMutation({
-    mutationFn: (choice: 'AGREED' | 'DECLINED') => sendConsent({ consentVersion: CURRENT_CONSENT_VERSION, choice }, key.current),
+    mutationFn: () => sendConsent({ consentVersion: CURRENT_CONSENT_VERSION, choice: 'AGREED' }, key.current),
     onSuccess: async ({ consent, participantCode }) => {
       await queryClient.invalidateQueries({ queryKey: qk.me() });
       if (consent === 'AGREED' && participantCode) setCode(participantCode);
@@ -37,26 +41,7 @@ export function Consent({ onDone }: { onDone: () => void }) {
   });
 
   return (
-    <StudentShell
-      current={t('consent.title')}
-      {...(code
-        ? {}
-        : {
-            footer: (
-              <div className="stack grow">
-                <div className="egrid">
-                  <button type="button" className="btn secondary" disabled={choose.isPending} onClick={() => choose.mutate('AGREED')}>{t('consent.agree')}</button>
-                  <button type="button" className="btn secondary" disabled={choose.isPending} onClick={() => choose.mutate('DECLINED')}>{t('consent.decline')}</button>
-                </div>
-                <div className="row">
-                  <span className="s13 muted">{t('consent.once')}</span>
-                  <span className="sp" />
-                  <span className="s13 muted num">{t('consent.version', { version: CURRENT_CONSENT_VERSION })}</span>
-                </div>
-              </div>
-            ),
-          })}
-    >
+    <StudentShell current={t('consent.title')}>
       {code ? (
         <>
           <div className="card tight">
@@ -87,8 +72,26 @@ export function Consent({ onDone }: { onDone: () => void }) {
               </div>
             ))}
           </div>
+          <div className="acc-list notice-more">
+            {DETAILS.map(({ title, lines }) => (
+              <details key={title} className="acc">
+                <summary>
+                  <h2>{t(`consent.${title}`)}</h2>
+                  <ChevronDown className="ico chev" aria-hidden="true" />
+                </summary>
+                <div className="acc-body sec">
+                  {lines.map((line) => <p key={line}>{t(`consent.${line}`)}</p>)}
+                </div>
+              </details>
+            ))}
+          </div>
           <Link to="/privacy" className="lnk">{t('consent.privacyLink')}</Link>
           {choose.isError ? <Note kind="err">{t(errorKey(choose.error instanceof ApiError ? choose.error.code : ''))}</Note> : null}
+          <div className="row consent-choice">
+            <span className="s13 muted num">{t('consent.version', { version: CURRENT_CONSENT_VERSION })}</span>
+            <span className="sp" />
+            <button type="button" className="btn primary" aria-busy={choose.isPending} disabled={choose.isPending} onClick={() => choose.mutate()}>{t('consent.agree')}</button>
+          </div>
         </>
       )}
     </StudentShell>

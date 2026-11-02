@@ -32,6 +32,7 @@ vi.mock('@/lib/auth', () => ({ ensureSession: vi.fn(async () => {}), idToken: vi
 const q1 = (over: Partial<StudentTaskDTO> = {}) =>
   ({
     slot: 'Q1',
+    submittedSlots: [],
     phase: 'REASON',
     stem: 'Which statement?',
     draftArtifact: null,
@@ -401,6 +402,32 @@ describe('Q2 to Q5', () => {
     expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: 'a' }] })).toBe(false);
     expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: '   ' }, { starterId: 's2', text: 'b' }] })).toBe(false);
     expect(isComplete(task, { slot: 'Q5', answers: [{ starterId: 's1', text: 'a' }, { starterId: 's2', text: 'unsure', declared: 'DONT_KNOW' }] })).toBe(true);
+  });
+});
+
+describe('smooth steps', () => {
+  it('shows the prompt from the lock reply, with no second request', async () => {
+    vi.mocked(api.getStudentTask).mockResolvedValue(q1({ draftArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' } }));
+    vi.mocked(api.lockTask).mockResolvedValue({ deliveryId: 'd', message: 'Think about this', lockedSummary: { answerText: 'x', evidenceText: 'y', confidence: 50 } });
+    await render(<TaskRunner />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Continue →' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Lock in answer' }));
+    expect(await screen.findByText('Think about this')).toBeInTheDocument();
+    expect(api.getChallenge).not.toHaveBeenCalled();
+  });
+
+  it('fetches the next task before the student submits', async () => {
+    vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
+    await render(<TaskRunner />);
+    await screen.findByRole('button', { name: 'Submit Q1' });
+    await waitFor(() => expect(api.getStudentTask).toHaveBeenCalledWith('att1', 'Q2'));
+  });
+
+  it('a failed load offers Try again and does not say the set was reset', async () => {
+    vi.mocked(api.getStudentTask).mockRejectedValue(new api.ApiError(500, 'INTERNAL'));
+    await render(<TaskRunner />);
+    expect(await screen.findByRole('button', { name: 'Try again' })).toBeInTheDocument();
+    expect(screen.queryByText('This set was reset.')).toBeNull();
   });
 });
 

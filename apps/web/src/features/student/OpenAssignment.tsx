@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LoadFailed } from '@/components/logina/LoadFailed';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StudentShell } from '@/components/logina/StudentShell';
-import { useSessionLocale } from '@/components/logina/TeacherShell';
-import { getMe, newKey, startAttempt } from '@/lib/api';
+import { useSessionLocale } from '@/lib/use-session-locale';
+import { ApiError, getMe, newKey, startAttempt } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { Consent } from './Consent';
 
@@ -25,9 +26,16 @@ export function OpenAssignment() {
   if (consenting) return <Consent onDone={() => setConsenting(false)} />;
 
   if (attempt.isError) {
+    if (attempt.error instanceof ApiError && attempt.error.status === 404) {
+      return (
+        <StudentShell title={t('student.goneAfterReset')}>
+          <Link to="/s/assignments" className="btn primary">{t('student.openNewSet')}</Link>
+        </StudentShell>
+      );
+    }
     return (
-      <StudentShell title={t('student.goneAfterReset')}>
-        <Link to="/s/assignments" className="btn primary">{t('student.openNewSet')}</Link>
+      <StudentShell>
+        <LoadFailed onRetry={() => void attempt.refetch()} />
       </StudentShell>
     );
   }

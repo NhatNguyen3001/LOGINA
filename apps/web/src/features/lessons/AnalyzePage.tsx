@@ -159,7 +159,7 @@ export function AnalyzePage() {
             {t('teacher.t02.timing')}
             {seconds === null ? null : <span className="block num">{t('teacher.t06.elapsed', { minutes: Math.floor(seconds / 60), seconds: seconds % 60 })}</span>}
           </span>
-          <button type="button" className="btn secondary" disabled={stop.isPending} onClick={() => stop.mutate()}>{t('teacher.t02.stop')}</button>
+          <button type="button" className="btn secondary" aria-busy={stop.isPending} disabled={stop.isPending} onClick={() => stop.mutate()}>{t('teacher.t02.stop')}</button>
         </div>
       </div> : null}
     </>

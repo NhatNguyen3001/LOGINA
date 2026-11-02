@@ -19,7 +19,8 @@ test('a judge goes from the entry page through consent, five tasks and results',
 
   await expect(page.getByRole('heading', { name: 'Taking part in research' })).toBeVisible();
   await expectAccessible(page, 'consent');
-  await page.getByRole('button', { name: 'No thanks, just try it' }).click();
+  await page.getByRole('button', { name: 'I agree' }).click();
+  await page.getByRole('button', { name: 'Continue to the tasks' }).click();
 
   await expect(page).toHaveURL(/\/s\/attempts\/.+\/Q1/);
   await expectAccessible(page, 'S1');
@@ -35,7 +36,8 @@ test('a judge goes from the entry page through consent, five tasks and results',
 test('a reload after locking shows the same answer and prompt', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Try as student' }).click();
-  await page.getByRole('button', { name: 'No thanks, just try it' }).click();
+  await page.getByRole('button', { name: 'I agree' }).click();
+  await page.getByRole('button', { name: 'Continue to the tasks' }).click();
   await page.getByRole('radiogroup').nth(0).getByRole('radio').first().check({ force: true });
   await page.getByRole('radiogroup').nth(1).getByRole('radio').first().check({ force: true });
   await page.getByRole('button', { name: 'Continue →' }).click();
@@ -52,7 +54,8 @@ test('the student screens fit a phone with no sideways scrolling', async ({ page
   await page.goto('/');
   await expectNoSideScroll(page);
   await page.getByRole('button', { name: 'Try as student' }).click();
-  await page.getByRole('button', { name: 'No thanks, just try it' }).click();
+  await page.getByRole('button', { name: 'I agree' }).click();
+  await page.getByRole('button', { name: 'Continue to the tasks' }).click();
   await expect(page).toHaveURL(/\/Q1/);
   await page.getByRole('radiogroup').nth(0).waitFor();
   await expectNoSideScroll(page);
@@ -63,7 +66,8 @@ test('a Vietnamese judge stays in Vietnamese and sees no raw keys', async ({ pag
   await page.getByRole('button', { name: 'Dùng thử với vai trò học sinh' }).click();
   await expect(page.getByRole('heading', { name: 'Tham gia nghiên cứu' })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'vi');
-  await page.getByRole('button', { name: 'Không, em chỉ dùng thử' }).click();
+  await page.getByRole('button', { name: 'Em đồng ý' }).click();
+  await page.getByRole('button', { name: 'Tiếp tục làm bài' }).click();
   await expect(page.getByRole('button', { name: 'Tiếp tục →' })).toBeVisible();
   await expect(page.locator('body')).not.toContainText(/student\.|teacher\.|common\./);
 });
@@ -71,7 +75,8 @@ test('a Vietnamese judge stays in Vietnamese and sees no raw keys', async ({ pag
 test('switching language changes the questions and keeps the chosen answer', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Try as student' }).click();
-  await page.getByRole('button', { name: 'No thanks, just try it' }).click();
+  await page.getByRole('button', { name: 'I agree' }).click();
+  await page.getByRole('button', { name: 'Continue to the tasks' }).click();
   await expect(page).toHaveURL(/\/Q1$/);
   const stem = page.getByRole('heading', { level: 1 });
   const before = await stem.innerText();

@@ -2,6 +2,7 @@ import type { SourceReviewDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { LoadFailed } from '@/components/logina/LoadFailed';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag, type TagKind } from '@/components/logina/StatusTag';
@@ -33,7 +34,7 @@ export function SourcePage() {
     window.open(url, '_blank', 'noopener');
   };
 
-  if (!review.data) return <LoadingSkeleton />;
+  if (!review.data) return review.isError ? <LoadFailed onRetry={() => void review.refetch()} /> : <LoadingSkeleton />;
   const { summaryClaims, teacherDecisions, openGaps, excluded, approveReady, blockersRemaining, readByAI } = review.data;
   const located = summaryClaims.every((claim) => claim.locator);
 
@@ -121,7 +122,7 @@ export function SourcePage() {
           <div className="row"><span className={blockersRemaining === 0 ? 'ok' : 'no'}>{blockersRemaining === 0 ? '✓' : '✕'}</span><span>{t('teacher.t05.blockers', { count: blockersRemaining })}</span></div>
           <div className="row"><span className={located ? 'ok' : 'no'}>{located ? '✓' : '✕'}</span><span>{t('teacher.t05.located')}</span></div>
           {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
-          <button type="button" className="btn primary block" disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t05.approve')}</button>
+          <button type="button" className="btn primary block" aria-busy={approve.isPending} disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t05.approve')}</button>
           <p className="small muted">{t('teacher.t05.note')}</p>
           <Link to="/t/lessons/$id/clarify" params={{ id }} className="btn secondary block">{t('teacher.t05.back')}</Link>
         </div>

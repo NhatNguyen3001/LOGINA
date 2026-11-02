@@ -49,7 +49,7 @@ function Decision({ lessonId, task, findings }: { lessonId: string; task: Task; 
           <textarea id={reasonId} className="textarea" value={reason} onChange={(event) => setReason(event.target.value)} />
           <span className="small muted">{t('teacher.t12.stillSays')}</span>
           <div className="row">
-            <button type="button" className="btn secondary sm" disabled={!reason.trim() || accept.isPending} onClick={() => accept.mutate()}>{t('teacher.t12.saveDecision')}</button>
+            <button type="button" className="btn secondary sm" aria-busy={accept.isPending} disabled={!reason.trim() || accept.isPending} onClick={() => accept.mutate()}>{t('teacher.t12.saveDecision')}</button>
             {fix}
           </div>
         </>
@@ -108,7 +108,7 @@ function ApprovePanel({ lessonId, task, uploaded }: { lessonId: string; task: Ta
         <span className="s13 grow">{t('teacher.t12.confirm', { slot: task.slot })}</span>
       </label>
       {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
-      <button type="button" className="btn primary block" disabled={!confirmed || !ready || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t12.approveSlot', { slot: task.slot })}</button>
+      <button type="button" className="btn primary block" aria-busy={approve.isPending} disabled={!confirmed || !ready || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t12.approveSlot', { slot: task.slot })}</button>
       {waitingOn ? <p className="hint">{t(`teacher.t12.why.${waitingOn}`)}</p> : null}
     </div>
   );

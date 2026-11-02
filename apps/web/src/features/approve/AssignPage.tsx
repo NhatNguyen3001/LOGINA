@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LoadFailed } from '@/components/logina/LoadFailed';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
@@ -32,7 +33,16 @@ export function AssignPage() {
     },
   });
 
-  if (lesson.isError || approval.isError) return <Note kind="err">{t('errors.generic')}</Note>;
+  if (lesson.isError || approval.isError) {
+    return (
+      <LoadFailed
+        onRetry={() => {
+          void lesson.refetch();
+          void approval.refetch();
+        }}
+      />
+    );
+  }
   if (!lesson.data || !approval.data) return <LoadingSkeleton />;
 
   return (
@@ -78,7 +88,7 @@ export function AssignPage() {
           </div>
           <p className="small muted">{t('teacher.t13.pinned')}</p>
           {assign.isError ? <Note kind="err">{t(errorKey(assign.error instanceof ApiError ? assign.error.code : ''))}</Note> : null}
-          <button type="button" className="btn primary block" disabled={assign.isPending} onClick={() => assign.mutate()}>{t('teacher.t13.title')}</button>
+          <button type="button" className="btn primary block" aria-busy={assign.isPending} disabled={assign.isPending} onClick={() => assign.mutate()}>{t('teacher.t13.title')}</button>
         </div>
       </div>
     </>

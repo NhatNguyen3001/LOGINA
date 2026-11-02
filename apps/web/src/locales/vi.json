@@ -93,13 +93,14 @@
         "EXCLUDED": "Đã loại"
       }
     },
-    "approvalBadge": "Duyệt",
+    "approvalBadge": "Duyệt {{n}}",
+    "stepNow": "Bước {{n}} trên 5: {{name}}",
     "stepper": {
-      "0": "Tạo & tải lên",
-      "1": "Làm rõ học liệu",
-      "2": "Duyệt nguồn · Duyệt 1",
-      "3": "Tạo & xem trước",
-      "4": "Duyệt 2 & giao"
+      "0": "Tải lên",
+      "1": "Làm rõ",
+      "2": "Kiểm tra nguồn",
+      "3": "Xem lại bài",
+      "4": "Duyệt và giao"
     },
     "pairs": {
       "corner": "Nhận định x Thẻ"
@@ -486,7 +487,8 @@
     "policies": "Chính sách",
     "draft": "Bản nháp",
     "menu": "Trình đơn",
-    "back": "Quay lại"
+    "back": "Quay lại",
+    "loadFailed": "Không tải được. Hãy kiểm tra kết nối rồi thử lại."
   },
   "demo": {
     "jumpSampleOnly": "Chỉ cho bộ bài mẫu",
@@ -673,6 +675,7 @@
     "teacher": "Dùng thử với vai trò giáo viên",
     "student": "Dùng thử với vai trò học sinh",
     "demoLine": "Đây là bản dùng thử, không cần tài khoản. Lớp học thật sẽ có tài khoản.",
+    "setup": "Đang chuẩn bị không gian làm việc. Lần đầu có thể mất một lúc.",
     "how": {
       "add": "Giáo viên đưa học liệu của mình lên.",
       "draft": "LOGINA đọc học liệu, hỏi lại chỗ chưa rõ và soạn năm nhiệm vụ.",
@@ -714,8 +717,6 @@
     "withdraw": "Muốn rút lại, em gửi mã người tham gia tới logina.edu@gmail.com. Chúng tôi sẽ xóa các dòng của em.",
     "privacyLink": "Đọc chính sách quyền riêng tư đầy đủ →",
     "agree": "Em đồng ý",
-    "decline": "Không, em chỉ dùng thử",
-    "once": "Em chỉ chọn một lần cho phiên này.",
     "version": "Phiên bản {{version}}",
     "thanks": "Cảm ơn em đã tham gia",
     "code": "MÃ NGƯỜI THAM GIA",
