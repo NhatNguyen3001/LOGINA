@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Public parts of the Q2 to Q5 task bodies (05-Backend-Schema section 5.6). These are typed and strict on
- * purpose: a loose `taskBody` would let `acceptedOrders`, `priorities` or `keywordPartitions` through.
+ * purpose: a loose `taskBody` would let `acceptedOrders`, `supportedReasons` or `keywordPartitions` through.
  */
 
 export const Q2TaskBody = z
@@ -16,9 +16,17 @@ export type Q2TaskBody = z.infer<typeof Q2TaskBody>;
 export const Q3TaskBody = z
   .object({
     options: z.array(z.object({ optionId: z.string(), text: z.string() }).strict()),
-    criteria: z.array(z.object({ criterionId: z.string(), text: z.string() }).strict()),
-    /** The drawbacks a student can accept: `Q3Artifact.tradeOffIds` picks from these. */
-    constraints: z.array(z.object({ tradeOffId: z.string(), text: z.string() }).strict()),
+    /** What each option gives up, and the reasons a student can give for that cost. */
+    tradeOffs: z.array(
+      z
+        .object({
+          tradeOffId: z.string(),
+          optionId: z.string(),
+          text: z.string(),
+          reasons: z.array(z.object({ reasonId: z.string(), text: z.string() }).strict()),
+        })
+        .strict(),
+    ),
   })
   .strict();
 export type Q3TaskBody = z.infer<typeof Q3TaskBody>;

@@ -12,7 +12,7 @@ function keywordPartition(text: string, partitions: Record<string, string[]>): s
 }
 
 /** The observable facts of a locked answer. Q1 is expected in authoring IDs. */
-export function buildLockFacts(artifact: Artifact, labels: Q1Labels, keywordPartitions: Record<string, string[]> = {}): LockFacts {
+export function buildLockFacts(artifact: Artifact, labels: Q1Labels, keywordPartitions: Record<string, string[]> = {}, supportedReasons: string[] = []): LockFacts {
   switch (artifact.slot) {
     case 'Q1':
       return buildQ1Facts(artifact.answerId, artifact.evidenceId, labels);
@@ -21,7 +21,7 @@ export function buildLockFacts(artifact: Artifact, labels: Q1Labels, keywordPart
       return firstCard ? { 'q2.firstCardId': firstCard } : {};
     }
     case 'Q3':
-      return { 'q3.judgmentOptionId': artifact.judgmentOptionId, 'q3.tradeOffCount': String(artifact.tradeOffIds.length) };
+      return { 'q3.judgmentOptionId': artifact.judgmentOptionId, 'q3.tradeOffId': artifact.tradeOffId, 'q3.reasonSupported': String(supportedReasons.includes(artifact.reasonId)) };
     case 'Q4': {
       const [firstSlot] = artifact.slots;
       return { 'q4.templateId': artifact.templateId, ...(firstSlot ? { 'q4.firstChoiceId': firstSlot.choiceId } : {}) };

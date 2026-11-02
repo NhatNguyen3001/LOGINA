@@ -1,3 +1,4 @@
+import { deterministicChecks } from '../src/jobs/content.js';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { loadFixture, studentTexts, type DraftFixture } from '@logina/domain';
 import { liveSetup, testSchoolId, type LiveProject } from '@logina/test-utils';
@@ -582,6 +583,13 @@ describe('live GENERATE and RERUN', () => {
 
 describe('generateStructured', () => {
   const schema = z.object({ ok: z.boolean() });
+
+  it('blocks a Q3 trade-off with no reason the source supports', () => {
+    const taskBody = { options: [{ optionId: 'O1' }], tradeOffs: [{ optionId: 'O1', reasons: [{ reasonId: 'R1' }, { reasonId: 'R2' }] }], supportedReasons: ['R9'] };
+    const draft = { slot: 'Q3', challengeCandidates: [{ challengeId: 'FB', isNeutralFallback: true }], taskBody } as unknown as DraftFixture;
+    const bundle = { slot: 'Q3', version: 1, fallbackChallengeId: 'FB', candidates: [] };
+    expect(deterministicChecks(draft, bundle as never, []).find((c) => c.checkId === 'STRUCT')?.status).toBe('FAIL');
+  });
 
   it('picks READER_MODEL for reader, GENERATOR_MODEL for generator, ANALYZER_MODEL for analyzer, XREASON_MODEL for xreason', () => {
     const config = testWorkerConfig({ readerModel: 'r', generatorModel: 'g', analyzerModel: 'a', xreasonModel: 'x' });

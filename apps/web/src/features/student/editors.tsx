@@ -2,8 +2,7 @@ import { closestCenter, DndContext, MouseSensor, TouchSensor, useSensor, useSens
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Artifact, DraftArtifact, Q2TaskBody, Q3TaskBody, Q4TaskBody, Q5TaskBody, StudentTaskDTO } from '@logina/contracts';
-import { ArrowDown, ArrowUp, Check, GripVertical } from 'lucide-react';
-import type { CSSProperties } from 'react';
+import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Pick } from '@/components/logina/Pick';
 
@@ -106,62 +105,38 @@ export function Q2Editor({ body, value, onChange }: EditorProps<'Q2', Q2TaskBody
   );
 }
 
-export function Q3Editor({ body, value, onChange }: EditorProps<'Q3', Q3TaskBody>) {
+export function Q3Editor({ body, value, onChange, original }: EditorProps<'Q3', Q3TaskBody>) {
   const { t } = useTranslation();
-  const comparisons = value.comparisons ?? [];
-  const tradeOffIds = value.tradeOffIds ?? [];
-
-  const compare = (criterionId: string, option: string) =>
-    onChange({ ...value, comparisons: [...comparisons.filter((c) => c.criterionId !== criterionId), { criterionId, value: option }] });
-
-  const toggle = (id: string) =>
-    onChange({ ...value, tradeOffIds: tradeOffIds.includes(id) ? tradeOffIds.filter((x) => x !== id) : [...tradeOffIds, id] });
+  const tradeOffs = body.tradeOffs.filter((tradeOff) => tradeOff.optionId === value.judgmentOptionId);
+  const tradeOff = tradeOffs.find((item) => item.tradeOffId === value.tradeOffId);
 
   return (
     <>
-      <ol className="ans ranked">
-        {body.options.map(({ optionId, text }, index) => (
-          <li key={optionId}>
-            <span className="k">{letterOf(index)}</span>
-            <span>{text}</span>
-          </li>
-        ))}
-      </ol>
-      <h2 className="s15 b part">{t('student.q3.compare')}</h2>
-      {/* One row per criterion: the option wording above is not repeated in every row. */}
-      <div className="cmp" style={{ '--cols': body.options.length } as CSSProperties}>
-        {body.criteria.map(({ criterionId, text }) => (
-          <fieldset key={criterionId} className="cmp-row">
-            <legend className="vh">{text}</legend>
-            <span className="m" aria-hidden="true">{text}</span>
-            {body.options.map(({ optionId, text: option }, index) => (
-              <Pick key={optionId} name={criterionId} value={optionId} label={letterOf(index)} checked={comparisons.find((c) => c.criterionId === criterionId)?.value === optionId} onSelect={(picked) => compare(criterionId, picked)}>
-                <span className="vh">{option}</span>
-              </Pick>
-            ))}
-          </fieldset>
-        ))}
-      </div>
-      <h2 className="s15 b part">{t('student.q3.decide')}</h2>
+      <h2 className="s15 b">{t('student.q3.decide')}</h2>
       <div className="stack" role="radiogroup" aria-label={t('student.q3.decide')}>
         {body.options.map(({ optionId, text }, index) => (
-          <Pick key={optionId} name="judgment" value={optionId} label={`${letterOf(index)}.`} checked={value.judgmentOptionId === optionId} onSelect={(judgmentOptionId) => onChange({ ...value, judgmentOptionId })}>
+          <Pick key={optionId} name="judgment" value={optionId} label={`${letterOf(index)}.`} checked={value.judgmentOptionId === optionId} state={pickState(optionId, value.judgmentOptionId, original?.judgmentOptionId)} onSelect={(judgmentOptionId) => onChange({ slot: 'Q3', judgmentOptionId })}>
             {text}
           </Pick>
         ))}
       </div>
-      <h2 className="s15 b part">{t('student.q3.tradeOffs')}</h2>
-      <div className="stack">
-        {body.constraints.map(({ tradeOffId, text }) => {
-          const ticked = tradeOffIds.includes(tradeOffId);
-          return (
-            <label key={tradeOffId} className={`pick ${ticked ? 'on' : ''}`}>
-              <input type="checkbox" checked={ticked} onChange={() => toggle(tradeOffId)} className="vh" />
-              <span className={`check ${ticked ? 'on' : ''}`} aria-hidden="true">{ticked ? <Check className="ico" /> : null}</span>
-              <span className="grow">{text}</span>
-            </label>
-          );
-        })}
+      <h2 className="s15 b part">{t('student.q3.giveUp')}</h2>
+      {tradeOffs.length === 0 ? <p className="q3-wait">{t('student.q3.waitPath')}</p> : null}
+      <div className="stack" role="radiogroup" aria-label={t('student.q3.giveUp')}>
+        {tradeOffs.map(({ tradeOffId, text }) => (
+          <Pick key={tradeOffId} name="tradeOff" value={tradeOffId} checked={value.tradeOffId === tradeOffId} state={pickState(tradeOffId, value.tradeOffId, original?.tradeOffId)} onSelect={(id) => onChange({ slot: 'Q3', judgmentOptionId: value.judgmentOptionId!, tradeOffId: id })}>
+            {text}
+          </Pick>
+        ))}
+      </div>
+      <h2 className="s15 b part">{t('student.q3.why')}</h2>
+      {tradeOff ? <p className="s13 sec">{t('student.q3.whyHint')}</p> : <p className="q3-wait">{t('student.q3.waitCost')}</p>}
+      <div className="stack" role="radiogroup" aria-label={t('student.q3.why')}>
+        {tradeOff?.reasons.map(({ reasonId, text }) => (
+          <Pick key={reasonId} name="reason" value={reasonId} checked={value.reasonId === reasonId} state={pickState(reasonId, value.reasonId, original?.reasonId)} onSelect={(id) => onChange({ ...value, reasonId: id })}>
+            {text}
+          </Pick>
+        ))}
       </div>
     </>
   );
@@ -234,7 +209,7 @@ export function ArtifactEditor({ task, value, onChange, original }: { task: Stud
 export function isComplete(task: StudentTaskDTO, value: DraftArtifact): value is Artifact {
   if (value.slot === 'Q1') return Boolean(value.answerId && value.evidenceId);
   if (value.slot === 'Q2') return Boolean(value.orderedCardIds?.length);
-  if (value.slot === 'Q3' && task.slot === 'Q3') return Boolean(value.judgmentOptionId) && task.taskBody.criteria.every((c) => value.comparisons?.some((x) => x.criterionId === c.criterionId));
+  if (value.slot === 'Q3') return Boolean(value.judgmentOptionId && value.tradeOffId && value.reasonId);
   if (value.slot === 'Q4' && task.slot === 'Q4') {
     const template = task.taskBody.templates.find((x) => x.templateId === value.templateId);
     return Boolean(template) && template!.slots.every((s) => value.slots?.some((x) => x.slotId === s.slotId));
@@ -249,9 +224,10 @@ export function missingKey(task: StudentTaskDTO, value: DraftArtifact): string |
     if (!value.answerId) return 'student.need.statement';
     return value.evidenceId ? null : 'student.need.card';
   }
-  if (value.slot === 'Q3' && task.slot === 'Q3') {
-    if (!task.taskBody.criteria.every((c) => value.comparisons?.some((x) => x.criterionId === c.criterionId))) return 'student.need.compare';
-    return value.judgmentOptionId ? null : 'student.need.decide';
+  if (value.slot === 'Q3') {
+    if (!value.judgmentOptionId) return 'student.need.decide';
+    if (!value.tradeOffId) return 'student.need.tradeOff';
+    return value.reasonId ? null : 'student.need.whyCost';
   }
   if (value.slot === 'Q4' && task.slot === 'Q4') {
     if (!value.templateId) return 'student.need.template';
@@ -264,11 +240,9 @@ export function missingKey(task: StudentTaskDTO, value: DraftArtifact): string |
   return null;
 }
 
-/** Lists the request requires start empty, so a student who ticks no drawback can still lock. */
 export function emptyDraft(task: StudentTaskDTO): DraftArtifact {
   const saved = task.draftArtifact;
   if (task.slot === 'Q2') return { slot: 'Q2', orderedCardIds: task.taskBody.cards.map((c) => c.cardId), ...saved } as DraftArtifact;
-  if (task.slot === 'Q3') return { slot: 'Q3', comparisons: [], tradeOffIds: [], ...saved } as DraftArtifact;
   if (task.slot === 'Q4') return { slot: 'Q4', slots: [], ...saved } as DraftArtifact;
   return saved ?? { slot: task.slot };
 }

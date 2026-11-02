@@ -71,11 +71,8 @@ function randomTasks(lessonId: string, n: number, releases: Record<string, Docum
     if (slot === 'Q2') return { orderedCardIds: shuffleForRelease(String(random()), (body.cards as { cardId: string }[]).map((c) => c.cardId)) };
     if (slot === 'Q3') {
       const option = pick(body.options as { optionId: string }[]).optionId;
-      return {
-        comparisons: (body.criteria as { criterionId: string }[]).map((c) => ({ criterionId: c.criterionId, value: option })),
-        judgmentOptionId: option,
-        tradeOffIds: [pick(body.constraints as { tradeOffId: string }[]).tradeOffId],
-      };
+      const tradeOff = pick((body.tradeOffs as { tradeOffId: string; optionId: string; reasons: { reasonId: string }[] }[]).filter((t) => t.optionId === option));
+      return { judgmentOptionId: option, tradeOffId: tradeOff.tradeOffId, reasonId: pick(tradeOff.reasons).reasonId };
     }
     if (slot === 'Q4') {
       const template = pick(body.templates as { templateId: string; slots: { slotId: string; choices: { choiceId: string }[] }[] }[]);

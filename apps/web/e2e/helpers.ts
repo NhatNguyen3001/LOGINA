@@ -10,9 +10,9 @@ export async function completeTask(page: Page, slot: string): Promise<void> {
     await page.getByRole('radiogroup').nth(1).getByRole('radio').first().check({ force: true });
   }
   if (slot === 'Q3') {
-    const groups = page.locator('fieldset');
-    for (let i = 0; i < (await groups.count()); i += 1) await groups.nth(i).getByRole('radio').first().check({ force: true });
-    await page.getByRole('radiogroup').getByRole('radio').first().check({ force: true });
+    for (const name of ['Choose one path', 'What does this choice give up?', 'Why does that cost come with this choice?']) {
+      await page.getByRole('radiogroup', { name }).getByRole('radio').first().check({ force: true });
+    }
   }
   if (slot === 'Q4') {
     await page.getByRole('radiogroup').getByRole('radio').first().check({ force: true });

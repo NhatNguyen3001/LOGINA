@@ -10,9 +10,9 @@
       "when": {
         "all": [
           {
-            "field": "q3.tradeOffCount",
+            "field": "q3.reasonSupported",
             "op": "eq",
-            "value": "0"
+            "value": "false"
           }
         ]
       },
@@ -22,30 +22,9 @@
       }
     },
     {
-      "challengeId": "TN4",
-      "label": "TN4",
-      "priorityOrder": 2,
-      "when": {
-        "all": [
-          {
-            "field": "q3.tradeOffCount",
-            "op": "in",
-            "value": [
-              "3",
-              "4"
-            ]
-          }
-        ]
-      },
-      "requires": {
-        "message": true,
-        "targetRef": "ref_TN4"
-      }
-    },
-    {
       "challengeId": "TN2",
       "label": "TN2",
-      "priorityOrder": 3,
+      "priorityOrder": 2,
       "when": {
         "all": [
           {
@@ -63,7 +42,7 @@
     {
       "challengeId": "TN3",
       "label": "TN3",
-      "priorityOrder": 4,
+      "priorityOrder": 3,
       "when": {
         "all": [
           {

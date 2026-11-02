@@ -116,7 +116,7 @@
     "taskType": {
       "Q1": "Q1 · Statement + evidence",
       "Q2": "Q2 · Rank cards",
-      "Q3": "Q3 · Compare options",
+      "Q3": "Q3 · Trade-off",
       "Q4": "Q4 · Counterargument template",
       "Q5": "Q5 · Write a proposal"
     },
@@ -244,6 +244,7 @@
       "question": "QUESTION",
       "thinkAgain": "Think again",
       "oneEach": "In each attempt, a student gets exactly 1 prompt.",
+      "supportedReason": "The source supports this reason",
       "editPrompt": "Edit {{label}}"
     },
     "t08": {
@@ -539,7 +540,7 @@
     "progress": {
       "Q1": "Q1 Statement",
       "Q2": "Q2 Rank cards",
-      "Q3": "Q3 Compare",
+      "Q3": "Q3 Trade-off",
       "Q4": "Q4 Counterargument",
       "Q5": "Q5 Proposal"
     },
@@ -611,9 +612,12 @@
       "moveDown": "Move {{card}} down"
     },
     "q3": {
-      "compare": "Compare the options on each criterion",
-      "decide": "Your decision",
-      "tradeOffs": "What drawbacks do you accept?"
+      "decide": "Choose one path",
+      "giveUp": "What does this choice give up?",
+      "why": "Why does that cost come with this choice?",
+      "whyHint": "Choose the reason the source supports best.",
+      "waitPath": "Choose a path first.",
+      "waitCost": "Choose what it gives up first."
     },
     "q4": {
       "template": "Choose a template",
@@ -653,8 +657,9 @@
     "need": {
       "statement": "Choose a statement to continue.",
       "card": "Choose an evidence card to continue.",
-      "compare": "Compare the options on every criterion to continue.",
-      "decide": "Make your decision to continue.",
+      "decide": "Choose a path to continue.",
+      "tradeOff": "Choose what it gives up to continue.",
+      "whyCost": "Choose a reason to continue.",
       "template": "Choose a template to continue.",
       "blanks": "Fill every blank to continue.",
       "proposal": "Write your proposal to continue.",

@@ -7,7 +7,6 @@ export interface ArtifactComparison {
 }
 
 const sameJson = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
-const sorted = (items: string[]): string[] => [...items].sort();
 
 function changedElements(initial: Artifact, final: Artifact): string[] {
   const changed: string[] = [];
@@ -21,11 +20,9 @@ function changedElements(initial: Artifact, final: Artifact): string[] {
   } else if (initial.slot === 'Q2' && final.slot === 'Q2') {
     mark('order', sameJson(initial.orderedCardIds, final.orderedCardIds));
   } else if (initial.slot === 'Q3' && final.slot === 'Q3') {
-    const byCriterion = (a: Artifact & { slot: 'Q3' }) =>
-      [...a.comparisons].sort((x, y) => x.criterionId.localeCompare(y.criterionId));
-    mark('comparisons', sameJson(byCriterion(initial), byCriterion(final)));
     mark('judgment', initial.judgmentOptionId === final.judgmentOptionId);
-    mark('tradeOffs', sameJson(sorted(initial.tradeOffIds), sorted(final.tradeOffIds)));
+    mark('tradeOff', initial.tradeOffId === final.tradeOffId);
+    mark('reason', initial.reasonId === final.reasonId);
   } else if (initial.slot === 'Q4' && final.slot === 'Q4') {
     mark('template', initial.templateId === final.templateId);
     const active = (a: Artifact & { slot: 'Q4' }) =>

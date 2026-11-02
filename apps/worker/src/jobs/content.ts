@@ -87,6 +87,18 @@ const q1Combos = (draft: DraftFixture): LockFacts[] =>
     (draft.generatedE ?? []).map((e) => ({ answerId: a.answerOptionId, evidenceId: e.generatedEId })),
   );
 
+interface Q3Body {
+  options?: { optionId: string }[];
+  tradeOffs?: { optionId: string; reasons: { reasonId: string }[] }[];
+  supportedReasons?: string[];
+}
+
+/** Every option has a cost, and every cost has a real choice of reasons with exactly one the source supports. */
+const q3Structured = ({ options = [], tradeOffs = [], supportedReasons = [] }: Q3Body): boolean =>
+  options.length > 0 &&
+  options.every((option) => tradeOffs.some((tradeOff) => tradeOff.optionId === option.optionId)) &&
+  tradeOffs.every(({ reasons }) => reasons.length >= 2 && reasons.filter((reason) => supportedReasons.includes(reason.reasonId)).length === 1);
+
 /** The checks code can settle. They run for real in every mode. */
 export function deterministicChecks(draft: DraftFixture, bundle: Bundle, evidenceTexts: string[]) {
   const candidates = draft.challengeCandidates;
@@ -106,6 +118,7 @@ export function deterministicChecks(draft: DraftFixture, bundle: Bundle, evidenc
       check('PAIRS', '16/16 statement × card pairs evaluated', (draft.pairAlignments ?? []).length === 16),
     );
   }
+  if (draft.slot === 'Q3') results.push(check('STRUCT', 'Each option has a drawback, each with exactly 1 supported reason', q3Structured(draft.taskBody as Q3Body)));
   if (evidenceTexts.length > 0) {
     const options = [...(draft.answerOptions ?? []).map((a) => a.text), ...(draft.generatedE ?? []).map((e) => e.text)];
     const added = options.flatMap((text) => detectNewFacts(text, evidenceTexts));

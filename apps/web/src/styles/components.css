@@ -199,13 +199,7 @@ table.t tr:last-child td{border-bottom:0}
 .pick .lbl{font-weight:700;margin-right:4px}
 .pick > .radio,.pick > .check{margin-top:2px}
 .egrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.cmp{display:flex;flex-direction:column}
-.cmp-row{display:grid;grid-template-columns:minmax(0,1fr) repeat(var(--cols),88px);gap:8px 10px;align-items:center;min-width:0;margin:0;padding:10px 0;border:0;border-top:1px solid var(--line)}
-.cmp-row:first-child{border-top:0;padding-top:0}
-.cmp-row .pick{padding:11px 14px;align-items:center;justify-content:center;gap:10px}
-.cmp-row .pick .grow{flex:none}
-.cmp-row .pick .lbl{margin:0}
-.cmp-row .pick > .radio{margin-top:0}
+.q3-wait{padding:12px 14px;border:1px dashed var(--line-strong);border-radius:10px;font-size:13px;color:var(--ink-3)}
 .part{margin-top:14px}
 .stu-foot{background:var(--surface);border-top:1px solid var(--line);padding-block:14px}
 .bubble-tn{border:1px solid var(--navy-line);background:var(--surface);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px}
@@ -519,8 +513,6 @@ a.task:hover{background:var(--subtle)}
   .stu-side.open{transform:none;visibility:visible}
   .stu-side .logo-home{display:none}
   .ibtn.menu-btn{display:grid;width:44px;height:44px;flex:none}
-  .cmp-row{grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
-  .cmp-row > .m{grid-column:1 / -1}
   .h1{font-size:22px}
 }
 @media (max-width:640px){

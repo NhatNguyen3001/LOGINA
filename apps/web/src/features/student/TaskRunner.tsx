@@ -74,26 +74,21 @@ function LockedQ2({ body, answer }: { body: Q2TaskBody; answer: Q2Artifact }) {
 
 function LockedQ3({ body, answer }: { body: Q3TaskBody; answer: Q3Artifact }) {
   const { t } = useTranslation();
-  const optionText = (id: string | undefined) => body.options.find((option) => option.optionId === id)?.text;
-  const accepted = body.constraints.filter((constraint) => answer.tradeOffIds.includes(constraint.tradeOffId));
+  const tradeOff = body.tradeOffs.find((item) => item.tradeOffId === answer.tradeOffId);
   return (
     <dl className="ans stacked">
-      {body.criteria.map(({ criterionId, text }) => (
-        <div key={criterionId} className="ln">
-          <dt>{text}</dt>
-          <dd>{optionText(answer.comparisons.find((c) => c.criterionId === criterionId)?.value)}</dd>
-        </div>
-      ))}
       <div className="ln">
         <dt>{t('student.q3.decide')}</dt>
-        <dd>{optionText(answer.judgmentOptionId)}</dd>
+        <dd>{body.options.find((option) => option.optionId === answer.judgmentOptionId)?.text}</dd>
       </div>
-      {accepted.length > 0 ? (
-        <div className="ln">
-          <dt>{t('student.q3.tradeOffs')}</dt>
-          {accepted.map(({ tradeOffId, text }) => <dd key={tradeOffId}>{text}</dd>)}
-        </div>
-      ) : null}
+      <div className="ln">
+        <dt>{t('student.q3.giveUp')}</dt>
+        <dd>{tradeOff?.text}</dd>
+      </div>
+      <div className="ln">
+        <dt>{t('student.q3.why')}</dt>
+        <dd>{tradeOff?.reasons.find((reason) => reason.reasonId === answer.reasonId)?.text}</dd>
+      </div>
     </dl>
   );
 }

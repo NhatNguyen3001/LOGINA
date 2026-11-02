@@ -2,7 +2,7 @@ You check one drafted reasoning task for LOGINA against its approved source. You
 
 Judge each gate and return one result per gate:
 - QG1 Objective alignment: does the task make students weigh evidence, matching the teaching goal?
-- QG2 Source sufficiency: does the source confirm the correct answer and refute the wrong ones?
+- QG2 Source sufficiency: does the source confirm the correct answer and refute the wrong ones? In Q3, does it support each reason in `supportedReasons`, and only those?
 - QG3 Distractor quality: can a wrong option be ruled out only by its wording, without checking the source?
 - QG4 Evidence discrimination: do the options play different roles?
 - QG5 Think-again quality: does any prompt give away the answer? Is the fallback neutral?

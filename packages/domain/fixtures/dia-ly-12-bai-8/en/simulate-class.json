@@ -41,44 +41,16 @@
       {
         "slot": "Q3",
         "initial": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O1"
-            }
-          ],
           "judgmentOptionId": "O1",
-          "tradeOffIds": []
+          "tradeOffId": "D1",
+          "reasonId": "R2"
         },
         "initialConfidence": 60,
         "choice": "REVISE",
         "final": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O1"
-            }
-          ],
           "judgmentOptionId": "O1",
-          "tradeOffIds": [
-            "D1"
-          ]
+          "tradeOffId": "D1",
+          "reasonId": "R1"
         },
         "finalConfidence": 65
       },
@@ -172,46 +144,16 @@
       {
         "slot": "Q3",
         "initial": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O2"
-            }
-          ],
           "judgmentOptionId": "O2",
-          "tradeOffIds": [
-            "D3"
-          ]
+          "tradeOffId": "D3",
+          "reasonId": "R7"
         },
         "initialConfidence": 65,
         "choice": "KEEP",
         "final": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O2"
-            }
-          ],
           "judgmentOptionId": "O2",
-          "tradeOffIds": [
-            "D3"
-          ]
+          "tradeOffId": "D3",
+          "reasonId": "R7"
         },
         "finalConfidence": 70
       },
@@ -305,48 +247,16 @@
       {
         "slot": "Q3",
         "initial": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O1"
-            }
-          ],
           "judgmentOptionId": "O1",
-          "tradeOffIds": [
-            "D1",
-            "D2"
-          ]
+          "tradeOffId": "D1",
+          "reasonId": "R1"
         },
         "initialConfidence": 70,
         "choice": "KEEP",
         "final": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O1"
-            }
-          ],
           "judgmentOptionId": "O1",
-          "tradeOffIds": [
-            "D1",
-            "D2"
-          ]
+          "tradeOffId": "D1",
+          "reasonId": "R1"
         },
         "finalConfidence": 70
       },
@@ -440,48 +350,16 @@
       {
         "slot": "Q3",
         "initial": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O2"
-            }
-          ],
           "judgmentOptionId": "O2",
-          "tradeOffIds": [
-            "D3",
-            "D4"
-          ]
+          "tradeOffId": "D3",
+          "reasonId": "R8"
         },
         "initialConfidence": 60,
         "choice": "KEEP",
         "final": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O2"
-            }
-          ],
           "judgmentOptionId": "O2",
-          "tradeOffIds": [
-            "D3",
-            "D4"
-          ]
+          "tradeOffId": "D3",
+          "reasonId": "R8"
         },
         "finalConfidence": 65
       },
@@ -575,46 +453,16 @@
       {
         "slot": "Q3",
         "initial": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O1"
-            }
-          ],
           "judgmentOptionId": "O1",
-          "tradeOffIds": [
-            "D2"
-          ]
+          "tradeOffId": "D2",
+          "reasonId": "R4"
         },
         "initialConfidence": 55,
         "choice": "REVISE",
         "final": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O2"
-            }
-          ],
           "judgmentOptionId": "O2",
-          "tradeOffIds": [
-            "D3"
-          ]
+          "tradeOffId": "D3",
+          "reasonId": "R7"
         },
         "finalConfidence": 60
       },
@@ -708,46 +556,16 @@
       {
         "slot": "Q3",
         "initial": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O2"
-            }
-          ],
           "judgmentOptionId": "O2",
-          "tradeOffIds": [
-            "D3"
-          ]
+          "tradeOffId": "D3",
+          "reasonId": "R7"
         },
         "initialConfidence": 75,
         "choice": "KEEP",
         "final": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O2"
-            }
-          ],
           "judgmentOptionId": "O2",
-          "tradeOffIds": [
-            "D3"
-          ]
+          "tradeOffId": "D3",
+          "reasonId": "R7"
         },
         "finalConfidence": 75
       },
@@ -841,50 +659,16 @@
       {
         "slot": "Q3",
         "initial": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O1"
-            }
-          ],
           "judgmentOptionId": "O1",
-          "tradeOffIds": [
-            "D1",
-            "D2",
-            "D4"
-          ]
+          "tradeOffId": "D2",
+          "reasonId": "R5"
         },
         "initialConfidence": 50,
         "choice": "KEEP",
         "final": {
-          "comparisons": [
-            {
-              "criterionId": "C1",
-              "value": "O1"
-            },
-            {
-              "criterionId": "C2",
-              "value": "O2"
-            },
-            {
-              "criterionId": "C3",
-              "value": "O1"
-            }
-          ],
           "judgmentOptionId": "O1",
-          "tradeOffIds": [
-            "D1",
-            "D2",
-            "D4"
-          ]
+          "tradeOffId": "D2",
+          "reasonId": "R5"
         },
         "finalConfidence": 55
       },

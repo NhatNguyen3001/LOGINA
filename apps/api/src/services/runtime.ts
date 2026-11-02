@@ -118,7 +118,11 @@ export function artifactSummary(artifact: Artifact, release: DocumentData): { an
     const cards = body.cards as { cardId: string; text: string }[];
     return { answerText: artifact.orderedCardIds.map((id) => cards.find((card) => card.cardId === id)?.text ?? '').join(' > ') };
   }
-  if (artifact.slot === 'Q3') return { answerText: (body.options as { optionId: string; text: string }[]).find((o) => o.optionId === artifact.judgmentOptionId)?.text ?? '' };
+  if (artifact.slot === 'Q3') {
+    const option = (body.options as { optionId: string; text: string }[]).find((o) => o.optionId === artifact.judgmentOptionId);
+    const tradeOff = (body.tradeOffs as { tradeOffId: string; text: string; reasons: { reasonId: string; text: string }[] }[]).find((t) => t.tradeOffId === artifact.tradeOffId);
+    return { answerText: [option?.text, tradeOff?.text, tradeOff?.reasons.find((r) => r.reasonId === artifact.reasonId)?.text].filter(Boolean).join(' · ') };
+  }
   const template = (body.templates as Q4Template[]).find((x) => x.templateId === artifact.templateId);
   const chosen = (slotId: string) => {
     const choiceId = artifact.slots.find((x) => x.slotId === slotId)?.choiceId;
@@ -147,7 +151,7 @@ export async function lockTask(
   const authoring = toAuthoring(artifact, release);
 
   const bundle = (await db.doc(`lessons/${attempt.lessonId as string}/ruleBundles/${release.ruleBundleId as string}`).get()).data() as RuleBundle;
-  const facts = buildLockFacts(authoring, slot === 'Q1' ? q1Labels(release) : { answers: {}, evidence: {}, pairs: {} }, release.serverBody?.keywordPartitions);
+  const facts = buildLockFacts(authoring, slot === 'Q1' ? q1Labels(release) : { answers: {}, evidence: {}, pairs: {} }, release.serverBody?.keywordPartitions, release.serverBody?.supportedReasons);
   const selection = selectChallenge(bundle, facts);
   const candidates = (release.teacherContent as { candidates: DocumentData[] }).candidates;
   const chosen = candidates.find((c) => c.challengeId === selection.challengeId);

@@ -116,7 +116,7 @@
     "taskType": {
       "Q1": "Q1 · Nhận định + căn cứ",
       "Q2": "Q2 · Xếp thẻ",
-      "Q3": "Q3 · So sánh phương án",
+      "Q3": "Q3 · Đánh đổi",
       "Q4": "Q4 · Mẫu phản biện",
       "Q5": "Q5 · Viết đề xuất"
     },
@@ -244,6 +244,7 @@
       "question": "CÂU HỎI",
       "thinkAgain": "Thử nghĩ thêm",
       "oneEach": "Mỗi lượt làm, học sinh nhận đúng 1 câu.",
+      "supportedReason": "Nguồn ủng hộ lí do này",
       "editPrompt": "Sửa {{label}}"
     },
     "t08": {
@@ -539,7 +540,7 @@
     "progress": {
       "Q1": "Q1 Nhận định",
       "Q2": "Q2 Xếp thẻ",
-      "Q3": "Q3 So sánh",
+      "Q3": "Q3 Đánh đổi",
       "Q4": "Q4 Phản biện",
       "Q5": "Q5 Đề xuất"
     },
@@ -611,9 +612,12 @@
       "moveDown": "Chuyển {{card}} xuống"
     },
     "q3": {
-      "compare": "So sánh các phương án theo từng tiêu chí",
-      "decide": "Quyết định của em",
-      "tradeOffs": "Em chấp nhận những hạn chế nào?"
+      "decide": "Chọn một hướng",
+      "giveUp": "Lựa chọn này phải đánh đổi điều gì?",
+      "why": "Vì sao lựa chọn này phải đánh đổi như vậy?",
+      "whyHint": "Chọn lí do được nguồn ủng hộ rõ nhất.",
+      "waitPath": "Hãy chọn một hướng trước.",
+      "waitCost": "Hãy chọn điều phải đánh đổi trước."
     },
     "q4": {
       "template": "Chọn một mẫu",
@@ -653,8 +657,9 @@
     "need": {
       "statement": "Chọn một nhận định để tiếp tục.",
       "card": "Chọn một thẻ căn cứ để tiếp tục.",
-      "compare": "So sánh các phương án theo mọi tiêu chí để tiếp tục.",
-      "decide": "Đưa ra quyết định của em để tiếp tục.",
+      "decide": "Chọn một hướng để tiếp tục.",
+      "tradeOff": "Chọn điều phải đánh đổi để tiếp tục.",
+      "whyCost": "Chọn một lí do để tiếp tục.",
       "template": "Chọn một mẫu để tiếp tục.",
       "blanks": "Điền mọi chỗ trống để tiếp tục.",
       "proposal": "Viết đề xuất của em để tiếp tục.",
