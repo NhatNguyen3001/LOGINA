@@ -213,6 +213,12 @@ describe('jobs', () => {
     expect(body).not.toHaveProperty('error');
   });
 
+  it('JobDTO carries the model thoughts for the wait screen', async () => {
+    const trace = [{ step: 'claims', at: 12, title: 'Checking', text: 'The shares add up.' }];
+    const { id } = await seedJob(a, { trace });
+    expect(await (await a.get(`/jobs/${id}`)).json()).toMatchObject({ trace });
+  });
+
   it('a job in another workspace is 404', async () => {
     const { id } = await seedJob(a, {});
     expect((await b.get(`/jobs/${id}`)).status).toBe(404);

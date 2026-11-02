@@ -27,7 +27,6 @@ export async function completeTask(page: Page, slot: string): Promise<void> {
   await page.getByRole('slider').focus();
   await page.keyboard.press('End');
   await page.getByRole('button', { name: 'Lock in answer' }).click();
-  await page.getByRole('button', { name: 'Keep my answer' }).click();
   await page.getByRole('button', { name: `Submit ${slot}` }).click();
 }
 

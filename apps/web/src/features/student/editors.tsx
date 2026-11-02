@@ -20,11 +20,7 @@ const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 const letterOf = (index: number): string => LETTERS[index] ?? String(index + 1);
 
-const pickState = (id: string, chosen: string | undefined, original: string | undefined) => {
-  if (original === undefined) return 'default' as const;
-  if (id === original) return 'orig' as const;
-  return id === chosen ? ('new' as const) : ('default' as const);
-};
+const pickState = (id: string, chosen: string | undefined, original: string | undefined) => (id === original && id !== chosen ? ('orig' as const) : ('default' as const));
 
 type Q1Task = Extract<StudentTaskDTO, { slot: 'Q1' }>;
 

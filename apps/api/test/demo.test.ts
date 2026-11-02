@@ -126,7 +126,7 @@ describe('demo menu', () => {
   });
 
   it('reset keeps researchRows and participants', async () => {
-    await h.live.db.doc(`participants/${a.session.uid}`).set({ consent: 'AGREED', consentVersion: '2026-10-v1' });
+    await h.live.db.doc(`participants/${a.session.uid}`).set({ consent: 'AGREED', consentVersion: '2026-11-v1' });
     await a.post('/demo/reset');
     expect((await h.live.db.doc(`participants/${a.session.uid}`).get()).exists).toBe(true);
     await h.live.db.doc(`participants/${a.session.uid}`).delete();

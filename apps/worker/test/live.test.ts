@@ -583,9 +583,28 @@ describe('live GENERATE and RERUN', () => {
 describe('generateStructured', () => {
   const schema = z.object({ ok: z.boolean() });
 
-  it('picks READER_MODEL for reader, GENERATOR_MODEL for generator, XREASON_MODEL for analyzer and xreason', () => {
-    const config = testWorkerConfig({ readerModel: 'r', generatorModel: 'g', xreasonModel: 'x' });
-    expect(['reader', 'generator', 'analyzer', 'xreason'].map((role) => modelFor(role as 'reader', config))).toEqual(['r', 'g', 'x', 'x']);
+  it('picks READER_MODEL for reader, GENERATOR_MODEL for generator, ANALYZER_MODEL for analyzer, XREASON_MODEL for xreason', () => {
+    const config = testWorkerConfig({ readerModel: 'r', generatorModel: 'g', analyzerModel: 'a', xreasonModel: 'x' });
+    expect(['reader', 'generator', 'analyzer', 'xreason'].map((role) => modelFor(role as 'reader', config))).toEqual(['r', 'g', 'a', 'x']);
+  });
+
+  it('reads with low thinking, analyzes with high thinking, and saves the thoughts in order', async () => {
+    const inner = stubGenai({ reader: reading('en'), analyzer: analysis });
+    const genai: StubGenai = {
+      ...inner,
+      generate: async (request) => {
+        await request.onThought?.('**Checking the shares**\n\nThe figures add up.');
+        await request.onThought?.('**Finding gaps**');
+        return inner.generate(request);
+      },
+    };
+    const { jobId } = await setup();
+    await worker(genai).runJob(jobId);
+    expect(roleCalls(inner, 'reader')[0]?.thinking).toBe('LOW');
+    expect(roleCalls(inner, 'analyzer')[0]?.thinking).toBe('HIGH');
+    const { trace } = await job(jobId);
+    expect(trace).toMatchObject([{ step: 'claims', title: 'Checking the shares', text: 'The figures add up.' }, { step: 'claims', title: 'Finding gaps', text: '' }]);
+    expect(trace[0].at).toBeGreaterThanOrEqual(0);
   });
 
   it('retries once on schema failure then throws AI_FAILED', async () => {

@@ -135,7 +135,8 @@ export type DraftReq = z.infer<typeof DraftReq>;
 export const LockReq = z.object({ artifact: Artifact, initialConfidence: Confidence }).strict();
 export type LockReq = z.infer<typeof LockReq>;
 
-export const SubmitReq = z.object({ choice: KeepRevise, finalArtifact: Artifact, finalConfidence: Confidence }).strict();
+/** `secondsToFirstChange` is set only if the student changed something after the prompt appeared. */
+export const SubmitReq = z.object({ choice: KeepRevise, finalArtifact: Artifact, finalConfidence: Confidence, secondsToFirstChange: z.number().int().nonnegative().optional() }).strict();
 export type SubmitReq = z.infer<typeof SubmitReq>;
 
 export const UpdateMeReq = z.object({ uiLocale: Locale }).strict();

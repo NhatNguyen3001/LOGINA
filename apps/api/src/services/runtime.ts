@@ -190,7 +190,7 @@ export async function submitTask(
   actor: Actor,
   attemptId: string,
   slot: string,
-  { choice, finalArtifact, finalConfidence }: { choice: 'KEEP' | 'REVISE'; finalArtifact: Artifact; finalConfidence: number },
+  { choice, finalArtifact, finalConfidence, secondsToFirstChange }: { choice: 'KEEP' | 'REVISE'; finalArtifact: Artifact; finalConfidence: number; secondsToFirstChange?: number | undefined },
   research?: ResearchSettings,
 ): Promise<SubmitResultDTO & { researchRowId?: string }> {
   const attempt = await loadAttempt(db, actor, attemptId);
@@ -232,7 +232,7 @@ export async function submitTask(
 
     const researchRowId =
       facts && research && participant?.consent === 'AGREED' && delivery
-        ? writeResearchRow(db, tx, { facts, participant, settings: research, slot, task, delivery, final, finalConfidence, choice: recordedChoice, changedElements, now: new Date() })
+        ? writeResearchRow(db, tx, { facts, participant, settings: research, slot, task, delivery, final, finalConfidence, choice: recordedChoice, changedElements, secondsToFirstChange, now: new Date() })
         : undefined;
 
     const next = SLOTS[SLOTS.indexOf(slot as (typeof SLOTS)[number]) + 1];

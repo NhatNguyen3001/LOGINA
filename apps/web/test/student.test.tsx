@@ -48,6 +48,11 @@ const render = (ui: React.ReactElement) =>
 
 const choose = (name: string) => fireEvent.click(screen.getByRole('radio', { name: new RegExp(name) }));
 
+const lockedAnswer = async () => {
+  fireEvent.click(await screen.findByRole('button', { name: 'See your locked answer' }));
+  return within(document.querySelector<HTMLElement>('.ans')!);
+};
+
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(api.getMe).mockResolvedValue(me);
@@ -159,55 +164,59 @@ describe('Q1 flow', () => {
     expect(api.lockTask).not.toHaveBeenCalled();
   });
 
-  it('Keep and Revise have identical classes', async () => {
+  it('the prompt sits on the task, with the first answer and first confidence in place', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
     await render(<TaskRunner />);
-    const keep = await screen.findByRole('button', { name: 'Keep my answer' });
-    expect(keep.className).toBe(screen.getByRole('button', { name: 'Revise answer' }).className);
+    expect(await screen.findByText('Your answer is unchanged. This will be recorded as Keep.')).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /First statement/ })).toBeChecked();
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '70');
+    expect(document.querySelectorAll('.knob')).toHaveLength(1);
+    expect(screen.queryByRole('button', { name: 'Keep my answer' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Back to your first answer' })).toBeDisabled();
   });
 
-  it('F-S5 Keep shows the locked answer and submits it', async () => {
+  it('F-S5 an unchanged answer submits as Keep, with no first change', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
     vi.mocked(api.submitTask).mockResolvedValue({ slot: 'Q1', recordedChoice: 'KEEP', nextSlot: 'Q2', attemptStatus: 'IN_PROGRESS' });
     await render(<TaskRunner />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Keep my answer' }));
-    expect(screen.getByText("You're keeping your answer")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Submit Q1' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Submit Q1' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/s/attempts/$id/$slot', params: { id: 'att1', slot: 'Q2' } }));
-    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 70 });
+    const sent = vi.mocked(api.submitTask).mock.calls[0]?.[2];
+    expect(sent).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 70 });
+    expect(sent).not.toHaveProperty('secondsToFirstChange');
   });
 
-  it('Keep starts the final confidence at the first confidence', async () => {
+  it('S4 a changed answer submits as Revise and marks the first answer', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
+    vi.mocked(api.submitTask).mockResolvedValue({ slot: 'Q1', recordedChoice: 'REVISE', nextSlot: 'Q2', attemptStatus: 'IN_PROGRESS' });
     await render(<TaskRunner />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Keep my answer' }));
-    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '70');
-  });
-
-  it('S4 marks new choices New and originals original', async () => {
-    vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
-    await render(<TaskRunner />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Revise answer' }));
+    await screen.findByRole('button', { name: 'Submit Q1' });
     choose('Second statement');
-    expect(screen.getByText('New')).toBeInTheDocument();
-    expect(screen.getAllByText('original').length).toBeGreaterThan(0);
+    expect(screen.getByText('You changed your answer. This will be recorded as Revise.')).toBeInTheDocument();
+    expect(screen.getByText('Your first answer')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit Q1' }));
+    await waitFor(() => expect(api.submitTask).toHaveBeenCalled());
+    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'REVISE', secondsToFirstChange: expect.any(Number) });
   });
 
-  it('S6 an unchanged revise says Keep, with one knob starting at the first confidence', async () => {
+  it('going back to the first answer says Keep again, and still reports the first change', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
+    vi.mocked(api.submitTask).mockResolvedValue({ slot: 'Q1', recordedChoice: 'KEEP', nextSlot: 'Q2', attemptStatus: 'IN_PROGRESS' });
     await render(<TaskRunner />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Revise answer' }));
-    expect(screen.getByText(/so it will be recorded as/)).toBeInTheDocument();
-    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '70');
-    expect(document.querySelectorAll('.knob')).toHaveLength(1);
+    await screen.findByRole('button', { name: 'Submit Q1' });
+    choose('Second statement');
+    fireEvent.click(screen.getByRole('button', { name: 'Back to your first answer' }));
+    expect(screen.getByText('Your answer is unchanged. This will be recorded as Keep.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit Q1' }));
+    await waitFor(() => expect(api.submitTask).toHaveBeenCalled());
+    expect(vi.mocked(api.submitTask).mock.calls[0]?.[2]).toMatchObject({ choice: 'KEEP', secondsToFirstChange: expect.any(Number) });
   });
 
   it('the last task goes to results', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(lockedTask());
     vi.mocked(api.submitTask).mockResolvedValue({ slot: 'Q1', recordedChoice: 'KEEP', attemptStatus: 'COMPLETE' });
     await render(<TaskRunner />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Keep my answer' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Submit Q1' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Submit Q1' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/s/attempts/$id/results', params: { id: 'att1' } }));
   });
 
@@ -264,7 +273,7 @@ describe('Q2 to Q5', () => {
     const initialArtifact = { slot: 'Q4', templateId: 't1', slots: [{ slotId: 'shown', choiceId: 's1' }, { slotId: 'missing', choiceId: 'm1' }] };
     vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q4', phase: 'CHALLENGED', stem: 'Reply', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
-    const sentence = (await screen.findByText('a fall')).closest('p')!;
+    const sentence = (await lockedAnswer()).getByText('a fall').closest('p')!;
     expect(sentence).toHaveTextContent('The source shows a fall, but not why.');
     expect(sentence.querySelectorAll('mark')).toHaveLength(2);
   });
@@ -273,9 +282,10 @@ describe('Q2 to Q5', () => {
     const initialArtifact = { slot: 'Q5', proposal: 'Open trade courses', reason: 'Many jobs need training' };
     vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q5', phase: 'CHALLENGED', stem: 'Propose', draftArtifact: null, taskBody: { instructions: 'Write', maxCharsPerField: 120 }, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
-    expect(await screen.findByText('Open trade courses')).toBeInTheDocument();
-    expect(screen.getByText('Many jobs need training')).toBeInTheDocument();
-    expect(screen.getByText('Your reason')).toBeInTheDocument();
+    const locked = await lockedAnswer();
+    expect(locked.getByText('Open trade courses')).toBeInTheDocument();
+    expect(locked.getByText('Many jobs need training')).toBeInTheDocument();
+    expect(locked.getByText('Your reason')).toBeInTheDocument();
   });
 
   it('Think again on Q2 lists the cards in the order the student locked', async () => {
@@ -283,8 +293,7 @@ describe('Q2 to Q5', () => {
     const initialArtifact = { slot: 'Q2', orderedCardIds: ['c3', 'c1', 'c2'] };
     vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q2', phase: 'CHALLENGED', stem: 'Rank them', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
-    await screen.findByText('Cities');
-    const ranked = screen.getByText('Cities').closest('ol')!;
+    const ranked = (await lockedAnswer()).getByText('Cities').closest('ol')!;
     expect([...ranked.querySelectorAll('li')].map((row) => row.textContent)).toEqual(['1Cities', '2Trade', '3Machines']);
   });
 
@@ -297,13 +306,13 @@ describe('Q2 to Q5', () => {
     const initialArtifact = { slot: 'Q3', comparisons: [{ criterionId: 'c1', value: 'o1' }, { criterionId: 'c2', value: 'o2' }], judgmentOptionId: 'o2', tradeOffIds: ['t2'] };
     vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q3', phase: 'CHALLENGED', stem: 'Which plan?', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
-    const answered = (question: string) => screen.getByText(question).parentElement!;
-    expect(await screen.findByText('Which costs less?')).toBeInTheDocument();
+    const locked = await lockedAnswer();
+    const answered = (question: string) => locked.getByText(question).parentElement!;
     expect(answered('Which costs less?')).toHaveTextContent('Plan A');
     expect(answered('Which is faster?')).toHaveTextContent('Plan B');
     expect(answered('Your decision')).toHaveTextContent('Plan B');
     expect(answered('What drawbacks do you accept?')).toHaveTextContent('Dearer');
-    expect(screen.queryByText('Slower')).toBeNull();
+    expect(locked.queryByText('Slower')).toBeNull();
   });
 
   it('Q4 shows only the slots of the chosen template', async () => {

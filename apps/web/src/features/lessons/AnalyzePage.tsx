@@ -15,6 +15,39 @@ import { useSecondsSince } from '@/lib/use-seconds-since';
 
 const FAILED: JobDTO['status'][] = ['FAILED', 'TIMED_OUT'];
 
+type Thought = NonNullable<JobDTO['trace']>[number];
+
+const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+
+/** The model's own words, so they stay in English on a Vietnamese screen. */
+function Thoughts({ thoughts }: { thoughts: Thought[] }) {
+  return (
+    <ol className="thoughts" lang="en">
+      {thoughts.map(({ at, title, text }) => (
+        <li key={`${at}-${title}`}>
+          <time className="num">{clock(at)}</time>
+          <div>
+            {title ? <b>{title}</b> : null}
+            {text}
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function StepThoughts({ step }: { step: JobDTO['steps'][number] & { thoughts: Thought[] } }) {
+  const { t } = useTranslation();
+  if (step.thoughts.length === 0) return null;
+  if (step.status !== 'DONE') return <Thoughts thoughts={step.thoughts} />;
+  return (
+    <details className="thoughts-fold">
+      <summary className="lnk">{t('teacher.t02.showThoughts', { count: step.thoughts.length })}</summary>
+      <Thoughts thoughts={step.thoughts} />
+    </details>
+  );
+}
+
 function StepIcon({ status }: { status: JobDTO['steps'][number]['status'] }) {
   const { t } = useTranslation();
   if (status === 'DONE') return <span className="ok">{'✓'}</span>;
@@ -112,9 +145,12 @@ export function AnalyzePage() {
         </div>
         <div className="stack">
           {steps.map((step) => (
-            <div key={step.label} className="row">
+            <div key={step.label} className="row top">
               <StepIcon status={step.status} />
-              <span className="m">{t(`teacher.job.${step.label}`, { defaultValue: step.label })}</span>
+              <div className="grow stack step-body">
+                <span className="m">{t(`teacher.job.${step.label}`, { defaultValue: step.label })}</span>
+                <StepThoughts step={{ ...step, thoughts: job.data?.trace?.filter((thought) => thought.step === step.label) ?? [] }} />
+              </div>
             </div>
           ))}
         </div>

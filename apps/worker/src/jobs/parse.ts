@@ -21,6 +21,30 @@ type Locale = 'en' | 'vi';
 
 const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** The sample calls no AI, so its wait screen replays these. In English, like the model's own thinking. */
+const SAMPLE_THOUGHTS: Record<string, string[]> = {
+  read: [
+    '**Reading the sample pages**\n\nI am going through both pages in order and keeping each paragraph exactly as printed.',
+    '**Recording the table**\n\nTable 8.1 gives the labor shares by sector, so I am keeping its rows and figures together.',
+  ],
+  claims: [
+    '**Comparing the sectors**\n\nThe share in agriculture, forestry and fisheries falls while industry, construction and services rise, so I am recording each change as its own claim.',
+    '**Checking the quotes**\n\nEach claim needs a quote copied word for word from the source, so I am matching them to their paragraphs.',
+  ],
+  issues: [
+    '**Looking for gaps**\n\nThe table gives shares but no totals, so the text cannot show how many people moved between sectors.',
+    '**Marking what needs a teacher**\n\nSome wording reads as an opinion about the shift, so I am flagging it for you to decide.',
+  ],
+};
+
+async function replayThoughts(context: JobContext, step: string): Promise<void> {
+  const thoughts = SAMPLE_THOUGHTS[step] ?? [];
+  for (const thought of thoughts) {
+    await context.thought(step, thought);
+    await delay(context.deps.config.stepDelayMs / thoughts.length);
+  }
+}
+
 /** Doc IDs can't hold every locator as is, but `pN-K` and `table 8.1` are both safe. */
 const writeAll = async (context: JobContext, collection: string, docs: ({ id: string } & object)[]): Promise<void> => {
   const { db } = context.deps;
@@ -36,19 +60,19 @@ async function seededParse(context: JobContext): Promise<void> {
   const materialVersionId = lesson.currentMaterialVersionId as string;
 
   await context.step('read', async () => {
-    await delay(deps.config.stepDelayMs);
+    await replayThoughts(context, 'read');
     await writeAll(context, 'sourceUnits', source.units.map((unit) => ({ ...unit, materialVersionId, readBy: 'SEEDED' })));
     await deps.db.doc(`lessons/${lesson.id}/materialVersions/${materialVersionId}`).update({ parseStatus: 'DONE' });
   });
   await context.step('claims', async () => {
-    await delay(deps.config.stepDelayMs);
+    await replayThoughts(context, 'claims');
     await writeAll(context, 'sourceEvidence', source.evidence.map((e) => ({ ...e, materialVersionId, verificationStatus: 'VERIFIED' })));
     await writeAll(context, 'sourceClaims', source.claims);
     await writeAll(context, 'claimEvidenceRelations', source.relations);
     await deps.db.doc(`lessons/${lesson.id}/teacherIntentVersions/${lesson.currentIntentVersionId as string}`).set(source.intent, { merge: true });
   });
   await context.step('issues', async () => {
-    await delay(deps.config.stepDelayMs);
+    await replayThoughts(context, 'issues');
     const issues = deps.loadFixture('issues', locale) as IssuesFixture;
     await writeAll(context, 'clarificationIssues', issues.map((issue) => ({ ...issue, version: 1 })));
   });
@@ -82,6 +106,7 @@ async function liveRead(context: JobContext, material: FirebaseFirestore.Documen
   const reading = await generateStructured(genai, config, {
     role: 'reader',
     schema: ReaderOutput,
+    thinking: 'LOW',
     ...(text
       ? { text }
       : { files: [{ gcsUri: `gs://${config.materialsBucket}/${storagePath}`, mimeType: material.mimeType as string }] }),
@@ -121,6 +146,8 @@ async function liveAnalyze(context: JobContext, locale: Locale): Promise<void> {
   const analysis = await generateStructured(genai, config, {
     role: 'analyzer',
     schema: AnalyzerOutput,
+    thinking: 'HIGH',
+    onThought: (text) => context.thought('claims', text),
     variables: { locale },
     text: units.map((unit) => `[${unit.locator}] ${unit.text}`).join('\n'),
   });

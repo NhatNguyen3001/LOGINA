@@ -2,6 +2,7 @@ export interface WorkerConfig {
   seededAi: boolean;
   liveAi: boolean;
   readerModel: string;
+  analyzerModel: string;
   generatorModel: string;
   xreasonModel: string;
   translatorModel: string;
@@ -18,7 +19,8 @@ type Env = Record<string, string | undefined>;
 export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
   seededAi: env.SEEDED_AI === 'true',
   liveAi: env.LIVE_AI === 'true',
-  readerModel: env.READER_MODEL ?? 'gemini-4-argon',
+  readerModel: env.READER_MODEL ?? 'gemini-3.8-flash',
+  analyzerModel: env.ANALYZER_MODEL ?? 'gemini-3.8-flash',
   generatorModel: env.GENERATOR_MODEL ?? 'gemini-4-argon',
   xreasonModel: env.XREASON_MODEL ?? 'gemini-4-argon',
   translatorModel: env.TRANSLATOR_MODEL ?? 'gemini-4-argon',

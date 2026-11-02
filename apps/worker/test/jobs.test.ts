@@ -82,6 +82,14 @@ describe('seeded PARSE', () => {
     expect(await lesson(lessonId)).toMatchObject({ stage: 'CLARIFY' });
   });
 
+  it('replays sample thoughts under their steps, with no AI call', async () => {
+    const lessonId = await seedLesson();
+    const id = await seedJob(lessonId, 'PARSE');
+    await worker().runJob(id);
+    const { trace } = (await live.db.doc(`jobs/${id}`).get()).data()!;
+    expect([...new Set(trace.map((thought: { step: string }) => thought.step))]).toEqual(['read', 'claims', 'issues']);
+  });
+
   it('terminal job status clears lesson activeJobId', async () => {
     const lessonId = await seedLesson();
     await worker().runJob(await seedJob(lessonId, 'PARSE'));

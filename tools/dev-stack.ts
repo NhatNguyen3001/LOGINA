@@ -15,7 +15,7 @@ const env = {
   NO_SIGN_IN: 'true',
   DEMO_MODE: 'true',
   SEEDED_AI: 'true',
-  SEEDED_STEP_DELAY_MS: '0',
+  SEEDED_STEP_DELAY_MS: process.env.SEEDED_STEP_DELAY_MS ?? '0',
   RESEARCH_ENABLED: process.env.RESEARCH_ENABLED ?? 'false',
   FIRESTORE_DATABASE_ID: process.env.FIRESTORE_DATABASE_ID ?? 'logina-test',
   MATERIALS_BUCKET: process.env.MATERIALS_BUCKET ?? 'logina-dev-test',

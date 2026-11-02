@@ -142,6 +142,16 @@ describe('T2', () => {
     expect(screen.getByRole('img', { name: 'Running' })).toBeInTheDocument();
   });
 
+  it('shows thoughts with their time under the running step, and folds them when it finishes', async () => {
+    const trace = [{ step: 'One', at: 12, title: 'Reading', text: 'Page one.' }, { step: 'Three', at: 75, title: 'Comparing', text: 'The shares add up.' }];
+    vi.mocked(api.getJob).mockResolvedValue(job({ trace }));
+    await render(<AnalyzePage />);
+    expect(await screen.findByText('Comparing')).toBeVisible();
+    expect(screen.getByText('1:15')).toBeInTheDocument();
+    expect(screen.getByText('Show 1 thought')).toBeInTheDocument();
+    expect(screen.getByText('Reading').closest('details')).not.toHaveAttribute('open');
+  });
+
   it('Stop analysis cancels and returns to T1', async () => {
     vi.mocked(api.getJob).mockResolvedValue(job({}));
     vi.mocked(api.cancelJob).mockResolvedValue(job({ status: 'CANCELLED' }));

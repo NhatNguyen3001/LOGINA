@@ -7,12 +7,16 @@ import { JobFailure } from '../errors.js';
 
 export type Role = 'reader' | 'analyzer' | 'generator' | 'xreason' | 'translator' | 'translationCheck';
 export type Part = { text: string } | { fileData: { fileUri: string; mimeType: string } };
+export type Thinking = 'LOW' | 'HIGH';
+export type ThoughtHandler = (text: string) => Promise<void>;
 
 export interface GenerateRequest {
   role: Role;
   model: string;
   parts: Part[];
   responseSchema: unknown;
+  thinking?: Thinking;
+  onThought?: ThoughtHandler;
 }
 
 /** Injected so tests never reach Vertex AI. */
@@ -26,10 +30,12 @@ export interface StructuredRequest<S extends z.ZodType> {
   variables?: Record<string, string>;
   files?: { gcsUri: string; mimeType: string }[];
   text?: string;
+  thinking?: Thinking;
+  onThought?: ThoughtHandler;
 }
 
 export const modelFor = (role: Role, config: WorkerConfig): string =>
-  ({ reader: config.readerModel, generator: config.generatorModel, analyzer: config.xreasonModel, xreason: config.xreasonModel, translator: config.translatorModel, translationCheck: config.xreasonModel })[role];
+  ({ reader: config.readerModel, generator: config.generatorModel, analyzer: config.analyzerModel, xreason: config.xreasonModel, translator: config.translatorModel, translationCheck: config.xreasonModel })[role];
 
 export const validatorVersion = (role: Role, config: WorkerConfig, seeded: boolean): string =>
   `${role}@${config.version}+${seeded ? 'seeded' : modelFor(role, config)}`;
@@ -65,14 +71,14 @@ function loadPrompt(role: Role, variables: Record<string, string>): string {
 export async function generateStructured<S extends z.ZodType>(
   genai: GenaiClient,
   config: WorkerConfig,
-  { role, schema, variables = {}, files = [], text }: StructuredRequest<S>,
+  { role, schema, variables = {}, files = [], text, thinking, onThought }: StructuredRequest<S>,
 ): Promise<z.infer<S>> {
   const parts: Part[] = [
     { text: loadPrompt(role, variables) },
     ...files.map(({ gcsUri, mimeType }) => ({ fileData: { fileUri: gcsUri, mimeType } })),
     ...(text ? [{ text }] : []),
   ];
-  const request: GenerateRequest = { role, model: modelFor(role, config), parts, responseSchema: z.toJSONSchema(schema) };
+  const request: GenerateRequest = { role, model: modelFor(role, config), parts, responseSchema: z.toJSONSchema(schema), ...(thinking ? { thinking } : {}), ...(onThought ? { onThought } : {}) };
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     if (attempt > 0) await pause(config.aiRetryDelayMs);

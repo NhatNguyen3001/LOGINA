@@ -1,6 +1,6 @@
 import type { DocumentData, Firestore } from 'firebase-admin/firestore';
 import { FieldValue } from 'firebase-admin/firestore';
-import type { FixtureName } from '@logina/domain';
+import { parseThought, type FixtureName } from '@logina/domain';
 import { resolveAiMode, type AiPath } from './ai/mode.js';
 import type { GenaiClient } from './ai/model.js';
 import type { WorkerConfig } from './config.js';
@@ -28,10 +28,13 @@ export interface JobContext {
   step: <T>(label: string, work: () => Promise<T>) => Promise<T>;
   /** Tasks run at the same time, so a long step checks again between its AI calls. */
   checkpoint: () => Promise<void>;
+  /** Saves what the model is thinking for the teacher's wait screen. A failed save never stops the job. */
+  thought: (step: string, text: string) => Promise<void>;
 }
 
 const RUNNABLE = ['QUEUED', 'RUNNING'];
 const LIVE_REFUSABLE = ['PARSE', 'ANALYZE'];
+const MAX_THOUGHTS = 100;
 
 export function createWorker(deps: WorkerDeps) {
   const { db, config } = deps;
@@ -68,10 +71,18 @@ export function createWorker(deps: WorkerDeps) {
       return result;
     };
 
+    let thoughts = 0;
+    const thought: JobContext['thought'] = async (stepLabel, text) => {
+      if (thoughts >= MAX_THOUGHTS) return;
+      thoughts += 1;
+      const entry = { step: stepLabel, at: Math.round((Date.now() - startedAt) / 1000), ...parseThought(text) };
+      await jobRef.update({ trace: FieldValue.arrayUnion(entry) }).catch((error: unknown) => console.warn(error));
+    };
+
     try {
       const mode = resolveAiMode({ aiMode: lesson.aiMode as string }, config);
       if (mode === 'LIVE_DISABLED' && LIVE_REFUSABLE.includes(job.type as string)) throw new JobFailure('LIVE_DISABLED');
-      const context: JobContext = { deps, jobId, job, lesson: { id: lessonRef.id, ...lesson }, mode, step, checkpoint };
+      const context: JobContext = { deps, jobId, job, lesson: { id: lessonRef.id, ...lesson }, mode, step, checkpoint, thought };
 
       if (job.type === 'PARSE') await runParse(context);
       else if (job.type === 'GENERATE') await runGenerate(context);

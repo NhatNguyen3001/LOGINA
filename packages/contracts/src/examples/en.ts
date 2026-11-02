@@ -949,7 +949,7 @@ export const examples = {
     uiLocale: 'en',
     demoMenu: true,
     consentRequired: false,
-    currentConsentVersion: '2026-10-v1',
+    currentConsentVersion: '2026-11-v1',
     participantCode: 'P-7K2M',
   },
 

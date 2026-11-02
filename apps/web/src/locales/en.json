@@ -57,7 +57,9 @@
       "needChoice": "Your choice needed",
       "failed": "The analysis didn't finish.",
       "notAnalyzed": "This lesson hasn't been analyzed",
-      "notAnalyzedNote": "The analysis was stopped or didn't finish. You can start it again."
+      "notAnalyzedNote": "The analysis was stopped or didn't finish. You can start it again.",
+      "showThoughts_one": "Show {{count}} thought",
+      "showThoughts": "Show {{count}} thoughts"
     },
     "t05": {
       "readByAiNotice": "LOGINA read this file with AI. Check the quoted text and figures against your original before approving.",
@@ -528,8 +530,7 @@
     "resetDoneBody": "You're back at the start."
   },
   "student": {
-    "new": "New",
-    "original": "original",
+    "original": "Your first answer",
     "confidence": {
       "low": "0 · Not sure",
       "high": "Very sure · 100",
@@ -543,8 +544,7 @@
       "Q5": "Q5 Proposal"
     },
     "phase": {
-      "think": "Think again",
-      "final": "Final answer",
+      "think": "Think again and final answer",
       "answer": "Answer on your own",
       "lock": "Lock in"
     },
@@ -590,27 +590,19 @@
       "back": "← Back"
     },
     "think": {
-      "locked": "YOUR LOCKED-IN ANSWER",
+      "showLocked": "See your locked answer",
+      "restore": "Back to your first answer",
       "statement": "Statement",
       "card": "Evidence card",
       "answer": "Answer",
-      "stays": "This stays unchanged so you can compare it with your final answer.",
       "title": "Think again",
-      "note": "This prompt helps you check again. It does not tell you whether your answer is right or wrong.",
-      "question": "Do you want to keep your answer or revise it?"
+      "note": "This prompt helps you check again. It does not tell you whether your answer is right or wrong."
     },
     "keep": "Keep my answer",
     "revise": "Revise answer",
     "final": {
-      "keepTitle": "You're keeping your answer",
-      "readOnly": "Read-only",
-      "unchanged": "Unchanged",
-      "changeMind": "Changed your mind? Revise answer",
-      "confidenceNote": "A change in confidence is recorded separately and does not count as revising your answer.",
-      "reviseTitle": "Revise your answer",
-      "confidence": "Final confidence",
-      "sameAsFirst": "Your answer hasn't changed from your first answer, so it will be recorded as Keep.",
-      "onlyRevision": "This is your only revision for {{slot}}; after you submit, you move on."
+      "willKeep": "Your answer is unchanged. This will be recorded as Keep.",
+      "willRevise": "You changed your answer. This will be recorded as Revise."
     },
     "submit": "Submit {{slot}}",
     "q2": {
@@ -701,7 +693,7 @@
     "aboutTitle": "What the study is about",
     "about": "We want to understand how people think again about their answers and their confidence after a short prompt.",
     "recordTitle": "What we record",
-    "record": "We record your choices before and after the prompt, your confidence, when you lock in and submit, and what you write in Q5.",
+    "record": "We record your choices before and after the prompt, your confidence, when you lock in, when you first change your answer, when you submit, and what you write in Q5.",
     "namesTitle": "No names",
     "names": "We don't ask for your name or email. Please don't type personal details in your written answer.",
     "dataTitle": "Where the data goes",
