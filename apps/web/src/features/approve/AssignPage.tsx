@@ -7,8 +7,9 @@ import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
-import { assignLesson, getApproval, getClass, getLesson, newKey } from '@/lib/api';
+import { assignLesson, getApproval, getLesson, newKey } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { useSamplePrefill } from '@/lib/sample-prefill';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { cardVariants } from '@/components/ui/card';
@@ -23,12 +24,13 @@ export function AssignPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [dueAt, setDueAt] = useState('');
-  const [message, setMessage] = useState('');
+  const sampleMessage = useSamplePrefill(id)?.messageToStudents;
+  const [typed, setMessage] = useState<string | null>(null);
+  const message = typed ?? sampleMessage ?? '';
   const key = useRef(newKey());
   const lesson = useQuery({ queryKey: qk.lesson(id), queryFn: () => getLesson(id) });
   const approval = useQuery({ queryKey: qk.approval(id), queryFn: () => getApproval(id) });
   const classId = lesson.data?.primaryClassId;
-  const classInfo = useQuery({ queryKey: qk.class(classId ?? 'none'), queryFn: () => getClass(classId!), enabled: Boolean(classId) });
 
   const assign = useMutation({
     mutationFn: () =>
@@ -64,10 +66,6 @@ export function AssignPage() {
       <p className="lede">{t('teacher.t13.lede')}</p>
       <div className="cols">
         <div className={cardVariants()}>
-          <div className="field">
-            <span className="b">{t('teacher.t01.class')}</span>
-            <span>{classInfo.data?.name ?? t('common.loading')}</span>
-          </div>
           <div className="field">
             <label htmlFor="due">{t('teacher.t13.due')}</label>
             <Input id="due" type="datetime-local" className="num" value={dueAt} onChange={(event) => setDueAt(event.target.value)} />

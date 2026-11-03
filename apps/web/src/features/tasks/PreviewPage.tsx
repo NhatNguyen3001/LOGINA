@@ -4,6 +4,7 @@ import { Link, useParams } from '@tanstack/react-router';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { promptName } from '@/lib/prompt-name';
 import { EditorShell } from '@/components/logina/EditorShell';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
@@ -11,6 +12,7 @@ import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { SwitchSide } from '@/components/logina/SwitchSide';
 import { ApiError, getChallenges, getLesson, getPreview, getTasks, newKey, rerunTask, sendEdit, tryCase } from '@/lib/api';
+import { useSamplePrefill } from '@/lib/sample-prefill';
 import { qk, useJobPolling } from '@/lib/query';
 import { TaskStatusTag } from './task-status';
 import { Textarea } from '@/components/ui/textarea';
@@ -43,7 +45,10 @@ function Gates({ gates }: { gates: TeacherTaskPreviewDTO['gates'] }) {
 function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, onClose }: { lessonId: string; draftId: string; draftVersion: number; challengeId: string; message: string; onClose: () => void }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [value, setValue] = useState(message);
+  /** The sample's blocked prompt starts with the scripted fix; typing replaces it. */
+  const sampleText = useSamplePrefill(lessonId)?.promptText[challengeId];
+  const [typed, setValue] = useState<string | null>(null);
+  const value = typed ?? sampleText ?? message;
   const save = useMutation({
     mutationFn: () => sendEdit(lessonId, { editScope: 'LOGIC', targetType: 'challenge', targetId: draftId, changedRefs: [challengeId], baseVersion: draftVersion, payload: { challengeId, message: value } }, newKey()),
     onSuccess: async () => {
@@ -53,7 +58,7 @@ function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, o
   });
   return (
     <div className="stack">
-      <label className="s13 b" htmlFor={`prompt-${challengeId}`}>{t('teacher.t07.editPrompt', { label: challengeId })}</label>
+      <label className="s13 b" htmlFor={`prompt-${challengeId}`}>{t('teacher.t07.editPrompt', { label: promptName(challengeId, t) })}</label>
       <Textarea id={`prompt-${challengeId}`} value={value} onChange={(event) => setValue(event.target.value)} />
       {save.isError ? <Note kind="err">{t(errorText(save.error))}</Note> : null}
       <div className="row">
@@ -78,10 +83,10 @@ function AllPrompts({ lessonId, slot, draftId, draftVersion, status }: { lessonI
         ? list.data?.challenges.map((challenge) => (
             <div key={challenge.challengeId} className={`cand ${challenge.isFallback ? 'fb' : ''}`}>
               <div className="row">
-                <Badge kind="info">{challenge.label}</Badge>
+                <Badge kind="info">{promptName(challenge.label, t)}</Badge>
                 <span className="s13 b">{challenge.purpose}</span>
                 <span className="sp" />
-                {blocked && !challenge.isFallback ? <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => setEditing(challenge.challengeId)}>{t('teacher.t07.editPrompt', { label: challenge.label })}</button> : null}
+                {blocked && !challenge.isFallback ? <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => setEditing(challenge.challengeId)}>{t('teacher.t07.editPrompt', { label: promptName(challenge.label, t) })}</button> : null}
               </div>
               {editing === challenge.challengeId ? (
                 <PromptEditor lessonId={lessonId} draftId={draftId} draftVersion={draftVersion} challengeId={challenge.challengeId} message={challenge.message} onClose={() => setEditing(null)} />
@@ -155,7 +160,7 @@ function TryCase({ lessonId, slot, preview }: { lessonId: string; slot: Slot; pr
         <div className="well stack">
           <div className="row">
             <span className="s13 sec">{t('teacher.t07.willGet')}</span>
-            <Badge kind="info">{run.data.wouldReceive.label}</Badge>
+            <Badge kind="info">{promptName(run.data.wouldReceive.label, t)}</Badge>
             <span className="s13 b">{run.data.wouldReceive.purpose}</span>
           </div>
           <p className="s15 m">{run.data.wouldReceive.message}</p>
@@ -169,7 +174,10 @@ function TryCase({ lessonId, slot, preview }: { lessonId: string; slot: Slot; pr
 function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: string; preview: TeacherTaskPreviewDTO; optionId: string; text: string; onClose: () => void }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [value, setValue] = useState(text);
+  /** The sample's A4 starts with the scripted rewording; typing replaces it. */
+  const sampleText = useSamplePrefill(lessonId)?.optionText[optionId];
+  const [typed, setValue] = useState<string | null>(null);
+  const value = typed ?? sampleText ?? text;
   const key = useRef(newKey());
 
   const save = useMutation({
@@ -390,7 +398,7 @@ export function PreviewPage() {
           {data.exampleChallenges.map((challenge) => (
             <div key={challenge.label} className="cand">
               <div className="row">
-                <Badge kind="info">{challenge.label}</Badge>
+                <Badge kind="info">{promptName(challenge.label, t)}</Badge>
                 <span className="s13 b">{challenge.purpose}</span>
                 <span className="sp" />
                 <span className="small muted">{challenge.whenShown}</span>

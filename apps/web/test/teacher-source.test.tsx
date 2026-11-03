@@ -72,53 +72,73 @@ beforeEach(() => {
   vi.mocked(api.registerMaterial).mockResolvedValue({ materialVersionId: 'm', aiMode: 'SEEDED' });
   vi.mocked(api.startAnalyze).mockResolvedValue({ id: 'j' } as JobDTO);
   vi.mocked(api.getSourceReview).mockResolvedValue(review());
+  vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', aiMode: 'LIVE', contentLocale: 'en' } as LessonDTO);
 });
 
 describe('T1', () => {
   it('a missing title shows an error under the field', async () => {
     await render(<CreateLesson sampleAllowed />);
-    await screen.findByText('12A3');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Analyze material' })).toBeEnabled());
     fireEvent.click(screen.getByRole('button', { name: 'Analyze material' }));
     expect((await screen.findAllByText('This field is required.')).length).toBeGreaterThan(0);
     expect(api.createLesson).not.toHaveBeenCalled();
   });
 
-  it('shows the fixed Q1 to Q5 structure read-only, and the class name', async () => {
+  it('shows the fixed Q1 to Q5 structure read-only, and no class name', async () => {
     await render(<CreateLesson />);
-    expect(await screen.findByText('12A3')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Analyze material' })).toBeEnabled());
+    expect(screen.queryByText('12A3')).toBeNull();
     expect(screen.getByText('Q4 · Counterargument')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /add|remove/i })).toBeNull();
   });
 
   it('the language defaults to the interface language and is sent as contentLocale', async () => {
     await render(<CreateLesson sampleAllowed />, 'vi');
-    await screen.findByText('12A3');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Phân tích học liệu' })).toBeEnabled());
     expect(screen.getByRole('combobox', { name: /Ngôn ngữ học liệu/ })).toHaveTextContent('tiếng Việt');
   });
 
   it('the Create lesson dropdowns open, pick with the keyboard and keep their label', async () => {
     await render(<CreateLesson sampleAllowed />);
-    await screen.findByText('12A3');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Analyze material' })).toBeEnabled());
     const language = screen.getByRole('combobox', { name: /Material language/ });
     expect(language).toHaveAttribute('data-slot', 'select-trigger');
     fireEvent.keyDown(language, { key: 'Enter' });
     fireEvent.keyDown(await screen.findByRole('option', { name: 'Vietnamese' }), { key: 'Enter' });
     expect(language).toHaveTextContent('Vietnamese');
-    fireEvent.click(screen.getByRole('button', { name: 'Use sample material' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Use sample material (pre-filled)' }));
     fillForm();
     fireEvent.click(screen.getByRole('button', { name: 'Analyze material' }));
     await waitFor(() => expect(api.createLesson).toHaveBeenCalledWith(expect.objectContaining({ contentLocale: 'vi' }), expect.any(String)));
   });
 
+  it('Use sample material fills every field from the sample, in the chosen material language', async () => {
+    await render(<CreateLesson sampleAllowed />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Analyze material' })).toBeEnabled());
+    fireEvent.click(screen.getByRole('button', { name: 'Use sample material (pre-filled)' }));
+    expect(screen.getByLabelText(/Source title/)).toHaveValue('Sample material · Labor and Employment');
+    expect(screen.getByLabelText(/Lesson set title/)).toHaveValue('Lesson 8: Labor and employment');
+    expect(screen.getByLabelText(/Subject/)).toHaveValue('Geography');
+    expect(screen.getByLabelText(/Topic/)).toHaveValue('Labor and employment');
+    expect(screen.getByLabelText(/Reasoning goal/)).toHaveValue('Students judge whether a statement about the shift in employment structure is fully supported by evidence.');
+    expect(screen.getByText(/Every step is pre-filled/)).toBeInTheDocument();
+    const language = screen.getByRole('combobox', { name: /Material language/ });
+    fireEvent.keyDown(language, { key: 'Enter' });
+    fireEvent.keyDown(await screen.findByRole('option', { name: 'Vietnamese' }), { key: 'Enter' });
+    expect(screen.getByLabelText(/Lesson set title/)).toHaveValue('Bài 8: Lao động và việc làm');
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze material' }));
+    await waitFor(() => expect(api.createLesson).toHaveBeenCalledWith(expect.objectContaining({ title: 'Bài 8: Lao động và việc làm', contentLocale: 'vi' }), expect.any(String)));
+  });
+
   it('Use sample material appears only in demo mode', async () => {
     await render(<CreateLesson sampleAllowed={false} />);
-    expect(screen.queryByRole('button', { name: 'Use sample material' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Use sample material (pre-filled)' })).toBeNull();
   });
 
   it('Use sample material sends sample true, skips the upload and goes to analyze', async () => {
     await render(<CreateLesson sampleAllowed />);
-    await screen.findByText('12A3');
-    fireEvent.click(screen.getByRole('button', { name: 'Use sample material' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Analyze material' })).toBeEnabled());
+    fireEvent.click(screen.getByRole('button', { name: 'Use sample material (pre-filled)' }));
     fillForm();
     fireEvent.click(screen.getByRole('button', { name: 'Analyze material' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/t/lessons/$id/analyze', params: { id: 'l1' } }));
@@ -129,8 +149,8 @@ describe('T1', () => {
   it('a refusal keeps the inputs, explains why, and does not create a second lesson', async () => {
     vi.mocked(api.registerMaterial).mockRejectedValueOnce(new api.ApiError(422, 'TOO_MANY_PAGES'));
     await render(<CreateLesson sampleAllowed />);
-    await screen.findByText('12A3');
-    fireEvent.click(screen.getByRole('button', { name: 'Use sample material' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Analyze material' })).toBeEnabled());
+    fireEvent.click(screen.getByRole('button', { name: 'Use sample material (pre-filled)' }));
     fillForm();
     fireEvent.click(screen.getByRole('button', { name: 'Analyze material' }));
     expect(await screen.findByText(/longer than 10 pages/)).toBeInTheDocument();
@@ -222,6 +242,21 @@ describe('a lesson with no job', () => {
 });
 
 describe('T3 and T4', () => {
+  it('on the sample lesson, point 1 opens Keep open with the sample bounds and reason filled in', async () => {
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', aiMode: 'SEEDED', contentLocale: 'en' } as LessonDTO);
+    await render(<ClarifyPage />);
+    expect(await screen.findByDisplayValue('Shares only')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('The table gives no totals')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(api.resolveIssue).toHaveBeenCalledWith('l1', 'iss1', expect.objectContaining({ action: 'KEEP_OPEN', keepOpenBounds: 'Shares only' }), expect.any(String)));
+  });
+
+  it('an uploaded lesson starts every point empty', async () => {
+    await render(<ClarifyPage />);
+    await screen.findByText('Bubble iss1');
+    expect(screen.queryByDisplayValue('Shares only')).toBeNull();
+  });
+
   it('Clarify suggestions are a radio group that the arrow keys move through', async () => {
     vi.mocked(api.getSourceReview).mockResolvedValue(review({ issues: [issue('iss1', { suggestions: [{ id: 'sug1', text: 'A suggestion', sourceRef: 'p. 8' }, { id: 'sug2', text: 'Another', sourceRef: 'p. 9' }] })] }));
     await render(<ClarifyPage />);

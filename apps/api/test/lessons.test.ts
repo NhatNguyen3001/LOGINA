@@ -255,3 +255,49 @@ describe('jobs', () => {
     expect((await a.post(`/jobs/${id}/answer`, { choice: 'KEEP_CHOSEN' })).status).toBe(409);
   });
 });
+
+describe('deleting a lesson', () => {
+  const del = (client: Client, lessonId: string) => client.post(`/lessons/${lessonId}/delete`, {});
+
+  it('removes the lesson, its uploaded file, its jobs, assignments and attempts, and nothing else', async () => {
+    const lesson = await newLesson(a);
+    const kept = await newLesson(a);
+    const { schoolId } = a.workspace;
+    const { db } = h.live;
+    const path = `uploads/${lesson.id}/${randomUUID()}.pdf`;
+    await h.live.bucket.file(path).save(Buffer.from('%PDF'));
+    await db.doc(`lessons/${lesson.id}/materialVersions/mv1`).set({ storagePath: path });
+    const own = { schoolId, lessonId: lesson.id };
+    await Promise.all([
+      db.doc(`jobs/job_del_${lesson.id}`).set(own),
+      db.doc(`assignments/asg_del_${lesson.id}`).set(own),
+      db.doc(`attempts/att_del_${lesson.id}`).set({ ...own, assignmentId: `asg_del_${lesson.id}` }),
+      db.doc(`assignments/asg_keep_${kept.id}`).set({ schoolId, lessonId: kept.id }),
+    ]);
+
+    const response = await del(a, lesson.id);
+    expect(response.status).toBe(200);
+    expect((await a.get(`/lessons/${lesson.id}`)).status).toBe(404);
+    const list = (await (await a.get('/lessons')).json()) as { lessons: { id: string }[] };
+    expect(list.lessons.map((l) => l.id)).not.toContain(lesson.id);
+    expect(list.lessons.map((l) => l.id)).toContain(kept.id);
+    for (const doc of [`jobs/job_del_${lesson.id}`, `assignments/asg_del_${lesson.id}`, `attempts/att_del_${lesson.id}`]) expect((await db.doc(doc).get()).exists, doc).toBe(false);
+    expect((await db.doc(`assignments/asg_keep_${kept.id}`).get()).exists).toBe(true);
+    expect((await h.live.bucket.file(path).exists())[0]).toBe(false);
+  });
+
+  it('another workspace cannot delete it', async () => {
+    const lesson = await newLesson(a);
+    expect((await del(b, lesson.id)).status).toBe(404);
+    expect((await a.get(`/lessons/${lesson.id}`)).status).toBe(200);
+  });
+
+  it('a lesson with a running job is not deleted, so the worker never writes into a removed lesson', async () => {
+    const lesson = await newLesson(a);
+    await h.live.db.doc(`lessons/${lesson.id}`).update({ activeJobId: 'job_running' });
+    const response = await del(a, lesson.id);
+    expect(response.status).toBe(409);
+    expect(((await response.json()) as { code: string }).code).toBe('JOB_RUNNING');
+    expect((await a.get(`/lessons/${lesson.id}`)).status).toBe(200);
+  });
+});

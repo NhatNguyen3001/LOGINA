@@ -63,4 +63,10 @@ describe('final review fixes', () => {
       expect(src(file), file).toMatch(/alertVariants/);
     }
   });
+
+  it('links styled as buttons get the hover too, since a link is never :enabled', () => {
+    expect(src('components/ui/button.tsx')).not.toMatch(/enabled:hover:/);
+    expect(src('components/ui/button.tsx')).toMatch(/not-disabled:hover:bg-subtle/);
+    expect(src('components/logina/BackLink.tsx')).toMatch(/motion-safe:group-hover:-translate-x-0.5/);
+  });
 });

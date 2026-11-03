@@ -18,9 +18,9 @@
       "lede": "LOGINA đọc học liệu trước, hỏi cô những điểm chưa rõ, rồi mới soạn 5 nhiệm vụ. Cô duyệt nguồn một lần và duyệt nhiệm vụ một lần trước khi giao.",
       "material": "1. Học liệu",
       "chooseFile": "Chọn tệp",
-      "useSample": "Dùng học liệu mẫu",
+      "useSample": "Dùng học liệu mẫu (điền sẵn)",
       "fileHint": "PDF hoặc Word · tối đa 20 MB",
-      "sampleChosen": "Đã chọn học liệu mẫu",
+      "sampleChosen": "Đã chọn học liệu mẫu. Mọi bước đã được điền sẵn câu trả lời mẫu, bạn chỉ cần xem lại và tiếp tục.",
       "sourceTitle": "Tên nguồn",
       "required": "(bắt buộc)",
       "requiredError": "Cô hãy điền mục này.",
@@ -30,7 +30,6 @@
       "goal": "Mục tiêu suy luận",
       "lessonInfo": "3. Bài học",
       "lessonTitle": "Tên bộ bài",
-      "class": "Lớp",
       "subject": "Môn",
       "topic": "Chủ đề",
       "structureTitle": "5 nhiệm vụ",
@@ -413,7 +412,9 @@
       "promptsNote": "Mỗi câu được hiển thị bao nhiêu lần, và bao nhiêu lần học sinh sửa sau đó. Số liệu cho biết điều gì xảy ra tiếp theo, không cho biết vì sao.",
       "promptsTitle": "Những câu học sinh sửa bài sau khi đọc",
       "seeAll": "Xem tất cả",
-      "revisedOf": "{{revised}} trên {{count}} đã sửa"
+      "revisedOf": "{{revised}} trên {{count}} đã sửa",
+      "backToLessons": "Quay lại bộ bài",
+      "backToTracking": "Quay lại theo dõi lượt làm"
     },
     "t15": {
       "changed": "Đổi",
@@ -437,7 +438,9 @@
       "drafts": "Soạn các nhiệm vụ",
       "checks": "Chạy kiểm tra chất lượng",
       "recheck": "Kiểm tra lại phần đã đổi"
-    }
+    },
+    "promptN": "Gợi ý {{n}}",
+    "promptFallback": "Gợi ý chung"
   },
   "errors": {
     "FILE_TYPE": "LOGINA đọc được tệp PDF hoặc Word.",
@@ -726,7 +729,12 @@
       "APPROVE_ASSIGN": "Duyệt 2 & giao",
       "ASSIGNED": "Đã giao"
     },
-    "uploaded": "Tệp của cô"
+    "uploaded": "Tệp của cô",
+    "deleteLabel": "Xóa {{title}}",
+    "deleteTitle": "Xóa “{{title}}”?",
+    "deleteBody": "Thao tác này xóa bộ bài, các bài và kết quả của lớp khỏi không gian làm việc này. Dữ liệu nghiên cứu đã ghi vẫn được giữ. Không thể hoàn tác.",
+    "deleteConfirm": "Xóa bộ bài",
+    "deleteCancel": "Giữ lại"
   },
   "consent": {
     "title": "Tham gia nghiên cứu",

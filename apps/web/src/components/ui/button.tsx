@@ -5,14 +5,14 @@ import { cn } from '@/lib/utils';
 
 /** shadcn/ui Button in LOGINA colours. A busy button shows a spinner (styled in components.css) and a disabled one keeps its grey on hover. */
 const buttonVariants = cva(
-  'ui-btn inline-flex cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-md border font-semibold no-underline transition duration-150 enabled:active:translate-y-px disabled:cursor-not-allowed disabled:border-transparent disabled:bg-gray disabled:text-ink-3',
+  'ui-btn inline-flex cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-md border font-semibold no-underline transition duration-150 not-disabled:active:translate-y-px disabled:cursor-not-allowed disabled:border-transparent disabled:bg-gray disabled:text-ink-3',
   {
     variants: {
       variant: {
-        primary: 'border-transparent bg-accent text-on-accent enabled:hover:bg-accent-hover',
-        secondary: 'border-line-strong bg-surface text-ink enabled:hover:border-control enabled:hover:bg-subtle',
-        danger: 'border-red-line bg-surface text-red enabled:hover:bg-red-bg',
-        choice: 'border-accent bg-surface text-accent-ink enabled:hover:bg-accent-bg',
+        primary: 'border-transparent bg-accent text-on-accent not-disabled:hover:bg-accent-hover',
+        secondary: 'border-line-strong bg-surface text-ink not-disabled:hover:border-control not-disabled:hover:bg-subtle',
+        danger: 'border-red-line bg-surface text-red not-disabled:hover:bg-red-bg',
+        choice: 'border-accent bg-surface text-accent-ink not-disabled:hover:bg-accent-bg',
       },
       size: {
         md: 'min-h-10 px-4.5 py-2.5 text-base',

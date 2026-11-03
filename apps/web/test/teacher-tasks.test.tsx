@@ -221,8 +221,8 @@ describe('T8 logic review', () => {
     fireEvent.mouseDown(await screen.findByRole('tab', { name: /Adjust/ }));
     const which = await screen.findByRole('combobox', { name: 'Which prompt' });
     fireEvent.keyDown(which, { key: 'Enter' });
-    fireEvent.keyDown(await screen.findByRole('option', { name: 'TN2' }), { key: 'Enter' });
-    expect(which).toHaveTextContent('TN2');
+    fireEvent.keyDown(await screen.findByRole('option', { name: 'Prompt 2' }), { key: 'Enter' });
+    expect(which).toHaveTextContent('Prompt 2');
   });
 });
 
@@ -416,9 +416,9 @@ describe('T7, T9 and T11', () => {
     ] });
     vi.mocked(api.sendEdit).mockResolvedValue({ editId: 'e', newDraftIds: [], staleDraftIds: [], jobId: 'j' });
     await render(<PreviewPage />);
-    fireEvent.click(await screen.findByRole('button', { name: 'Edit TN2' }));
-    expect(screen.queryByRole('button', { name: 'Edit Fallback' })).toBeNull();
-    fireEvent.change(screen.getByLabelText('Edit TN2', { selector: 'textarea' }), { target: { value: 'What else would you need to know?' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit Prompt 2' }));
+    expect(screen.queryByRole('button', { name: 'Edit Neutral prompt' })).toBeNull();
+    fireEvent.change(screen.getByLabelText('Edit Prompt 2', { selector: 'textarea' }), { target: { value: 'What else would you need to know?' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save and recheck' }));
     await waitFor(() => expect(api.sendEdit).toHaveBeenCalledWith('l1', { editScope: 'LOGIC', targetType: 'challenge', targetId: 'd4', changedRefs: ['TN2'], baseVersion: 3, payload: { challengeId: 'TN2', message: 'What else would you need to know?' } }, expect.any(String)));
   });
@@ -435,7 +435,8 @@ describe('T8 pair grid', () => {
   it('renders 16 cells with relation, reason and target', async () => {
     const pairs = ['A1', 'A2', 'A3', 'A4'].flatMap((answerId) => ['E1', 'E2', 'E3', 'E4'].map((evidenceId) => ({ answerId, evidenceId, relationLabel: 'Partial', explanation: `${answerId}${evidenceId}`, goesTo: 'TN1' })));
     await render(<PairGrid pairs={pairs} />);
-    expect(screen.getAllByText('TN1')).toHaveLength(16);
+    expect(screen.getAllByText('Prompt 1')).toHaveLength(16);
+    expect(screen.queryByText('TN1')).toBeNull();
     expect(screen.getByText('A3E2')).toBeInTheDocument();
   });
 });
@@ -540,7 +541,8 @@ describe('T12 and T13', () => {
     vi.mocked(api.getApproval).mockResolvedValue({ tasks: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'].map((slot) => approvalTask(slot, { releaseLabel: 'r2' })), contentManifestHash: 'h', canApprove: true });
     vi.mocked(api.assignLesson).mockResolvedValue({ assignmentId: 'asg1', revision: 1, releaseLabels: {} } as never);
     await render(<AssignPage />);
-    expect(await screen.findByText('12A3')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Assign' })).toBeEnabled());
+    expect(screen.queryByText('12A3')).toBeNull();
     expect(screen.queryByText(/\d+ students/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Assign' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/t/assignments/$id', params: { id: 'asg1' } }));
@@ -571,6 +573,12 @@ describe('T14 and T15', () => {
     expect(screen.getAllByRole('link', { name: 'View trace' })[0]).toHaveAttribute('href', '/t/attempts/$id/trace/$slot');
   });
 
+  it('attempt tracking has a back button to the lesson sets', async () => {
+    vi.mocked(api.getTracking).mockResolvedValue(tracking);
+    await render(<TrackingPage />);
+    expect(await screen.findByRole('link', { name: 'Back to lesson sets' })).toHaveAttribute('href', '/t/lessons');
+  });
+
   it('shows keep and revise, confidence, prompts and the disclaimer', async () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     const { container } = await render(<TrackingPage />);
@@ -578,10 +586,10 @@ describe('T14 and T15', () => {
     expect(screen.getAllByText('68 → 76')).toHaveLength(2);
     expect(screen.getByText(/not enough to conclude that students learned better/)).toBeInTheDocument();
     const prompts = [...container.querySelectorAll('.prompt-row')].map((row) => row.textContent);
-    expect(prompts).toEqual(['Q1 · TN2Check the card.2 of 2 revised', 'Q1 · TN1Compare the figures.1 of 3 revised']);
+    expect(prompts).toEqual(['Q1 · Prompt 2Check the card.2 of 2 revised', 'Q1 · Prompt 1Compare the figures.1 of 3 revised']);
     fireEvent.click(screen.getByRole('button', { name: 'See all prompts' }));
     expect(screen.getByRole('tab', { name: /Think-again prompts/ })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText('TN1')).toBeInTheDocument();
+    expect(screen.getByText('Prompt 1')).toBeInTheDocument();
   });
 
   it('the arrow keys move between the tabs', async () => {
@@ -675,6 +683,7 @@ describe('T14 and T15', () => {
     } as unknown as TraceDTO);
     await render(<TracePage />);
     expect(await screen.findAllByText('Trade > Cities')).toHaveLength(2);
+    expect(screen.getByRole('link', { name: 'Back to attempt tracking' })).toHaveAttribute('href', '/t/assignments/$id');
     expect(screen.queryByText('Evidence card')).toBeNull();
     expect(screen.queryByText('()')).toBeNull();
     expect(screen.getByRole('link', { name: 'Q1 · Revise' })).toHaveAttribute('href', '/t/attempts/$id/trace/$slot');
@@ -701,5 +710,53 @@ describe('T14 and T15', () => {
     expect(screen.getByText(/runs opposite to the source/)).toBeInTheDocument();
     expect(screen.getAllByText('Changed')).toHaveLength(1);
     expect(screen.getByText(/does not show why the student changed their mind/)).toBeInTheDocument();
+  });
+});
+
+describe('sample pre-fill', () => {
+  const sampleLesson = () => vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', title: 'Lesson 8', version: 5, primaryClassId: 'c', currentTaskDraftIds: {}, aiMode: 'SEEDED', contentLocale: 'en' } as unknown as LessonDTO);
+
+  it('quick edit on sample A4 starts with the scripted rewording, ready to save', async () => {
+    sampleLesson();
+    vi.mocked(api.getPreview).mockResolvedValue(preview({ answers: [{ id: 'A4', text: 'Old wording', teacherLabel: 'Wrong', sourceAnchor: 'p. 8' }] as never }));
+    await render(<PreviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Quick edit A4' }));
+    expect(screen.getByRole('textbox')).toHaveValue('The share of workers in services decreased, giving way to industry and construction.');
+    expect(screen.getByRole('button', { name: 'Save and recheck' })).toBeEnabled();
+  });
+
+  it('an uploaded lesson opens quick edit on its own wording', async () => {
+    vi.mocked(api.getPreview).mockResolvedValue(preview({ answers: [{ id: 'A4', text: 'Old wording', teacherLabel: 'Wrong', sourceAnchor: 'p. 8' }] as never }));
+    await render(<PreviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Quick edit A4' }));
+    expect(screen.getByRole('textbox')).toHaveValue('Old wording');
+  });
+
+  it('the blocked sample prompt TN2 starts with the scripted fix', async () => {
+    sampleLesson();
+    params.slot = 'Q4';
+    vi.mocked(api.getPreview).mockResolvedValue({ slot: 'Q4', draftId: 'd4', draftVersion: 3, taskType: 'COUNTERARGUMENT', status: 'BLOCKED', questionStem: 'Rebut', gates: [], exampleChallenges: preview().exampleChallenges, blockers: 1, canApprove: false, taskBody: { frame: 'A [s1]', slots: [], cards: [], teacherLabels: {} } } as never);
+    vi.mocked(api.getChallenges).mockResolvedValue({ slot: 'Q4', draftVersion: 3, candidateSetVersion: 1, challenges: [{ challengeId: 'TN2', label: 'TN2', purpose: 'Enough', whenShown: 'x', message: 'Productivity rose.', isFallback: false, sourceAnchor: 'p. 8' }] });
+    await render(<PreviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit Prompt 2' }));
+    expect(screen.getByLabelText('Edit Prompt 2', { selector: 'textarea' })).toHaveValue('What else would you need to know before saying that agriculture is weaker?');
+  });
+
+  it('accepting a warning on the sample starts with the scripted reason', async () => {
+    sampleLesson();
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: [approvalTask('Q1', { decisionsNeeded: [{ gateId: 'QG1', findingCode: 'TREND', explanationForTeacher: 'May be too easy', overridable: true }] })], contentManifestHash: 'h', canApprove: true });
+    await render(<ApprovePage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Accept with a reason' }));
+    expect(screen.getByLabelText('Accept warning, give a reason')).toHaveValue('Fits this class');
+  });
+
+  it('assigning the sample starts with a message to students and sends it', async () => {
+    sampleLesson();
+    vi.mocked(api.getApproval).mockResolvedValue({ tasks: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'].map((slot) => approvalTask(slot, { releaseLabel: 'r2' })), contentManifestHash: 'h', canApprove: true });
+    vi.mocked(api.assignLesson).mockResolvedValue({ assignmentId: 'asg1', revision: 1, releaseLabels: {} } as never);
+    await render(<AssignPage />);
+    await waitFor(() => expect(screen.getByLabelText('Message to students (optional)')).toHaveValue('Work through the five tasks on your own. After each answer you can think again once.'));
+    fireEvent.click(screen.getByRole('button', { name: 'Assign' }));
+    await waitFor(() => expect(api.assignLesson).toHaveBeenCalledWith('l1', expect.objectContaining({ messageToStudents: 'Work through the five tasks on your own. After each answer you can think again once.' }), expect.any(String)));
   });
 });

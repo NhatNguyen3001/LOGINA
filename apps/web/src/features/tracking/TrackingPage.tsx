@@ -4,6 +4,8 @@ import { Link, useParams } from '@tanstack/react-router';
 import { Activity, Check, LayoutDashboard, MessageSquare, PenLine, Users, type LucideIcon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BackLink } from '@/components/logina/BackLink';
+import { promptName } from '@/lib/prompt-name';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -160,7 +162,7 @@ function TopPrompts({ rows, onSeeAll }: { rows: TaskRow[]; onSeeAll: () => void 
   return (
     <ChartCard title={t('teacher.t14.promptsTitle')} legend={<button type="button" className="lnk jump" onClick={onSeeAll}>{t('teacher.t14.seeAll')}</button>} wide>
       {prompts.slice(0, TOP_PROMPTS).map(({ slot, label, message, count, revised }) => (
-        <PromptRow key={`${slot}-${label}`} tag={`${slot} · ${label}`} message={message} count={count} revised={revised} clip />
+        <PromptRow key={`${slot}-${label}`} tag={`${slot} · ${promptName(label, t)}`} message={message} count={count} revised={revised} clip />
       ))}
     </ChartCard>
   );
@@ -242,7 +244,7 @@ function Prompts({ rows }: { rows: TaskRow[] }) {
           <ChartCard key={slot} title={t(`teacher.taskType.${slot}`)}>
             {deliveredChallenges.length === 0 ? <span className="s13 muted">{t('teacher.t14.noPrompts')}</span> : null}
             {deliveredChallenges.map(({ label, message, count, revised }) => (
-              <PromptRow key={label} tag={label} message={message} count={count} revised={revised} />
+              <PromptRow key={label} tag={promptName(label, t)} message={message} count={count} revised={revised} />
             ))}
           </ChartCard>
         ))}
@@ -270,6 +272,7 @@ export function TrackingPage() {
         <span>/</span>
         <span>{t('teacher.t14.title')}</span>
       </nav>
+      <BackLink to="/t/lessons" label={t('teacher.t14.backToLessons')} />
       <div className="track-head">
         <h1 className="h1">{t('teacher.t14.title')}</h1>
         {lesson ? <p className="s15 m">{lesson}</p> : null}
