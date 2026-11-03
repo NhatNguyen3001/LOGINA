@@ -470,7 +470,11 @@
     "ATTEMPT_INCOMPLETE": "Finish every task first.",
     "UNKNOWN_OPTION": "That option isn't part of this task.",
     "CONSENT_VERSION_STALE": "The research notice has changed. Please read it again.",
-    "JOB_RUNNING": "LOGINA is still working on this lesson."
+    "JOB_RUNNING": "LOGINA is still working on this lesson.",
+    "NETWORK": "Couldn't reach LOGINA. Check your connection and try again.",
+    "INTERNAL": "Something went wrong on our side. Try again in a moment.",
+    "RATE_LIMITED": "LOGINA is busy right now. Try again in a few seconds.",
+    "CONTENT_OUTDATED": "This demo was set up with an older version of LOGINA. Reset the demo to get the current tasks."
   },
   "common": {
     "lang": {
@@ -502,7 +506,9 @@
       "light": "Light",
       "dark": "Dark",
       "system": "Same as device"
-    }
+    },
+    "langFailed": "The language could not be changed. Try again.",
+    "resetDemo": "Reset the demo"
   },
   "demo": {
     "jumpSampleOnly": "Sample lesson only",
@@ -637,7 +643,7 @@
     },
     "q4": {
       "cards": "Cards",
-      "cardsHint": "There are more cards than blanks, and each card can be used once.",
+      "cardsHint": "Drag a card into a blank, or tap a card and then a blank. There are more cards than blanks, and each card can be used once.",
       "chooseCard": "Choose a card first",
       "placeHere": "Tap to place the card here",
       "choose": "Choose…"

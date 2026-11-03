@@ -8,12 +8,11 @@ import { StudentShell } from '@/components/logina/StudentShell';
 import { Note } from '@/components/logina/Note';
 import { newKey, sendConsent } from '@/lib/api';
 import { qk } from '@/lib/query';
-import { errorKey } from '@/i18n';
-import { ApiError } from '@/lib/api';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { cardVariants } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { errorText } from '@/lib/errors';
 
 /** What a person needs in order to decide stays open. Everything else is one tap away. */
 const POINTS: { icon: LucideIcon; title: string; lines: string[] }[] = [
@@ -87,7 +86,7 @@ export function Consent({ onDone }: { onDone: () => void }) {
             ))}
           </Accordion>
           <Link to="/privacy" className="lnk">{t('consent.privacyLink')}</Link>
-          {choose.isError ? <Note kind="err">{t(errorKey(choose.error instanceof ApiError ? choose.error.code : ''))}</Note> : null}
+          {choose.isError ? <Note kind="err">{t(errorText(choose.error))}</Note> : null}
           <div className="row consent-choice">
             <span className="s13 muted num">{t('consent.version', { version: CURRENT_CONSENT_VERSION })}</span>
             <span className="sp" />

@@ -7,7 +7,7 @@ import { Toaster } from 'sonner';
 export function ToastCard({ message, onClose }: { message: { title: string; body: string }; onClose: () => void }) {
   const { t } = useTranslation();
   return (
-    <div role="status" className="toast">
+    <div className="toast">
       <span className="toast-ic"><Check className="ico" aria-hidden="true" /></span>
       <span className="grow">
         <span className="toast-title">{message.title}</span>

@@ -16,13 +16,13 @@ import { StudentShell } from '@/components/logina/StudentShell';
 import { useSessionLocale } from '@/lib/use-session-locale';
 import { ApiError, getChallenge, getStudentTask, lockTask, newKey, saveDraft, submitTask } from '@/lib/api';
 import { qk } from '@/lib/query';
-import { errorKey } from '@/i18n';
 import { ArtifactEditor, FilledFrame, describeChange, emptyDraft, isComplete, missingKey, sameArtifact } from './editors';
 import { createTrace, type TaskTrace } from './use-task-trace';
 import { useAutosave } from './use-autosave';
 import { useLessonTitle } from './use-lesson-title';
 import { buttonVariants } from '@/components/ui/button';
 import { cardVariants } from '@/components/ui/card';
+import { errorText } from '@/lib/errors';
 
 const SLOTS: Slot[] = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
 
@@ -39,10 +39,6 @@ function TaskActions({ note, children }: { note?: ReactNode; children: ReactNode
       </div>
     </StickyActionBar>
   );
-}
-
-function errorText(error: unknown): string {
-  return errorKey(error instanceof ApiError ? error.code : '');
 }
 
 function LockedAnswer({ summary }: { summary: StudentChallengeDTO['lockedSummary'] }) {
@@ -219,7 +215,7 @@ function Reconsidering({ attemptId, task, trace, onSubmitted, onPhase }: { attem
     setAnswer(next);
   };
 
-  if (!challenge.data) return challenge.isError ? <LoadFailed onRetry={() => void challenge.refetch()} /> : <LoadingSkeleton />;
+  if (!challenge.data) return challenge.isError ? <LoadFailed error={challenge.error} onRetry={() => void challenge.refetch()} /> : <LoadingSkeleton />;
   const lockedAnswer =
     task.slot === 'Q2' && original.slot === 'Q2' ? <LockedQ2 body={task.taskBody} answer={original} />
     : task.slot === 'Q3' && original.slot === 'Q3' ? <LockedQ3 body={task.taskBody} answer={original} />
@@ -304,7 +300,7 @@ export function TaskRunner() {
     }
     return (
       <StudentShell lesson={lesson}>
-        <LoadFailed onRetry={() => void task.refetch()} />
+        <LoadFailed error={task.error} onRetry={() => void task.refetch()} />
       </StudentShell>
     );
   }

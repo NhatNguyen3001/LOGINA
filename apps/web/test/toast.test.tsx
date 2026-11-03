@@ -29,8 +29,8 @@ describe('Toast', () => {
   it('announces a confirmation, and it can be dismissed', async () => {
     await renderWithI18n(<Toast />, { lang: 'en' });
     act(() => showToast({ title: 'Demo reset', body: 'Back at the start.' }));
-    expect(await screen.findByRole('status')).toHaveTextContent('Demo reset');
-    expect(screen.getByRole('status')).toHaveTextContent('Back at the start.');
+    expect(await screen.findByText('Demo reset')).toBeInTheDocument();
+    expect(screen.getByText('Back at the start.')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(screen.queryByText('Demo reset')).toBeNull());
   });

@@ -13,7 +13,6 @@ const buttonVariants = cva(
         secondary: 'border-line-strong bg-surface text-ink enabled:hover:border-control enabled:hover:bg-subtle',
         danger: 'border-red-line bg-surface text-red enabled:hover:bg-red-bg',
         choice: 'border-accent bg-surface text-accent-ink enabled:hover:bg-accent-bg',
-        link: 'min-h-0 border-0 border-transparent bg-transparent p-0 text-accent-ink underline-offset-2 hover:underline disabled:bg-transparent',
       },
       size: {
         md: 'min-h-10 px-4.5 py-2.5 text-base',

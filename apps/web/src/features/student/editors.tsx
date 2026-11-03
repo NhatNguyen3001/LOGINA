@@ -1,9 +1,9 @@
-import { closestCenter, DndContext, MouseSensor, TouchSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
+import { closestCenter, DndContext, MouseSensor, pointerWithin, TouchSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Artifact, DraftArtifact, Q2TaskBody, Q3TaskBody, Q4TaskBody, Q5TaskBody, StudentTaskDTO } from '@logina/contracts';
 import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pick } from '@/components/logina/Pick';
 import { buttonVariants } from '@/components/ui/button';
@@ -163,47 +163,105 @@ export function FilledFrame({ body, placements }: { body: Q4TaskBody; placements
   );
 }
 
+const PILE = 'pile';
+
+interface CardDrag {
+  cardId: string;
+  /** Set when the card is dragged out of a blank. */
+  fromSlot?: string;
+}
+
+/** A card the student can drag; a tap still works, because the drag only starts after the pointer moves. */
+function DragCard({ id, drag, className, children, ...button }: { id: string; drag: CardDrag; className: string; children: ReactNode } & Omit<ComponentProps<'button'>, 'id' | 'className' | 'children'>) {
+  const { listeners, setNodeRef, transform, isDragging } = useDraggable({ id, data: drag });
+  return (
+    <button ref={setNodeRef} type="button" {...button} {...listeners} className={cn(className, isDragging && 'dragging')} style={transform ? { transform: CSS.Translate.toString(transform) } : undefined}>
+      {children}
+    </button>
+  );
+}
+
+function DropZone({ id, className, children }: { id: string; className?: string; children: ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={cn(className, isOver && 'over')}>
+      {children}
+    </div>
+  );
+}
+
 export function Q4Editor({ body, value, onChange }: EditorProps<'Q4', Q4TaskBody>) {
   const { t } = useTranslation();
   const [held, setHeld] = useState<string | null>(null);
+  /** The same sensors as Q2: a short hold starts a drag on touch, so a swipe still scrolls the page. */
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }),
+  );
   const placements = value.placements ?? [];
   const cardIn = (slotId: string) => placements.find((x) => x.slotId === slotId)?.cardId;
   const free = body.cards.filter((card) => !placements.some((x) => x.cardId === card.cardId));
 
-  /** Kept in the order of the blanks, because that order decides the Think-again prompt. */
-  const save = (slotId: string, cardId: string | null) => {
-    const next = (id: string) => (id === slotId ? cardId : cardIn(id));
+  /** Kept in the order of the blanks, because that order decides the Think-again prompt. One change per move. */
+  const save = (changes: Record<string, string | null>) => {
+    const next = (id: string) => (id in changes ? changes[id] : cardIn(id));
     onChange({ ...value, placements: body.slots.flatMap(({ slotId: id }) => (next(id) ? [{ slotId: id, cardId: next(id)! }] : [])) });
   };
 
   const tapBlank = (slotId: string) => {
-    if (held) save(slotId, held);
-    else if (cardIn(slotId)) save(slotId, null);
+    if (held) save({ [slotId]: held });
+    else if (cardIn(slotId)) save({ [slotId]: null });
     setHeld(null);
   };
 
+  /** Onto a blank places the card (a card already there goes back to the pile); onto the pile takes it out. */
+  const drop = ({ active, over }: DragEndEvent) => {
+    setHeld(null);
+    const drag = active.data.current as CardDrag | undefined;
+    if (!over || !drag) return;
+    const target = String(over.id);
+    if (target === PILE) {
+      if (drag.fromSlot) save({ [drag.fromSlot]: null });
+      return;
+    }
+    const toSlot = target.replace(/^slot:/, '');
+    if (toSlot === drag.fromSlot) return;
+    save({ [toSlot]: drag.cardId, ...(drag.fromSlot ? { [drag.fromSlot]: null } : {}) });
+  };
+
   return (
-    <>
+    <DndContext sensors={sensors} collisionDetection={pointerWithin} onDragEnd={drop}>
       <FilledFrame body={body} placements={placements} />
       <h2 className="s15 b">{t('student.q4.cards')}</h2>
       <p className="s13 sec">{t('student.q4.cardsHint')}</p>
-      <div className="card-bank">
+      <DropZone id={PILE} className="card-bank">
         {free.map(({ cardId, text }) => (
-          <button key={cardId} type="button" className={`word-card ${held === cardId ? 'on' : ''}`} aria-pressed={held === cardId} onClick={() => setHeld(held === cardId ? null : cardId)}>{text}</button>
+          <DragCard key={cardId} id={`card:${cardId}`} drag={{ cardId }} className={`word-card ${held === cardId ? 'on' : ''}`} aria-pressed={held === cardId} onClick={() => setHeld(held === cardId ? null : cardId)}>
+            {text}
+          </DragCard>
         ))}
-      </div>
+      </DropZone>
       {body.slots.map(({ slotId, label }) => {
         const card = body.cards.find((x) => x.cardId === cardIn(slotId));
+        const blankClass = `blank ${card ? 'full' : held ? 'ready' : ''}`;
         return (
           <div key={slotId} className="field">
             <span className="b" id={`blank-${slotId}`}>{label}</span>
-            <button type="button" aria-describedby={`blank-${slotId}`} className={`blank ${card ? 'full' : held ? 'ready' : ''}`} onClick={() => tapBlank(slotId)}>
-              {card?.text ?? t(held ? 'student.q4.placeHere' : 'student.q4.chooseCard')}
-            </button>
+            <DropZone id={`slot:${slotId}`} className="blank-zone">
+              {card ? (
+                <DragCard id={`placed:${slotId}`} drag={{ cardId: card.cardId, fromSlot: slotId }} className={blankClass} aria-describedby={`blank-${slotId}`} onClick={() => tapBlank(slotId)}>
+                  {card.text}
+                </DragCard>
+              ) : (
+                <button type="button" aria-describedby={`blank-${slotId}`} className={blankClass} onClick={() => tapBlank(slotId)}>
+                  {t(held ? 'student.q4.placeHere' : 'student.q4.chooseCard')}
+                </button>
+              )}
+            </DropZone>
           </div>
         );
       })}
-    </>
+    </DndContext>
   );
 }
 

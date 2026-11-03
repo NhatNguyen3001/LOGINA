@@ -575,7 +575,7 @@ describe('T14 and T15', () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     const { container } = await render(<TrackingPage />);
     expect(await screen.findByText('4 / 4')).toBeInTheDocument();
-    expect(screen.getAllByText('68 → 76')).toHaveLength(1);
+    expect(screen.getAllByText('68 → 76')).toHaveLength(2);
     expect(screen.getByText(/not enough to conclude that students learned better/)).toBeInTheDocument();
     const prompts = [...container.querySelectorAll('.prompt-row')].map((row) => row.textContent);
     expect(prompts).toEqual(['Q1 · TN2Check the card.2 of 2 revised', 'Q1 · TN1Compare the figures.1 of 3 revised']);

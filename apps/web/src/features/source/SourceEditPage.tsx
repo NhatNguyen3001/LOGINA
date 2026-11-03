@@ -5,13 +5,13 @@ import { DiffRow } from '@/components/logina/DiffRow';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
-import { errorKey } from '@/i18n';
-import { ApiError, approveSource, getSourceDraft, newKey } from '@/lib/api';
+import { approveSource, getSourceDraft, newKey } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { cardVariants } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { errorText } from '@/lib/errors';
 
 export function SourceEditPage() {
   const { t } = useTranslation();
@@ -72,7 +72,7 @@ export function SourceEditPage() {
         </div>
         <div className={cn(cardVariants(), 'sticky')}>
           {assignedReleasesUnchanged.length > 0 ? <p className="s13">{t('teacher.t10.assigned', { releases: assignedReleasesUnchanged.map((x) => `${x.classLabel} ${x.releaseLabel}`).join(', ') })}</p> : null}
-          {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
+          {approve.isError ? <Note kind="err">{t(errorText(approve.error))}</Note> : null}
           <button type="button" className={buttonVariants({ block: true })} aria-busy={approve.isPending} disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t10.approve', { version })}</button>
           <Link to="/t/lessons/$id/tasks" params={{ id }} className={buttonVariants({ variant: 'secondary', block: true })}>{t('teacher.t10.cancel')}</Link>
         </div>

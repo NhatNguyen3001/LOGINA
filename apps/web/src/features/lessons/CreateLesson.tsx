@@ -9,8 +9,8 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { Note } from '@/components/logina/Note';
 import { Stepper } from '@/components/logina/Stepper';
-import { errorKey } from '@/i18n';
 import { ApiError, createLesson, getClass, getMe, getUploadUrl, newKey, registerMaterial, startAnalyze } from '@/lib/api';
+import { errorText } from '@/lib/errors';
 import { qk } from '@/lib/query';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -100,7 +100,6 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
   });
 
   const errorOf = (name: keyof Form) => (errors[name] ? t('teacher.t01.requiredError') : undefined);
-  const code = analyze.error instanceof ApiError ? analyze.error.code : '';
 
   return (
     <form onSubmit={(event) => void submit(event)} noValidate className="contents">
@@ -150,7 +149,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
             {analyze.isError ? (
               <Note kind="err">
                 <span className="b">{t('teacher.t01.refusal.title')}</span>
-                <p>{t(errorKey(code))}</p>
+                <p>{t(errorText(analyze.error))}</p>
               </Note>
             ) : null}
             <Field id="sourceTitle" label={`${t('teacher.t01.sourceTitle')} ${t('teacher.t01.required')}`} error={errorOf('sourceTitle')}>

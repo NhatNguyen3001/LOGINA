@@ -36,7 +36,7 @@ export function OpenAssignment() {
     }
     return (
       <StudentShell>
-        <LoadFailed onRetry={() => void attempt.refetch()} />
+        <LoadFailed error={attempt.error} onRetry={() => void attempt.refetch()} />
       </StudentShell>
     );
   }

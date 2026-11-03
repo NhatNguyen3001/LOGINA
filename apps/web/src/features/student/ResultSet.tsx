@@ -7,14 +7,14 @@ import { Note } from '@/components/logina/Note';
 import { StudentProgress } from '@/components/logina/StudentProgress';
 import { StudentShell } from '@/components/logina/StudentShell';
 import { useSessionLocale } from '@/lib/use-session-locale';
-import { ApiError, getFeedback, getMyAssignments, newKey, restartAttempt } from '@/lib/api';
+import { getFeedback, getMyAssignments, newKey, restartAttempt } from '@/lib/api';
 import { qk, queryClient } from '@/lib/query';
-import { errorKey } from '@/i18n';
 import { useLessonTitle } from './use-lesson-title';
 import { Badge } from '@/components/ui/badge';
 import { cardVariants } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { errorText } from '@/lib/errors';
 
 const changed = (row: StudentFeedbackDTO) => row.choice === 'REVISE';
 
@@ -47,7 +47,7 @@ export function ResultSet() {
   return (
     <StudentShell title={t('student.result.title')} lesson={lesson} progress={<StudentProgress slots={SLOTS.map((slot) => ({ slot, state: submitted.includes(slot) ? 'done' : 'todo' }))} />}>
       {feedback.isPending ? <LoadingSkeleton /> : null}
-      {feedback.isError ? <Note kind="info">{t(errorKey(feedback.error instanceof ApiError ? feedback.error.code : ''))}</Note> : null}
+      {feedback.isError ? <Note kind="info">{t(errorText(feedback.error))}</Note> : null}
       {feedback.data ? (
         <>
           <p className="s15 sec">{t('student.result.summary', { kept: rows.length - revised, revised })}</p>

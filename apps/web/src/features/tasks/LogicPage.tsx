@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Note } from '@/components/logina/Note';
 import { PairGrid } from '@/components/logina/PairGrid';
-import { errorKey } from '@/i18n';
-import { ApiError, getLesson, getLogicReview, getPreview, newKey, sendEdit } from '@/lib/api';
+import { getLesson, getLogicReview, getPreview, newKey, sendEdit } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { cardVariants } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { errorText } from '@/lib/errors';
 
 const TABS = ['pairs', 'prompts', 'adjust'] as const;
 
@@ -82,7 +82,7 @@ export function LogicPage() {
             <Textarea id="message" value={message} onChange={(event) => setMessage(event.target.value)} />
           </div>
           <p className="s13 sec">{t('teacher.t08.invalidates')}</p>
-          {save.isError ? <Note kind="err">{t(errorKey(save.error instanceof ApiError ? save.error.code : ''))}</Note> : null}
+          {save.isError ? <Note kind="err">{t(errorText(save.error))}</Note> : null}
           <button type="button" className={cn(buttonVariants(), 'self-start')} aria-busy={save.isPending} disabled={!challengeId || !message.trim() || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         </div>
         </TabsContent>
