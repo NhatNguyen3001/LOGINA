@@ -56,15 +56,16 @@ function StudentPreview() {
 
 function RoleCard({ icon: Icon, title, note, busy, disabled, onClick, children }: { icon: LucideIcon; title: string; note: string; busy: boolean; disabled: boolean; onClick: () => void; children: ReactNode }) {
   const id = useId();
+  /** The title is the button, so its name is exactly what it says; the button stretches over the card so the whole card is the target. */
   return (
-    <button type="button" className="role-card" aria-labelledby={`${id}-t`} aria-describedby={`${id}-n`} aria-busy={busy} disabled={disabled} onClick={onClick}>
-      <span className="role-head">
+    <div className="role-card" data-busy={busy || undefined} data-disabled={disabled || undefined}>
+      <div className="role-head">
         <span className="role-ic"><Icon className="size-5" aria-hidden="true" /></span>
-        <span id={`${id}-t`} className="role-title">{title}</span>
-      </span>
-      <span id={`${id}-n`} className="role-note">{note}</span>
+        <button type="button" className="role-btn role-title" aria-describedby={`${id}-n`} aria-busy={busy} disabled={disabled} onClick={onClick}>{title}</button>
+      </div>
+      <p id={`${id}-n`} className="role-note">{note}</p>
       {children}
-    </button>
+    </div>
   );
 }
 
