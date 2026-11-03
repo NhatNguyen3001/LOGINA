@@ -55,4 +55,12 @@ describe('final review fixes', () => {
     expect(existsSync(licence)).toBe(true);
     expect(readFileSync(licence, 'utf8')).toMatch(/Apache License\s+Version 2\.0/);
   });
+
+  it('notes use the Alert styles, because the old note class has no CSS left', () => {
+    expect(src('styles/components.css')).not.toMatch(/\.note\b/);
+    for (const file of ['features/source/ClarifyPage.tsx', 'components/logina/BusyNote.tsx']) {
+      expect(src(file), file).not.toMatch(/['" ]note[ '"]/);
+      expect(src(file), file).toMatch(/alertVariants/);
+    }
+  });
 });

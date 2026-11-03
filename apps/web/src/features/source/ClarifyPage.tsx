@@ -8,6 +8,7 @@ import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
+import { alertVariants } from '@/components/ui/alert';
 import { RestartAnalysis } from '@/features/lessons/RestartAnalysis';
 import { getSourceReview, newKey, resolveIssue } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -179,7 +180,7 @@ export function ClarifyPage() {
             if (points.length === 0) return <p key={paragraph.id} className="s13">{paragraph.text}</p>;
             const blocked = points.some((p) => p.severity === 'BLOCKER' && p.state === 'UNRESOLVED');
             return (
-              <div key={paragraph.id} data-testid={`paragraph-${paragraph.id}`} className={cn('note src-pt flex-col', blocked ? 'err' : 'warn', points.some((p) => p.pointNumber === litPoint) && 'lit')}>
+              <div key={paragraph.id} data-testid={`paragraph-${paragraph.id}`} className={cn(alertVariants({ kind: blocked ? 'err' : 'warn' }), 'src-pt flex-col gap-1', points.some((p) => p.pointNumber === litPoint) && 'lit')}>
                 <span className="small b">{points.map((p) => t('teacher.t03.point', { n: p.pointNumber })).join(', ')}</span>
                 <span>{paragraph.text}</span>
               </div>
