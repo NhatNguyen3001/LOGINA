@@ -496,7 +496,13 @@
     "draft": "Draft",
     "menu": "Menu",
     "back": "Back",
-    "loadFailed": "This did not load. Check your connection and try again."
+    "loadFailed": "This did not load. Check your connection and try again.",
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "Same as device"
+    }
   },
   "demo": {
     "jumpSampleOnly": "Sample lesson only",

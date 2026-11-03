@@ -11,7 +11,7 @@ function RadioGroupItem({ className, children, ...props }: ComponentProps<typeof
   return (
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
-      className={cn('group flex w-full cursor-pointer items-start gap-3 rounded-lg border border-line bg-surface px-3.5 py-3 text-left text-ink transition duration-150 outline-none hover:border-control focus-visible:ring-3 focus-visible:ring-accent-bg aria-checked:border-accent aria-checked:bg-accent-bg aria-checked:inset-ring aria-checked:inset-ring-accent disabled:cursor-not-allowed', className)}
+      className={cn('group flex w-full cursor-pointer items-start gap-3 rounded-lg border border-line bg-surface px-3.5 py-3 text-left text-ink transition duration-150 outline-none hover:border-control focus-visible:ring-2 focus-visible:ring-accent aria-checked:border-accent aria-checked:bg-accent-bg aria-checked:inset-ring aria-checked:inset-ring-accent disabled:cursor-not-allowed', className)}
       {...props}
     >
       <span className="mt-0.5 grid size-4.5 shrink-0 place-items-center rounded-full border border-control bg-surface group-aria-checked:border-accent" aria-hidden="true">

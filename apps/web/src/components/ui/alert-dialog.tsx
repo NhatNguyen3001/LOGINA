@@ -10,7 +10,7 @@ const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
 function AlertDialogContent({ className, ...props }: ComponentProps<typeof AlertDialogPrimitive.Content>) {
   return (
     <AlertDialogPrimitive.Portal>
-      <AlertDialogPrimitive.Overlay data-slot="alert-dialog-overlay" className="sheet-overlay fixed inset-0 z-40 bg-ink/40" />
+      <AlertDialogPrimitive.Overlay data-slot="alert-dialog-overlay" className="sheet-overlay fixed inset-0 z-40 bg-black/45" />
       <AlertDialogPrimitive.Content
         data-slot="alert-dialog-content"
         className={cn('fixed top-1/2 left-1/2 z-50 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-lg border border-line bg-surface p-5 text-ink shadow-card outline-none', className)}

@@ -13,7 +13,7 @@ test('a judge goes from the entry page through consent, five tasks and results',
   });
 
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Try LOGINA' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /LOGINA helps teachers/ })).toBeVisible();
   await expectAccessible(page, 'P0');
   await page.getByRole('button', { name: 'Try as student' }).click();
 

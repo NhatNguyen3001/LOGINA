@@ -140,7 +140,7 @@ test('a finished student starts a new run, keeps the old one, and can always go 
   await page.setViewportSize({ width: 1280, height: 720 });
 
   await page.getByRole('link', { name: 'Home' }).click();
-  await expect(page.getByRole('heading', { name: 'Try LOGINA' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /LOGINA helps teachers/ })).toBeVisible();
   await page.getByRole('button', { name: 'Try as student' }).click();
   await expect(page).toHaveURL(/\/Q1$/);
   await expect(page.getByRole('button', { name: 'Continue →' })).toBeVisible();
@@ -185,7 +185,7 @@ test('the header menu is for phones: desktop shows its actions, a phone folds th
   await startTasks(page);
   await expect(page.getByRole('button', { name: 'Menu' })).toBeHidden();
   await expect(page.getByRole('link', { name: 'My runs' })).toBeVisible();
-  await expect(page).toHaveTitle('Q1 Statement · Student · LOGINA');
+  await expect(page).toHaveTitle('LOGINA');
 
   await page.setViewportSize({ width: 375, height: 760 });
   await expect(page.getByRole('link', { name: 'My runs' })).toBeHidden();

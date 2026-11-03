@@ -15,7 +15,7 @@ function AccordionTrigger({ className, children, heading: Heading = 'h3', ...pro
   return (
     <AccordionPrimitive.Header asChild>
       <Heading className="m-0 flex">
-      <AccordionPrimitive.Trigger data-slot="accordion-trigger" className={cn('group flex min-h-11 flex-1 cursor-pointer items-center justify-between gap-3 rounded-lg px-4.5 py-3 text-left text-md font-semibold text-ink outline-none hover:bg-subtle focus-visible:ring-3 focus-visible:ring-accent-bg aria-expanded:text-accent-ink', className)} {...props}>
+      <AccordionPrimitive.Trigger data-slot="accordion-trigger" className={cn('group flex min-h-11 flex-1 cursor-pointer items-center justify-between gap-3 rounded-lg px-4.5 py-3 text-left text-md font-semibold text-ink outline-none hover:bg-subtle focus-visible:ring-2 focus-visible:ring-accent aria-expanded:text-accent-ink', className)} {...props}>
         <span className="min-w-0 flex-1">{children}</span>
         <ChevronDown className="size-4 shrink-0 text-ink-3 transition-transform duration-200 group-aria-expanded:rotate-180 group-aria-expanded:text-accent-ink" aria-hidden="true" />
       </AccordionPrimitive.Trigger>

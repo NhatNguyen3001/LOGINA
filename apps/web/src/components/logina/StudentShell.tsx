@@ -3,6 +3,7 @@ import { History } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LangSwitch } from './LangSwitch';
+import { ModeToggle } from './ModeToggle';
 import { LegalFooter } from './LegalFooter';
 import { PanelShell } from './PanelShell';
 import { SwitchSide } from './SwitchSide';
@@ -35,7 +36,10 @@ export function StudentShell({ title, lesson, current, progress, reset, footer, 
           </Link>
           <SwitchSide to="teacher" short />
         </div>
-        <LangSwitch />
+        <div className="prefs">
+          <LangSwitch />
+          <ModeToggle />
+        </div>
       </div>
     </>
   );

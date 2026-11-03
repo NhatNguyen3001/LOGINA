@@ -496,7 +496,13 @@
     "draft": "Bản nháp",
     "menu": "Trình đơn",
     "back": "Quay lại",
-    "loadFailed": "Không tải được. Hãy kiểm tra kết nối rồi thử lại."
+    "loadFailed": "Không tải được. Hãy kiểm tra kết nối rồi thử lại.",
+    "theme": {
+      "label": "Giao diện",
+      "light": "Sáng",
+      "dark": "Tối",
+      "system": "Theo thiết bị"
+    }
   },
   "demo": {
     "jumpSampleOnly": "Chỉ cho bộ bài mẫu",

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Consent } from '@/features/student/Consent';
 import { DemoMenu } from '@/components/logina/DemoMenu';
 import { ResetRun } from '@/components/logina/ResetRun';
+import { TeacherShell } from '@/components/logina/TeacherShell';
 import { EntryPage } from '@/features/entry/EntryPage';
 import { LessonsHome } from '@/features/lessons/LessonsHome';
 import { OpenAssignment } from '@/features/student/OpenAssignment';
@@ -18,8 +19,8 @@ vi.mock('@tanstack/react-router', async (original) => ({
   ...(await original<object>()),
   useNavigate: () => navigate,
   useParams: () => ({ id: 'asg1' }),
+  Link: ({ to, children, className, 'aria-label': label }: { to: string; children: React.ReactNode; className?: string; 'aria-label'?: string }) => <a href={to} className={className} aria-label={label}>{children}</a>,
   Navigate: ({ to }: { to: string }) => <p>{`redirect ${to}`}</p>,
-  Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => <a href={to} className={className}>{children}</a>,
 }));
 vi.mock('@/lib/api', async (original) => ({ ...(await original<object>()), resetAttempt: vi.fn(), getLessons: vi.fn(), getLesson: vi.fn(), getMyAssignments: vi.fn(), getMe: vi.fn(), sendConsent: vi.fn(), getDemoSnapshots: vi.fn(), startAttempt: vi.fn(async () => ({ attemptId: 'att', status: 'NOT_STARTED', slots: [{ slot: 'Q1', phase: 'REASON' }] })) }));
 vi.mock('@/lib/auth', () => ({ ensureSession: vi.fn(async () => {}), idToken: vi.fn(async () => 't'), renewSession: vi.fn(async () => {}) }));
@@ -136,6 +137,13 @@ describe('demo menu', () => {
     await renderWithI18n(withQuery(<DemoMenu />));
     await waitFor(() => expect(api.getMe).toHaveBeenCalled());
     expect(screen.queryByRole('button', { name: 'Explore the demo' })).toBeNull();
+  });
+});
+
+describe('teacher shell', () => {
+  it('the logo goes back to the entry page', async () => {
+    await renderWithI18n(withQuery(<TeacherShell><p>Body</p></TeacherShell>));
+    expect(screen.getByRole('link', { name: 'logina Home' })).toHaveAttribute('href', '/');
   });
 });
 

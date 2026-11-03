@@ -1,17 +1,6 @@
-import { Link } from '@tanstack/react-router';
 import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Logo } from './Logo';
+import { HomeLogo } from './Logo';
 import { MenuButton } from './MenuButton';
-
-function HomeLogo() {
-  const { t } = useTranslation();
-  return (
-    <Link to="/" className="logo-home" aria-label={t('student.shell.logoHome')}>
-      <Logo />
-    </Link>
-  );
-}
 
 /** The left panel layout: a fixed column on a wide screen, a sliding panel behind a menu button on a narrow one. */
 export function PanelShell({ phoneTitle, label, panel, children }: { phoneTitle: string | undefined; label: string; panel: ReactNode; children: ReactNode }) {

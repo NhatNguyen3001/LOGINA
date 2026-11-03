@@ -6,8 +6,9 @@ import { useSessionLocale } from '@/lib/use-session-locale';
 import { BusyNote } from './BusyNote';
 import { DemoMenu } from './DemoMenu';
 import { LangSwitch } from './LangSwitch';
+import { ModeToggle } from './ModeToggle';
 import { LegalFooter } from './LegalFooter';
-import { Logo } from './Logo';
+import { HomeLogo } from './Logo';
 import { PhoneMenu } from './MenuButton';
 import { SwitchSide } from './SwitchSide';
 
@@ -18,13 +19,16 @@ export function TeacherShell({ lessonId, assignmentId, children }: { lessonId?: 
   return (
     <div className="app min-h-dvh">
       <aside className="side">
-        <Logo />
+        <HomeLogo />
         <Link to="/t/lessons" className="nav on">
           <Layers aria-hidden="true" />
           <span>{t('teacher.shell.lessons')}</span>
         </Link>
         <PhoneMenu>
-          <LangSwitch />
+          <div className="prefs">
+            <LangSwitch />
+            <ModeToggle />
+          </div>
           <SwitchSide to="student" block {...(lessonId ? { lessonId } : {})} />
           <DemoMenu {...(assignmentId ? { assignmentId } : {})} />
         </PhoneMenu>

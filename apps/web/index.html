@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LOGINA</title>
+    <!-- Applies a saved theme before the first paint, so a dark choice never flashes light. Same rule as src/lib/theme.ts. -->
+    <script>
+      try {
+        var theme = localStorage.getItem('logina.theme');
+        if (theme === 'dark') document.documentElement.dataset.theme = 'dark';
+        else if (theme === 'system') delete document.documentElement.dataset.theme;
+      } catch (error) {}
+    </script>
     <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>

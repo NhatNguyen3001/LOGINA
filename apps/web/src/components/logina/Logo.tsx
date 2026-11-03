@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 
 export function Logo() {
@@ -19,5 +20,15 @@ export function Logo() {
       </span>
       <span className="wm">{t('common.brand')}</span>
     </div>
+  );
+}
+
+/** The logo as a way back to the start page, on every side of the app. */
+export function HomeLogo() {
+  const { t } = useTranslation();
+  return (
+    <Link to="/" className="logo-home" aria-label={t('student.shell.logoHome')}>
+      <Logo />
+    </Link>
   );
 }

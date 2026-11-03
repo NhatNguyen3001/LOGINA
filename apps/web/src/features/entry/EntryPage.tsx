@@ -3,6 +3,7 @@ import { Check, ClipboardCheck, PencilLine, type LucideIcon } from 'lucide-react
 import { useId, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LangSwitch } from '@/components/logina/LangSwitch';
+import { ModeToggle } from '@/components/logina/ModeToggle';
 import { LegalFooter } from '@/components/logina/LegalFooter';
 import { Logo } from '@/components/logina/Logo';
 import { Note } from '@/components/logina/Note';
@@ -107,7 +108,10 @@ export function EntryPage() {
     <div className="flex min-h-dvh flex-col bg-page">
       <header className="entry-top">
         <Logo />
-        <LangSwitch />
+        <div className="prefs">
+          <LangSwitch />
+          <ModeToggle />
+        </div>
       </header>
       <main className="entry">
         <div className="entry-intro">

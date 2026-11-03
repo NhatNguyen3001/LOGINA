@@ -3,6 +3,7 @@ import { Accessibility, ArrowLeft, FileText, ShieldCheck, type LucideIcon } from
 import { Fragment, useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LangSwitch } from '@/components/logina/LangSwitch';
+import { ModeToggle } from '@/components/logina/ModeToggle';
 import { PanelShell } from '@/components/logina/PanelShell';
 import { StatusTag } from '@/components/logina/StatusTag';
 import accessibility from '@/legal/accessibility-statement.md?raw';
@@ -154,7 +155,10 @@ export function LegalPage({ doc }: { doc: Doc }) {
         </ul>
       </nav>
       <div className="stu-tools">
-        <LangSwitch />
+        <div className="prefs">
+          <LangSwitch />
+          <ModeToggle />
+        </div>
       </div>
     </>
   );

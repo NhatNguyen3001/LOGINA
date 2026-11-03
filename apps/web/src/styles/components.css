@@ -309,7 +309,7 @@ a.card-link:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:
 .prompt-row{display:grid;grid-template-columns:minmax(58px,auto) minmax(0,1fr) 120px 92px;gap:12px;align-items:center}
 .prompt-row .clip{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 button.clip{min-width:0;padding:0;border:0;background:none;color:inherit;text-align:left;cursor:pointer;border-radius:4px}
-button.clip:hover{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+button.clip:hover{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px}
 .prompt-row [data-slot="badge"]{justify-self:start}
 .prompt-list .prompt-row{grid-template-columns:74px minmax(0,1fr) 120px 92px}
 .dash-row{display:grid;grid-template-columns:24px minmax(0,1fr) 42px;gap:10px;align-items:center;font-size:13px}
@@ -516,3 +516,27 @@ a.task:hover{background:var(--subtle)}
   .entry-lede{font-size:16px}
 }
 @media (prefers-reduced-motion:reduce){.role-card,.role-card:hover:not(:disabled){transform:none}}
+/* The language switch and the theme toggle sit together wherever either appears. */
+.prefs{display:flex;align-items:center;gap:8px;width:100%}
+.prefs .lang-switch{flex:1 1 auto}
+.prefs .mode-toggle{flex:none;width:44px;height:44px}
+.entry-top .prefs{width:auto}
+.entry-top .prefs .lang-switch{flex:none}
+/* A panel kept mounted while closed is out of sight and out of the way. */
+[data-slot="sheet-content"][data-state="closed"]{display:none}
+/* The entry page fits one screen at every common size: the strip and the previews give way first. */
+@media (max-height:820px),(max-width:860px){.entry-how{display:none}}
+@media (max-height:700px),(max-width:640px){.role-preview{display:none}}
+@media (max-width:640px){
+  .entry-top{padding:14px 16px 0}
+  .entry{padding:16px 16px 12px;gap:12px}
+  .entry-h{font-size:24px}
+  .entry-lede{font-size:15px}
+  .role-grid{gap:10px;margin-top:4px}
+  .role-card{padding:14px 16px;gap:6px}
+  .role-ic{width:34px;height:34px}
+  .role-title{font-size:17px}
+  .role-note{font-size:14px}
+}
+@media (max-height:700px) and (min-width:641px){.entry{padding-top:20px;gap:14px}}
+@media (max-width:400px){.entry-top{gap:8px}.entry-top .prefs{gap:6px}.entry-top .lang-switch button{padding-inline:9px}}
