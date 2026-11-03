@@ -2,6 +2,8 @@ import type { Slot } from '@logina/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { BackLink } from '@/components/logina/BackLink';
+import { promptName } from '@/lib/prompt-name';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { getTrace } from '@/lib/api';
@@ -49,6 +51,7 @@ export function TracePage() {
         <span>/</span>
         <span>{person}</span>
       </nav>
+      <BackLink to="/t/assignments/$id" params={{ id: assignmentId }} label={t('teacher.t14.backToTracking')} />
       <div className="row">
         <h1 className="h1 num">{person}</h1>
         {completedAt ? <StatusTag kind="pass">{t('teacher.t15.completed', { time: new Date(completedAt).toLocaleString(i18n.language) })}</StatusTag> : null}
@@ -89,7 +92,7 @@ export function TracePage() {
           <div className="row">
             <span className="small b">{t('teacher.t15.think')}</span>
             <span className="sp" />
-            <Badge kind="info">{challenge.label}</Badge>
+            <Badge kind="info">{promptName(challenge.label, t)}</Badge>
           </div>
           <p className="m">{challenge.message}</p>
           <span className="s13 sec">{t('teacher.t15.why', { reason: challenge.whySelected })}</span>

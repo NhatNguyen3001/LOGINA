@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { promptName } from '@/lib/prompt-name';
 import { Note } from '@/components/logina/Note';
 import { PairGrid } from '@/components/logina/PairGrid';
 import { getLesson, getLogicReview, getPreview, newKey, sendEdit } from '@/lib/api';
@@ -56,7 +57,7 @@ export function LogicPage() {
           {logic.data?.challenges.map((challenge) => (
             <div key={challenge.label} className={`cand ${challenge.isFallback ? 'fb' : ''}`}>
               <div className="row">
-                <Badge kind="info">{challenge.label}</Badge>
+                <Badge kind="info">{promptName(challenge.label, t)}</Badge>
                 <span className="s13 b">{challenge.purpose}</span>
               </div>
               <p className="msg">{challenge.message}</p>
@@ -72,7 +73,7 @@ export function LogicPage() {
               <SelectTrigger id="challenge"><SelectValue placeholder={t('student.q4.choose')} /></SelectTrigger>
               <SelectContent>
                 {logic.data?.boundedEditActions.map((action) => (
-                  <SelectItem key={action.challengeId} value={action.challengeId}>{action.label}</SelectItem>
+                  <SelectItem key={action.challengeId} value={action.challengeId}>{promptName(action.label, t)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

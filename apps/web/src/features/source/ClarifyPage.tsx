@@ -12,6 +12,7 @@ import { alertVariants } from '@/components/ui/alert';
 import { RestartAnalysis } from '@/features/lessons/RestartAnalysis';
 import { getSourceReview, newKey, resolveIssue } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { useSamplePrefill, type SamplePrefill } from '@/lib/sample-prefill';
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,13 +26,18 @@ type Issue = SourceReviewDTO['issues'][number];
 type Mode = 'adjust' | 'keepOpen' | 'exclude' | null;
 type Resolution = ResolveIssueReq extends infer R ? (R extends { baseVersion: number } ? Omit<R, 'baseVersion'> : never) : never;
 
-function IssueCard({ issue, onResolve, pending, onFocusPoint }: { issue: Issue; onResolve: (req: Resolution) => void; pending: boolean; onFocusPoint: (point: number | null) => void }) {
+function IssueCard({ issue, onResolve, pending, onFocusPoint, sample }: { issue: Issue; onResolve: (req: Resolution) => void; pending: boolean; onFocusPoint: (point: number | null) => void; sample: SamplePrefill['issues'][string] | undefined }) {
   const { t, i18n } = useTranslation();
-  const [mode, setMode] = useState<Mode>(null);
-  const [suggestion, setSuggestion] = useState(issue.suggestions[0]?.id ?? '');
+  /** Until the teacher chooses, the sample's own answer shows; it arrives with the lesson, which may load after this card. */
+  const [chosenMode, setMode] = useState<Mode | undefined>();
+  const [chosenSuggestion, setSuggestion] = useState<string | null>(null);
   const [text, setText] = useState(issue.currentInterpretation);
-  const [bounds, setBounds] = useState('');
-  const [reason, setReason] = useState('');
+  const [typedBounds, setBounds] = useState<string | null>(null);
+  const [typedReason, setReason] = useState<string | null>(null);
+  const mode = chosenMode === undefined ? (sample?.keepOpen ? 'keepOpen' : null) : chosenMode;
+  const suggestion = chosenSuggestion ?? sample?.suggestionId ?? issue.suggestions[0]?.id ?? '';
+  const bounds = typedBounds ?? (mode === 'keepOpen' ? sample?.keepOpen?.bounds : undefined) ?? '';
+  const reason = typedReason ?? (mode === 'keepOpen' ? sample?.keepOpen?.reason : undefined) ?? '';
   const resolved = issue.state !== 'UNRESOLVED';
   const blocker = issue.severity === 'BLOCKER';
 
@@ -128,6 +134,7 @@ export function ClarifyPage() {
   const { id } = useParams({ strict: false }) as { id: string };
   const queryClient = useQueryClient();
   const [litPoint, setLitPoint] = useState<number | null>(null);
+  const sample = useSamplePrefill(id);
   const review = useQuery({ queryKey: qk.sourceReview(id), queryFn: () => getSourceReview(id) });
 
   const resolve = useMutation({
@@ -190,7 +197,7 @@ export function ClarifyPage() {
         </div>
         <div className="stack">
           {issues.map((issue) => (
-            <IssueCard key={`${issue.id}-${issue.state}`} issue={issue} pending={resolve.isPending} onFocusPoint={setLitPoint} onResolve={(req) => resolve.mutate({ issueId: issue.id, req })} />
+            <IssueCard key={`${issue.id}-${issue.state}`} issue={issue} sample={sample?.issues[issue.id]} pending={resolve.isPending} onFocusPoint={setLitPoint} onResolve={(req) => resolve.mutate({ issueId: issue.id, req })} />
           ))}
         </div>
       </div>

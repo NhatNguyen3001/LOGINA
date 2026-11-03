@@ -66,7 +66,7 @@ test('the full teacher path, from the sample to tracking', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Open to fix' }).click();
   await expect(page).toHaveURL(new RegExp('tasks/Q4$'));
-  await page.getByRole('button', { name: 'Edit TN2' }).click();
+  await page.getByRole('button', { name: 'Edit Prompt 2' }).click();
   await page.locator('#prompt-TN2').fill('What else would you need to know before saying that agriculture is weaker?');
   await page.getByRole('button', { name: 'Save and recheck' }).click();
   await expect(page.getByText('Draft v4')).toBeVisible({ timeout: 60_000 });

@@ -9,9 +9,10 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { Note } from '@/components/logina/Note';
 import { Stepper } from '@/components/logina/Stepper';
-import { ApiError, createLesson, getClass, getMe, getUploadUrl, newKey, registerMaterial, startAnalyze } from '@/lib/api';
+import { ApiError, createLesson, getMe, getUploadUrl, newKey, registerMaterial, startAnalyze } from '@/lib/api';
 import { errorText } from '@/lib/errors';
 import { qk } from '@/lib/query';
+import { SAMPLE_PREFILL } from '@/lib/sample-prefill';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -61,12 +62,16 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
 
   const me = useQuery({ queryKey: qk.me(), queryFn: getMe });
   const classId = me.data?.classIds[0];
-  const classInfo = useQuery({ queryKey: qk.class(classId ?? 'none'), queryFn: () => getClass(classId!), enabled: Boolean(classId) });
 
-  const { register, handleSubmit, control, formState: { errors } } = useForm<Form>({
+  const { register, handleSubmit, control, setValue, getValues, formState: { errors } } = useForm<Form>({
     resolver: zodResolver(Form),
     defaultValues: kept.form ?? { sourceTitle: '', title: '', subject: '', topic: '', objective: '', contentLocale: i18n.language === 'vi' ? 'vi' : 'en' },
   });
+
+  /** The sample fills every field in the material language, so a judge only has to press Analyze. */
+  const fillSample = (locale: Form['contentLocale']) => {
+    for (const [name, value] of Object.entries(SAMPLE_PREFILL[locale].lesson)) setValue(name as keyof Form, value, { shouldValidate: Boolean(errors[name as keyof Form]) });
+  };
 
   const analyze = useMutation({
     mutationFn: async (values: Form) => {
@@ -136,6 +141,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
               {sampleAllowed ? (
                 <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => {
                   setUseSample(true);
+                  fillSample(getValues('contentLocale'));
                   setFile(null);
                   setMissingMaterial(false);
                   analyze.reset();
@@ -160,7 +166,10 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
                 control={control}
                 name="contentLocale"
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(value) => {
+                    field.onChange(value);
+                    if (useSample) fillSample(value as Form['contentLocale']);
+                  }}>
                     <SelectTrigger id="contentLocale" onBlur={field.onBlur}><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="en">{t('common.lang.en')}</SelectItem>
@@ -192,10 +201,6 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
           </div>
         </div>
         <div className={cn(cardVariants(), 'sticky')}>
-          <div className="row">
-            <span className="s13 muted">{t('teacher.t01.class')}</span>
-            <span className="b">{classInfo.data?.name ?? t('common.loading')}</span>
-          </div>
           <h3 className="s15 b">{t('teacher.t01.structureTitle')}</h3>
           <ol className="stack">
             {SLOTS.map((slot) => (

@@ -1,6 +1,7 @@
 import type { TeacherLogicReviewDTO } from '@logina/contracts';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
+import { promptName } from '@/lib/prompt-name';
 
 const RELATION_CLASS: Record<string, string> = { FULL: 'full', PARTIAL: 'part', CONTRADICTS: 'contra', IRRELEVANT: 'none' };
 
@@ -24,7 +25,7 @@ export function PairGrid({ pairs }: { pairs: TeacherLogicReviewDTO['pairs'] }) {
                 <div key={evidenceId} className={row === answers.length - 1 ? 'last' : ''}>
                   <span className={`rel ${RELATION_CLASS[pair?.relationLabel ?? ''] ?? 'none'}`}>{pair?.relationLabel}</span>
                   <span className="s13">{pair?.explanation}</span>
-                  <span className="goes">{pair?.goesTo}</span>
+                  <span className="goes">{pair?.goesTo ? promptName(pair.goesTo, t) : null}</span>
                 </div>
               );
             })}

@@ -18,9 +18,9 @@
       "lede": "LOGINA reads your material first, asks you about anything unclear, and only then drafts 5 tasks. You approve the source once and the tasks once before assigning.",
       "material": "1. Material",
       "chooseFile": "Choose file",
-      "useSample": "Use sample material",
+      "useSample": "Use sample material (pre-filled)",
       "fileHint": "PDF or Word · up to 20 MB",
-      "sampleChosen": "Sample material ready",
+      "sampleChosen": "Sample material ready. Every step is pre-filled with example answers, so you can check each one and continue.",
       "sourceTitle": "Source title",
       "required": "(required)",
       "requiredError": "This field is required.",
@@ -30,7 +30,6 @@
       "goal": "Reasoning goal",
       "lessonInfo": "3. Lesson",
       "lessonTitle": "Lesson set title",
-      "class": "Class",
       "subject": "Subject",
       "topic": "Topic",
       "structureTitle": "The 5 tasks",
@@ -413,7 +412,9 @@
       "promptsNote": "How often each prompt was shown, and how often students revised after it. This shows what happened next, not why.",
       "promptsTitle": "Prompts followed by a revision",
       "seeAll": "See all prompts",
-      "revisedOf": "{{revised}} of {{count}} revised"
+      "revisedOf": "{{revised}} of {{count}} revised",
+      "backToLessons": "Back to lesson sets",
+      "backToTracking": "Back to attempt tracking"
     },
     "t15": {
       "changed": "Changed",
@@ -437,7 +438,9 @@
       "drafts": "Draft the tasks",
       "checks": "Run the quality checks",
       "recheck": "Recheck the changed parts"
-    }
+    },
+    "promptN": "Prompt {{n}}",
+    "promptFallback": "Neutral prompt"
   },
   "errors": {
     "FILE_TYPE": "LOGINA reads PDF or Word files.",
@@ -726,7 +729,12 @@
       "APPROVE_ASSIGN": "Approval 2 & assign",
       "ASSIGNED": "Assigned"
     },
-    "uploaded": "Your file"
+    "uploaded": "Your file",
+    "deleteLabel": "Delete {{title}}",
+    "deleteTitle": "Delete “{{title}}”?",
+    "deleteBody": "This removes the lesson set, its tasks and its class results from this workspace. Research data already recorded stays. You cannot undo this.",
+    "deleteConfirm": "Delete lesson set",
+    "deleteCancel": "Keep it"
   },
   "consent": {
     "title": "Taking part in research",

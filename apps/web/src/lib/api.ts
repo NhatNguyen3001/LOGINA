@@ -137,6 +137,7 @@ export const sendConsent = (req: { consentVersion: string; choice: 'AGREED' | 'D
 export const getLessons = () => get('/lessons', LessonListDTO);
 export const getLesson = (id: string) => get(lessonPath(id), LessonDTO);
 export const createLesson = (req: CreateLessonReq, key: string) => post('/lessons', LessonDTO, req, key);
+export const deleteLesson = (id: string, key: string) => post(`${lessonPath(id)}/delete`, Ok, {}, key);
 export const getClass = (id: string) => get(`/classes/${id}`, ClassDTO);
 
 export const getUploadUrl = (lessonId: string, req: UploadUrlReq, key: string) => post(`${lessonPath(lessonId)}/materials/upload-url`, UploadUrlDTO, req, key);

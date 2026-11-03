@@ -6,6 +6,7 @@ import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
 import { respond } from '../middleware/respond.js';
 import { createJob, toJobDTO } from '../services/jobs.js';
+import { deleteLesson } from '../services/lessons.js';
 
 const iso = (value: { toDate: () => Date } | undefined): string => value?.toDate().toISOString() ?? new Date(0).toISOString();
 
@@ -27,7 +28,7 @@ export const toLessonDTO = (lesson: DocumentData) => ({
 });
 
 export function lessonRoutes(deps: AppDeps): Hono<AppEnv> {
-  const { db, enqueue } = deps;
+  const { db, enqueue, files } = deps;
   const routes = new Hono<AppEnv>();
 
   routes.get('/', async (c) => {
@@ -114,6 +115,19 @@ export function lessonRoutes(deps: AppDeps): Hono<AppEnv> {
       await db.doc(`lessons/${lessonId}`).update({ stage: 'CLARIFY', activeJobId: job.id });
       await enqueue({ jobId: job.id, type: 'PARSE', lessonId, targetIds: [] });
       return respond(c, JobDTO, toJobDTO(job));
+    }),
+  );
+
+  routes.post(
+    '/:id/delete',
+    withIdempotency(db, async (c) => {
+      const { schoolId } = c.var.user;
+      const lessonId = c.req.param('id') as string;
+      const lesson = await lessonsRepo.get(db, schoolId, lessonId);
+      if (!lesson) throw new AppError('NOT_FOUND', 404, 'Not found.');
+      if (lesson.activeJobId) throw new AppError('JOB_RUNNING', 409, 'A job is still running on this lesson.');
+      await deleteLesson(db, files, schoolId, lessonId);
+      return c.json({ ok: true });
     }),
   );
 

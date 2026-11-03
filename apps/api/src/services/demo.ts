@@ -5,6 +5,7 @@ import type { Artifact } from '@logina/contracts';
 import type { FileStore } from '../context.js';
 import { loadRelease, lockTask, startAttempt, submitTask } from './runtime.js';
 import type { ResearchSettings } from './research.js';
+import { removeLessonTree } from './lessons.js';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const SIMULATED_PARTICIPANTS = 7;
@@ -16,18 +17,7 @@ const TENANT_COLLECTIONS = ['assignments', 'attempts', 'jobs', 'previewViews'];
 export async function clearWorkspace(db: Firestore, files: FileStore, schoolId: string): Promise<void> {
   await db.doc(`schools/${schoolId}`).update({ readyAt: null, copyStartedAt: FieldValue.serverTimestamp(), failNextRerun: FieldValue.delete() });
   const lessons = await db.collection('lessons').where('schoolId', '==', schoolId).get();
-  await Promise.all(
-    lessons.docs.map(async (lesson) => {
-      const materials = await lesson.ref.collection('materialVersions').get();
-      await Promise.all(
-        materials.docs
-          .map((doc) => doc.data().storagePath as string)
-          .filter((path) => path.startsWith('uploads/'))
-          .map((path) => files.remove(path)),
-      );
-      await db.recursiveDelete(lesson.ref);
-    }),
-  );
+  await Promise.all(lessons.docs.map((lesson) => removeLessonTree(db, files, lesson.ref)));
   for (const name of TENANT_COLLECTIONS) {
     const docs = await db.collection(name).where('schoolId', '==', schoolId).get();
     await Promise.all(docs.docs.map((doc) => db.recursiveDelete(doc.ref)));

@@ -9,6 +9,7 @@ import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { ApiError, approveTask, getApproval, getLesson, newKey, sendDisposition } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { useSamplePrefill } from '@/lib/sample-prefill';
 import { TaskStatusTag } from '@/features/tasks/task-status';
 import { TranslationReview } from './TranslationReview';
 import { Textarea } from '@/components/ui/textarea';
@@ -37,7 +38,9 @@ function Decision({ lessonId, task, findings }: { lessonId: string; task: Task; 
   const queryClient = useQueryClient();
   const reasonId = useId();
   const [accepting, setAccepting] = useState(false);
-  const [reason, setReason] = useState('');
+  const sampleReason = useSamplePrefill(lessonId)?.acceptReason;
+  const [typed, setReason] = useState<string | null>(null);
+  const reason = typed ?? sampleReason ?? '';
   const first = findings[0]!;
   const accept = useMutation({
     mutationFn: () => Promise.all(findings.map(({ gateId, findingCode }) => sendDisposition(lessonId, task.slot, { decision: 'TEACHER_ACCEPT_WITH_REASON', gateId, findingCode, reason, baseVersion: task.draftVersion }, newKey()))),
