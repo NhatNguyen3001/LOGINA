@@ -74,21 +74,31 @@ LOGINA does not grade or rank students, and it makes no claims about learning ga
 
 ## Screenshots
 
+Every screen has a light and a dark theme. GitHub shows the one that matches your own theme, and the links below open either version.
+
 | Choose a side, with no sign-in | Review what AI flagged in the material |
 |---|---|
-| ![Entry page with buttons to try LOGINA as a teacher or a student](docs/screenshots/entry.png) | ![Clarify material screen showing the source beside the points to resolve](docs/screenshots/teacher-clarify.png) |
+| <picture> <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/entry-dark.png" /> <img src="docs/screenshots/entry-light.png" alt="Entry page with cards to try LOGINA as a teacher or a student" /> </picture> | <picture> <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/teacher-clarify-dark.png" /> <img src="docs/screenshots/teacher-clarify-light.png" alt="Clarify material screen showing the source beside the points to resolve" /> </picture> |
 
 | Answer on your own | Think again with one approved prompt |
 |---|---|
-| ![Q1 with a chosen statement and evidence card](docs/screenshots/student-answer.png) | ![Think again screen showing the locked answer and a prompt, with keep and revise buttons](docs/screenshots/student-think-again.png) |
+| <picture> <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/student-answer-dark.png" /> <img src="docs/screenshots/student-answer-light.png" alt="Q1 with a chosen statement and evidence card" /> </picture> | <picture> <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/student-think-again-dark.png" /> <img src="docs/screenshots/student-think-again-light.png" alt="Think again screen showing a prompt above the locked answer, with a Submit button" /> </picture> |
 
 **Track how the class responded**
 
-![Tracking dashboard with keep or revise counts and confidence from first to final answer for each task](docs/screenshots/teacher-tracking.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/teacher-tracking-dark.png" />
+  <img src="docs/screenshots/teacher-tracking-light.png" alt="Tracking dashboard with keep or revise counts and confidence from first to final answer for each task" />
+</picture>
+
+Light: [entry](docs/screenshots/entry-light.png), [clarify](docs/screenshots/teacher-clarify-light.png), [answer](docs/screenshots/student-answer-light.png), [think again](docs/screenshots/student-think-again-light.png), [tracking](docs/screenshots/teacher-tracking-light.png). Dark: [entry](docs/screenshots/entry-dark.png), [clarify](docs/screenshots/teacher-clarify-dark.png), [answer](docs/screenshots/student-answer-dark.png), [think again](docs/screenshots/student-think-again-dark.png), [tracking](docs/screenshots/teacher-tracking-dark.png).
 
 ## Architecture
 
-![LOGINA architecture: the web app reaches the API through Firebase Hosting; the API uses Firestore and queues jobs on Cloud Tasks; a private worker reads uploads from Cloud Storage, calls Vertex AI and appends rows to Google Sheets.](docs/architecture/logina-architecture-light.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture/logina-architecture-dark.png" />
+  <img src="docs/architecture/logina-architecture-light.png" alt="LOGINA architecture: the web app reaches the API through Firebase Hosting; the API uses Firestore and queues jobs on Cloud Tasks; a private worker reads uploads from Cloud Storage, calls Vertex AI and appends rows to Google Sheets." />
+</picture>
 
 Open [`docs/architecture/logina-architecture.html`](docs/architecture/logina-architecture.html) in a browser for the interactive version. The diagram source is [`logina.architecture.json`](docs/architecture/logina.architecture.json), rendered with [Archify](https://github.com/tt-a1i/archify).
 
