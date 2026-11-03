@@ -31,24 +31,30 @@ i18n.on('languageChanged', (lang) => {
 
 export const applySessionLocale = (lang: Lang): Promise<TFunction> => i18n.changeLanguage(lang);
 
-let switching: Lang | null = null;
+export interface SwitchState {
+  /** The language being switched to, while the server prepares the content in it. */
+  to: Lang | null;
+  /** The last switch could not be saved, so nothing changed. */
+  failed: boolean;
+}
+
+let switchState: SwitchState = { to: null, failed: false };
 const switchListeners = new Set<() => void>();
 
-function setSwitching(lang: Lang | null): void {
-  switching = lang;
-  if (lang) document.documentElement.dataset.switching = lang;
+function setSwitchState(next: SwitchState): void {
+  switchState = next;
+  if (next.to) document.documentElement.dataset.switching = next.to;
   else delete document.documentElement.dataset.switching;
   switchListeners.forEach((listener) => listener());
 }
 
-/** The language being switched to, while the server prepares the content in it. */
-export const useSwitchingTo = (): Lang | null =>
+export const useSwitchState = (): SwitchState =>
   useSyncExternalStore(
     (listener) => {
       switchListeners.add(listener);
       return () => switchListeners.delete(listener);
     },
-    () => switching,
+    () => switchState,
   );
 
 /**
@@ -57,15 +63,16 @@ export const useSwitchingTo = (): Lang | null =>
  */
 export async function switchLanguage(lang: Lang): Promise<void> {
   if (saveLocale) {
-    setSwitching(lang);
+    setSwitchState({ to: lang, failed: false });
     try {
       await saveLocale(lang);
     } catch {
-      // The words still switch; the content stays in the saved language until the next try.
-    } finally {
-      await i18n.changeLanguage(lang);
-      setSwitching(null);
+      // Nothing changes: switching only the words would show half of each language.
+      setSwitchState({ to: null, failed: true });
+      return;
     }
+    await i18n.changeLanguage(lang);
+    setSwitchState({ to: null, failed: false });
     return;
   }
   await i18n.changeLanguage(lang);

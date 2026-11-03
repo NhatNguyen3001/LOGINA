@@ -7,8 +7,7 @@ import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
-import { errorKey } from '@/i18n';
-import { ApiError, assignLesson, getApproval, getClass, getLesson, newKey } from '@/lib/api';
+import { assignLesson, getApproval, getClass, getLesson, newKey } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -16,6 +15,7 @@ import { cardVariants } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { errorText } from '@/lib/errors';
 
 export function AssignPage() {
   const { t } = useTranslation();
@@ -42,6 +42,7 @@ export function AssignPage() {
   if (lesson.isError || approval.isError) {
     return (
       <LoadFailed
+        error={lesson.error ?? approval.error}
         onRetry={() => {
           void lesson.refetch();
           void approval.refetch();
@@ -91,7 +92,7 @@ export function AssignPage() {
               </TableBody>
             </Table>
           <p className="small muted">{t('teacher.t13.pinned')}</p>
-          {assign.isError ? <Note kind="err">{t(errorKey(assign.error instanceof ApiError ? assign.error.code : ''))}</Note> : null}
+          {assign.isError ? <Note kind="err">{t(errorText(assign.error))}</Note> : null}
           <button type="button" className={buttonVariants({ block: true })} aria-busy={assign.isPending} disabled={assign.isPending} onClick={() => assign.mutate()}>{t('teacher.t13.title')}</button>
         </div>
       </div>

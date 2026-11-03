@@ -10,7 +10,6 @@ import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { SwitchSide } from '@/components/logina/SwitchSide';
-import { errorKey } from '@/i18n';
 import { ApiError, getChallenges, getLesson, getPreview, getTasks, newKey, rerunTask, sendEdit, tryCase } from '@/lib/api';
 import { qk, useJobPolling } from '@/lib/query';
 import { TaskStatusTag } from './task-status';
@@ -18,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { cardVariants } from '@/components/ui/card';
+import { errorText } from '@/lib/errors';
 
 const GATE_KIND = { PASS: 'pass', REVIEW_REQUIRED: 'review', BLOCKER: 'block' } as const;
 const RECHECKING = ['VALIDATING', 'GENERATING', 'STALE'];
@@ -55,7 +55,7 @@ function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, o
     <div className="stack">
       <label className="s13 b" htmlFor={`prompt-${challengeId}`}>{t('teacher.t07.editPrompt', { label: challengeId })}</label>
       <Textarea id={`prompt-${challengeId}`} value={value} onChange={(event) => setValue(event.target.value)} />
-      {save.isError ? <Note kind="err">{t(errorKey(save.error instanceof ApiError ? save.error.code : ''))}</Note> : null}
+      {save.isError ? <Note kind="err">{t(errorText(save.error))}</Note> : null}
       <div className="row">
         <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={save.isPending} disabled={!value.trim() || value === message || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={onClose}>{t('common.cancel')}</button>
@@ -217,7 +217,7 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
           </div>
         </div>
       ) : null}
-      {save.isError && !refused && !conflict && code !== 'RATE_LIMITED' ? <Note kind="err">{t(errorKey(code))}</Note> : null}
+      {save.isError && !refused && !conflict && code !== 'RATE_LIMITED' ? <Note kind="err">{t(errorText(save.error))}</Note> : null}
       <div className="row">
         <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={save.isPending} disabled={!value.trim() || value === text || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={onClose}>{t('common.cancel')}</button>

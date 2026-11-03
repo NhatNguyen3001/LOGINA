@@ -8,7 +8,7 @@ import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
-import { ApiError, chooseSufficiency, getLesson, getTasks, newKey } from '@/lib/api';
+import { chooseSufficiency, getLesson, getTasks, newKey } from '@/lib/api';
 import { jobFinished, qk, useJobPolling } from '@/lib/query';
 import { readableSourceRefs } from '@/lib/source-refs';
 import { useSecondsSince } from '@/lib/use-seconds-since';
@@ -17,6 +17,7 @@ import { cardVariants } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { errorText } from '@/lib/errors';
 
 const CHOICES = ['REFOCUS', 'ADD_SOURCE', 'LEAVE_EMPTY'] as const;
 const SUFFICIENCY_KIND = { SUFFICIENT: 'pass', UNCERTAIN: 'review', INSUFFICIENT: 'block' } as const;
@@ -50,7 +51,7 @@ function Q4Decision({ lessonId, slot, version }: { lessonId: string; slot: Slot;
           </RadioGroupItem>
         ))}
       </RadioGroup>
-      {send.isError ? <Note kind="err">{t(errorKey(send.error instanceof ApiError ? send.error.code : ''))}</Note> : null}
+      {send.isError ? <Note kind="err">{t(errorText(send.error))}</Note> : null}
       <div className="row">
         <span className="sp" />
         <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={send.isPending} disabled={send.isPending} onClick={() => send.mutate()}>{t('teacher.t06.regenerate', { slot })}</button>

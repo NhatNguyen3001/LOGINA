@@ -470,7 +470,11 @@
     "ATTEMPT_INCOMPLETE": "Hãy làm xong tất cả các bài trước.",
     "UNKNOWN_OPTION": "Lựa chọn này không thuộc bài này.",
     "CONSENT_VERSION_STALE": "Thông tin nghiên cứu đã thay đổi. Vui lòng đọc lại.",
-    "JOB_RUNNING": "LOGINA vẫn đang xử lý bài này."
+    "JOB_RUNNING": "LOGINA vẫn đang xử lý bài này.",
+    "NETWORK": "Không kết nối được tới LOGINA. Hãy kiểm tra kết nối rồi thử lại.",
+    "INTERNAL": "LOGINA đang gặp lỗi. Hãy thử lại sau ít phút.",
+    "RATE_LIMITED": "LOGINA đang bận. Hãy thử lại sau vài giây.",
+    "CONTENT_OUTDATED": "Bản dùng thử này được tạo bằng phiên bản cũ của LOGINA. Hãy đặt lại bản dùng thử để nhận nhiệm vụ mới."
   },
   "common": {
     "lang": {
@@ -502,7 +506,9 @@
       "light": "Sáng",
       "dark": "Tối",
       "system": "Theo thiết bị"
-    }
+    },
+    "langFailed": "Chưa đổi được ngôn ngữ. Em thử lại nhé.",
+    "resetDemo": "Đặt lại bản dùng thử"
   },
   "demo": {
     "jumpSampleOnly": "Chỉ cho bộ bài mẫu",
@@ -637,7 +643,7 @@
     },
     "q4": {
       "cards": "Thẻ",
-      "cardsHint": "Số thẻ nhiều hơn số chỗ trống, và mỗi thẻ chỉ dùng một lần.",
+      "cardsHint": "Kéo thẻ vào chỗ trống, hoặc chạm vào thẻ rồi chạm vào chỗ trống. Số thẻ nhiều hơn số chỗ trống, và mỗi thẻ chỉ dùng một lần.",
       "chooseCard": "Hãy chọn một thẻ trước",
       "placeHere": "Chạm để đặt thẻ vào đây",
       "choose": "Chọn…"

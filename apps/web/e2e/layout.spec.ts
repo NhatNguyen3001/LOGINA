@@ -130,6 +130,43 @@ test('the task editor has the footer at the bottom', async ({ page }) => {
   await expectAtBottom(page, page.locator('.legal-foot'));
 });
 
+const dragOnto = async (page: Page, from: Locator, to: Locator) => {
+  const start = (await from.boundingBox())!;
+  const end = (await to.boundingBox())!;
+  await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(end.x + end.width / 2, end.y + end.height / 2, { steps: 20 });
+  await page.mouse.up();
+};
+
+test('Q4 cards drag into blanks, between blanks and back to the pile, and tapping still works', async ({ page }) => {
+  await startTasks(page);
+  for (const slot of ['Q1', 'Q2', 'Q3']) await completeTask(page, slot);
+  await expect(page).toHaveURL(/\/Q4$/);
+  const pile = page.locator('.card-bank');
+  const blanks = page.locator('.blank');
+  const first = pile.locator('.word-card').first();
+  const text = await first.innerText();
+
+  await dragOnto(page, first, blanks.nth(0));
+  await expect(blanks.nth(0)).toHaveText(text);
+  await expect(pile).not.toContainText(text);
+
+  await dragOnto(page, blanks.nth(0), blanks.nth(1));
+  await expect(blanks.nth(1)).toHaveText(text);
+  await expect(blanks.nth(0)).not.toHaveText(text);
+
+  await dragOnto(page, blanks.nth(1), pile);
+  await expect(pile).toContainText(text);
+  await expect(blanks.nth(1)).not.toHaveText(text);
+
+  // dnd-kit swallows a click that lands just after a drop; no person is that quick.
+  await page.waitForTimeout(200);
+  await pile.locator('.word-card').first().click();
+  await blanks.nth(2).click();
+  await expect(blanks.nth(2)).toHaveClass(/full/);
+});
+
 test('a finished student starts a new run, keeps the old one, and can always go home', async ({ page }) => {
   await startTasks(page);
   for (const slot of ['Q1', 'Q2', 'Q3', 'Q4', 'Q5']) await completeTask(page, slot);

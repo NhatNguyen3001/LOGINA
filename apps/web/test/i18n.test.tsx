@@ -66,12 +66,27 @@ describe('language', () => {
     expect(document.documentElement.dataset.switching).toBeUndefined();
   });
 
-  it('a failed save still switches the words on screen', async () => {
+  it('a failed save keeps the current language and says so', async () => {
     setUserLocaleSaver(async () => { throw new Error('offline'); });
     await renderWithI18n(<><LangSwitch /><Label /></>);
     await userEvent.click(screen.getByRole('button', { name: 'Tiếng Việt' }));
-    expect(await screen.findByText('Đọc bằng AI')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent('The language could not be changed. Try again.');
+    expect(screen.getByText('Read by AI')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'true');
     expect(document.documentElement.dataset.switching).toBeUndefined();
+  });
+
+  it('the chosen language keeps keyboard focus while it loads', async () => {
+    let finish = () => {};
+    setUserLocaleSaver(() => new Promise<void>((resolve) => { finish = resolve; }));
+    await renderWithI18n(<LangSwitch />);
+    const picked = screen.getByRole('button', { name: 'Tiếng Việt' });
+    picked.focus();
+    await userEvent.keyboard('{Enter}');
+    expect(picked).toHaveFocus();
+    expect(picked).not.toBeDisabled();
+    expect(picked).toHaveAttribute('aria-disabled', 'true');
+    await act(async () => finish());
   });
 
   it('switching without a session updates ?lang=', async () => {

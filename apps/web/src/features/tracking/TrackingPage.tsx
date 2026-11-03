@@ -115,6 +115,14 @@ function ConfidenceChart({ rows }: { rows: TaskRow[] }) {
     >
       <div aria-hidden="true">
         <BarChart data={points} index="slot" categories={[first, final]} colors={['control', 'accent']} minValue={0} maxValue={100} showLegend={false} yAxisWidth={32} className="h-44" />
+        {/* The numbers stay readable on a projected screen, not only on hover; screen readers get the table below. */}
+        <ul className="conf-nums">
+          {points.map((point) => (
+            <li key={point.slot}>
+              <span className="num">{point[first] === null ? '–' : `${point[first]} → ${point[final]}`}</span>
+            </li>
+          ))}
+        </ul>
       </div>
       <table className="vh" aria-label={t('teacher.t14.confidenceTitle')}>
         <thead>

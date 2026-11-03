@@ -7,13 +7,13 @@ import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { StatusTag, type TagKind } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
-import { errorKey } from '@/i18n';
-import { ApiError, approveSource, getLesson, getMaterialViewUrl, getSourceReview, newKey } from '@/lib/api';
+import { approveSource, getLesson, getMaterialViewUrl, getSourceReview, newKey } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { cardVariants } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { errorText } from '@/lib/errors';
 
 const STATUS_KIND: Record<SourceReviewDTO['summaryClaims'][number]['status'], TagKind> = { VERIFIED: 'pass', CONTEXT_ONLY: 'neutral', INSUFFICIENT: 'review', EXCLUDED: 'stale' };
 
@@ -38,7 +38,7 @@ export function SourcePage() {
     window.open(url, '_blank', 'noopener');
   };
 
-  if (!review.data) return review.isError ? <LoadFailed onRetry={() => void review.refetch()} /> : <LoadingSkeleton />;
+  if (!review.data) return review.isError ? <LoadFailed error={review.error} onRetry={() => void review.refetch()} /> : <LoadingSkeleton />;
   const { summaryClaims, teacherDecisions, openGaps, excluded, approveReady, blockersRemaining, readByAI } = review.data;
   const located = summaryClaims.every((claim) => claim.locator);
 
@@ -123,7 +123,7 @@ export function SourcePage() {
           <h3 className="b">{t('teacher.t05.ready')}</h3>
           <div className="row"><span className={blockersRemaining === 0 ? 'ok' : 'no'}>{blockersRemaining === 0 ? '✓' : '✕'}</span><span>{t('teacher.t05.blockers', { count: blockersRemaining })}</span></div>
           <div className="row"><span className={located ? 'ok' : 'no'}>{located ? '✓' : '✕'}</span><span>{t('teacher.t05.located')}</span></div>
-          {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
+          {approve.isError ? <Note kind="err">{t(errorText(approve.error))}</Note> : null}
           <button type="button" className={buttonVariants({ block: true })} aria-busy={approve.isPending} disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t05.approve')}</button>
           <p className="small muted">{t('teacher.t05.note')}</p>
           <Link to="/t/lessons/$id/clarify" params={{ id }} className={buttonVariants({ variant: 'secondary', block: true })}>{t('teacher.t05.back')}</Link>

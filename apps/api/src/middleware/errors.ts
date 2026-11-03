@@ -1,4 +1,5 @@
 import type { Context } from 'hono';
+import { ZodError } from 'zod';
 import { AppError } from '@logina/db';
 
 import { RateLimited } from '../services/limits.js';
@@ -7,6 +8,7 @@ import { MaterialRefusal } from '../services/materials.js';
 export { AppError };
 
 const GENERIC_MESSAGE = 'Something went wrong. Please try again.';
+const OUTDATED_MESSAGE = 'This content was made with an older version. Reset the demo to get the current version.';
 
 /** Error bodies are `{ code, message, affectedRefs? }`; anything else goes to the logs only. */
 export function handleError(error: Error, c: Context): Response {
@@ -19,6 +21,11 @@ export function handleError(error: Error, c: Context): Response {
   if (error instanceof AppError) {
     const { code, message, affectedRefs } = error;
     return c.json({ code, message, ...(affectedRefs ? { affectedRefs } : {}) }, error.status);
+  }
+  /** Requests are checked with safeParse, so a thrown ZodError means stored data no longer fits the current format. */
+  if (error instanceof ZodError) {
+    console.error('Stored content in an older format:', error.issues);
+    return c.json({ code: 'CONTENT_OUTDATED', message: OUTDATED_MESSAGE }, 409);
   }
   console.error(error);
   return c.json({ code: 'INTERNAL', message: GENERIC_MESSAGE }, 500);

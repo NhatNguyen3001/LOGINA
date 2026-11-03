@@ -9,8 +9,7 @@ import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { RestartAnalysis } from '@/features/lessons/RestartAnalysis';
-import { errorKey } from '@/i18n';
-import { ApiError, getSourceReview, newKey, resolveIssue } from '@/lib/api';
+import { getSourceReview, newKey, resolveIssue } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -19,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { cardVariants } from '@/components/ui/card';
+import { errorText } from '@/lib/errors';
 
 type Issue = SourceReviewDTO['issues'][number];
 type Mode = 'adjust' | 'keepOpen' | 'exclude' | null;
@@ -166,7 +166,7 @@ export function ClarifyPage() {
         <span className="sp" />
         <span className="s13 muted">{t('teacher.t03.alwaysShown')}</span>
       </div>
-      {resolve.isError ? <Note kind="err">{t(errorKey(resolve.error instanceof ApiError ? resolve.error.code : ''))}</Note> : null}
+      {resolve.isError ? <Note kind="err">{t(errorText(resolve.error))}</Note> : null}
       <div className="cols l400">
         <div className={cn(cardVariants(), 'sticky')}>
           <div className="row">

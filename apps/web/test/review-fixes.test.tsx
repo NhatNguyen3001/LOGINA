@@ -40,6 +40,16 @@ describe('final review fixes', () => {
     for (const file of walk(resolve(process.cwd(), 'src')).filter((path) => /\.tsx?$/.test(path))) expect(readFileSync(file, 'utf8'), file).not.toMatch(/document\.title\s*=/);
   });
 
+  it('the reset dialog keeps a gap from the screen edges on a phone', () => {
+    expect(src('components/ui/alert-dialog.tsx')).toMatch(/inset-x-4/);
+    expect(src('components/ui/alert-dialog.tsx')).not.toMatch(/(^|s)w-full(s|')/);
+  });
+
+  it('a toast timer pauses while hovered and the card is announced only once', () => {
+    expect(src('components/logina/Toast.tsx')).not.toMatch(/role="status"/);
+    expect(src('styles/components.css')).toMatch(/:hover .toast-time{animation-play-state:paused}/);
+  });
+
   it('the copied Tremor components ship with their Apache 2.0 licence', () => {
     const licence = resolve(process.cwd(), 'src/components/tremor/LICENSE');
     expect(existsSync(licence)).toBe(true);
