@@ -1,35 +1,20 @@
-import { useSyncExternalStore } from 'react';
+import { createElement } from 'react';
+import { toast } from 'sonner';
+import { ToastCard } from '@/components/logina/Toast';
 
 const SHOW_MS = 8000;
+const ID = 'logina-toast';
 
 export interface ToastMessage {
   title: string;
   body: string;
 }
 
-let message: ToastMessage | null = null;
-let timer: ReturnType<typeof setTimeout> | undefined;
-const listeners = new Set<() => void>();
-
-const announce = () => listeners.forEach((listener) => listener());
-
 export function clearToast(): void {
-  clearTimeout(timer);
-  message = null;
-  announce();
+  toast.dismiss(ID);
 }
 
-/** Lives outside React, so a message survives the page change that follows the action it confirms. */
+/** Sonner keeps the message outside React, so it survives the page change that follows the action it confirms. */
 export function showToast(next: ToastMessage): void {
-  clearTimeout(timer);
-  message = next;
-  timer = setTimeout(clearToast, SHOW_MS);
-  announce();
+  toast.custom(() => createElement(ToastCard, { message: next, onClose: clearToast }), { id: ID, duration: SHOW_MS });
 }
-
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
-
-export const useToast = (): ToastMessage | null => useSyncExternalStore(subscribe, () => message);

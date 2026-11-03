@@ -6,6 +6,7 @@ import { LangSwitch } from './LangSwitch';
 import { LegalFooter } from './LegalFooter';
 import { PanelShell } from './PanelShell';
 import { SwitchSide } from './SwitchSide';
+import { buttonVariants } from '@/components/ui/button';
 
 interface StudentShellProps {
   /** The page's own heading. A task has none here: its question is the heading. */
@@ -28,7 +29,7 @@ export function StudentShell({ title, lesson, current, progress, reset, footer, 
       {progress}
       <div className="stu-tools">
         <div className="stu-pair">
-          <Link to="/s/assignments" className="btn secondary sm">
+          <Link to="/s/assignments" className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
             <History className="ico" aria-hidden="true" />
             {t('student.shell.runs')}
           </Link>

@@ -6,6 +6,8 @@ import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { getTrace } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { Badge } from '@/components/ui/badge';
+import { cardVariants } from '@/components/ui/card';
 
 function Choice({ label, letter, authoring, text, changed }: { label: string; letter: string; authoring: string; text: string; changed?: boolean }) {
   const { t } = useTranslation();
@@ -64,12 +66,12 @@ export function TracePage() {
           ),
         )}
       </div>
-      <div className="card tight">
+      <div className={cardVariants({ tone: 'tight' })}>
         <span className="small b sec">{t('teacher.t07.question')}</span>
         <p className="m">{questionStem}</p>
       </div>
       <div className="trio">
-        <div className="card">
+        <div className={cardVariants()}>
           <div className="row">
             <span className="small b sec">{t('teacher.t15.first')}</span>
             <span className="sp" />
@@ -83,20 +85,20 @@ export function TracePage() {
           </div>
           {before.relationLabel ? <span className="rel none">{before.relationLabel}</span> : null}
         </div>
-        <div className="card b-navy">
+        <div className={cardVariants({ edge: 'accent' })}>
           <div className="row">
             <span className="small b">{t('teacher.t15.think')}</span>
             <span className="sp" />
-            <span className="tag info">{challenge.label}</span>
+            <Badge kind="info">{challenge.label}</Badge>
           </div>
           <p className="m">{challenge.message}</p>
           <span className="s13 sec">{t('teacher.t15.why', { reason: challenge.whySelected })}</span>
           <div className="row">
             <span className="s13 muted grow">{t('teacher.t15.chose')}</span>
-            <span className="tag neutral">{t(challenge.studentChoice === 'KEEP' ? 'student.keep' : 'student.revise')}</span>
+            <Badge kind="neutral">{t(challenge.studentChoice === 'KEEP' ? 'student.keep' : 'student.revise')}</Badge>
           </div>
         </div>
-        <div className="card">
+        <div className={cardVariants()}>
           <div className="row">
             <span className="small b sec">{t('teacher.t15.final')}</span>
             <span className="sp" />

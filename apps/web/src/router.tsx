@@ -1,3 +1,4 @@
+import { Toast } from '@/components/logina/Toast';
 import { Outlet, createRootRoute, createRoute, createRouter, useNavigate, useParams } from '@tanstack/react-router';
 import { Suspense, lazy, type ComponentType } from 'react';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
@@ -35,7 +36,12 @@ const TaskRunner = screen(() => import('@/features/student/TaskRunner'), 'TaskRu
 
 function Root() {
   usePageTitle();
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <Toast />
+    </>
+  );
 }
 
 const rootRoute = createRootRoute({ component: Root });

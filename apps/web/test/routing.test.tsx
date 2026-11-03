@@ -1,9 +1,10 @@
 import type { MeDTO } from '@logina/contracts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Consent } from '@/features/student/Consent';
 import { DemoMenu } from '@/components/logina/DemoMenu';
+import { ResetRun } from '@/components/logina/ResetRun';
 import { EntryPage } from '@/features/entry/EntryPage';
 import { LessonsHome } from '@/features/lessons/LessonsHome';
 import { OpenAssignment } from '@/features/student/OpenAssignment';
@@ -20,7 +21,7 @@ vi.mock('@tanstack/react-router', async (original) => ({
   Navigate: ({ to }: { to: string }) => <p>{`redirect ${to}`}</p>,
   Link: ({ to, children, className }: { to: string; children: React.ReactNode; className?: string }) => <a href={to} className={className}>{children}</a>,
 }));
-vi.mock('@/lib/api', async (original) => ({ ...(await original<object>()), getLessons: vi.fn(), getLesson: vi.fn(), getMyAssignments: vi.fn(), getMe: vi.fn(), sendConsent: vi.fn(), getDemoSnapshots: vi.fn(), startAttempt: vi.fn(async () => ({ attemptId: 'att', status: 'NOT_STARTED', slots: [{ slot: 'Q1', phase: 'REASON' }] })) }));
+vi.mock('@/lib/api', async (original) => ({ ...(await original<object>()), resetAttempt: vi.fn(), getLessons: vi.fn(), getLesson: vi.fn(), getMyAssignments: vi.fn(), getMe: vi.fn(), sendConsent: vi.fn(), getDemoSnapshots: vi.fn(), startAttempt: vi.fn(async () => ({ attemptId: 'att', status: 'NOT_STARTED', slots: [{ slot: 'Q1', phase: 'REASON' }] })) }));
 vi.mock('@/lib/auth', () => ({ ensureSession: vi.fn(async () => {}), idToken: vi.fn(async () => 't'), renewSession: vi.fn(async () => {}) }));
 
 const withQuery = (ui: React.ReactElement) => <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{ui}</QueryClientProvider>;
@@ -120,11 +121,32 @@ describe('demo menu', () => {
     expect(localStorage.getItem('logina.demoTourSeen')).toBe('1');
   });
 
+  it('the demo drawer returns focus to its button on Escape', async () => {
+    await renderWithI18n(withQuery(<DemoMenu assignmentId="a" />));
+    const opener = await screen.findByRole('button', { name: 'Explore the demo' });
+    fireEvent.click(opener);
+    const drawer = await screen.findByRole('dialog', { name: 'Explore the demo' });
+    fireEvent.keyDown(drawer, { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Explore the demo' })).toBeNull());
+    expect(opener).toHaveFocus();
+  });
+
   it('is hidden when MeDTO.demoMenu is false', async () => {
     vi.mocked(api.getMe).mockResolvedValue({ ...me, demoMenu: false });
     await renderWithI18n(withQuery(<DemoMenu />));
     await waitFor(() => expect(api.getMe).toHaveBeenCalled());
     expect(screen.queryByRole('button', { name: 'Explore the demo' })).toBeNull();
+  });
+});
+
+describe('reset run', () => {
+  it('Reset asks before clearing and Cancel changes nothing', async () => {
+    await renderWithI18n(withQuery(<ResetRun attemptId="att1" />));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset run' }));
+    const ask = await screen.findByRole('alertdialog', { name: 'Start over?' });
+    fireEvent.click(within(ask).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(api.resetAttempt).not.toHaveBeenCalled();
   });
 });
 
@@ -140,6 +162,18 @@ describe('opening an assignment', () => {
     expect(api.startAttempt).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Continue to the tasks' }));
     await waitFor(() => expect(api.startAttempt).toHaveBeenCalled());
+  });
+});
+
+describe('consent details', () => {
+  it('open on request and keep all study text in the page', async () => {
+    await renderWithI18n(withQuery(<Consent onDone={() => {}} />));
+    const data = await screen.findByRole('button', { name: 'Where the data goes' });
+    expect(data).toHaveAttribute('data-slot', 'accordion-trigger');
+    expect(data).toHaveAttribute('aria-expanded', 'false');
+    for (const text of [/Q5/, /2 years/, /withdraw/]) expect(screen.getAllByText(text, { ignore: 'script' }).length).toBeGreaterThan(0);
+    fireEvent.click(data);
+    expect(data).toHaveAttribute('aria-expanded', 'true');
   });
 });
 

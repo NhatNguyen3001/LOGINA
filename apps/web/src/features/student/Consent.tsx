@@ -1,6 +1,6 @@
 import { CURRENT_CONSENT_VERSION } from '@logina/contracts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ChevronDown, EyeOff, FlaskConical, HandHeart, Sheet, type LucideIcon } from 'lucide-react';
+import { EyeOff, FlaskConical, HandHeart, Sheet, type LucideIcon } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,10 @@ import { newKey, sendConsent } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { errorKey } from '@/i18n';
 import { ApiError } from '@/lib/api';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { cardVariants } from '@/components/ui/card';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 /** What a person needs in order to decide stays open. Everything else is one tap away. */
 const POINTS: { icon: LucideIcon; title: string; lines: string[] }[] = [
@@ -44,7 +48,7 @@ export function Consent({ onDone }: { onDone: () => void }) {
     <StudentShell current={t('consent.title')}>
       {code ? (
         <>
-          <div className="card tight">
+          <div className={cardVariants({ tone: 'tight' })}>
             <h1 className="s15 b">{t('consent.thanks')}</h1>
             <div className="stack">
               <span className="small b sec">{t('consent.code')}</span>
@@ -52,12 +56,12 @@ export function Consent({ onDone }: { onDone: () => void }) {
             </div>
             <p className="s13 sec">{t('consent.keepCode')}</p>
           </div>
-          <button type="button" className="btn primary" onClick={onDone}>{t('consent.continue')}</button>
+          <button type="button" className={buttonVariants()} onClick={onDone}>{t('consent.continue')}</button>
         </>
       ) : (
         <>
           <h1 className="stem">{t('consent.title')}</h1>
-          <div className="card notice-card">
+          <div className={cn(cardVariants(), 'notice-card')}>
             {POINTS.map(({ icon: Icon, title, lines }) => (
               <div key={title} className="np">
                 <span className="ni">
@@ -72,25 +76,22 @@ export function Consent({ onDone }: { onDone: () => void }) {
               </div>
             ))}
           </div>
-          <div className="acc-list notice-more">
+          <Accordion type="multiple" className="acc-list notice-more">
             {DETAILS.map(({ title, lines }) => (
-              <details key={title} className="acc">
-                <summary>
-                  <h2>{t(`consent.${title}`)}</h2>
-                  <ChevronDown className="ico chev" aria-hidden="true" />
-                </summary>
-                <div className="acc-body sec">
+              <AccordionItem key={title} value={title}>
+                <AccordionTrigger heading="h2">{t(`consent.${title}`)}</AccordionTrigger>
+                <AccordionContent>
                   {lines.map((line) => <p key={line}>{t(`consent.${line}`)}</p>)}
-                </div>
-              </details>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
           <Link to="/privacy" className="lnk">{t('consent.privacyLink')}</Link>
           {choose.isError ? <Note kind="err">{t(errorKey(choose.error instanceof ApiError ? choose.error.code : ''))}</Note> : null}
           <div className="row consent-choice">
             <span className="s13 muted num">{t('consent.version', { version: CURRENT_CONSENT_VERSION })}</span>
             <span className="sp" />
-            <button type="button" className="btn primary" aria-busy={choose.isPending} disabled={choose.isPending} onClick={() => choose.mutate()}>{t('consent.agree')}</button>
+            <button type="button" className={buttonVariants()} aria-busy={choose.isPending} disabled={choose.isPending} onClick={() => choose.mutate()}>{t('consent.agree')}</button>
           </div>
         </>
       )}

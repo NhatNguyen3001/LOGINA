@@ -59,7 +59,9 @@
       "notAnalyzed": "This lesson hasn't been analyzed",
       "notAnalyzedNote": "The analysis was stopped or didn't finish. You can start it again.",
       "showThoughts_one": "Show {{count}} thought",
-      "showThoughts": "Show {{count}} thoughts"
+      "showThoughts": "Show {{count}} thoughts",
+      "hideThoughts_one": "Hide {{count}} thought",
+      "hideThoughts": "Hide {{count}} thoughts"
     },
     "t05": {
       "readByAiNotice": "LOGINA read this file with AI. Check the quoted text and figures against your original before approving.",
@@ -204,7 +206,13 @@
       "notChecked": "Not checked",
       "wait": "Drafting and translating from your own file can take up to 15 minutes. You can close this tab and come back; it keeps running, and finished drafts appear here as they're ready.",
       "elapsed": "Running for {{minutes}} min {{seconds}} s",
-      "progress": {"DRAFTING":"Drafting…","CHECKING":"Checking…","TRANSLATING":"Translating…","FAILED":"Could not finish","READY":"Ready"},
+      "progress": {
+        "DRAFTING": "Drafting…",
+        "CHECKING": "Checking…",
+        "TRANSLATING": "Translating…",
+        "FAILED": "Could not finish",
+        "READY": "Ready"
+      },
       "sufficiency": {
         "SUFFICIENT": "Enough",
         "UNCERTAIN": "Uncertain",
@@ -671,7 +679,6 @@
   },
   "entry": {
     "headline": "LOGINA helps teachers turn their own material into five reasoning tasks.",
-    "title": "Try LOGINA",
     "teacher": "Try as teacher",
     "student": "Try as student",
     "demoLine": "This is a demo without accounts. Real classes would have accounts.",
@@ -681,6 +688,18 @@
       "draft": "LOGINA reads it, asks about anything unclear, and drafts five tasks.",
       "approve": "The teacher approves the source and the tasks.",
       "think": "Students answer, think again, then keep or revise."
+    },
+    "lede": "Pick a side to try the demo. No account needed.",
+    "teacherNote": "Upload material, answer what LOGINA asks, then approve five tasks.",
+    "studentNote": "Answer five tasks, think again after a prompt, then keep or revise.",
+    "howTitle": "How it works",
+    "who": {
+      "teacher": "Teacher",
+      "logina": "LOGINA",
+      "students": "Students"
+    },
+    "preview": {
+      "choice": "The share of workers in farming fell."
     }
   },
   "lessons": {

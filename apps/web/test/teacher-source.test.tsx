@@ -1,6 +1,6 @@
 import type { JobDTO, LessonDTO, SourceReviewDTO } from '@logina/contracts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AnalyzePage } from '@/features/lessons/AnalyzePage';
 import { clearKeptLesson, CreateLesson } from '@/features/lessons/CreateLesson';
@@ -93,7 +93,21 @@ describe('T1', () => {
   it('the language defaults to the interface language and is sent as contentLocale', async () => {
     await render(<CreateLesson sampleAllowed />, 'vi');
     await screen.findByText('12A3');
-    expect(screen.getByLabelText(/Ngôn ngữ học liệu/)).toHaveValue('vi');
+    expect(screen.getByRole('combobox', { name: /Ngôn ngữ học liệu/ })).toHaveTextContent('tiếng Việt');
+  });
+
+  it('the Create lesson dropdowns open, pick with the keyboard and keep their label', async () => {
+    await render(<CreateLesson sampleAllowed />);
+    await screen.findByText('12A3');
+    const language = screen.getByRole('combobox', { name: /Material language/ });
+    expect(language).toHaveAttribute('data-slot', 'select-trigger');
+    fireEvent.keyDown(language, { key: 'Enter' });
+    fireEvent.keyDown(await screen.findByRole('option', { name: 'Vietnamese' }), { key: 'Enter' });
+    expect(language).toHaveTextContent('Vietnamese');
+    fireEvent.click(screen.getByRole('button', { name: 'Use sample material' }));
+    fillForm();
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze material' }));
+    await waitFor(() => expect(api.createLesson).toHaveBeenCalledWith(expect.objectContaining({ contentLocale: 'vi' }), expect.any(String)));
   });
 
   it('Use sample material appears only in demo mode', async () => {
@@ -142,14 +156,17 @@ describe('T2', () => {
     expect(screen.getByRole('img', { name: 'Running' })).toBeInTheDocument();
   });
 
-  it('shows thoughts with their time under the running step, and folds them when it finishes', async () => {
+  it('shows thoughts with their time, keeps them open when the step finishes, and lets the teacher fold them', async () => {
     const trace = [{ step: 'One', at: 12, title: 'Reading', text: 'Page one.' }, { step: 'Three', at: 75, title: 'Comparing', text: 'The shares add up.' }];
     vi.mocked(api.getJob).mockResolvedValue(job({ trace }));
     await render(<AnalyzePage />);
     expect(await screen.findByText('Comparing')).toBeVisible();
     expect(screen.getByText('1:15')).toBeInTheDocument();
-    expect(screen.getByText('Show 1 thought')).toBeInTheDocument();
-    expect(screen.getByText('Reading').closest('details')).not.toHaveAttribute('open');
+    const fold = screen.getByRole('button', { name: 'Hide 1 thought' });
+    expect(fold).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Reading')).toBeVisible();
+    fireEvent.click(fold);
+    expect(screen.getByRole('button', { name: 'Show 1 thought' })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('Stop analysis cancels and returns to T1', async () => {
@@ -205,6 +222,19 @@ describe('a lesson with no job', () => {
 });
 
 describe('T3 and T4', () => {
+  it('Clarify suggestions are a radio group that the arrow keys move through', async () => {
+    vi.mocked(api.getSourceReview).mockResolvedValue(review({ issues: [issue('iss1', { suggestions: [{ id: 'sug1', text: 'A suggestion', sourceRef: 'p. 8' }, { id: 'sug2', text: 'Another', sourceRef: 'p. 9' }] })] }));
+    await render(<ClarifyPage />);
+    const group = await screen.findByRole('radiogroup', { name: 'AI suggestions, with evidence from the source' });
+    const radios = within(group).getAllByRole('radio');
+    expect(radios).toHaveLength(2);
+    expect(radios[0]).toHaveAttribute('data-slot', 'radio-group-item');
+    expect(radios[0]).toBeChecked();
+    act(() => radios[0]!.focus());
+    fireEvent.keyDown(radios[0]!, { key: 'ArrowDown' });
+    await waitFor(() => expect(radios[1]).toBeChecked());
+  });
+
   it('Confirm sends CONFIRM with the review version', async () => {
     await render(<ClarifyPage />);
     fireEvent.click(await screen.findByRole('button', { name: 'Confirm current reading' }));

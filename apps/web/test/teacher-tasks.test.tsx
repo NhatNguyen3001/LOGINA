@@ -1,11 +1,12 @@
 import type { ClassTrackingDTO, LessonDTO, TaskApprovalDTO, TasksOverviewDTO, TeacherTaskPreviewDTO, TraceDTO } from '@logina/contracts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PairGrid } from '@/components/logina/PairGrid';
 import { ApprovePage } from '@/features/approve/ApprovePage';
 import { AssignPage } from '@/features/approve/AssignPage';
 import { SourceEditPage } from '@/features/source/SourceEditPage';
+import { LogicPage } from '@/features/tasks/LogicPage';
 import { PreviewPage } from '@/features/tasks/PreviewPage';
 import { TasksPage } from '@/features/tasks/TasksPage';
 import { TracePage } from '@/features/tracking/TracePage';
@@ -44,6 +45,7 @@ vi.mock('@/lib/api', async (original) => ({
   getSourceDraft: vi.fn(),
   getTracking: vi.fn(),
   getTrace: vi.fn(),
+  getLogicReview: vi.fn(),
 }));
 vi.mock('@/lib/auth', () => ({ ensureSession: vi.fn(async () => {}), idToken: vi.fn(async () => 't'), renewSession: vi.fn(async () => {}) }));
 
@@ -197,6 +199,33 @@ describe('T6', () => {
   });
 });
 
+describe('T8 logic review', () => {
+  beforeEach(() => {
+    vi.mocked(api.getLogicReview).mockResolvedValue({ pairs: [], challenges: [], boundedEditActions: [{ challengeId: 'TN1', label: 'TN1' }, { challengeId: 'TN2', label: 'TN2' }] } as never);
+    vi.mocked(api.getPreview).mockResolvedValue({ draftVersion: 3 } as never);
+  });
+
+  it('the Logic page tabs move with the arrow keys', async () => {
+    await render(<LogicPage />);
+    const pairs = await screen.findByRole('tab', { name: /16-pair/ });
+    act(() => pairs.focus());
+    fireEvent.keyDown(pairs, { key: 'ArrowRight' });
+    const prompts = screen.getByRole('tab', { name: /Think again/ });
+    await waitFor(() => expect(prompts).toHaveFocus());
+    expect(prompts).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', prompts.id);
+  });
+
+  it('the Logic dropdown picks a prompt with the keyboard', async () => {
+    await render(<LogicPage />);
+    fireEvent.mouseDown(await screen.findByRole('tab', { name: /Adjust/ }));
+    const which = await screen.findByRole('combobox', { name: 'Which prompt' });
+    fireEvent.keyDown(which, { key: 'Enter' });
+    fireEvent.keyDown(await screen.findByRole('option', { name: 'TN2' }), { key: 'Enter' });
+    expect(which).toHaveTextContent('TN2');
+  });
+});
+
 describe('T12 translation', () => {
   const translation = (over: object = {}) => ({ status: 'READY', locale: 'vi', version: 2, texts: [{ from: 'Which statement?', to: 'Nhận định nào?' }], keywords: {}, findings: [], ...over });
   const showing = (slot: string, value: object | undefined) => {
@@ -228,6 +257,17 @@ describe('T12 translation', () => {
     expect(screen.getByRole('button', { name: 'Approve Q1' })).toBeDisabled();
     fireEvent.click(screen.getByRole('button', { name: 'Retry translation' }));
     await waitFor(() => expect(api.retryTranslation).toHaveBeenCalledWith('l1', 'Q1', expect.any(String)));
+  });
+
+  it('Approve keeps the confirm checkbox required', async () => {
+    showing('Q1', translation());
+    await render(<ApprovePage />);
+    const approve = await screen.findByRole('button', { name: 'Approve Q1' });
+    const confirm = screen.getByRole('checkbox');
+    expect(confirm).toHaveAttribute('data-slot', 'checkbox');
+    expect(approve).toBeDisabled();
+    fireEvent.click(confirm);
+    expect(approve).toBeEnabled();
   });
 
   it('a blocked translation shows why and stops approval', async () => {
@@ -526,7 +566,7 @@ describe('T14 and T15', () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     await render(<TrackingPage />);
     expect(await screen.findByText('8 people started, 8 finished')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: /Students/ }));
+    fireEvent.mouseDown(screen.getByRole('tab', { name: /Students/ }));
     expect(screen.getByText('P-7K2M')).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: 'View trace' })[0]).toHaveAttribute('href', '/t/attempts/$id/trace/$slot');
   });
@@ -535,7 +575,7 @@ describe('T14 and T15', () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     const { container } = await render(<TrackingPage />);
     expect(await screen.findByText('4 / 4')).toBeInTheDocument();
-    expect(screen.getAllByText('68 → 76')).toHaveLength(2);
+    expect(screen.getAllByText('68 → 76')).toHaveLength(1);
     expect(screen.getByText(/not enough to conclude that students learned better/)).toBeInTheDocument();
     const prompts = [...container.querySelectorAll('.prompt-row')].map((row) => row.textContent);
     expect(prompts).toEqual(['Q1 · TN2Check the card.2 of 2 revised', 'Q1 · TN1Compare the figures.1 of 3 revised']);
@@ -544,10 +584,72 @@ describe('T14 and T15', () => {
     expect(screen.getByText('TN1')).toBeInTheDocument();
   });
 
+  it('the arrow keys move between the tabs', async () => {
+    vi.mocked(api.getTracking).mockResolvedValue(tracking);
+    await render(<TrackingPage />);
+    const dashboard = await screen.findByRole('tab', { name: /Dashboard/ });
+    act(() => dashboard.focus());
+    fireEvent.keyDown(dashboard, { key: 'ArrowRight' });
+    const students = screen.getByRole('tab', { name: /Students/ });
+    await waitFor(() => expect(students).toHaveFocus());
+    expect(students).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', students.id);
+  });
+
+  it('a chart bar opens its numbers on click', async () => {
+    vi.mocked(api.getTracking).mockResolvedValue(tracking);
+    await render(<TrackingPage />);
+    const bar = await screen.findByRole('button', { name: 'Q1: 4 kept, 4 revised' });
+    fireEvent.click(bar);
+    expect(await screen.findByRole('dialog')).toHaveTextContent('Q1: 4 kept, 4 revised');
+  });
+
+  it('metric cards draw Tremor progress bars', async () => {
+    vi.mocked(api.getTracking).mockResolvedValue(tracking);
+    await render(<TrackingPage />);
+    const finished = await screen.findByRole('progressbar', { name: 'Finished' });
+    expect(finished).toHaveAttribute('tremor-id', 'tremor-raw');
+    expect(finished).toHaveAttribute('aria-valuenow', '8');
+    expect(finished).toHaveAttribute('aria-valuemax', '8');
+  });
+
+  it('keep or revise draws one category bar per task with its numbers on click', async () => {
+    vi.mocked(api.getTracking).mockResolvedValue(tracking);
+    await render(<TrackingPage />);
+    const bar = await screen.findByRole('button', { name: 'Q1: 4 kept, 4 revised' });
+    expect(bar.querySelector('[tremor-id="tremor-raw"]')).not.toBeNull();
+    fireEvent.click(bar);
+    expect(await screen.findByRole('dialog')).toHaveTextContent('Q1: 4 kept, 4 revised');
+  });
+
+  it('confidence draws first and final bars per task with a readable table', async () => {
+    vi.mocked(api.getTracking).mockResolvedValue(tracking);
+    await render(<TrackingPage />);
+    const table = await screen.findByRole('table', { name: 'Confidence, first to final' });
+    expect(within(table).getByRole('cell', { name: 'Q1' })).toBeInTheDocument();
+    expect(within(table).getByRole('cell', { name: '68' })).toBeInTheDocument();
+    expect(within(table).getByRole('cell', { name: '76' })).toBeInTheDocument();
+  });
+
+  it('an empty class shows the empty note and no NaN', async () => {
+    const empty = { ...tracking, counts: { started: 0, complete: 0 }, participants: [], perTask: [{ slot: 'Q1', submitted: 0, keep: 0, revise: 0, avgConfidenceBefore: null, avgConfidenceAfter: null, deliveredChallenges: [] }] } as unknown as ClassTrackingDTO;
+    vi.mocked(api.getTracking).mockResolvedValue(empty);
+    const { container } = await render(<TrackingPage />);
+    expect(await screen.findByText('No one has submitted a task yet.')).toBeInTheDocument();
+    expect(container.textContent).not.toMatch(/NaN/);
+  });
+
+  it('a clipped prompt opens its full text on click', async () => {
+    vi.mocked(api.getTracking).mockResolvedValue(tracking);
+    await render(<TrackingPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Compare the figures.' }));
+    expect(await screen.findByRole('dialog')).toHaveTextContent('Compare the figures.');
+  });
+
   it('someone who declined shows Not in research', async () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     await render(<TrackingPage />);
-    fireEvent.click(await screen.findByRole('tab', { name: /Students/ }));
+    fireEvent.mouseDown(await screen.findByRole('tab', { name: /Students/ }));
     expect(screen.getByText('Not in research')).toBeInTheDocument();
   });
 
@@ -555,8 +657,8 @@ describe('T14 and T15', () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     const { container } = await render(<TrackingPage />);
     await screen.findByText('4 / 4');
-    expect(screen.getByRole('img', { name: 'Q1: 4 kept, 4 revised' })).toBeInTheDocument();
-    expect(container.querySelector('[role="img"] .full, [role="img"] .contra')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Q1: 4 kept, 4 revised' })).toBeInTheDocument();
+    expect(container.querySelector('.dash-bar .full, .dash-bar .contra')).toBeNull();
   });
 
   it('a Q2 trace has no evidence card and no empty letters', async () => {

@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getLesson, getMyAssignments } from '@/lib/api';
+import { buttonVariants } from '@/components/ui/button';
 
 async function studentTarget(lessonId?: string): Promise<string> {
   const lesson = lessonId ? await getLesson(lessonId) : null;
@@ -16,7 +17,7 @@ export function SwitchSide({ to, lessonId, block, short }: { to: 'student' | 'te
   };
   const label = t(to === 'student' ? 'common.openStudentViewFull' : 'common.openTeacherViewFull');
   return (
-    <button type="button" className={`btn secondary sm ${block ? 'block' : ''}`} aria-label={label} title={label} onClick={() => void open()}>
+    <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm', block })} aria-label={label} title={label} onClick={() => void open()}>
       <ExternalLink className="ico" aria-hidden="true" />
       <span>{short ? t(`titles.${to}`) : t(to === 'student' ? 'common.openStudentView' : 'common.openTeacherView')}</span>
     </button>

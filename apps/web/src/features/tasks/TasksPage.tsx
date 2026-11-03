@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
-import { Pick } from '@/components/logina/Pick';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
@@ -14,6 +13,10 @@ import { jobFinished, qk, useJobPolling } from '@/lib/query';
 import { readableSourceRefs } from '@/lib/source-refs';
 import { useSecondsSince } from '@/lib/use-seconds-since';
 import { TaskStatusTag } from './task-status';
+import { cardVariants } from '@/components/ui/card';
+import { buttonVariants } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const CHOICES = ['REFOCUS', 'ADD_SOURCE', 'LEAVE_EMPTY'] as const;
 const SUFFICIENCY_KIND = { SUFFICIENT: 'pass', UNCERTAIN: 'review', INSUFFICIENT: 'block' } as const;
@@ -33,24 +36,24 @@ function Q4Decision({ lessonId, slot, version }: { lessonId: string; slot: Slot;
   });
 
   return (
-    <div className="card b-orange">
+    <div className={cardVariants({ edge: 'orange' })}>
       <div className="row">
         <h3 className="s15 b">{t('teacher.t06.needsDecision', { slot })}</h3>
         <span className="sp" />
         <span className="s13 muted">{t('teacher.t06.othersContinue')}</span>
       </div>
-      <div className="stack" role="radiogroup" aria-label={t('teacher.t06.needsDecision', { slot })}>
+      <RadioGroup value={choice} onValueChange={(value) => setChoice(value as typeof choice)} aria-label={t('teacher.t06.needsDecision', { slot })}>
         {CHOICES.map((value) => (
-          <Pick key={value} name="sufficiency" value={value} checked={choice === value} onSelect={() => setChoice(value)}>
+          <RadioGroupItem key={value} value={value}>
             <span className="block b">{t(`teacher.t06.choice.${value}`)}</span>
             <span className="small muted">{t(`teacher.t06.choiceNote.${value}`)}</span>
-          </Pick>
+          </RadioGroupItem>
         ))}
-      </div>
+      </RadioGroup>
       {send.isError ? <Note kind="err">{t(errorKey(send.error instanceof ApiError ? send.error.code : ''))}</Note> : null}
       <div className="row">
         <span className="sp" />
-        <button type="button" className="btn primary sm" aria-busy={send.isPending} disabled={send.isPending} onClick={() => send.mutate()}>{t('teacher.t06.regenerate', { slot })}</button>
+        <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={send.isPending} disabled={send.isPending} onClick={() => send.mutate()}>{t('teacher.t06.regenerate', { slot })}</button>
       </div>
     </div>
   );
@@ -102,28 +105,27 @@ export function TasksPage() {
       {failure !== null && !running ? <Note kind="err">{t(errorKey(failure))}</Note> : null}
       {tasks.isPending ? <LoadingSkeleton /> : null}
       {tasks.isError ? <Note kind="err">{t('errors.generic')}</Note> : null}
-      {tasks.data ? <div className="card flush">
+      {tasks.data ? <div className={cardVariants({ tone: 'flush' })}>
         <div className="row p-4">
           <h3 className="s15 b">{t('teacher.t06.count')}</h3>
           <span className="sp" />
           <span className="s13 sec num">{t('teacher.t06.ready', { ready, total: slots.length })}</span>
         </div>
-        <div className="tbl-wrap">
-          <table className="t stack-sm">
-            <thead>
-              <tr>
-                <th>{t('student.result.task')}</th>
-                <th>{t('teacher.t06.enough')}</th>
-                <th>{t('teacher.t06.draft')}</th>
-              </tr>
-            </thead>
-            <tbody>
+        <Table className="stack-sm">
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('student.result.task')}</TableHead>
+                <TableHead>{t('teacher.t06.enough')}</TableHead>
+                <TableHead>{t('teacher.t06.draft')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {slots.map((slot) => (
-                <tr key={slot.slot}>
-                  <td>
+                <TableRow key={slot.slot}>
+                  <TableCell>
                     {slot.draftStatus ? <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: slot.slot }} className="lnk">{t(`teacher.taskType.${slot.slot}`)}</Link> : <span className="b">{t(`teacher.taskType.${slot.slot}`)}</span>}
-                  </td>
-                  <td data-label={t('teacher.t06.enough')}>
+                  </TableCell>
+                  <TableCell data-label={t('teacher.t06.enough')}>
                     <div className="stack">
                       {slot.sufficiency ? (
                         <StatusTag kind={SUFFICIENCY_KIND[slot.sufficiency]}>{t(`teacher.t06.sufficiency.${slot.sufficiency}`)}</StatusTag>
@@ -133,25 +135,24 @@ export function TasksPage() {
                       <span className="s13">{slot.sufficiencyNote}</span>
                       <span className="src">{readableSourceRefs(slot.sourceRefs, t)}</span>
                     </div>
-                  </td>
-                  <td data-label={t('teacher.t06.draft')}>
+                  </TableCell>
+                  <TableCell data-label={t('teacher.t06.draft')}>
                     <div className="stack">
                       {slot.draftStatus ? <TaskStatusTag status={slot.draftStatus} /> : null}
                       {slot.progress === 'FAILED' || (running && slot.progress !== 'READY') ? <span className="s13 b">{t(`teacher.t06.progress.${slot.progress}`)}</span> : null}
                       {!running && !slot.draftStatus ? <span className="s13 b">{t('teacher.t06.paused')}</span> : null}
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
       </div> : null}
       {paused && lesson.data && !running ? <Q4Decision lessonId={id} slot={paused.slot} version={lesson.data.version} /> : null}
       <div className="row">
         {canApprove ? null : <span className="s13 sec">{t('teacher.t06.approvalWhy')}</span>}
         <span className="sp" />
-        {canApprove ? <Link to="/t/lessons/$id/approve" params={{ id }} className="btn primary">{t('teacher.goApproval')}</Link> : <button type="button" className="btn primary" disabled>{t('teacher.goApproval')}</button>}
+        {canApprove ? <Link to="/t/lessons/$id/approve" params={{ id }} className={buttonVariants()}>{t('teacher.goApproval')}</Link> : <button type="button" className={buttonVariants()} disabled>{t('teacher.goApproval')}</button>}
       </div>
     </>
   );

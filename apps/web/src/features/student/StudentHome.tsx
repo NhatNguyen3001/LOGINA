@@ -7,6 +7,8 @@ import { StatusTag } from '@/components/logina/StatusTag';
 import { useSessionLocale } from '@/lib/use-session-locale';
 import { getMyAssignments, getRecordedRuns } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { cardVariants } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 export function StudentHome() {
   const { t, i18n } = useTranslation();
@@ -18,7 +20,7 @@ export function StudentHome() {
       {assignments.isPending ? <LoadingSkeleton cards={2} /> : null}
       {assignments.data?.assignments.length === 0 ? <p className="muted">{t('student.home.empty')}</p> : null}
       {assignments.data?.assignments.map((item) => (
-        <Link key={item.assignmentId} to="/s/assignments/$id" params={{ id: item.assignmentId }} className="card tight no-underline">
+        <Link key={item.assignmentId} to="/s/assignments/$id" params={{ id: item.assignmentId }} className={cn(cardVariants({ tone: 'tight' }), 'no-underline')}>
           <div className="row">
             <span className="b s15">{item.lessonTitle}</span>
             <span className="sp" />
@@ -32,7 +34,7 @@ export function StudentHome() {
       <h2 className="s15 b">{t('student.home.runsTitle')}</h2>
       {runs.data?.runs.length === 0 ? <p className="muted">{t('student.home.runsEmpty')}</p> : null}
       {runs.data?.runs.map(({ attemptId, lessonTitle, run, completedAt }) => (
-        <Link key={attemptId} to="/s/attempts/$id/results" params={{ id: attemptId }} className="card tight no-underline">
+        <Link key={attemptId} to="/s/attempts/$id/results" params={{ id: attemptId }} className={cn(cardVariants({ tone: 'tight' }), 'no-underline')}>
           <div className="row">
             <span className="b s15">{lessonTitle}</span>
             <span className="sp" />

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Accessibility, ArrowLeft, ChevronDown, FileText, ShieldCheck, type LucideIcon } from 'lucide-react';
+import { Accessibility, ArrowLeft, FileText, ShieldCheck, type LucideIcon } from 'lucide-react';
 import { Fragment, useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LangSwitch } from '@/components/logina/LangSwitch';
@@ -8,6 +8,10 @@ import { StatusTag } from '@/components/logina/StatusTag';
 import accessibility from '@/legal/accessibility-statement.md?raw';
 import privacy from '@/legal/privacy-policy.md?raw';
 import terms from '@/legal/terms-of-use.md?raw';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { cardVariants } from '@/components/ui/card';
+import { buttonVariants } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const DOCS = { privacy, terms, accessibility };
 type Doc = keyof typeof DOCS;
@@ -76,19 +80,17 @@ function BlockView({ block, tableLabel }: { block: Block; tableLabel: string }) 
   if (!('rows' in block)) return null;
   const head = block.rows[0] ?? [];
   return (
-    <div className="card flush">
-      <div className="tbl-wrap" role="region" aria-label={tableLabel} tabIndex={0}>
-        <table className="t">
-          <thead>
-            <tr>{head.map((cell) => <th key={cell}>{cell}</th>)}</tr>
-          </thead>
-          <tbody>
+    <div className={cardVariants({ tone: 'flush' })}>
+      <Table wrapperProps={{ role: 'region', 'aria-label': tableLabel, tabIndex: 0 }}>
+          <TableHeader>
+            <TableRow>{head.map((cell) => <TableHead key={cell}>{cell}</TableHead>)}</TableRow>
+          </TableHeader>
+          <TableBody>
             {block.rows.slice(1).map((row) => (
-              <tr key={row[0]}>{row.map((cell) => <td key={cell}>{inline(cell)}</td>)}</tr>
+              <TableRow key={row[0]}>{row.map((cell) => <TableCell key={cell}>{inline(cell)}</TableCell>)}</TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
     </div>
   );
 }
@@ -124,7 +126,7 @@ function useRevealOnScroll(...resetWhen: string[]) {
         observer.unobserve(entry.target);
       }
     });
-    node.querySelectorAll('.acc').forEach((row) => observer.observe(row));
+    node.querySelectorAll('[data-slot="accordion-item"]').forEach((row) => observer.observe(row));
     return () => observer.disconnect();
   }, resetWhen);
   return list;
@@ -161,26 +163,23 @@ export function LegalPage({ doc }: { doc: Doc }) {
     <PanelShell phoneTitle={title} label={t('common.policies')} panel={panel}>
       <main className="stu-in policy w-full grow">
         <div className="row">
-          <button type="button" className="btn secondary sm" onClick={goBack}>
+          <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={goBack}>
             <ArrowLeft className="ico" aria-hidden="true" />
             {t('common.back')}
           </button>
           {/((bản nháp|draft))/i.test(section) ? <StatusTag kind="review">{t('common.draft')}</StatusTag> : null}
         </div>
         {intro.map((block, index) => <BlockView key={index} block={block} tableLabel={title} />)}
-        <div key={doc} ref={list} className="acc-list">
+        <Accordion key={doc} ref={list} type="multiple" className="acc-list">
           {sections.map(({ heading, blocks }) => (
-            <details key={heading} className="acc">
-              <summary>
-                <h2>{heading}</h2>
-                <ChevronDown className="ico chev" aria-hidden="true" />
-              </summary>
-              <div className="acc-body">
+            <AccordionItem key={heading} value={heading}>
+              <AccordionTrigger heading="h2">{heading}</AccordionTrigger>
+              <AccordionContent className="text-base text-ink">
                 {blocks.map((block, index) => <BlockView key={index} block={block} tableLabel={heading} />)}
-              </div>
-            </details>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </main>
     </PanelShell>
   );

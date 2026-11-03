@@ -8,6 +8,10 @@ import { StatusTag } from '@/components/logina/StatusTag';
 import { errorKey } from '@/i18n';
 import { ApiError, approveSource, getSourceDraft, newKey } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { cardVariants } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export function SourceEditPage() {
   const { t } = useTranslation();
@@ -37,42 +41,40 @@ export function SourceEditPage() {
       <div className="cols">
         <div className="stack">
           {editedClaims.map((claim) => (
-            <div key={claim.claimId} className="card">
+            <div key={claim.claimId} className={cardVariants()}>
               <h3 className="s15 b">{t('teacher.t10.claim')}</h3>
               <DiffRow kind="del">{claim.before}</DiffRow>
               <DiffRow kind="add">{claim.after}</DiffRow>
               <span className="s13 sec">{claim.evidence}</span>
             </div>
           ))}
-          <div className="card flush">
+          <div className={cardVariants({ tone: 'flush' })}>
             <h3 className="s15 b p-4">{t('teacher.t10.impact')}</h3>
-            <div className="tbl-wrap">
-              <table className="t">
-                <thead>
-                  <tr>
-                    <th>{t('student.result.task')}</th>
-                    <th>{t('teacher.t10.uses')}</th>
-                    <th>{t('teacher.t10.after')}</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('student.result.task')}</TableHead>
+                    <TableHead>{t('teacher.t10.uses')}</TableHead>
+                    <TableHead>{t('teacher.t10.after')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {impact.map((row) => (
-                    <tr key={row.slot}>
-                      <td className="b">{row.slot}</td>
-                      <td>{row.usesClaim ? t('teacher.t10.yes', { refs: row.refs.join(', ') }) : t('teacher.t10.no')}</td>
-                      <td>{row.usesClaim ? <StatusTag kind="stale">{t('teacher.t10.regenerate')}</StatusTag> : <StatusTag kind="pass">{t('teacher.t10.keeps')}</StatusTag>}</td>
-                    </tr>
+                    <TableRow key={row.slot}>
+                      <TableCell className="b">{row.slot}</TableCell>
+                      <TableCell>{row.usesClaim ? t('teacher.t10.yes', { refs: row.refs.join(', ') }) : t('teacher.t10.no')}</TableCell>
+                      <TableCell>{row.usesClaim ? <StatusTag kind="stale">{t('teacher.t10.regenerate')}</StatusTag> : <StatusTag kind="pass">{t('teacher.t10.keeps')}</StatusTag>}</TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
           </div>
         </div>
-        <div className="card sticky">
+        <div className={cn(cardVariants(), 'sticky')}>
           {assignedReleasesUnchanged.length > 0 ? <p className="s13">{t('teacher.t10.assigned', { releases: assignedReleasesUnchanged.map((x) => `${x.classLabel} ${x.releaseLabel}`).join(', ') })}</p> : null}
           {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
-          <button type="button" className="btn primary block" aria-busy={approve.isPending} disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t10.approve', { version })}</button>
-          <Link to="/t/lessons/$id/tasks" params={{ id }} className="btn secondary block">{t('teacher.t10.cancel')}</Link>
+          <button type="button" className={buttonVariants({ block: true })} aria-busy={approve.isPending} disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t10.approve', { version })}</button>
+          <Link to="/t/lessons/$id/tasks" params={{ id }} className={buttonVariants({ variant: 'secondary', block: true })}>{t('teacher.t10.cancel')}</Link>
         </div>
       </div>
     </>

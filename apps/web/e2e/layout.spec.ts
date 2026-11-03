@@ -49,7 +49,7 @@ const openTeacher = async (page: Page) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Try as teacher' }).click();
   await expect(page).toHaveURL(/\/t\/lessons/);
-  await expect(page.locator('.card').first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /Lesson 8/ }).first()).toBeVisible();
 };
 
 test('the first-answer bar follows a drag, past the end of the bar too', async ({ page }) => {
@@ -167,7 +167,7 @@ test('the first bar starts at 50, the final bar at the first confidence, and Res
   await expect(page.locator('.knob')).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Reset run' }).click();
-  const popup = page.getByRole('dialog', { name: 'Start over?' });
+  const popup = page.getByRole('alertdialog', { name: 'Start over?' });
   await expect(popup).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(popup).toHaveCount(0);

@@ -10,8 +10,20 @@
 @import '@fontsource/source-sans-3/600.css';
 @import '@fontsource/source-sans-3/700.css';
 
+/* The root font is 14 px, so rem-based steps would land on odd pixels. These keep shadcn sizes on LOGINA's own. */
+@theme {
+  --spacing: 4px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+}
+
 @theme inline {
   --font-sans: var(--font);
+  --color-accent-hover: color-mix(in srgb, var(--accent) 86%, #000);
   --color-canvas: var(--canvas);
   --color-page: var(--page);
   --color-surface: var(--surface);
@@ -25,9 +37,10 @@
   --color-ink-3: var(--ink-3);
   --color-on-accent: var(--on-accent);
   --color-accent: var(--accent);
-  --color-navy: var(--navy);
-  --color-navy-bg: var(--navy-bg);
-  --color-navy-line: var(--navy-line);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-bg: var(--accent-bg);
+  --color-accent-line: var(--accent-line);
+  --color-mark: var(--mark);
   --color-green: var(--green);
   --color-green-bg: var(--green-bg);
   --color-green-line: var(--green-line);

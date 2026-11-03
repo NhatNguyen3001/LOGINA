@@ -6,6 +6,10 @@ import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { editTranslation, newKey, retryTranslation } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { Textarea } from '@/components/ui/textarea';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { cardVariants } from '@/components/ui/card';
 
 type Task = TaskApprovalDTO['tasks'][number];
 type Translation = NonNullable<Task['translation']>;
@@ -28,8 +32,8 @@ function Line({ lessonId, slot, translation, from, to }: { lessonId: string; slo
       <span className="s13">{from}</span>
       {editing ? (
         <div className="stack">
-          <textarea className="textarea" aria-label={from} lang={translation.locale} value={value} onChange={(event) => setValue(event.target.value)} />
-          <button type="button" className="btn secondary sm self-start" aria-busy={save.isPending} disabled={!value.trim() || value === to || save.isPending} onClick={() => save.mutate()}>{t('teacher.t12.translation.save')}</button>
+          <Textarea  aria-label={from} lang={translation.locale} value={value} onChange={(event) => setValue(event.target.value)} />
+          <button type="button" className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'self-start')} aria-busy={save.isPending} disabled={!value.trim() || value === to || save.isPending} onClick={() => save.mutate()}>{t('teacher.t12.translation.save')}</button>
         </div>
       ) : (
         <div className="stack">
@@ -53,7 +57,7 @@ export function TranslationReview({ lessonId, task }: { lessonId: string; task: 
   const blockers = translation?.findings.filter((finding) => finding.status === 'BLOCKER') ?? [];
 
   return (
-    <section className="card" aria-label={t('teacher.t12.translation.title', { slot: task.slot })}>
+    <section className={cardVariants()} aria-label={t('teacher.t12.translation.title', { slot: task.slot })}>
       <div className="row">
         <h3 className="s15 b">{t('teacher.t12.translation.title', { slot: task.slot })}</h3>
         <span className="sp" />
@@ -63,7 +67,7 @@ export function TranslationReview({ lessonId, task }: { lessonId: string; task: 
       {canRetry ? (
         <div className="row">
           <span className="s13 sec grow">{t('teacher.t12.translation.missing')}</span>
-          <button type="button" className="btn secondary sm" aria-busy={retry.isPending} disabled={retry.isPending} onClick={() => retry.mutate()}>{t('teacher.t12.translation.retry')}</button>
+          <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} aria-busy={retry.isPending} disabled={retry.isPending} onClick={() => retry.mutate()}>{t('teacher.t12.translation.retry')}</button>
         </div>
       ) : null}
       {blockers.map((finding) => (

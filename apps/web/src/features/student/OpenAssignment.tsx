@@ -9,6 +9,7 @@ import { useSessionLocale } from '@/lib/use-session-locale';
 import { ApiError, getMe, newKey, startAttempt } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { Consent } from './Consent';
+import { buttonVariants } from '@/components/ui/button';
 
 /** Consent comes first, then the attempt starts or resumes at its first open task. */
 export function OpenAssignment() {
@@ -29,7 +30,7 @@ export function OpenAssignment() {
     if (attempt.error instanceof ApiError && attempt.error.status === 404) {
       return (
         <StudentShell title={t('student.goneAfterReset')}>
-          <Link to="/s/assignments" className="btn primary">{t('student.openNewSet')}</Link>
+          <Link to="/s/assignments" className={buttonVariants()}>{t('student.openNewSet')}</Link>
         </StudentShell>
       );
     }

@@ -10,6 +10,12 @@ import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { ApiError, assignLesson, getApproval, getClass, getLesson, newKey } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { cardVariants } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 export function AssignPage() {
   const { t } = useTranslation();
@@ -56,39 +62,37 @@ export function AssignPage() {
       <h1 className="h1">{t('teacher.t13.title')}</h1>
       <p className="lede">{t('teacher.t13.lede')}</p>
       <div className="cols">
-        <div className="card">
+        <div className={cardVariants()}>
           <div className="field">
             <span className="b">{t('teacher.t01.class')}</span>
             <span>{classInfo.data?.name ?? t('common.loading')}</span>
           </div>
           <div className="field">
             <label htmlFor="due">{t('teacher.t13.due')}</label>
-            <input id="due" type="datetime-local" className="input num" value={dueAt} onChange={(event) => setDueAt(event.target.value)} />
+            <Input id="due" type="datetime-local" className="num" value={dueAt} onChange={(event) => setDueAt(event.target.value)} />
           </div>
           <p className="hint">{t('teacher.t13.noTimer')}</p>
           <div className="field">
             <label htmlFor="message">{t('teacher.t13.message')}</label>
-            <textarea id="message" className="textarea" value={message} onChange={(event) => setMessage(event.target.value)} />
+            <Textarea id="message" value={message} onChange={(event) => setMessage(event.target.value)} />
           </div>
         </div>
-        <div className="card sticky">
+        <div className={cn(cardVariants(), 'sticky')}>
           <h3 className="b">{t('teacher.t13.version')}</h3>
-          <div className="tbl-wrap">
-            <table className="t">
-              <tbody>
+          <Table>
+              <TableBody>
                 {approval.data.tasks.map((task) => (
-                  <tr key={task.slot}>
-                    <td className="b">{task.slot}</td>
-                    <td className="num">{task.releaseLabel}</td>
-                    <td>{task.acceptedWarning ? <StatusTag kind="teacher">{t('teacher.t13.withReason')}</StatusTag> : <StatusTag kind="pass">{t('teacher.gate.PASS')}</StatusTag>}</td>
-                  </tr>
+                  <TableRow key={task.slot}>
+                    <TableCell className="b">{task.slot}</TableCell>
+                    <TableCell className="num">{task.releaseLabel}</TableCell>
+                    <TableCell>{task.acceptedWarning ? <StatusTag kind="teacher">{t('teacher.t13.withReason')}</StatusTag> : <StatusTag kind="pass">{t('teacher.gate.PASS')}</StatusTag>}</TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
           <p className="small muted">{t('teacher.t13.pinned')}</p>
           {assign.isError ? <Note kind="err">{t(errorKey(assign.error instanceof ApiError ? assign.error.code : ''))}</Note> : null}
-          <button type="button" className="btn primary block" aria-busy={assign.isPending} disabled={assign.isPending} onClick={() => assign.mutate()}>{t('teacher.t13.title')}</button>
+          <button type="button" className={buttonVariants({ block: true })} aria-busy={assign.isPending} disabled={assign.isPending} onClick={() => assign.mutate()}>{t('teacher.t13.title')}</button>
         </div>
       </div>
     </>

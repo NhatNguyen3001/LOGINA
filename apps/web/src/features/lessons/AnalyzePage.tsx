@@ -1,7 +1,7 @@
 import type { JobDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Navigate, useNavigate, useParams } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
@@ -12,6 +12,11 @@ import { qk, useJobPolling } from '@/lib/query';
 import { RestartAnalysis } from './RestartAnalysis';
 import { stagePath } from './stage-path';
 import { useSecondsSince } from '@/lib/use-seconds-since';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { cardVariants } from '@/components/ui/card';
+import { buttonVariants } from '@/components/ui/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const FAILED: JobDTO['status'][] = ['FAILED', 'TIMED_OUT'];
 
@@ -38,13 +43,18 @@ function Thoughts({ thoughts }: { thoughts: Thought[] }) {
 
 function StepThoughts({ step }: { step: JobDTO['steps'][number] & { thoughts: Thought[] } }) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState('thoughts');
   if (step.thoughts.length === 0) return null;
   if (step.status !== 'DONE') return <Thoughts thoughts={step.thoughts} />;
   return (
-    <details className="thoughts-fold">
-      <summary className="lnk">{t('teacher.t02.showThoughts', { count: step.thoughts.length })}</summary>
-      <Thoughts thoughts={step.thoughts} />
-    </details>
+    <Accordion type="single" collapsible value={open} onValueChange={setOpen} className="thoughts-fold">
+      <AccordionItem value="thoughts" className="border-0 bg-transparent">
+        <AccordionTrigger className="min-h-0 flex-none justify-start gap-1.5 px-0 py-1 text-sm text-accent-ink hover:bg-transparent hover:underline">{t(open ? 'teacher.t02.hideThoughts' : 'teacher.t02.showThoughts', { count: step.thoughts.length })}</AccordionTrigger>
+        <AccordionContent className="px-0 pb-0">
+          <Thoughts thoughts={step.thoughts} />
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 }
 
@@ -112,16 +122,16 @@ export function AnalyzePage() {
         <p className="lede">{t('teacher.t02.lede')}</p>
       </div>
       {question ? (
-        <div className="card b-navy">
+        <div className={cardVariants({ edge: 'accent' })}>
           <div className="row">
-            <span className="tag info">{t('teacher.t02.needChoice')}</span>
+            <Badge kind="info">{t('teacher.t02.needChoice')}</Badge>
             <span className="sp" />
             <span className="s13 muted">{t('teacher.t02.paused')}</span>
           </div>
           <p className="s15 b">{t('teacher.t02.language.question', { detected: t(`common.lang.${question.detected}`) })}</p>
           <div className="row">
-            <button type="button" className="btn primary sm" onClick={() => answer.mutate('USE_DETECTED')}>{t('teacher.t02.language.useDetected', { lang: t(`common.lang.${question.detected}`) })}</button>
-            <button type="button" className="btn secondary sm" onClick={() => answer.mutate('KEEP_CHOSEN')}>{t('teacher.t02.language.keepChosen', { lang: t(`common.lang.${question.chosen}`) })}</button>
+            <button type="button" className={buttonVariants({ size: 'sm' })} onClick={() => answer.mutate('USE_DETECTED')}>{t('teacher.t02.language.useDetected', { lang: t(`common.lang.${question.detected}`) })}</button>
+            <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => answer.mutate('KEEP_CHOSEN')}>{t('teacher.t02.language.keepChosen', { lang: t(`common.lang.${question.chosen}`) })}</button>
           </div>
         </div>
       ) : null}
@@ -129,20 +139,18 @@ export function AnalyzePage() {
         <Note kind="err">
           <p className="b">{t('teacher.t02.failed')}</p>
           <p>{t(errorKey(job.data?.errorCode ?? ''))}</p>
-          <button type="button" className="btn secondary sm" onClick={() => retry.mutate()}>{t('common.retry')}</button>
+          <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => retry.mutate()}>{t('common.retry')}</button>
         </Note>
       ) : null}
       {unreadable ? <Note kind="err">{t('errors.generic')}</Note> : null}
       {!job.data && !unreadable ? <LoadingSkeleton /> : null}
-      {job.data ? <div className="card">
+      {job.data ? <div className={cardVariants()}>
         <div className="row">
           <h3 className="s15 b">{t('teacher.t02.progress')}</h3>
           <span className="sp" />
           <span className="s13 sec num">{t('teacher.t02.steps', { done, total: steps.length })}</span>
         </div>
-        <div className="slider" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label={t('teacher.t02.progress')}>
-          <div className="fill" style={{ width: `${percent}%` }} />
-        </div>
+        <Progress value={percent} aria-label={t('teacher.t02.progress')} />
         <div className="stack">
           {steps.map((step) => (
             <div key={step.label} className="row top">
@@ -159,7 +167,7 @@ export function AnalyzePage() {
             {t('teacher.t02.timing')}
             {seconds === null ? null : <span className="block num">{t('teacher.t06.elapsed', { minutes: Math.floor(seconds / 60), seconds: seconds % 60 })}</span>}
           </span>
-          <button type="button" className="btn secondary" aria-busy={stop.isPending} disabled={stop.isPending} onClick={() => stop.mutate()}>{t('teacher.t02.stop')}</button>
+          <button type="button" className={buttonVariants({ variant: 'secondary' })} aria-busy={stop.isPending} disabled={stop.isPending} onClick={() => stop.mutate()}>{t('teacher.t02.stop')}</button>
         </div>
       </div> : null}
     </>

@@ -1,9 +1,10 @@
+import { alertVariants } from '@/components/ui/alert';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { MaterialMimeType } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { Note } from '@/components/logina/Note';
@@ -11,6 +12,12 @@ import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { ApiError, createLesson, getClass, getMe, getUploadUrl, newKey, registerMaterial, startAnalyze } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { cardVariants } from '@/components/ui/card';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const ACCEPT = '.pdf,.docx';
@@ -56,7 +63,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
   const classId = me.data?.classIds[0];
   const classInfo = useQuery({ queryKey: qk.class(classId ?? 'none'), queryFn: () => getClass(classId!), enabled: Boolean(classId) });
 
-  const { register, handleSubmit, formState: { errors } } = useForm<Form>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<Form>({
     resolver: zodResolver(Form),
     defaultValues: kept.form ?? { sourceTitle: '', title: '', subject: '', topic: '', objective: '', contentLocale: i18n.language === 'vi' ? 'vi' : 'en' },
   });
@@ -109,10 +116,10 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
       </div>
       <div className="cols">
         <div className="stack">
-          <div className="card">
+          <div className={cardVariants()}>
             <h3 className="s15 b">{t('teacher.t01.material')}</h3>
-            <div className="note info flex-col">
-              <span className="b text-navy">{t('teacher.t01.guide.title')}</span>
+            <div className={cn(alertVariants({ kind: 'info' }), 'flex-col')}>
+              <span className="b text-accent-ink">{t('teacher.t01.guide.title')}</span>
               <ul className="list-disc pl-5">
                 {['pages', 'formats', 'languages', 'content'].map((item) => (
                   <li key={item}>{t(`teacher.t01.guide.${item}`)}</li>
@@ -126,9 +133,9 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
                 setMissingMaterial(false);
                 analyze.reset();
               }} />
-              <button type="button" className="btn secondary sm" onClick={() => fileInput.current?.click()}>{t(analyze.isError ? 'teacher.t01.refusal.chooseAnother' : 'teacher.t01.chooseFile')}</button>
+              <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => fileInput.current?.click()}>{t(analyze.isError ? 'teacher.t01.refusal.chooseAnother' : 'teacher.t01.chooseFile')}</button>
               {sampleAllowed ? (
-                <button type="button" className="btn secondary sm" onClick={() => {
+                <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => {
                   setUseSample(true);
                   setFile(null);
                   setMissingMaterial(false);
@@ -147,36 +154,45 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
               </Note>
             ) : null}
             <Field id="sourceTitle" label={`${t('teacher.t01.sourceTitle')} ${t('teacher.t01.required')}`} error={errorOf('sourceTitle')}>
-              <input id="sourceTitle" className="input" {...register('sourceTitle')} />
+              <Input id="sourceTitle" {...register('sourceTitle')} />
             </Field>
             <Field id="contentLocale" label={t('teacher.t01.language')}>
-              <select id="contentLocale" className="select" {...register('contentLocale')}>
-                <option value="en">{t('common.lang.en')}</option>
-                <option value="vi">{t('common.lang.vi')}</option>
-              </select>
+              <Controller
+                control={control}
+                name="contentLocale"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="contentLocale" onBlur={field.onBlur}><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">{t('common.lang.en')}</SelectItem>
+                      <SelectItem value="vi">{t('common.lang.vi')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </Field>
             <p className="hint">{t('teacher.t01.languageHint')}</p>
           </div>
-          <div className="card">
+          <div className={cardVariants()}>
             <h3 className="s15 b">{t('teacher.t01.goalTitle')}</h3>
             <Field id="objective" label={`${t('teacher.t01.goal')} ${t('teacher.t01.required')}`} error={errorOf('objective')}>
-              <textarea id="objective" className="textarea" {...register('objective')} />
+              <Textarea id="objective" {...register('objective')} />
             </Field>
           </div>
-          <div className="card">
+          <div className={cardVariants()}>
             <h3 className="s15 b">{t('teacher.t01.lessonInfo')}</h3>
             <Field id="title" label={`${t('teacher.t01.lessonTitle')} ${t('teacher.t01.required')}`} error={errorOf('title')}>
-              <input id="title" className="input" {...register('title')} />
+              <Input id="title" {...register('title')} />
             </Field>
             <Field id="subject" label={`${t('teacher.t01.subject')} ${t('teacher.t01.required')}`} error={errorOf('subject')}>
-              <input id="subject" className="input" {...register('subject')} />
+              <Input id="subject" {...register('subject')} />
             </Field>
             <Field id="topic" label={`${t('teacher.t01.topic')} ${t('teacher.t01.required')}`} error={errorOf('topic')}>
-              <input id="topic" className="input" {...register('topic')} />
+              <Input id="topic" {...register('topic')} />
             </Field>
           </div>
         </div>
-        <div className="card sticky">
+        <div className={cn(cardVariants(), 'sticky')}>
           <div className="row">
             <span className="s13 muted">{t('teacher.t01.class')}</span>
             <span className="b">{classInfo.data?.name ?? t('common.loading')}</span>
@@ -188,7 +204,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
             ))}
           </ol>
           <p className="small muted">{t('teacher.t01.structureNote')}</p>
-          <button type="submit" className="btn primary block" aria-busy={analyze.isPending} disabled={analyze.isPending || !classId}>{t('teacher.t01.analyze')}</button>
+          <button type="submit" className={buttonVariants({ block: true })} aria-busy={analyze.isPending} disabled={analyze.isPending || !classId}>{t('teacher.t01.analyze')}</button>
           {classId ? null : <p className="hint">{t(me.isError ? 'errors.generic' : 'common.loading')}</p>}
         </div>
       </div>
