@@ -5,6 +5,8 @@ import { Note } from '@/components/logina/Note';
 import { errorKey } from '@/i18n';
 import { ApiError, newKey, startAnalyze } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { cardVariants } from '@/components/ui/card';
+import { buttonVariants } from '@/components/ui/button';
 
 /** For a lesson whose analysis was stopped, refused or failed. */
 export function RestartAnalysis({ lessonId }: { lessonId: string }) {
@@ -19,13 +21,13 @@ export function RestartAnalysis({ lessonId }: { lessonId: string }) {
     },
   });
   return (
-    <div className="card">
+    <div className={cardVariants()}>
       <h1 className="h1">{t('teacher.t02.notAnalyzed')}</h1>
       <p className="lede">{t('teacher.t02.notAnalyzedNote')}</p>
       {restart.isError ? <Note kind="err">{t(errorKey(restart.error instanceof ApiError ? restart.error.code : ''))}</Note> : null}
       <div className="row">
-        <button type="button" className="btn primary" aria-busy={restart.isPending} disabled={restart.isPending} onClick={() => restart.mutate()}>{t('teacher.t01.analyze')}</button>
-        <Link to="/t/lessons/new" className="btn secondary">{t('lessons.new')}</Link>
+        <button type="button" className={buttonVariants()} aria-busy={restart.isPending} disabled={restart.isPending} onClick={() => restart.mutate()}>{t('teacher.t01.analyze')}</button>
+        <Link to="/t/lessons/new" className={buttonVariants({ variant: 'secondary' })}>{t('lessons.new')}</Link>
       </div>
     </div>
   );

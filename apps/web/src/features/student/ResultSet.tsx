@@ -11,6 +11,10 @@ import { ApiError, getFeedback, getMyAssignments, newKey, restartAttempt } from 
 import { qk, queryClient } from '@/lib/query';
 import { errorKey } from '@/i18n';
 import { useLessonTitle } from './use-lesson-title';
+import { Badge } from '@/components/ui/badge';
+import { cardVariants } from '@/components/ui/card';
+import { buttonVariants } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const changed = (row: StudentFeedbackDTO) => row.choice === 'REVISE';
 
@@ -47,36 +51,34 @@ export function ResultSet() {
       {feedback.data ? (
         <>
           <p className="s15 sec">{t('student.result.summary', { kept: rows.length - revised, revised })}</p>
-          <div className="card flush">
-            <div className="tbl-wrap">
-              <table className="t">
-                <thead>
-                  <tr>
-                    <th>{t('student.result.task')}</th>
-                    <th>{t('student.result.after')}</th>
-                    <th>{t('student.result.change')}</th>
-                    <th>{t('student.result.confidence')}</th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
+          <div className={cardVariants({ tone: 'flush' })}>
+            <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('student.result.task')}</TableHead>
+                    <TableHead>{t('student.result.after')}</TableHead>
+                    <TableHead>{t('student.result.change')}</TableHead>
+                    <TableHead>{t('student.result.confidence')}</TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {rows.map((row) => (
-                    <tr key={row.slot}>
-                      <td className="b">{row.slot}</td>
-                      <td><span className="tag neutral">{t(changed(row) ? 'student.result.revise' : 'student.result.keep')}</span></td>
-                      <td className="s13">{t(changed(row) ? 'student.result.changed' : 'student.result.noChange')}</td>
-                      <td className="num">{`${row.confidenceBefore} → ${row.confidenceAfter}`}</td>
-                      <td className="whitespace-nowrap">
+                    <TableRow key={row.slot}>
+                      <TableCell className="b">{row.slot}</TableCell>
+                      <TableCell><Badge kind="neutral">{t(changed(row) ? 'student.result.revise' : 'student.result.keep')}</Badge></TableCell>
+                      <TableCell className="s13">{t(changed(row) ? 'student.result.changed' : 'student.result.noChange')}</TableCell>
+                      <TableCell className="num">{`${row.confidenceBefore} → ${row.confidenceAfter}`}</TableCell>
+                      <TableCell className="whitespace-nowrap">
                         <Link to="/s/attempts/$id/results/$slot" params={{ id, slot: row.slot }} className="lnk">{t('student.result.details')}</Link>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
           </div>
           {current ? (
-            <button type="button" className="btn primary" aria-busy={restart.isPending} disabled={restart.isPending} onClick={() => restart.mutate(current.assignmentId)}>
+            <button type="button" className={buttonVariants()} aria-busy={restart.isPending} disabled={restart.isPending} onClick={() => restart.mutate(current.assignmentId)}>
               {t('student.result.newRun')}
             </button>
           ) : null}
@@ -102,19 +104,19 @@ export function ResultDetail() {
       {row ? (
         <>
           <div className="journey">
-            <div className="card tight">
+            <div className={cardVariants({ tone: 'tight' })}>
               <span className="small b muted">{t('student.result.first')}</span>
               <span className="m">{row.initial.label}</span>
               <span className="s13 sec">{row.initial.text}</span>
               <span className="s13 sec num">{t('student.result.confidenceValue', { value: row.confidenceBefore })}</span>
             </div>
             <div className="arrow" aria-hidden="true">→</div>
-            <div className="card tight">
-              <span className="small b text-navy">{t('student.result.think')}</span>
+            <div className={cardVariants({ tone: 'tight' })}>
+              <span className="small b text-accent-ink">{t('student.result.think')}</span>
               <span className="s13">{row.challengeMessage}</span>
             </div>
             <div className="arrow" aria-hidden="true">→</div>
-            <div className="card tight">
+            <div className={cardVariants({ tone: 'tight' })}>
               <span className="small b muted">{t('student.result.final')}</span>
               <span className="m">{row.final.label}</span>
               <span className="s13 sec">{row.final.text}</span>
@@ -122,7 +124,7 @@ export function ResultDetail() {
             </div>
           </div>
           {row.explanations.length > 0 ? (
-            <div className="card">
+            <div className={cardVariants()}>
               <h2 className="s15 b">{t('student.result.feedback')}</h2>
               <div className="stack">
                 {row.explanations.map(({ optionId, relationLabel, text }) => (

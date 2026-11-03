@@ -6,6 +6,8 @@ import { PhaseLine } from '@/components/logina/PhaseLine';
 import { Pick } from '@/components/logina/Pick';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { StudentProgress } from '@/components/logina/StudentProgress';
 import { renderWithI18n } from '../utils';
 
@@ -27,6 +29,47 @@ describe('StatusTag', () => {
     const { container } = await renderWithI18n(<StatusTag kind={kind}>Label</StatusTag>);
     expect(screen.getByText('Label')).toBeInTheDocument();
     expect(container.querySelector('svg')).not.toBeNull();
+  });
+});
+
+describe('Button', () => {
+  it('shows a spinner and stays disabled while busy', async () => {
+    await renderWithI18n(<Button aria-busy disabled>Lock</Button>);
+    const button = screen.getByRole('button', { name: 'Lock' });
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('data-slot', 'button');
+  });
+
+  it('keeps the current heights: 40 px for md and 36 px for sm', () => {
+    expect(buttonVariants()).toContain('min-h-10');
+    expect(buttonVariants({ size: 'sm' })).toContain('min-h-9');
+  });
+
+  it('used on its own, a secondary button keeps a visible border', () => {
+    expect(buttonVariants({ variant: 'secondary' })).toContain('border-line-strong');
+    expect(buttonVariants({ variant: 'secondary' }).split(' ')).not.toContain('border-transparent');
+  });
+
+  it('renders a link styled as a button through asChild', async () => {
+    await renderWithI18n(<Button asChild variant="secondary"><a href="/t/lessons">Lessons</a></Button>);
+    expect(screen.getByRole('link', { name: 'Lessons' })).toHaveAttribute('data-slot', 'button');
+  });
+});
+
+describe('Card', () => {
+  it('tones map to padding, and flush has none', async () => {
+    const { container } = await renderWithI18n(<><Card>A</Card><Card tone="flush">B</Card></>);
+    const [plain, flush] = [...container.querySelectorAll('[data-slot="card"]')];
+    expect(plain?.className).toContain('p-5');
+    expect(flush?.className).not.toMatch(/(^|\s)p-/);
+  });
+});
+
+describe('StatusTag as a Badge', () => {
+  it('renders the shadcn badge slot', async () => {
+    const { container } = await renderWithI18n(<StatusTag kind="pass">Approved</StatusTag>);
+    expect(container.querySelector('[data-slot="badge"]')).not.toBeNull();
   });
 });
 

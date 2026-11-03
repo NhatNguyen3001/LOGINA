@@ -6,12 +6,21 @@ import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getMyAssignments, getTracking } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { Badge } from '@/components/ui/badge';
+import { cardVariants } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { BarChart } from '@/components/tremor/BarChart';
+import { CategoryBar } from '@/components/tremor/CategoryBar';
+import { ProgressBar } from '@/components/tremor/ProgressBar';
 
 type TaskRow = ClassTrackingDTO['perTask'][number];
+type TabId = 'dashboard' | 'students' | 'prompts';
 
-const TABS: { id: 'dashboard' | 'students' | 'prompts'; icon: LucideIcon }[] = [
+const TABS: { id: TabId; icon: LucideIcon }[] = [
   { id: 'dashboard', icon: LayoutDashboard },
   { id: 'students', icon: Users },
   { id: 'prompts', icon: MessageSquare },
@@ -19,7 +28,6 @@ const TABS: { id: 'dashboard' | 'students' | 'prompts'; icon: LucideIcon }[] = [
 
 const TOP_PROMPTS = 3;
 
-const share = (part: number, whole: number) => (whole > 0 ? `${(part / whole) * 100}%` : '0%');
 
 /** Each task counts by how many answers it has, so a task few people reached does not outweigh the rest. */
 function averageConfidence(rows: TaskRow[], pick: (row: TaskRow) => number | null): number | null {
@@ -39,7 +47,7 @@ function Metric({ icon: Icon, good, label, value, of, part, whole, hint }: { ico
         {value}
         {of ? <small> {of}</small> : null}
       </div>
-      {whole === undefined ? <span className="metric-hint">{hint}</span> : <div className="meter" aria-hidden="true"><i style={{ width: share(part ?? 0, whole) }} /></div>}
+      {whole === undefined ? <span className="metric-hint">{hint}</span> : <ProgressBar value={part ?? 0} max={whole} aria-label={label} className="metric-bar" />}
     </div>
   );
 }
@@ -56,6 +64,18 @@ function ChartCard({ title, legend, wide, children }: { title: string; legend?: 
   );
 }
 
+/** A bar a teacher can click, tap or reach by keyboard to read its numbers, where a hover title reached only a mouse. */
+function BarHint({ label, className, children }: { label: string; className: string; children: ReactNode }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button type="button" className={className} aria-label={label}>{children}</button>
+      </PopoverTrigger>
+      <PopoverContent side="top">{label}</PopoverContent>
+    </Popover>
+  );
+}
+
 function KeepReviseChart({ rows }: { rows: TaskRow[] }) {
   const { t } = useTranslation();
   return (
@@ -69,10 +89,9 @@ function KeepReviseChart({ rows }: { rows: TaskRow[] }) {
         return (
           <div key={slot} className="dash-row">
             <span className="b">{slot}</span>
-            <div className="dash-bar" role="img" aria-label={label} title={label}>
-              {keep ? <i className="kept" style={{ width: share(keep, total) }} /> : null}
-              {revise ? <i className="revised" style={{ width: share(revise, total) }} /> : null}
-            </div>
+            <BarHint className="dash-bar" label={label}>
+              {total > 0 ? <CategoryBar values={[keep, revise]} colors={['control', 'accent']} showLabels={false} className="w-full" /> : null}
+            </BarHint>
             <span className="dash-num num">{`${keep} / ${revise}`}</span>
           </div>
         );
@@ -83,32 +102,30 @@ function KeepReviseChart({ rows }: { rows: TaskRow[] }) {
 
 function ConfidenceChart({ rows }: { rows: TaskRow[] }) {
   const { t } = useTranslation();
+  const first = t('teacher.t14.firstDot');
+  const final = t('teacher.t14.finalDot');
+  const points = rows.map(({ slot, avgConfidenceBefore, avgConfidenceAfter }) => {
+    const before = avgConfidenceBefore === null ? null : Math.round(avgConfidenceBefore);
+    return { slot, [first]: before, [final]: before === null ? null : Math.round(avgConfidenceAfter ?? 0) };
+  });
   return (
     <ChartCard
       title={t('teacher.t14.confidenceTitle')}
-      legend={<><span><i className="sw round first" />{t('teacher.t14.firstDot')}</span><span><i className="sw round final" />{t('teacher.t14.finalDot')}</span></>}
+      legend={<><span><i className="sw round first" />{first}</span><span><i className="sw round final" />{final}</span></>}
     >
-      {rows.map(({ slot, avgConfidenceBefore, avgConfidenceAfter }) => {
-        const before = avgConfidenceBefore === null ? null : Math.round(avgConfidenceBefore);
-        const after = before === null ? null : Math.round(avgConfidenceAfter ?? 0);
-        const text = before === null ? '–' : `${before} → ${after}`;
-        const label = t('teacher.t14.barConfidence', { slot, change: text });
-        return (
-          <div key={slot} className="dash-row wide-num">
-            <span className="b">{slot}</span>
-            <div className="dumbbell" role="img" aria-label={label} title={label}>
-              {before !== null && after !== null ? (
-                <>
-                  <i className="link" style={{ left: `${Math.min(before, after)}%`, width: `${Math.abs(after - before)}%` }} />
-                  <i className="dot first" style={{ left: `${before}%` }} />
-                  <i className="dot final" style={{ left: `${after}%` }} />
-                </>
-              ) : null}
-            </div>
-            <span className="dash-num num">{text}</span>
-          </div>
-        );
-      })}
+      <div aria-hidden="true">
+        <BarChart data={points} index="slot" categories={[first, final]} colors={['control', 'accent']} minValue={0} maxValue={100} showLegend={false} yAxisWidth={32} className="h-44" />
+      </div>
+      <table className="vh" aria-label={t('teacher.t14.confidenceTitle')}>
+        <thead>
+          <tr><th>{t('student.result.task')}</th><th>{first}</th><th>{final}</th></tr>
+        </thead>
+        <tbody>
+          {points.map((point) => (
+            <tr key={point.slot}><td>{point.slot}</td><td>{point[first] ?? '–'}</td><td>{point[final] ?? '–'}</td></tr>
+          ))}
+        </tbody>
+      </table>
     </ChartCard>
   );
 }
@@ -118,9 +135,9 @@ function PromptRow({ tag, message, count, revised, clip }: { tag: string; messag
   const label = t('teacher.t14.revisedOf', { revised, count });
   return (
     <div className="prompt-row">
-      <span className="tag info num">{tag}</span>
-      <span className={`s13 ${clip ? 'clip' : ''}`} title={message}>{message}</span>
-      <div className="dash-bar single" aria-hidden="true">{revised ? <i className="revised" style={{ width: share(revised, count) }} /> : null}</div>
+      <Badge kind="info" className="num">{tag}</Badge>
+      {clip ? <BarHint className="s13 clip" label={message}>{message}</BarHint> : <span className="s13">{message}</span>}
+      <ProgressBar value={revised} max={count} variant="accent" aria-hidden="true" className="prompt-bar" />
       <span className="dash-num num">{label}</span>
     </div>
   );
@@ -174,36 +191,34 @@ function Students({ data }: { data: ClassTrackingDTO }) {
   const { t } = useTranslation();
   if (data.participants.length === 0) return <p className="dash-empty">{t('teacher.t14.empty')}</p>;
   return (
-    <div className="card flush">
-      <div className="tbl-wrap">
-        <table className="t">
-          <thead>
-            <tr>
-              <th>{t('teacher.t14.code')}</th>
-              <th>{t('teacher.t14.progress')}</th>
-              <th>{t('teacher.t14.keepOrRevise')}</th>
-              <th>{t('student.result.confidence')}</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
+    <div className={cardVariants({ tone: 'flush' })}>
+      <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('teacher.t14.code')}</TableHead>
+              <TableHead>{t('teacher.t14.progress')}</TableHead>
+              <TableHead>{t('teacher.t14.keepOrRevise')}</TableHead>
+              <TableHead>{t('student.result.confidence')}</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {data.participants.map((person) => (
-              <tr key={person.attemptId}>
-                <td className="b num">
+              <TableRow key={person.attemptId}>
+                <TableCell className="b num">
                   {person.participantCode ?? t('teacher.t14.notInResearch')}
                   {person.isSimulated ? <> <StatusTag kind="neutral">{t('teacher.t14.simulated')}</StatusTag></> : null}
-                </td>
-                <td className="num">{`${person.submittedCount}/5`}</td>
-                <td className="num">{`${person.keepCount} / ${person.reviseCount}`}</td>
-                <td className="num">{person.confidenceBefore === undefined ? '–' : `${Math.round(person.confidenceBefore)} → ${Math.round(person.confidenceAfter ?? 0)}`}</td>
-                <td>
+                </TableCell>
+                <TableCell className="num">{`${person.submittedCount}/5`}</TableCell>
+                <TableCell className="num">{`${person.keepCount} / ${person.reviseCount}`}</TableCell>
+                <TableCell className="num">{person.confidenceBefore === undefined ? '–' : `${Math.round(person.confidenceBefore)} → ${Math.round(person.confidenceAfter ?? 0)}`}</TableCell>
+                <TableCell>
                   {person.submittedCount > 0 ? <Link to="/t/attempts/$id/trace/$slot" params={{ id: person.attemptId, slot: 'Q1' }} className="lnk">{t('teacher.t14.trace')}</Link> : null}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
     </div>
   );
 }
@@ -231,7 +246,7 @@ function Prompts({ rows }: { rows: TaskRow[] }) {
 export function TrackingPage() {
   const { t } = useTranslation();
   const { id } = useParams({ strict: false }) as { id: string };
-  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('dashboard');
+  const [tab, setTab] = useState<TabId>('dashboard');
   const tracking = useQuery({ queryKey: qk.tracking(id), queryFn: () => getTracking(id) });
   const assignments = useQuery({ queryKey: qk.myAssignments(), queryFn: getMyAssignments });
   if (!tracking.data) return tracking.isError ? <p className="muted">{t('errors.NOT_FOUND')}</p> : <LoadingSkeleton />;
@@ -252,20 +267,20 @@ export function TrackingPage() {
         {lesson ? <p className="s15 m">{lesson}</p> : null}
         <p className="s13 muted">{releases}</p>
       </div>
-      <div className="track-tabs" role="tablist" aria-label={t('teacher.t14.title')}>
-        {TABS.map(({ id: name, icon: Icon }) => (
-          <button key={name} type="button" role="tab" id={`tab-${name}`} aria-selected={tab === name} aria-controls={`panel-${name}`} className={tab === name ? 'on' : undefined} onClick={() => setTab(name)}>
-            <Icon className="ico" aria-hidden="true" />
-            {t(`teacher.t14.tab.${name}`)}
-            {name === 'students' ? <span className="tab-count num">{participants.length}</span> : null}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="track-panel">
-        {tab === 'dashboard' ? <Dashboard data={tracking.data} onSeeAll={() => setTab('prompts')} /> : null}
-        {tab === 'students' ? <Students data={tracking.data} /> : null}
-        {tab === 'prompts' ? <Prompts rows={perTask} /> : null}
-      </div>
+      <Tabs value={tab} onValueChange={(value) => setTab(value as TabId)} className="contents">
+        <TabsList className="track-tabs" aria-label={t('teacher.t14.title')}>
+          {TABS.map(({ id: name, icon: Icon }) => (
+            <TabsTrigger key={name} value={name}>
+              <Icon className="ico" aria-hidden="true" />
+              {t(`teacher.t14.tab.${name}`)}
+              {name === 'students' ? <span className="tab-count num">{participants.length}</span> : null}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value="dashboard" className="track-panel"><Dashboard data={tracking.data} onSeeAll={() => setTab('prompts')} /></TabsContent>
+        <TabsContent value="students" className="track-panel"><Students data={tracking.data} /></TabsContent>
+        <TabsContent value="prompts" className="track-panel"><Prompts rows={perTask} /></TabsContent>
+      </Tabs>
     </>
   );
 }

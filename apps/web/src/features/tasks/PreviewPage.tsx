@@ -14,6 +14,10 @@ import { errorKey } from '@/i18n';
 import { ApiError, getChallenges, getLesson, getPreview, getTasks, newKey, rerunTask, sendEdit, tryCase } from '@/lib/api';
 import { qk, useJobPolling } from '@/lib/query';
 import { TaskStatusTag } from './task-status';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
+import { cardVariants } from '@/components/ui/card';
 
 const GATE_KIND = { PASS: 'pass', REVIEW_REQUIRED: 'review', BLOCKER: 'block' } as const;
 const RECHECKING = ['VALIDATING', 'GENERATING', 'STALE'];
@@ -50,11 +54,11 @@ function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, o
   return (
     <div className="stack">
       <label className="s13 b" htmlFor={`prompt-${challengeId}`}>{t('teacher.t07.editPrompt', { label: challengeId })}</label>
-      <textarea id={`prompt-${challengeId}`} className="textarea" value={value} onChange={(event) => setValue(event.target.value)} />
+      <Textarea id={`prompt-${challengeId}`} value={value} onChange={(event) => setValue(event.target.value)} />
       {save.isError ? <Note kind="err">{t(errorKey(save.error instanceof ApiError ? save.error.code : ''))}</Note> : null}
       <div className="row">
-        <button type="button" className="btn primary sm" aria-busy={save.isPending} disabled={!value.trim() || value === message || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
-        <button type="button" className="btn secondary sm" onClick={onClose}>{t('common.cancel')}</button>
+        <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={save.isPending} disabled={!value.trim() || value === message || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
+        <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={onClose}>{t('common.cancel')}</button>
       </div>
     </div>
   );
@@ -74,10 +78,10 @@ function AllPrompts({ lessonId, slot, draftId, draftVersion, status }: { lessonI
         ? list.data?.challenges.map((challenge) => (
             <div key={challenge.challengeId} className={`cand ${challenge.isFallback ? 'fb' : ''}`}>
               <div className="row">
-                <span className="tag info">{challenge.label}</span>
+                <Badge kind="info">{challenge.label}</Badge>
                 <span className="s13 b">{challenge.purpose}</span>
                 <span className="sp" />
-                {blocked && !challenge.isFallback ? <button type="button" className="btn secondary sm" onClick={() => setEditing(challenge.challengeId)}>{t('teacher.t07.editPrompt', { label: challenge.label })}</button> : null}
+                {blocked && !challenge.isFallback ? <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => setEditing(challenge.challengeId)}>{t('teacher.t07.editPrompt', { label: challenge.label })}</button> : null}
               </div>
               {editing === challenge.challengeId ? (
                 <PromptEditor lessonId={lessonId} draftId={draftId} draftVersion={draftVersion} challengeId={challenge.challengeId} message={challenge.message} onClose={() => setEditing(null)} />
@@ -111,7 +115,7 @@ function SummaryBody({ preview }: { preview: TeacherTaskSummaryDTO }) {
           <span className="k">{id}</span>
           <div>
             <div className="m">{text}</div>
-            {labels[id] ? <div className="meta"><span className="tag neutral">{labels[id] === 'SUPPORTED' ? t('teacher.t07.supportedReason') : labels[id]}</span></div> : null}
+            {labels[id] ? <div className="meta"><Badge kind="neutral">{labels[id] === 'SUPPORTED' ? t('teacher.t07.supportedReason') : labels[id]}</Badge></div> : null}
           </div>
           <span />
         </div>
@@ -127,7 +131,7 @@ function TryCase({ lessonId, slot, preview }: { lessonId: string; slot: Slot; pr
   const [evidenceId, setEvidenceId] = useState('');
   const run = useMutation({ mutationFn: () => tryCase(lessonId, slot, { answerId, evidenceId }, newKey()) });
   return (
-    <div className="card b-navy">
+    <div className={cardVariants({ edge: 'accent' })}>
       <div className="row">
         <h3 className="s15 b">{t('teacher.t07.tryCase')}</h3>
         <span className="sp" />
@@ -145,13 +149,13 @@ function TryCase({ lessonId, slot, preview }: { lessonId: string; slot: Slot; pr
           <button key={id} type="button" className={`chip ${evidenceId === id ? 'on' : ''}`} aria-pressed={evidenceId === id} onClick={() => setEvidenceId(id)}>{id}</button>
         ))}
         <span className="sp" />
-        <button type="button" className="btn secondary sm" aria-busy={run.isPending} disabled={!answerId || !evidenceId || run.isPending} onClick={() => run.mutate()}>{t('teacher.t07.tryRun')}</button>
+        <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} aria-busy={run.isPending} disabled={!answerId || !evidenceId || run.isPending} onClick={() => run.mutate()}>{t('teacher.t07.tryRun')}</button>
       </div>
       {run.data ? (
         <div className="well stack">
           <div className="row">
             <span className="s13 sec">{t('teacher.t07.willGet')}</span>
-            <span className="tag info">{run.data.wouldReceive.label}</span>
+            <Badge kind="info">{run.data.wouldReceive.label}</Badge>
             <span className="s13 b">{run.data.wouldReceive.purpose}</span>
           </div>
           <p className="s15 m">{run.data.wouldReceive.message}</p>
@@ -191,32 +195,32 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
   return (
     <div className="stack">
       <label className="vh" htmlFor={`edit-${optionId}`}>{t('teacher.t07.quickEdit', { option: optionId })}</label>
-      <textarea id={`edit-${optionId}`} className="textarea" value={value} onChange={(event) => setValue(event.target.value)} />
+      <Textarea id={`edit-${optionId}`} value={value} onChange={(event) => setValue(event.target.value)} />
       {refused ? (
-        <div className="card b-red">
+        <div className={cardVariants({ edge: 'red' })}>
           <StatusTag kind="block">{t('teacher.t11.refusedTitle')}</StatusTag>
           <p className="s15">{t('teacher.t11.refused')}</p>
           <div className="row">
-            <button type="button" className="btn secondary sm" onClick={() => save.reset()}>{t('teacher.t11.keepWording')}</button>
-            <Link to="/t/lessons/$id/source/edit" params={{ id: lessonId }} className="btn secondary sm">{t('teacher.t11.editSource')}</Link>
-            <button type="button" className="btn secondary sm" onClick={onClose}>{t('teacher.t11.revert')}</button>
+            <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => save.reset()}>{t('teacher.t11.keepWording')}</button>
+            <Link to="/t/lessons/$id/source/edit" params={{ id: lessonId }} className={buttonVariants({ variant: 'secondary', size: 'sm' })}>{t('teacher.t11.editSource')}</Link>
+            <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={onClose}>{t('teacher.t11.revert')}</button>
           </div>
         </div>
       ) : null}
       {conflict ? (
-        <div className="card b-orange">
+        <div className={cardVariants({ edge: 'orange' })}>
           <StatusTag kind="review">{t('teacher.t11.conflictTitle')}</StatusTag>
           <p className="s15">{t('teacher.t11.conflict')}</p>
           <div className="row">
-            <button type="button" className="btn primary sm" onClick={() => void reload()}>{t('teacher.t11.openNew')}</button>
-            <button type="button" className="btn secondary sm" onClick={() => void navigator.clipboard.writeText(value)}>{t('teacher.t11.copy')}</button>
+            <button type="button" className={buttonVariants({ size: 'sm' })} onClick={() => void reload()}>{t('teacher.t11.openNew')}</button>
+            <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => void navigator.clipboard.writeText(value)}>{t('teacher.t11.copy')}</button>
           </div>
         </div>
       ) : null}
       {save.isError && !refused && !conflict && code !== 'RATE_LIMITED' ? <Note kind="err">{t(errorKey(code))}</Note> : null}
       <div className="row">
-        <button type="button" className="btn primary sm" aria-busy={save.isPending} disabled={!value.trim() || value === text || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
-        <button type="button" className="btn secondary sm" onClick={onClose}>{t('common.cancel')}</button>
+        <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={save.isPending} disabled={!value.trim() || value === text || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
+        <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={onClose}>{t('common.cancel')}</button>
       </div>
     </div>
   );
@@ -239,7 +243,7 @@ function Q1Body({ lessonId, preview }: { lessonId: string; preview: TeacherTaskP
               <div className="m">{answer.text}</div>
             )}
             <div className="meta">
-              <span className="tag neutral">{answer.teacherLabel}</span>
+              <Badge kind="neutral">{answer.teacherLabel}</Badge>
               <span className="src">{answer.sourceAnchor}</span>
             </div>
             {answer.inlineFinding ? (
@@ -250,7 +254,7 @@ function Q1Body({ lessonId, preview }: { lessonId: string; preview: TeacherTaskP
             ) : null}
           </div>
           <div className="acts">
-            <button type="button" className="ibtn" aria-label={t('teacher.t07.quickEdit', { option: answer.id })} disabled={locked} onClick={() => setEditing(answer.id)}>
+            <button type="button" className={buttonVariants({ variant: 'secondary', size: 'icon' })} aria-label={t('teacher.t07.quickEdit', { option: answer.id })} disabled={locked} onClick={() => setEditing(answer.id)}>
               <Pencil className="ico" aria-hidden="true" />
             </button>
           </div>
@@ -263,7 +267,7 @@ function Q1Body({ lessonId, preview }: { lessonId: string; preview: TeacherTaskP
           <div>
             <div className="m">{card.text}</div>
             <div className="meta">
-              <span className="tag neutral">{card.teacherLabel}</span>
+              <Badge kind="neutral">{card.teacherLabel}</Badge>
               <span className="s13 sec">{card.relationNote}</span>
               <span className="src">{card.sourceAnchor}</span>
             </div>
@@ -301,11 +305,11 @@ export function PreviewPage() {
 
   const header = (
     <>
-      <Link to="/t/lessons/$id/tasks" params={{ id }} className="btn secondary sm" aria-label={t('teacher.t06.title')}><ArrowLeft className="ico" aria-hidden="true" /></Link>
+      <Link to="/t/lessons/$id/tasks" params={{ id }} className={buttonVariants({ variant: 'secondary', size: 'sm' })} aria-label={t('teacher.t06.title')}><ArrowLeft className="ico" aria-hidden="true" /></Link>
       <span className="b s15">{lesson.data?.title}</span>
       <span className="sp" />
-      {slot === 'Q1' ? <Link to="/t/lessons/$id/tasks/$slot/logic" params={{ id, slot }} className="btn secondary sm">{t('teacher.t08.title')}</Link> : null}
-      <Link to="/t/lessons/$id/approve" params={{ id }} className="btn secondary sm">
+      {slot === 'Q1' ? <Link to="/t/lessons/$id/tasks/$slot/logic" params={{ id, slot }} className={buttonVariants({ variant: 'secondary', size: 'sm' })}>{t('teacher.t08.title')}</Link> : null}
+      <Link to="/t/lessons/$id/approve" params={{ id }} className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
         {t('teacher.goApproval')}
         {remaining > 0 ? <span className="cnt">{remaining}</span> : null}
       </Link>
@@ -357,13 +361,13 @@ export function PreviewPage() {
         </Note>
       ) : null}
       {failed ? (
-        <div className="card b-red">
+        <div className={cardVariants({ edge: 'red' })}>
           <StatusTag kind="block">{t('teacher.t11.failedTitle')}</StatusTag>
           <p className="s15">{t('teacher.t11.failed')}</p>
           <div className="row">
-            <span className="tag stale">{t('teacher.t11.cantApprove', { slot })}</span>
+            <Badge kind="stale">{t('teacher.t11.cantApprove', { slot })}</Badge>
             <span className="sp" />
-            <button type="button" className="btn primary sm" aria-busy={rerun.isPending} disabled={rerun.isPending} onClick={() => rerun.mutate()}>{t('common.retry')}</button>
+            <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={rerun.isPending} disabled={rerun.isPending} onClick={() => rerun.mutate()}>{t('common.retry')}</button>
           </div>
         </div>
       ) : null}
@@ -374,7 +378,7 @@ export function PreviewPage() {
             <span className="sp" />
             <span className="s13 muted num">{t('teacher.t07.version', { version: data.draftVersion })}</span>
           </div>
-          <div className="card tight">
+          <div className={cardVariants({ tone: 'tight' })}>
             <span className="small b sec">{t('teacher.t07.question')}</span>
             <p className="s15 m">{data.questionStem}</p>
           </div>
@@ -386,7 +390,7 @@ export function PreviewPage() {
           {data.exampleChallenges.map((challenge) => (
             <div key={challenge.label} className="cand">
               <div className="row">
-                <span className="tag info">{challenge.label}</span>
+                <Badge kind="info">{challenge.label}</Badge>
                 <span className="s13 b">{challenge.purpose}</span>
                 <span className="sp" />
                 <span className="small muted">{challenge.whenShown}</span>

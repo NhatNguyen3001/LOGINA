@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { AlertTriangle, Compass, RotateCcw, Users, X, type LucideIcon } from 'lucide-react';
+import { AlertTriangle, Compass, RotateCcw, Users, type LucideIcon } from 'lucide-react';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,8 @@ import { demoFailNextRerun, demoReset, demoSimulate, getDemoSnapshots, getMe, ge
 import { qk } from '@/lib/query';
 import { showToast, type ToastMessage } from '@/lib/toast';
 import { Note } from './Note';
+import { buttonVariants } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const TOUR = ['button', 'jump', 'try', 'reset'] as const;
 const TOUR_SEEN = 'logina.demoTourSeen';
@@ -34,15 +36,11 @@ const markTourSeen = (): void => {
   }
 };
 
-const showModal = (node: HTMLDialogElement | null) => {
-  if (node && !node.open) node.showModal();
-};
-
 /** A modal focuses its first control, which here is Skip; the step's own action is the one to land on. */
 const openOnNext = (node: HTMLDialogElement | null) => {
   if (!node || node.open) return;
   node.showModal();
-  node.querySelector<HTMLElement>('.btn.primary')?.focus();
+  node.querySelector<HTMLElement>('[data-next]')?.focus();
 };
 
 function coachPlace(box: DOMRect | null): CSSProperties {
@@ -97,7 +95,7 @@ function Tour({ step, onNext, onSkip }: { step: number; onNext: () => void; onSk
           </span>
           <span className="sp" />
           {last ? null : <button type="button" className="lnk jump" onClick={onSkip}>{t('demo.tour.skip')}</button>}
-          <button type="button" className="btn primary sm" onClick={onNext}>{t(last ? 'demo.tour.done' : 'demo.tour.next')}</button>
+          <button type="button" data-next className={buttonVariants({ size: 'sm' })} onClick={onNext}>{t(last ? 'demo.tour.done' : 'demo.tour.next')}</button>
         </div>
       </div>
     </dialog>
@@ -186,28 +184,17 @@ export function DemoMenu({ assignmentId }: { assignmentId?: string }) {
 
   return (
     <>
-      <button type="button" data-tour="button" className="demo-open" aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(true)}>
-        <Compass className="ico" aria-hidden="true" />
-        <span>{t('demo.title')}</span>
-      </button>
-      {createPortal(
-        <>
-          {open ? (
-            <dialog
-              ref={showModal}
-              className="drawer"
-              aria-labelledby="demo-title"
-              onClose={close}
-              onClick={(event) => {
-                if (event.target === event.currentTarget) close();
-              }}
-            >
-              <div className="drawer-in">
-                <div className="row">
-                  <h2 id="demo-title" className="s15 b grow">{t('demo.title')}</h2>
-                  <button type="button" className="ibtn" aria-label={t('demo.close')} onClick={close}><X className="ico" aria-hidden="true" /></button>
-                </div>
-                <p className="s13 sec">{t('demo.intro')}</p>
+      {/* While the tour runs it sits above the drawer, so the drawer must not trap focus or close on its clicks. */}
+      <Sheet open={open} onOpenChange={(next) => (next ? setOpen(true) : close())} modal={tourStep === null}>
+        <SheetTrigger asChild>
+          <button type="button" data-tour="button" className="demo-open">
+            <Compass className="ico" aria-hidden="true" />
+            <span>{t('demo.title')}</span>
+          </button>
+        </SheetTrigger>
+        <SheetContent side="right" closeLabel={t('demo.close')} overlay={tourStep === null} onInteractOutside={(event) => tourStep !== null && event.preventDefault()}>
+                <SheetTitle>{t('demo.title')}</SheetTitle>
+                <SheetDescription>{t('demo.intro')}</SheetDescription>
                 {pending ? <p role="status" className="s13 muted">{t('common.loading')}</p> : null}
                 <section className="demo-part" data-tour="jump">
                   <h3 className="small b sec">{t('demo.jump')}</h3>
@@ -236,28 +223,24 @@ export function DemoMenu({ assignmentId }: { assignmentId?: string }) {
                     <>
                       <p className="s13">{t('demo.resetConfirm')}</p>
                       <div className="row">
-                        <button type="button" className="btn danger sm" disabled={pending} onClick={() => replaceWorkspace.mutate({ action: () => demoReset(newKey()), done: { title: t('demo.resetDoneTitle'), body: t('demo.resetDoneBody') } })}>{t('common.confirm')}</button>
-                        <button type="button" className="btn secondary sm" onClick={() => setConfirming(false)}>{t('common.cancel')}</button>
+                        <button type="button" className={buttonVariants({ variant: 'danger', size: 'sm' })} disabled={pending} onClick={() => replaceWorkspace.mutate({ action: () => demoReset(newKey()), done: { title: t('demo.resetDoneTitle'), body: t('demo.resetDoneBody') } })}>{t('common.confirm')}</button>
+                        <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => setConfirming(false)}>{t('common.cancel')}</button>
                       </div>
                     </>
                   ) : (
-                    <button type="button" className="btn danger block" disabled={pending} onClick={() => setConfirming(true)}>
+                    <button type="button" className={buttonVariants({ variant: 'danger', block: true })} disabled={pending} onClick={() => setConfirming(true)}>
                       <RotateCcw className="ico" aria-hidden="true" />
                       {t('demo.reset')}
                     </button>
                   )}
-                  <button type="button" className="btn choice block" onClick={replayTour}>
+                  <button type="button" className={buttonVariants({ variant: 'choice', block: true })} onClick={replayTour}>
                     <Compass className="ico" aria-hidden="true" />
                     {t('demo.replay')}
                   </button>
                 </div>
-              </div>
-            </dialog>
-          ) : null}
-          {tourStep === null ? null : <Tour key={tourStep} step={tourStep} onNext={nextTourStep} onSkip={skipTour} />}
-        </>,
-        document.body,
-      )}
+        </SheetContent>
+      </Sheet>
+      {tourStep === null ? null : createPortal(<Tour key={tourStep} step={tourStep} onNext={nextTourStep} onSkip={skipTour} />, document.body)}
     </>
   );
 }

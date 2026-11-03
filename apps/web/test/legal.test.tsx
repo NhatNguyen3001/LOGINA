@@ -42,10 +42,10 @@ describe('policy pages', () => {
 
   it('folds every section until it is opened', async () => {
     const { container } = await render('terms');
-    const sections = [...container.querySelectorAll('details')];
+    const sections = [...container.querySelectorAll('[data-slot="accordion-trigger"]')];
     expect(sections).toHaveLength(9);
-    expect(sections.every((section) => !section.open)).toBe(true);
-    expect(container.querySelector('summary')).toHaveTextContent('1. About LOGINA');
+    expect(sections.every((section) => section.getAttribute('aria-expanded') === 'false')).toBe(true);
+    expect(sections[0]).toHaveTextContent('1. About LOGINA');
   });
 
   it('Back goes to the previous page, not the start', async () => {

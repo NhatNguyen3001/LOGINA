@@ -6,6 +6,10 @@ import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pick } from '@/components/logina/Pick';
+import { buttonVariants } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cardVariants } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 type Draft<S extends Artifact['slot']> = Extract<DraftArtifact, { slot: S }>;
 
@@ -62,10 +66,10 @@ function RankRow({ id, index, count, text, onMove }: { id: string; index: number
         <span>{text}</span>
         {/* The row starts a drag, so the buttons keep their own presses. */}
         <span className="acts" onMouseDown={(event) => event.stopPropagation()} onTouchStart={(event) => event.stopPropagation()}>
-          <button type="button" className="ibtn" aria-label={t('student.q2.moveUp', { card: text })} disabled={index === 0} onClick={() => onMove(-1)}>
+          <button type="button" className={buttonVariants({ variant: 'secondary', size: 'icon' })} aria-label={t('student.q2.moveUp', { card: text })} disabled={index === 0} onClick={() => onMove(-1)}>
             <ArrowUp className="ico" aria-hidden="true" />
           </button>
-          <button type="button" className="ibtn" aria-label={t('student.q2.moveDown', { card: text })} disabled={index === count - 1} onClick={() => onMove(1)}>
+          <button type="button" className={buttonVariants({ variant: 'secondary', size: 'icon' })} aria-label={t('student.q2.moveDown', { card: text })} disabled={index === count - 1} onClick={() => onMove(1)}>
             <ArrowDown className="ico" aria-hidden="true" />
           </button>
         </span>
@@ -214,9 +218,9 @@ function StarterField({ id, lead, answer, max, onChange }: { id: string; lead: s
   const { t } = useTranslation();
   const typed = answer?.declared ? '' : (answer?.text ?? '');
   return (
-    <div className="card tight starter">
+    <div className={cn(cardVariants({ tone: 'tight' }), 'starter')}>
       <label htmlFor={id} className="b s15">{lead}</label>
-      <input id={id} className="input" maxLength={max} disabled={Boolean(answer?.declared)} placeholder={t('student.q5.placeholder')} value={typed} onChange={(event) => onChange(event.target.value ? { starterId: id, text: event.target.value } : null)} />
+      <Input id={id} maxLength={max} disabled={Boolean(answer?.declared)} placeholder={t('student.q5.placeholder')} value={typed} onChange={(event) => onChange(event.target.value ? { starterId: id, text: event.target.value } : null)} />
       <div className="row">
         {DECLARATIONS.map(({ kind, key }) => (
           <button key={kind} type="button" className={`word-card s13 ${answer?.declared === kind ? 'on' : ''}`} aria-pressed={answer?.declared === kind} onClick={() => onChange(answer?.declared === kind ? null : { starterId: id, text: t(key), declared: kind })}>{t(key)}</button>

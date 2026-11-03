@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useTranslation } from 'react-i18next';
 import { afterEach, describe, expect, it, vi as vitest } from 'vitest';
@@ -49,6 +49,29 @@ describe('language', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Tiếng Việt' }));
     expect(saver).toHaveBeenCalledWith('vi');
     expect(screen.getByRole('button', { name: 'Tiếng Việt' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('switching waits for the new content, then changes every word at once', async () => {
+    let finish = () => {};
+    setUserLocaleSaver(() => new Promise<void>((resolve) => { finish = resolve; }));
+    await renderWithI18n(<><LangSwitch /><Label /></>);
+    await userEvent.click(screen.getByRole('button', { name: 'Tiếng Việt' }));
+    const picked = screen.getByRole('button', { name: 'Tiếng Việt' });
+    expect(picked).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByText('Read by AI')).toBeInTheDocument();
+    expect(document.documentElement.dataset.switching).toBe('vi');
+    await act(async () => finish());
+    expect(await screen.findByText('Đọc bằng AI')).toBeInTheDocument();
+    expect(picked).not.toHaveAttribute('aria-busy', 'true');
+    expect(document.documentElement.dataset.switching).toBeUndefined();
+  });
+
+  it('a failed save still switches the words on screen', async () => {
+    setUserLocaleSaver(async () => { throw new Error('offline'); });
+    await renderWithI18n(<><LangSwitch /><Label /></>);
+    await userEvent.click(screen.getByRole('button', { name: 'Tiếng Việt' }));
+    expect(await screen.findByText('Đọc bằng AI')).toBeInTheDocument();
+    expect(document.documentElement.dataset.switching).toBeUndefined();
   });
 
   it('switching without a session updates ?lang=', async () => {

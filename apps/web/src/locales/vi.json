@@ -59,7 +59,9 @@
       "notAnalyzed": "Bài này chưa được phân tích",
       "notAnalyzedNote": "Việc phân tích đã dừng hoặc chưa xong. Cô có thể chạy lại.",
       "showThoughts_one": "Xem {{count}} suy nghĩ của AI",
-      "showThoughts": "Xem {{count}} suy nghĩ của AI"
+      "showThoughts": "Xem {{count}} suy nghĩ của AI",
+      "hideThoughts_one": "Ẩn {{count}} suy nghĩ của AI",
+      "hideThoughts": "Ẩn {{count}} suy nghĩ của AI"
     },
     "t05": {
       "readByAiNotice": "LOGINA đã đọc tệp này bằng AI. Cô hãy đối chiếu đoạn trích và số liệu với bản gốc trước khi duyệt.",
@@ -204,7 +206,13 @@
       "notChecked": "Chưa kiểm tra",
       "wait": "Soạn và dịch từ tài liệu của cô có thể mất tới 15 phút. Cô có thể đóng thẻ này rồi quay lại; việc soạn vẫn tiếp tục, bản nháp nào xong sẽ hiện ở đây.",
       "elapsed": "Đã chạy {{minutes}} phút {{seconds}} giây",
-      "progress": {"DRAFTING":"Đang soạn…","CHECKING":"Đang kiểm tra…","TRANSLATING":"Đang dịch…","FAILED":"Chưa hoàn thành","READY":"Sẵn sàng"},
+      "progress": {
+        "DRAFTING": "Đang soạn…",
+        "CHECKING": "Đang kiểm tra…",
+        "TRANSLATING": "Đang dịch…",
+        "FAILED": "Chưa hoàn thành",
+        "READY": "Sẵn sàng"
+      },
       "sufficiency": {
         "SUFFICIENT": "Đủ",
         "UNCERTAIN": "Chưa chắc",
@@ -488,7 +496,13 @@
     "draft": "Bản nháp",
     "menu": "Trình đơn",
     "back": "Quay lại",
-    "loadFailed": "Không tải được. Hãy kiểm tra kết nối rồi thử lại."
+    "loadFailed": "Không tải được. Hãy kiểm tra kết nối rồi thử lại.",
+    "theme": {
+      "label": "Giao diện",
+      "light": "Sáng",
+      "dark": "Tối",
+      "system": "Theo thiết bị"
+    }
   },
   "demo": {
     "jumpSampleOnly": "Chỉ cho bộ bài mẫu",
@@ -671,7 +685,6 @@
   },
   "entry": {
     "headline": "LOGINA giúp giáo viên biến học liệu của mình thành năm nhiệm vụ suy luận.",
-    "title": "Dùng thử LOGINA",
     "teacher": "Dùng thử với vai trò giáo viên",
     "student": "Dùng thử với vai trò học sinh",
     "demoLine": "Đây là bản dùng thử, không cần tài khoản. Lớp học thật sẽ có tài khoản.",
@@ -681,6 +694,18 @@
       "draft": "LOGINA đọc học liệu, hỏi lại chỗ chưa rõ và soạn năm nhiệm vụ.",
       "approve": "Giáo viên duyệt nguồn và duyệt nhiệm vụ.",
       "think": "Học sinh trả lời, thử nghĩ thêm, rồi giữ hoặc sửa."
+    },
+    "lede": "Chọn một vai để dùng thử. Không cần tài khoản.",
+    "teacherNote": "Đưa học liệu lên, trả lời câu hỏi của LOGINA, rồi duyệt năm nhiệm vụ.",
+    "studentNote": "Làm năm nhiệm vụ, thử nghĩ thêm sau một gợi ý, rồi giữ hoặc sửa.",
+    "howTitle": "LOGINA hoạt động thế nào",
+    "who": {
+      "teacher": "Giáo viên",
+      "logina": "LOGINA",
+      "students": "Học sinh"
+    },
+    "preview": {
+      "choice": "Tỉ trọng lao động nông nghiệp giảm."
     }
   },
   "lessons": {

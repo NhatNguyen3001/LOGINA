@@ -103,7 +103,7 @@ Open [`docs/architecture/logina-architecture.html`](docs/architecture/logina-arc
 
 | Area | Technology |
 |---|---|
-| Web | React 19, Vite, TanStack Router and Query, Tailwind CSS v4, i18next (English and Vietnamese), dnd-kit |
+| Web | React 19, Vite, TanStack Router and Query, Tailwind CSS v4, shadcn/ui (Radix), Tremor charts (Recharts), Sonner, i18next (English and Vietnamese), dnd-kit |
 | API and worker | Node.js 22, TypeScript, Hono, Zod |
 | Data | Cloud Firestore, Cloud Storage |
 | Jobs | Cloud Tasks |
@@ -236,7 +236,7 @@ The legal pages are drafts awaiting legal review, and the sample figures should 
 
 LOGINA is built on these projects and services:
 
-- **Web:** [React](https://react.dev), [Vite](https://vite.dev), [TanStack Router and Query](https://tanstack.com), [Tailwind CSS](https://tailwindcss.com), [i18next](https://www.i18next.com), [dnd-kit](https://dndkit.com), [Lucide](https://lucide.dev) and [Be Vietnam Pro](https://fonts.google.com/specimen/Be+Vietnam+Pro)
+- **Web:** [React](https://react.dev), [Vite](https://vite.dev), [TanStack Router and Query](https://tanstack.com), [Tailwind CSS](https://tailwindcss.com), [shadcn/ui](https://ui.shadcn.com), [Radix](https://www.radix-ui.com), [Tremor](https://tremor.so) (Apache 2.0), [Recharts](https://recharts.org), [Sonner](https://sonner.emilkowal.ski), [i18next](https://www.i18next.com), [dnd-kit](https://dndkit.com), [Lucide](https://lucide.dev) and [Be Vietnam Pro](https://fonts.google.com/specimen/Be+Vietnam+Pro)
 - **Backend:** [Node.js](https://nodejs.org), [TypeScript](https://www.typescriptlang.org), [Hono](https://hono.dev), [Zod](https://zod.dev), [pdf-lib](https://pdf-lib.js.org) and [Mammoth](https://github.com/mwilliamson/mammoth.js)
 - **Cloud:** [Firebase](https://firebase.google.com) and [Google Cloud](https://cloud.google.com) (Cloud Run, Firestore, Cloud Storage and Cloud Tasks)
 - **AI:** [Gemini](https://ai.google.dev) on [Vertex AI](https://cloud.google.com/vertex-ai)

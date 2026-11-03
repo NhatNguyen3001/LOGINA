@@ -12,6 +12,12 @@ import { ApiError, approveTask, getApproval, getLesson, newKey, sendDisposition 
 import { qk } from '@/lib/query';
 import { TaskStatusTag } from '@/features/tasks/task-status';
 import { TranslationReview } from './TranslationReview';
+import { Textarea } from '@/components/ui/textarea';
+import { buttonVariants } from '@/components/ui/button';
+import { cardVariants } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type Task = TaskApprovalDTO['tasks'][number];
 type Finding = Task['decisionsNeeded'][number];
@@ -46,16 +52,16 @@ function Decision({ lessonId, task, findings }: { lessonId: string; task: Task; 
       {accepting ? (
         <>
           <label className="small b sec" htmlFor={reasonId}>{t('teacher.t12.acceptWarning')}</label>
-          <textarea id={reasonId} className="textarea" value={reason} onChange={(event) => setReason(event.target.value)} />
+          <Textarea id={reasonId} value={reason} onChange={(event) => setReason(event.target.value)} />
           <span className="small muted">{t('teacher.t12.stillSays')}</span>
           <div className="row">
-            <button type="button" className="btn secondary sm" aria-busy={accept.isPending} disabled={!reason.trim() || accept.isPending} onClick={() => accept.mutate()}>{t('teacher.t12.saveDecision')}</button>
+            <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} aria-busy={accept.isPending} disabled={!reason.trim() || accept.isPending} onClick={() => accept.mutate()}>{t('teacher.t12.saveDecision')}</button>
             {fix}
           </div>
         </>
       ) : (
         <div className="row">
-          <button type="button" className="btn secondary sm" onClick={() => setAccepting(true)}>{t('teacher.t12.acceptWithReason')}</button>
+          <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => setAccepting(true)}>{t('teacher.t12.acceptWithReason')}</button>
           {fix}
         </div>
       )}
@@ -85,7 +91,7 @@ function ApprovePanel({ lessonId, task, uploaded }: { lessonId: string; task: Ta
   const waitingOn = blockers > 0 ? 'blockers' : undecided > 0 ? 'warnings' : !translated ? 'translation' : !ready ? 'status' : !confirmed ? 'confirm' : null;
 
   return (
-    <div className="card sticky">
+    <div className={cn(cardVariants(), 'sticky')}>
       <div className="row">
         <h3 className="b">{t('teacher.t12.approveSlot', { slot: task.slot })}</h3>
         <span className="sp" />
@@ -104,11 +110,11 @@ function ApprovePanel({ lessonId, task, uploaded }: { lessonId: string; task: Ta
         <div className="row"><span className={undecided === 0 ? 'ok' : 'wait'}>{undecided === 0 ? '✓' : '…'}</span><span>{t('teacher.t12.warningsDecided')}</span></div>
       </div>
       <label className="row top">
-        <input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />
+        <Checkbox checked={confirmed} onCheckedChange={(state) => setConfirmed(state === true)} className="mt-0.5" />
         <span className="s13 grow">{t('teacher.t12.confirm', { slot: task.slot })}</span>
       </label>
       {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
-      <button type="button" className="btn primary block" aria-busy={approve.isPending} disabled={!confirmed || !ready || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t12.approveSlot', { slot: task.slot })}</button>
+      <button type="button" className={buttonVariants({ block: true })} aria-busy={approve.isPending} disabled={!confirmed || !ready || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t12.approveSlot', { slot: task.slot })}</button>
       {waitingOn ? <p className="hint">{t(`teacher.t12.why.${waitingOn}`)}</p> : null}
     </div>
   );
@@ -131,7 +137,7 @@ export function ApprovePage() {
       return (
         <div className="stack">
           <Note kind="info">{t('teacher.t12.notReady')}</Note>
-          <Link to="/t/lessons/$id/tasks" params={{ id }} className="btn secondary self-start">{t('teacher.t12.backToTasks')}</Link>
+          <Link to="/t/lessons/$id/tasks" params={{ id }} className={cn(buttonVariants({ variant: 'secondary' }), 'self-start')}>{t('teacher.t12.backToTasks')}</Link>
         </div>
       );
     }
@@ -157,57 +163,55 @@ export function ApprovePage() {
       </div>
       <p className="lede">{t('teacher.t12.lede')}</p>
       <div className="cols">
-      <div className="card flush">
+      <div className={cardVariants({ tone: 'flush' })}>
         <div className="row p-4">
           <h3 className="s15 b">{t('teacher.t06.count')}</h3>
           <span className="sp" />
           <span className="s13 sec num">{t('teacher.t12.approved', { count: approved })}</span>
         </div>
-        <div className="tbl-wrap">
-          <table className="t stack-sm">
-            <thead>
-              <tr>
-                <th>{t('student.result.task')}</th>
-                <th>{t('teacher.t12.results')}</th>
-                <th>{t('teacher.t12.preview')}</th>
-                <th>{t('teacher.t12.approval')}</th>
-              </tr>
-            </thead>
-            <tbody>
+        <Table className="stack-sm">
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('student.result.task')}</TableHead>
+                <TableHead>{t('teacher.t12.results')}</TableHead>
+                <TableHead>{t('teacher.t12.preview')}</TableHead>
+                <TableHead>{t('teacher.t12.approval')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {tasks.map((task) => (
-                <tr key={task.slot}>
-                  <td className="b">{t(`teacher.taskType.${task.slot}`)}</td>
-                  <td data-label={t('teacher.t12.results')}>
+                <TableRow key={task.slot}>
+                  <TableCell className="b">{t(`teacher.taskType.${task.slot}`)}</TableCell>
+                  <TableCell data-label={t('teacher.t12.results')}>
                     <div className="stack">
                       <TaskStatusTag status={task.status} />
                       {task.acceptedWarning ? <StatusTag kind="teacher">{t('teacher.t12.decided')}</StatusTag> : null}
                       {blockingGates(task).map((gate) => (
                         <div key={gate.gateId} className="stack">
                           <span className="s13">{`${t(`teacher.gateName.${gate.gateId}`)} · ${gate.explanationForTeacher}`}</span>
-                          <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: task.slot }} className="btn secondary sm self-start">{t('teacher.t12.openToFix')}</Link>
+                          <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: task.slot }} className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'self-start')}>{t('teacher.t12.openToFix')}</Link>
                         </div>
                       ))}
                       {groupFindings(task.decisionsNeeded.filter((finding) => finding.overridable)).map((findings) => (
                         <Decision key={`${findings[0]!.gateId}-${findings[0]!.findingCode}`} lessonId={id} task={task} findings={findings} />
                       ))}
                     </div>
-                  </td>
-                  <td data-label={t('teacher.t12.preview')}>
+                  </TableCell>
+                  <TableCell data-label={t('teacher.t12.preview')}>
                     <div className="small num">{t('teacher.t07.version', { version: task.draftVersion })}</div>
                     <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: task.slot }} className="lnk">{t('teacher.t12.view')}</Link>
-                  </td>
-                  <td data-label={t('teacher.t12.approval')}>
+                  </TableCell>
+                  <TableCell data-label={t('teacher.t12.approval')}>
                     {task.approvedAt ? (
                       <StatusTag kind="teacher">{task.releaseLabel}</StatusTag>
                     ) : (
-                      <button type="button" className="btn secondary sm" aria-pressed={current?.slot === task.slot} onClick={() => setSelected(task.slot)}>{t('teacher.t12.review', { slot: task.slot })}</button>
+                      <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} aria-pressed={current?.slot === task.slot} onClick={() => setSelected(task.slot)}>{t('teacher.t12.review', { slot: task.slot })}</button>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
       </div>
       {current ? <ApprovePanel key={`${current.slot}-${current.draftVersion}`} lessonId={id} task={current} uploaded={uploaded} /> : null}
       </div>
@@ -215,7 +219,7 @@ export function ApprovePage() {
       <div className="row">
         {allApproved ? null : <span className="s13 sec">{t('teacher.t12.assignWhy')}</span>}
         <span className="sp" />
-        {allApproved ? <Link to="/t/lessons/$id/assign" params={{ id }} className="btn primary">{t('teacher.t12.assignCount', { count: approved })}</Link> : <button type="button" className="btn primary" disabled>{t('teacher.t12.assignCount', { count: approved })}</button>}
+        {allApproved ? <Link to="/t/lessons/$id/assign" params={{ id }} className={buttonVariants()}>{t('teacher.t12.assignCount', { count: approved })}</Link> : <button type="button" className={buttonVariants()} disabled>{t('teacher.t12.assignCount', { count: approved })}</button>}
       </div>
     </>
   );

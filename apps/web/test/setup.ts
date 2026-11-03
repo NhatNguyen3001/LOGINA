@@ -18,4 +18,9 @@ HTMLDialogElement.prototype.showModal ??= function showModal(this: HTMLDialogEle
 
 window.scrollTo = () => {};
 
+/** Radix Select asks for pointer capture and scrolls the chosen option into view. */
+Element.prototype.hasPointerCapture ??= () => false;
+Element.prototype.releasePointerCapture ??= () => {};
+Element.prototype.scrollIntoView ??= () => {};
+
 afterEach(cleanup);

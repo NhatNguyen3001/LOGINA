@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { DiffRow } from '@/components/logina/DiffRow';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
-import { Pick } from '@/components/logina/Pick';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { RestartAnalysis } from '@/features/lessons/RestartAnalysis';
@@ -14,6 +13,12 @@ import { errorKey } from '@/i18n';
 import { ApiError, getSourceReview, newKey, resolveIssue } from '@/lib/api';
 import { qk } from '@/lib/query';
 import { cn } from '@/lib/utils';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
+import { cardVariants } from '@/components/ui/card';
 
 type Issue = SourceReviewDTO['issues'][number];
 type Mode = 'adjust' | 'keepOpen' | 'exclude' | null;
@@ -30,7 +35,7 @@ function IssueCard({ issue, onResolve, pending, onFocusPoint }: { issue: Issue; 
   const blocker = issue.severity === 'BLOCKER';
 
   return (
-    <article id={`point-${issue.id}`} tabIndex={-1} className={cn('card', !resolved && (blocker ? 'b-red' : 'b-orange'))} onMouseEnter={() => onFocusPoint(issue.pointNumber)} onMouseLeave={() => onFocusPoint(null)} onFocus={() => onFocusPoint(issue.pointNumber)}>
+    <article id={`point-${issue.id}`} tabIndex={-1} className={cardVariants({ edge: resolved ? 'none' : blocker ? 'red' : 'orange' })} onMouseEnter={() => onFocusPoint(issue.pointNumber)} onMouseLeave={() => onFocusPoint(null)} onFocus={() => onFocusPoint(issue.pointNumber)}>
       <div className="row">
         <span className="pt">{t('teacher.t03.point', { n: issue.pointNumber })}</span>
         {resolved ? <StatusTag kind="pass">{t('teacher.t03.resolvedTag')}</StatusTag> : <StatusTag kind={blocker ? 'block' : 'review'}>{t(`teacher.t03.severity.${issue.severity}`)}</StatusTag>}
@@ -52,20 +57,20 @@ function IssueCard({ issue, onResolve, pending, onFocusPoint }: { issue: Issue; 
           {issue.suggestions.length > 0 ? (
             <>
               <p className="small b sec">{t('teacher.t03.suggestions')}</p>
-              <div className="stack" role="radiogroup" aria-label={t('teacher.t03.suggestions')}>
+              <RadioGroup value={suggestion} onValueChange={setSuggestion} aria-label={t('teacher.t03.suggestions')}>
                 {issue.suggestions.map((s) => (
-                  <Pick key={s.id} name={`suggestion-${issue.id}`} value={s.id} checked={suggestion === s.id} onSelect={setSuggestion}>
+                  <RadioGroupItem key={s.id} value={s.id}>
                     <span className="block">{s.text}</span>
                     <span className="small muted">{s.sourceRef}</span>
-                  </Pick>
+                  </RadioGroupItem>
                 ))}
-              </div>
+              </RadioGroup>
             </>
           ) : null}
           <div className="row">
-            <button type="button" className="btn primary sm" disabled={pending} onClick={() => onResolve({ action: 'CONFIRM' })}>{t('teacher.t03.confirm')}</button>
-            {issue.suggestions.length > 0 ? <button type="button" className="btn secondary sm" disabled={pending} onClick={() => onResolve({ action: 'USE_SUGGESTION', suggestionId: suggestion })}>{t('teacher.t03.useSuggestion')}</button> : null}
-            <button type="button" className="btn secondary sm" onClick={() => setMode('adjust')}>{t('teacher.t03.adjust')}</button>
+            <button type="button" className={buttonVariants({ size: 'sm' })} disabled={pending} onClick={() => onResolve({ action: 'CONFIRM' })}>{t('teacher.t03.confirm')}</button>
+            {issue.suggestions.length > 0 ? <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} disabled={pending} onClick={() => onResolve({ action: 'USE_SUGGESTION', suggestionId: suggestion })}>{t('teacher.t03.useSuggestion')}</button> : null}
+            <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={() => setMode('adjust')}>{t('teacher.t03.adjust')}</button>
           </div>
           <div className="row">
             <span className="muted">{t('teacher.t03.or')}</span>
@@ -77,7 +82,7 @@ function IssueCard({ issue, onResolve, pending, onFocusPoint }: { issue: Issue; 
             <div className="stack">
               <div className="field">
                 <label htmlFor={`adjust-${issue.id}`}>{t('teacher.t03.adjustLabel')}</label>
-                <textarea id={`adjust-${issue.id}`} className="textarea" value={text} onChange={(event) => setText(event.target.value)} />
+                <Textarea id={`adjust-${issue.id}`} value={text} onChange={(event) => setText(event.target.value)} />
               </div>
               {text !== issue.currentInterpretation ? (
                 <>
@@ -86,29 +91,29 @@ function IssueCard({ issue, onResolve, pending, onFocusPoint }: { issue: Issue; 
                   <p className="small muted">{t('teacher.t03.teacherReading')}</p>
                 </>
               ) : null}
-              <button type="button" className="btn primary sm self-start" disabled={!text.trim() || pending} onClick={() => onResolve({ action: 'EDIT', text })}>{t('teacher.t03.save')}</button>
+              <button type="button" className={cn(buttonVariants({ size: 'sm' }), 'self-start')} disabled={!text.trim() || pending} onClick={() => onResolve({ action: 'EDIT', text })}>{t('teacher.t03.save')}</button>
             </div>
           ) : null}
           {mode === 'keepOpen' ? (
             <div className="stack">
               <div className="field">
                 <label htmlFor={`bounds-${issue.id}`}>{t('teacher.t03.bounds')}</label>
-                <input id={`bounds-${issue.id}`} className="input" value={bounds} onChange={(event) => setBounds(event.target.value)} />
+                <Input id={`bounds-${issue.id}`} value={bounds} onChange={(event) => setBounds(event.target.value)} />
               </div>
               <div className="field">
                 <label htmlFor={`why-${issue.id}`}>{t('teacher.t03.why')}</label>
-                <input id={`why-${issue.id}`} className="input" value={reason} onChange={(event) => setReason(event.target.value)} />
+                <Input id={`why-${issue.id}`} value={reason} onChange={(event) => setReason(event.target.value)} />
               </div>
-              <button type="button" className="btn primary sm self-start" disabled={!bounds.trim() || !reason.trim() || pending} onClick={() => onResolve({ action: 'KEEP_OPEN', keepOpenBounds: bounds, keepOpenReason: reason })}>{t('teacher.t03.save')}</button>
+              <button type="button" className={cn(buttonVariants({ size: 'sm' }), 'self-start')} disabled={!bounds.trim() || !reason.trim() || pending} onClick={() => onResolve({ action: 'KEEP_OPEN', keepOpenBounds: bounds, keepOpenReason: reason })}>{t('teacher.t03.save')}</button>
             </div>
           ) : null}
           {mode === 'exclude' ? (
             <div className="stack">
               <div className="field">
                 <label htmlFor={`exclude-${issue.id}`}>{t('teacher.t03.excludeReason')}</label>
-                <input id={`exclude-${issue.id}`} className="input" value={reason} onChange={(event) => setReason(event.target.value)} />
+                <Input id={`exclude-${issue.id}`} value={reason} onChange={(event) => setReason(event.target.value)} />
               </div>
-              <button type="button" className="btn danger sm self-start" disabled={!reason.trim() || pending} onClick={() => onResolve({ action: 'EXCLUDE', excludeReason: reason })}>{t('teacher.t03.excludeConfirm')}</button>
+              <button type="button" className={cn(buttonVariants({ variant: 'danger', size: 'sm' }), 'self-start')} disabled={!reason.trim() || pending} onClick={() => onResolve({ action: 'EXCLUDE', excludeReason: reason })}>{t('teacher.t03.excludeConfirm')}</button>
             </div>
           ) : null}
         </>
@@ -163,11 +168,11 @@ export function ClarifyPage() {
       </div>
       {resolve.isError ? <Note kind="err">{t(errorKey(resolve.error instanceof ApiError ? resolve.error.code : ''))}</Note> : null}
       <div className="cols l400">
-        <div className="card sticky">
+        <div className={cn(cardVariants(), 'sticky')}>
           <div className="row">
             <h3 className="s15 b">{t('teacher.t03.material')}</h3>
             <span className="sp" />
-            <span className="tag neutral">{material.fileName}</span>
+            <Badge kind="neutral">{material.fileName}</Badge>
           </div>
           {material.paragraphs.map((paragraph) => {
             const points = pointsOf(paragraph.id);
@@ -188,14 +193,14 @@ export function ClarifyPage() {
           ))}
         </div>
       </div>
-      <div className="card tight dock">
+      <div className={cn(cardVariants({ tone: 'tight' }), 'dock')}>
         <div className="row">
           {blockersRemaining > 0 ? <span className="s13 sec">{t('teacher.t03.blocked')}</span> : null}
           <span className="sp" />
           {blockersRemaining > 0 ? (
-            <button type="button" className="btn primary" disabled>{t('teacher.t03.continue')}</button>
+            <button type="button" className={buttonVariants()} disabled>{t('teacher.t03.continue')}</button>
           ) : (
-            <Link to="/t/lessons/$id/source" params={{ id }} className="btn primary">{t('teacher.t03.continue')}</Link>
+            <Link to="/t/lessons/$id/source" params={{ id }} className={buttonVariants()}>{t('teacher.t03.continue')}</Link>
           )}
         </div>
       </div>

@@ -7,7 +7,7 @@ test('a new teacher sees the ready Lesson 8 set', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Try as teacher' }).click();
   await expect(page).toHaveURL(/\/t\/lessons/);
-  await expect(page.locator('.card').first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /Lesson 8/ }).first()).toBeVisible();
   await expectAccessible(page, 'teacher home');
   await expectNoSideScroll(page);
 });
@@ -96,7 +96,7 @@ test('tracking after Jump to T14 shows the class and a trace', async ({ page }) 
   await page.getByRole('button', { name: /T14/ }).click();
   await expect(page.getByRole('button', { name: /T14/ })).toBeHidden({ timeout: 30_000 });
   await expect(page.getByText(/Jumped to T14/)).toBeVisible();
-  await page.locator('a.card').first().click();
+  await page.getByRole('link', { name: /Lesson 8/ }).first().click();
   await expect(page.getByText('8 people started, 8 finished')).toBeVisible();
   await expectAccessible(page, 'T14');
   await page.getByRole('tab', { name: /Students/ }).click();
@@ -109,11 +109,11 @@ test('two browsers never see each other', async ({ browser }) => {
   const [one, two] = await Promise.all([browser.newContext(), browser.newContext()]);
   const [first, second] = await Promise.all([one.newPage(), two.newPage()]);
   await first.goto('/t/lessons');
-  await first.locator('a.card').first().waitFor();
-  const href = await first.locator('a.card').first().getAttribute('href');
+  await first.getByRole('link', { name: /Lesson 8/ }).first().waitFor();
+  const href = await first.getByRole('link', { name: /Lesson 8/ }).first().getAttribute('href');
   await second.goto('/t/lessons');
-  await second.locator('a.card').first().waitFor();
-  expect(await second.locator('a.card').first().getAttribute('href')).not.toBe(href);
+  await second.getByRole('link', { name: /Lesson 8/ }).first().waitFor();
+  expect(await second.getByRole('link', { name: /Lesson 8/ }).first().getAttribute('href')).not.toBe(href);
   await one.close();
   await two.close();
 });
@@ -131,7 +131,7 @@ test.describe('a first visit', () => {
     await page.getByRole('button', { name: 'Next', exact: true }).click();
     await page.getByRole('button', { name: 'Got it' }).click();
     await expect(page.getByRole('dialog', { name: 'Explore the demo' })).toBeVisible();
-    const sideways = await page.locator('.drawer').evaluate((drawer) => drawer.scrollWidth - drawer.clientWidth);
+    const sideways = await page.getByRole('dialog', { name: 'Explore the demo' }).evaluate((drawer) => drawer.scrollWidth - drawer.clientWidth);
     expect(sideways).toBeLessThanOrEqual(0);
     await page.reload();
     await expect(page.getByRole('button', { name: 'Explore the demo' })).toBeVisible();

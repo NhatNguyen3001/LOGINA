@@ -12,9 +12,10 @@ export function useSessionLocale(): void {
     if (!uiLocale) return;
     void applySessionLocale(uiLocale);
     setUserLocaleSaver(async (lang) => {
-      await updateMe({ uiLocale: lang });
-      /** Questions and answers come from the server in the saved language. */
-      await queryClient.invalidateQueries();
+      const saved = await updateMe({ uiLocale: lang });
+      /** Questions and answers come from the server in the saved language; wait for all of them before the words switch. */
+      await queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] !== qk.me()[0] });
+      queryClient.setQueryData(qk.me(), saved);
     });
   }, [uiLocale]);
 }

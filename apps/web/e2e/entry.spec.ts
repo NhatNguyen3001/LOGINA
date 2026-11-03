@@ -25,6 +25,6 @@ for (const viewport of SCREENS) {
 test('a device in dark mode still gets the light theme', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/');
-  const background = await page.evaluate(() => getComputedStyle(document.querySelector('.login-brand')!).backgroundColor);
+  const background = await page.evaluate(() => getComputedStyle(document.querySelector('.role-card')!).backgroundColor);
   expect(background).toBe('rgb(255, 255, 255)');
 });

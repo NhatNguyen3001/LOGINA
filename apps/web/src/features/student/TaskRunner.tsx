@@ -21,6 +21,8 @@ import { ArtifactEditor, FilledFrame, describeChange, emptyDraft, isComplete, mi
 import { createTrace, type TaskTrace } from './use-task-trace';
 import { useAutosave } from './use-autosave';
 import { useLessonTitle } from './use-lesson-title';
+import { buttonVariants } from '@/components/ui/button';
+import { cardVariants } from '@/components/ui/card';
 
 const SLOTS: Slot[] = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'];
 
@@ -155,8 +157,8 @@ function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: s
         <p className="s13 sec">{t('student.lock.note')}</p>
         {lock.isError ? <Note kind="err">{t(errorText(lock.error))}</Note> : null}
         <TaskActions note={saveStatus}>
-          <button type="button" className="btn secondary" onClick={() => setLocking(false)}>{t('student.lock.back')}</button>
-          <button type="button" className="btn primary" aria-busy={lock.isPending} disabled={lock.isPending} onClick={sendLock}>{t('student.lock.button')}</button>
+          <button type="button" className={buttonVariants({ variant: 'secondary' })} onClick={() => setLocking(false)}>{t('student.lock.back')}</button>
+          <button type="button" className={buttonVariants()} aria-busy={lock.isPending} disabled={lock.isPending} onClick={sendLock}>{t('student.lock.button')}</button>
         </TaskActions>
       </>
     );
@@ -167,7 +169,7 @@ function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: s
       <h1 className="stem" tabIndex={-1}>{task.stem}</h1>
       <ArtifactEditor task={task} value={draft} onChange={change} />
       <TaskActions note={<>{missing ? <span className="s13 sec">{t(missing)}</span> : null}{saveStatus}</>}>
-        <button type="button" className="btn primary" disabled={!complete} onClick={() => setLocking(true)}>{t('student.continue')}</button>
+        <button type="button" className={buttonVariants()} disabled={!complete} onClick={() => setLocking(true)}>{t('student.continue')}</button>
       </TaskActions>
     </>
   );
@@ -229,7 +231,7 @@ function Reconsidering({ attemptId, task, trace, onSubmitted, onPhase }: { attem
   return (
     <>
       <div className="bubble-tn">
-        <span className="small b text-navy">{t('student.think.title')}</span>
+        <span className="small b text-accent-ink">{t('student.think.title')}</span>
         <p className="say">{challenge.data.message}</p>
         <span className="s13 muted">{t('student.think.note')}</span>
       </div>
@@ -244,12 +246,12 @@ function Reconsidering({ attemptId, task, trace, onSubmitted, onPhase }: { attem
       {showLocked ? lockedAnswer : null}
       <h1 className="stem" tabIndex={-1}>{task.stem}</h1>
       <ArtifactEditor task={task} value={answer} onChange={change} original={original} />
-      <div className="card tight">
+      <div className={cardVariants({ tone: 'tight' })}>
         <ConfidenceSlider value={finalConfidence} onChange={setFinalConfidence} />
       </div>
       {submit.isError ? <Note kind="err">{t(errorText(submit.error))}</Note> : null}
       <TaskActions note={<span className="s13 sec">{t(missing ?? (unchanged ? 'student.final.willKeep' : 'student.final.willRevise'))}</span>}>
-        <button type="button" className="btn primary" aria-busy={submit.isPending} disabled={!isComplete(task, answer) || submit.isPending} onClick={() => submit.mutate()}>{t('student.submit', { slot: task.slot })}</button>
+        <button type="button" className={buttonVariants()} aria-busy={submit.isPending} disabled={!isComplete(task, answer) || submit.isPending} onClick={() => submit.mutate()}>{t('student.submit', { slot: task.slot })}</button>
       </TaskActions>
     </>
   );
@@ -296,7 +298,7 @@ export function TaskRunner() {
     if (task.error instanceof ApiError && task.error.status === 404) {
       return (
         <StudentShell title={t('student.goneAfterReset')}>
-          <Link to="/s/assignments" className="btn primary">{t('student.openNewSet')}</Link>
+          <Link to="/s/assignments" className={buttonVariants()}>{t('student.openNewSet')}</Link>
         </StudentShell>
       );
     }
@@ -314,7 +316,7 @@ export function TaskRunner() {
       <BusyNote side="student" />
       {!task.data ? <LoadingSkeleton /> : null}
       {task.data?.phase === 'SUBMITTED' ? (
-        <button type="button" className="btn primary" onClick={() => onSubmitted(nextAfter)}>{t('student.continue')}</button>
+        <button type="button" className={buttonVariants()} onClick={() => onSubmitted(nextAfter)}>{t('student.continue')}</button>
       ) : null}
       {step === 'answer' ? (
         <div key={`${slot}-answer`} className="step-in">

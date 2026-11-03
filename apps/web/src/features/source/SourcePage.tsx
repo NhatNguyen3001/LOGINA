@@ -10,6 +10,10 @@ import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { ApiError, approveSource, getLesson, getMaterialViewUrl, getSourceReview, newKey } from '@/lib/api';
 import { qk } from '@/lib/query';
+import { cardVariants } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const STATUS_KIND: Record<SourceReviewDTO['summaryClaims'][number]['status'], TagKind> = { VERIFIED: 'pass', CONTEXT_ONLY: 'neutral', INSUFFICIENT: 'review', EXCLUDED: 'stale' };
 
@@ -55,34 +59,32 @@ export function SourcePage() {
       ) : null}
       <div className="cols">
         <div className="stack">
-          <div className="card flush">
+          <div className={cardVariants({ tone: 'flush' })}>
             <div className="row p-4">
               <h3 className="s15 b">{t('teacher.t05.claims')}</h3>
             </div>
-            <div className="tbl-wrap">
-              <table className="t">
-                <thead>
-                  <tr>
-                    <th>{t('teacher.t05.claim')}</th>
-                    <th>{t('teacher.t05.evidence')}</th>
-                    <th>{t('teacher.t05.location')}</th>
-                    <th>{t('teacher.t05.status')}</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('teacher.t05.claim')}</TableHead>
+                    <TableHead>{t('teacher.t05.evidence')}</TableHead>
+                    <TableHead>{t('teacher.t05.location')}</TableHead>
+                    <TableHead>{t('teacher.t05.status')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {summaryClaims.map((claim) => (
-                    <tr key={claim.id}>
-                      <td className="m">{claim.wording}</td>
-                      <td className="sec">{claim.evidenceSnippet}</td>
-                      <td className="src">{claim.locator}</td>
-                      <td><StatusTag kind={STATUS_KIND[claim.status]}>{t(`teacher.t05.claimStatus.${claim.status}`)}</StatusTag></td>
-                    </tr>
+                    <TableRow key={claim.id}>
+                      <TableCell className="m">{claim.wording}</TableCell>
+                      <TableCell className="sec">{claim.evidenceSnippet}</TableCell>
+                      <TableCell className="src">{claim.locator}</TableCell>
+                      <TableCell><StatusTag kind={STATUS_KIND[claim.status]}>{t(`teacher.t05.claimStatus.${claim.status}`)}</StatusTag></TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
           </div>
-          <div className="card">
+          <div className={cardVariants()}>
             <div className="row">
               <h3 className="s15 b">{t('teacher.t05.decisions')}</h3>
               <span className="sp" />
@@ -117,14 +119,14 @@ export function SourcePage() {
             ))}
           </div>
         </div>
-        <div className="card sticky">
+        <div className={cn(cardVariants(), 'sticky')}>
           <h3 className="b">{t('teacher.t05.ready')}</h3>
           <div className="row"><span className={blockersRemaining === 0 ? 'ok' : 'no'}>{blockersRemaining === 0 ? '✓' : '✕'}</span><span>{t('teacher.t05.blockers', { count: blockersRemaining })}</span></div>
           <div className="row"><span className={located ? 'ok' : 'no'}>{located ? '✓' : '✕'}</span><span>{t('teacher.t05.located')}</span></div>
           {approve.isError ? <Note kind="err">{t(errorKey(approve.error instanceof ApiError ? approve.error.code : ''))}</Note> : null}
-          <button type="button" className="btn primary block" aria-busy={approve.isPending} disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t05.approve')}</button>
+          <button type="button" className={buttonVariants({ block: true })} aria-busy={approve.isPending} disabled={!approveReady || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t05.approve')}</button>
           <p className="small muted">{t('teacher.t05.note')}</p>
-          <Link to="/t/lessons/$id/clarify" params={{ id }} className="btn secondary block">{t('teacher.t05.back')}</Link>
+          <Link to="/t/lessons/$id/clarify" params={{ id }} className={buttonVariants({ variant: 'secondary', block: true })}>{t('teacher.t05.back')}</Link>
         </div>
       </div>
     </>

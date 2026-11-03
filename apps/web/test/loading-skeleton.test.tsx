@@ -8,6 +8,6 @@ describe('LoadingSkeleton', () => {
     const { container } = await renderWithI18n(<LoadingSkeleton />, { lang: 'en' });
     expect(screen.getByRole('status', { name: 'Loading…' })).toBeInTheDocument();
     expect(screen.queryByText('Loading…')).toBeNull();
-    expect(container.querySelectorAll('.bone').length).toBeGreaterThan(1);
+    expect(container.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(1);
   });
 });

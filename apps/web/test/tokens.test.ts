@@ -31,6 +31,27 @@ describe('design tokens', () => {
     expect(token(darkBlock, 'ink-3')).toBe('#96A0AF');
   });
 
+  it('holds the option B values', () => {
+    expect(token(lightBlock, 'accent')).toBe('#0B7285');
+    expect(token(lightBlock, 'mark')).toBe('#0E3A7E');
+    expect(token(darkBlock, 'accent')).toBe('#1B7A8A');
+  });
+
+  it('has no navy tokens left', () => {
+    expect(css).not.toMatch(/--navy/);
+  });
+
+  it.each([
+    ['light', lightBlock],
+    ['dark', darkBlock],
+  ])('%s theme brand colours meet the contrast floors', (_, block) => {
+    expect(contrast(token(block, 'on-accent'), token(block, 'accent'))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token(block, 'accent-ink'), token(block, 'surface'))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token(block, 'accent-ink'), token(block, 'accent-bg'))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token(block, 'accent'), token(block, 'surface'))).toBeGreaterThanOrEqual(3);
+    expect(contrast(token(block, 'mark'), token(block, 'surface'))).toBeGreaterThanOrEqual(3);
+  });
+
   it.each([
     ['light', lightBlock],
     ['dark', darkBlock],

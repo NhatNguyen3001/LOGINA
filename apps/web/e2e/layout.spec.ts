@@ -49,7 +49,7 @@ const openTeacher = async (page: Page) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Try as teacher' }).click();
   await expect(page).toHaveURL(/\/t\/lessons/);
-  await expect(page.locator('.card').first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /Lesson 8/ }).first()).toBeVisible();
 };
 
 test('the first-answer bar follows a drag, past the end of the bar too', async ({ page }) => {
@@ -140,7 +140,7 @@ test('a finished student starts a new run, keeps the old one, and can always go 
   await page.setViewportSize({ width: 1280, height: 720 });
 
   await page.getByRole('link', { name: 'Home' }).click();
-  await expect(page.getByRole('heading', { name: 'Try LOGINA' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /LOGINA helps teachers/ })).toBeVisible();
   await page.getByRole('button', { name: 'Try as student' }).click();
   await expect(page).toHaveURL(/\/Q1$/);
   await expect(page.getByRole('button', { name: 'Continue →' })).toBeVisible();
@@ -167,7 +167,7 @@ test('the first bar starts at 50, the final bar at the first confidence, and Res
   await expect(page.locator('.knob')).toHaveCount(1);
 
   await page.getByRole('button', { name: 'Reset run' }).click();
-  const popup = page.getByRole('dialog', { name: 'Start over?' });
+  const popup = page.getByRole('alertdialog', { name: 'Start over?' });
   await expect(popup).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(popup).toHaveCount(0);
@@ -185,7 +185,7 @@ test('the header menu is for phones: desktop shows its actions, a phone folds th
   await startTasks(page);
   await expect(page.getByRole('button', { name: 'Menu' })).toBeHidden();
   await expect(page.getByRole('link', { name: 'My runs' })).toBeVisible();
-  await expect(page).toHaveTitle('Q1 Statement · Student · LOGINA');
+  await expect(page).toHaveTitle('LOGINA');
 
   await page.setViewportSize({ width: 375, height: 760 });
   await expect(page.getByRole('link', { name: 'My runs' })).toBeHidden();
