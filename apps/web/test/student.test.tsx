@@ -41,8 +41,8 @@ const q1 = (over: Partial<StudentTaskDTO> = {}) =>
     ...over,
   }) as StudentTaskDTO;
 
-const locked = { deliveryId: 'd', message: 'Look at the figures again.', lockedSummary: { answerText: 'First statement', evidenceText: 'Card one', confidence: 70 } };
-const lockedTask = () => q1({ phase: 'CHALLENGED', initialArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' }, initialConfidence: 70 });
+const locked = { deliveryId: 'd', message: 'Look at the figures again.', lockedSummary: { answerText: 'First statement', evidenceText: 'Card one', confidence: 7 } };
+const lockedTask = () => q1({ phase: 'CHALLENGED', initialArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' }, initialConfidence: 7 });
 const me = { uid: 'u', role: 'demo', displayName: 'x', schoolId: 's', classIds: [], uiLocale: 'en', demoMenu: true, consentRequired: false, currentConsentVersion: 'v' } as unknown as MeDTO;
 
 const render = (ui: React.ReactElement) =>
@@ -174,18 +174,18 @@ describe('Q1 flow', () => {
     await waitFor(() => expect(api.saveDraft).toHaveBeenCalledWith('att1', 'Q1', { draftArtifact: { slot: 'Q1', answerId: 'a1' } }), { timeout: 2000 });
   });
 
-  it('Lock starts ready at 50 and sends one request on double click', async () => {
+  it('Lock starts ready at 5 and sends one request on double click', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(q1({ draftArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' } }));
     vi.mocked(api.lockTask).mockImplementation(() => new Promise(() => {}));
     await render(<TaskRunner />);
     fireEvent.click(await screen.findByRole('button', { name: 'Continue →' }));
     const lock = screen.getByRole('button', { name: 'Lock in answer' });
-    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '50');
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '5');
     fireEvent.click(lock);
     fireEvent.click(lock);
     await waitFor(() => expect(api.lockTask).toHaveBeenCalled());
     expect(api.lockTask).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(api.lockTask).mock.calls[0]![2]).toMatchObject({ initialConfidence: 50 });
+    expect(vi.mocked(api.lockTask).mock.calls[0]![2]).toMatchObject({ initialConfidence: 5 });
   });
 
   it('F-S9 a reload after lock shows the same answer and prompt with no second lock', async () => {
@@ -201,10 +201,20 @@ describe('Q1 flow', () => {
     await render(<TaskRunner />);
     expect(await screen.findByText('Your answer is unchanged. This will be recorded as Keep.')).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /First statement/ })).toBeChecked();
-    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '70');
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '7');
     expect(document.querySelectorAll('[data-slot="slider-thumb"]')).toHaveLength(1);
     expect(screen.queryByRole('button', { name: 'Keep my answer' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Back to your first answer' })).toBeDisabled();
+  });
+
+  it('a first answer locked on the old 0 to 100 scale starts the final slider at the same point out of 10', async () => {
+    vi.mocked(api.getStudentTask).mockResolvedValue(q1({ phase: 'CHALLENGED', initialArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' }, initialConfidence: 70 }));
+    vi.mocked(api.submitTask).mockResolvedValue({ slot: 'Q1', recordedChoice: 'KEEP', nextSlot: 'Q2', attemptStatus: 'IN_PROGRESS' });
+    await render(<TaskRunner />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Submit Q1' }));
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '7');
+    await waitFor(() => expect(api.submitTask).toHaveBeenCalled());
+    expect(vi.mocked(api.submitTask).mock.calls[0]![2]).toMatchObject({ finalConfidence: 7 });
   });
 
   it('F-S5 an unchanged answer submits as Keep, with no first change', async () => {
@@ -214,7 +224,7 @@ describe('Q1 flow', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Submit Q1' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/s/attempts/$id/$slot', params: { id: 'att1', slot: 'Q2' } }));
     const sent = vi.mocked(api.submitTask).mock.calls[0]?.[2];
-    expect(sent).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 70 });
+    expect(sent).toMatchObject({ choice: 'KEEP', finalArtifact: { answerId: 'a1', evidenceId: 'e1' }, finalConfidence: 7 });
     expect(sent).not.toHaveProperty('secondsToFirstChange');
   });
 
@@ -318,7 +328,7 @@ describe('Q2 to Q5', () => {
   it('Think again on Q4 shows the finished sentence, not the blanks', async () => {
     const taskBody = { frame: 'The source shows [shown], but not [missing].', slots: [{ slotId: 'shown', label: 'Shows' }, { slotId: 'missing', label: 'Gap' }], cards: [{ cardId: 'c1', text: 'a fall' }, { cardId: 'c2', text: 'why' }, { cardId: 'c3', text: 'a rise' }] };
     const initialArtifact = { slot: 'Q4', placements: [{ slotId: 'shown', cardId: 'c1' }, { slotId: 'missing', cardId: 'c2' }] };
-    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q4', phase: 'CHALLENGED', stem: 'Reply', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q4', phase: 'CHALLENGED', stem: 'Reply', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 7 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
     const sentence = (await lockedAnswer()).getByText('a fall').closest('p')!;
     expect(sentence).toHaveTextContent('The source shows a fall, but not why.');
@@ -329,7 +339,7 @@ describe('Q2 to Q5', () => {
 
   it('Think again on Q5 lists each sentence with its answer', async () => {
     const initialArtifact = { slot: 'Q5', answers: [{ starterId: 's1', text: 'skills' }, { starterId: 's2', text: "I don't know how to answer", declared: 'DONT_KNOW' }] };
-    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q5', phase: 'CHALLENGED', stem: 'Finish', draftArtifact: null, taskBody: q5Body, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q5', phase: 'CHALLENGED', stem: 'Finish', draftArtifact: null, taskBody: q5Body, initialArtifact, initialConfidence: 7 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
     const locked = await lockedAnswer();
     expect(locked.getByText('Jobs depend on...')).toBeInTheDocument();
@@ -340,7 +350,7 @@ describe('Q2 to Q5', () => {
   it('Think again on Q2 lists the cards in the order the student locked', async () => {
     const taskBody = { cards: [{ cardId: 'c1', text: 'Trade' }, { cardId: 'c2', text: 'Machines' }, { cardId: 'c3', text: 'Cities' }] };
     const initialArtifact = { slot: 'Q2', orderedCardIds: ['c3', 'c1', 'c2'] };
-    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q2', phase: 'CHALLENGED', stem: 'Rank them', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q2', phase: 'CHALLENGED', stem: 'Rank them', draftArtifact: null, taskBody, initialArtifact, initialConfidence: 7 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
     const ranked = (await lockedAnswer()).getByText('Cities').closest('ol')!;
     expect([...ranked.querySelectorAll('li')].map((row) => row.textContent)).toEqual(['1Cities', '2Trade', '3Machines']);
@@ -348,7 +358,7 @@ describe('Q2 to Q5', () => {
 
   it('Think again on Q3 lists the path, the cost and the reason', async () => {
     const initialArtifact = { slot: 'Q3', judgmentOptionId: 'o2', tradeOffId: 't2', reasonId: 'r3' };
-    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q3', phase: 'CHALLENGED', stem: 'Which plan?', draftArtifact: null, taskBody: q3Body, initialArtifact, initialConfidence: 70 } as unknown as StudentTaskDTO);
+    vi.mocked(api.getStudentTask).mockResolvedValue({ slot: 'Q3', phase: 'CHALLENGED', stem: 'Which plan?', draftArtifact: null, taskBody: q3Body, initialArtifact, initialConfidence: 7 } as unknown as StudentTaskDTO);
     await render(<TaskRunner />);
     const locked = await lockedAnswer();
     expect(locked.getByText('Plan B')).toBeInTheDocument();
@@ -438,7 +448,7 @@ describe('Q2 to Q5', () => {
 describe('smooth steps', () => {
   it('shows the prompt from the lock reply, with no second request', async () => {
     vi.mocked(api.getStudentTask).mockResolvedValue(q1({ draftArtifact: { slot: 'Q1', answerId: 'a1', evidenceId: 'e1' } }));
-    vi.mocked(api.lockTask).mockResolvedValue({ deliveryId: 'd', message: 'Think about this', lockedSummary: { answerText: 'x', evidenceText: 'y', confidence: 50 } });
+    vi.mocked(api.lockTask).mockResolvedValue({ deliveryId: 'd', message: 'Think about this', lockedSummary: { answerText: 'x', evidenceText: 'y', confidence: 5 } });
     await render(<TaskRunner />);
     fireEvent.click(await screen.findByRole('button', { name: 'Continue →' }));
     fireEvent.click(screen.getByRole('button', { name: 'Lock in answer' }));
@@ -540,8 +550,8 @@ describe('results', () => {
     initial: { label: 'B', text: 'x' },
     challengeMessage: 'm',
     final: { label: changed ? 'A' : 'B', text: 'y' },
-    confidenceBefore: 70,
-    confidenceAfter: 82,
+    confidenceBefore: 7,
+    confidenceAfter: 8,
     explanations: [],
   });
 

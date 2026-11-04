@@ -48,7 +48,7 @@ describe('api client', () => {
 
   it('student runtime calls send no baseVersion', async () => {
     fetchMock.mockResolvedValue(json({}, 500));
-    await lockTask('a', 'Q1', { artifact: { slot: 'Q1', answerId: 'x', evidenceId: 'y' }, initialConfidence: 50 }, 'k').catch(() => {});
+    await lockTask('a', 'Q1', { artifact: { slot: 'Q1', answerId: 'x', evidenceId: 'y' }, initialConfidence: 5 }, 'k').catch(() => {});
     expect(sent().body).not.toHaveProperty('baseVersion');
   });
 

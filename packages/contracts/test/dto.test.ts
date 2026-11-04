@@ -132,7 +132,7 @@ describe('student DTOs', () => {
     expect(examples.studentTask).not.toHaveProperty('initialConfidence');
 
     const locked = exampleVariants.studentTask.locked;
-    expect(locked.initialConfidence).toBe(70);
+    expect(locked.initialConfidence).toBe(7);
     expect(locked.initialArtifact).toMatchObject({
       answerId: expect.stringMatching(/^opt_/),
       evidenceId: expect.stringMatching(/^ev_/),
@@ -198,11 +198,12 @@ describe('teacher DTOs', () => {
 });
 
 describe('requests', () => {
-  it('confidence must be an integer between 0 and 100', () => {
-    expect(() => LockReq.parse({ ...lockBody, initialConfidence: 55 })).not.toThrow();
-    expect(() => LockReq.parse({ ...lockBody, initialConfidence: 55.5 })).toThrow();
+  it('confidence must be an integer between 0 and 10', () => {
+    expect(() => LockReq.parse({ ...lockBody, initialConfidence: 0 })).not.toThrow();
+    expect(() => LockReq.parse({ ...lockBody, initialConfidence: 10 })).not.toThrow();
+    expect(() => LockReq.parse({ ...lockBody, initialConfidence: 5.5 })).toThrow();
     expect(() => LockReq.parse({ ...lockBody, initialConfidence: -1 })).toThrow();
-    expect(() => LockReq.parse({ ...lockBody, initialConfidence: 101 })).toThrow();
+    expect(() => LockReq.parse({ ...lockBody, initialConfidence: 11 })).toThrow();
   });
 
   it('Q5 artifact rejects an answer over 120 characters', () => {

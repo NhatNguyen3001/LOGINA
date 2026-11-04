@@ -12,7 +12,7 @@ import { StudentProgress } from '@/components/logina/StudentProgress';
 import { renderWithI18n } from '../utils';
 
 function Controlled({ onChange }: { onChange: (value: number) => void }) {
-  const [value, setValue] = useState(50);
+  const [value, setValue] = useState(5);
   return (
     <ConfidenceSlider
       value={value}
@@ -74,33 +74,33 @@ describe('StatusTag as a Badge', () => {
 });
 
 describe('ConfidenceSlider', () => {
-  it('F-S2 starts at 50 and supports keyboard steps of ten', async () => {
+  it('F-S2 starts at 5 and supports keyboard steps of one', async () => {
     const onChange = vi.fn();
     await renderWithI18n(<Controlled onChange={onChange} />);
     const slider = screen.getByRole('slider');
-    expect(slider).toHaveAttribute('aria-valuenow', '50');
+    expect(slider).toHaveAttribute('aria-valuenow', '5');
     fireEvent.keyDown(slider, { key: 'ArrowRight' });
-    expect(onChange).toHaveBeenLastCalledWith(60);
+    expect(onChange).toHaveBeenLastCalledWith(6);
     fireEvent.keyDown(slider, { key: 'ArrowLeft' });
-    expect(onChange).toHaveBeenLastCalledWith(50);
+    expect(onChange).toHaveBeenLastCalledWith(5);
     fireEvent.keyDown(slider, { key: 'End' });
-    expect(onChange).toHaveBeenLastCalledWith(100);
+    expect(onChange).toHaveBeenLastCalledWith(10);
     fireEvent.keyDown(slider, { key: 'Home' });
     expect(onChange).toHaveBeenLastCalledWith(0);
   });
 
-  it('accepts any integer such as 73', async () => {
-    await renderWithI18n(<ConfidenceSlider value={73} onChange={() => {}} />);
-    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '73');
-    expect(screen.getByText('73')).toBeInTheDocument();
+  it('shows the value it is given, such as 7', async () => {
+    await renderWithI18n(<ConfidenceSlider value={7} onChange={() => {}} />);
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '7');
+    expect(screen.getByText('7', { selector: '.b' })).toBeInTheDocument();
   });
 
-  it('never goes below 0 or above 100', async () => {
+  it('never goes below 0 or above 10', async () => {
     const onChange = vi.fn();
-    await renderWithI18n(<ConfidenceSlider value={100} onChange={onChange} />);
+    await renderWithI18n(<ConfidenceSlider value={10} onChange={onChange} />);
     fireEvent.keyDown(screen.getByRole('slider'), { key: 'PageUp' });
     fireEvent.keyDown(screen.getByRole('slider'), { key: 'ArrowRight' });
-    expect(onChange.mock.calls.every(([next]) => next <= 100)).toBe(true);
+    expect(onChange.mock.calls.every(([next]) => next <= 10)).toBe(true);
   });
 });
 

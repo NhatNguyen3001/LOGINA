@@ -629,10 +629,10 @@ describe('T14 and T15', () => {
     releaseLabels: { Q1: 'r4', Q2: 'r2', Q3: 'r2', Q4: 'r4', Q5: 'r3' },
     counts: { started: 8, complete: 8 },
     participants: [
-      { attemptId: 'att1', participantCode: 'P-7K2M', isSimulated: false, status: 'COMPLETE', submittedCount: 5, keepCount: 4, reviseCount: 1, confidenceBefore: 70, confidenceAfter: 82 },
+      { attemptId: 'att1', participantCode: 'P-7K2M', isSimulated: false, status: 'COMPLETE', submittedCount: 5, keepCount: 4, reviseCount: 1, confidenceBefore: 7, confidenceAfter: 8 },
       { attemptId: 'att2', isSimulated: false, status: 'COMPLETE', submittedCount: 5, keepCount: 5, reviseCount: 0 },
     ],
-    perTask: [{ slot: 'Q1', submitted: 8, keep: 4, revise: 4, avgConfidenceBefore: 68, avgConfidenceAfter: 76, deliveredChallenges: [{ label: 'TN1', message: 'Compare the figures.', count: 3, revised: 1 }, { label: 'TN2', message: 'Check the card.', count: 2, revised: 2 }] }],
+    perTask: [{ slot: 'Q1', submitted: 8, keep: 4, revise: 4, avgConfidenceBefore: 6.8, avgConfidenceAfter: 7.6, deliveredChallenges: [{ label: 'TN1', message: 'Compare the figures.', count: 3, revised: 1 }, { label: 'TN2', message: 'Check the card.', count: 2, revised: 2 }] }],
     q1Relations: { releaseLabel: 'r4', denominator: 8, before: { full: 2, partial: 2, contradicts: 3, irrelevant: 1 }, after: { full: 5, partial: 1, contradicts: 2, irrelevant: 0 } },
   } as unknown as ClassTrackingDTO;
 
@@ -655,7 +655,7 @@ describe('T14 and T15', () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     const { container } = await render(<TrackingPage />);
     expect(await screen.findByText('4 / 4')).toBeInTheDocument();
-    expect(screen.getAllByText('68 → 76')).toHaveLength(2);
+    expect(screen.getAllByText('6.8 → 7.6')).toHaveLength(2);
     expect(screen.getByText(/not enough to conclude that students learned better/)).toBeInTheDocument();
     const prompts = [...container.querySelectorAll('.prompt-row')].map((row) => row.textContent);
     expect(prompts).toEqual(['Q1 Prompt 2Check the card.2 of 2 revised', 'Q1 Prompt 1Compare the figures.1 of 3 revised']);
@@ -705,10 +705,10 @@ describe('T14 and T15', () => {
   it('confidence draws first and final bars per task with a readable table', async () => {
     vi.mocked(api.getTracking).mockResolvedValue(tracking);
     await render(<TrackingPage />);
-    const table = await screen.findByRole('table', { name: 'Confidence, first to final' });
+    const table = await screen.findByRole('table', { name: 'Confidence out of 10, first to final' });
     expect(within(table).getByRole('cell', { name: 'Q1' })).toBeInTheDocument();
-    expect(within(table).getByRole('cell', { name: '68' })).toBeInTheDocument();
-    expect(within(table).getByRole('cell', { name: '76' })).toBeInTheDocument();
+    expect(within(table).getByRole('cell', { name: '6.8' })).toBeInTheDocument();
+    expect(within(table).getByRole('cell', { name: '7.6' })).toBeInTheDocument();
   });
 
   it('an empty class shows the empty note and no NaN', async () => {
@@ -749,9 +749,9 @@ describe('T14 and T15', () => {
       slotChips: [{ slot: 'Q1', choice: 'REVISE' }, { slot: 'Q2', choice: 'KEEP' }, { slot: 'Q3', choice: null }],
       slot: 'Q2',
       questionStem: 'Rank them',
-      before: { answer: { letter: '', authoringLabel: '', text: 'Trade > Cities' }, confidence: 70, lockedAt: '2026-10-31T03:31:00.000Z', relationLabel: '' },
+      before: { answer: { letter: '', authoringLabel: '', text: 'Trade > Cities' }, confidence: 7, lockedAt: '2026-10-31T03:31:00.000Z', relationLabel: '' },
       challenge: { label: 'TN1', message: 'Look again.', whySelected: '', studentChoice: 'KEEP' },
-      after: { answer: { letter: '', authoringLabel: '', text: 'Trade > Cities', changed: false }, confidenceBefore: 70, confidenceAfter: 82, submittedAt: '2026-10-31T03:34:00.000Z', relationLabel: '' },
+      after: { answer: { letter: '', authoringLabel: '', text: 'Trade > Cities', changed: false }, confidenceBefore: 7, confidenceAfter: 8, submittedAt: '2026-10-31T03:34:00.000Z', relationLabel: '' },
     } as unknown as TraceDTO);
     await render(<TracePage />);
     expect(await screen.findAllByText('Trade > Cities')).toHaveLength(2);
@@ -772,9 +772,9 @@ describe('T14 and T15', () => {
       slotChips: [{ slot: 'Q1', choice: 'REVISE' }, { slot: 'Q2', choice: null }],
       slot: 'Q1',
       questionStem: 'Which statement?',
-      before: { answer: { letter: 'B', authoringLabel: 'A2', text: 'Rises' }, evidence: { letter: 'Card C', authoringLabel: 'E3', text: 'Says rises' }, confidence: 70, lockedAt: '2026-10-31T03:31:00.000Z', relationLabel: 'Refuted' },
+      before: { answer: { letter: 'B', authoringLabel: 'A2', text: 'Rises' }, evidence: { letter: 'Card C', authoringLabel: 'E3', text: 'Says rises' }, confidence: 7, lockedAt: '2026-10-31T03:31:00.000Z', relationLabel: 'Refuted' },
       challenge: { label: 'TN1', message: 'Compare the figures.', whySelected: 'runs opposite to the source', studentChoice: 'REVISE' },
-      after: { answer: { letter: 'A', authoringLabel: 'A1', text: 'Falls', changed: true }, evidence: { letter: 'Card A', authoringLabel: 'E1', text: 'Says falls', changed: false }, confidenceBefore: 70, confidenceAfter: 82, submittedAt: '2026-10-31T03:34:00.000Z', relationLabel: 'Fully supports' },
+      after: { answer: { letter: 'A', authoringLabel: 'A1', text: 'Falls', changed: true }, evidence: { letter: 'Card A', authoringLabel: 'E1', text: 'Says falls', changed: false }, confidenceBefore: 7, confidenceAfter: 8, submittedAt: '2026-10-31T03:34:00.000Z', relationLabel: 'Fully supports' },
     } as unknown as TraceDTO);
     await render(<TracePage />);
     expect(await screen.findByText('Compare the figures.')).toBeInTheDocument();

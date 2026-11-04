@@ -8,13 +8,13 @@
           "answerId": "A2",
           "evidenceId": "E3"
         },
-        "initialConfidence": 65,
+        "initialConfidence": 7,
         "choice": "REVISE",
         "final": {
           "answerId": "A1",
           "evidenceId": "E1"
         },
-        "finalConfidence": 80
+        "finalConfidence": 8
       },
       {
         "slot": "Q2",
@@ -26,7 +26,7 @@
             "K3"
           ]
         },
-        "initialConfidence": 50,
+        "initialConfidence": 5,
         "choice": "REVISE",
         "final": {
           "orderedCardIds": [
@@ -36,7 +36,7 @@
             "K4"
           ]
         },
-        "finalConfidence": 70
+        "finalConfidence": 7
       },
       {
         "slot": "Q3",
@@ -45,14 +45,14 @@
           "tradeOffId": "D1",
           "reasonId": "R2"
         },
-        "initialConfidence": 60,
+        "initialConfidence": 6,
         "choice": "REVISE",
         "final": {
           "judgmentOptionId": "O1",
           "tradeOffId": "D1",
           "reasonId": "R1"
         },
-        "finalConfidence": 65
+        "finalConfidence": 7
       },
       {
         "slot": "Q4",
@@ -72,7 +72,7 @@
             }
           ]
         },
-        "initialConfidence": 55,
+        "initialConfidence": 6,
         "choice": "REVISE",
         "final": {
           "placements": [
@@ -90,7 +90,7 @@
             }
           ]
         },
-        "finalConfidence": 75
+        "finalConfidence": 8
       },
       {
         "slot": "Q5",
@@ -110,7 +110,7 @@
             }
           ]
         },
-        "initialConfidence": 70,
+        "initialConfidence": 7,
         "choice": "KEEP",
         "final": {
           "answers": [
@@ -128,7 +128,7 @@
             }
           ]
         },
-        "finalConfidence": 70
+        "finalConfidence": 7
       }
     ]
   },
@@ -141,13 +141,13 @@
           "answerId": "A1",
           "evidenceId": "E2"
         },
-        "initialConfidence": 70,
+        "initialConfidence": 7,
         "choice": "REVISE",
         "final": {
           "answerId": "A1",
           "evidenceId": "E1"
         },
-        "finalConfidence": 85
+        "finalConfidence": 9
       },
       {
         "slot": "Q2",
@@ -159,7 +159,7 @@
             "K4"
           ]
         },
-        "initialConfidence": 75,
+        "initialConfidence": 8,
         "choice": "KEEP",
         "final": {
           "orderedCardIds": [
@@ -169,7 +169,7 @@
             "K4"
           ]
         },
-        "finalConfidence": 80
+        "finalConfidence": 8
       },
       {
         "slot": "Q3",
@@ -178,14 +178,14 @@
           "tradeOffId": "D3",
           "reasonId": "R7"
         },
-        "initialConfidence": 65,
+        "initialConfidence": 7,
         "choice": "KEEP",
         "final": {
           "judgmentOptionId": "O2",
           "tradeOffId": "D3",
           "reasonId": "R7"
         },
-        "finalConfidence": 70
+        "finalConfidence": 7
       },
       {
         "slot": "Q4",
@@ -205,7 +205,7 @@
             }
           ]
         },
-        "initialConfidence": 70,
+        "initialConfidence": 7,
         "choice": "KEEP",
         "final": {
           "placements": [
@@ -223,7 +223,7 @@
             }
           ]
         },
-        "finalConfidence": 75
+        "finalConfidence": 8
       },
       {
         "slot": "Q5",
@@ -243,7 +243,7 @@
             }
           ]
         },
-        "initialConfidence": 60,
+        "initialConfidence": 6,
         "choice": "KEEP",
         "final": {
           "answers": [
@@ -261,7 +261,7 @@
             }
           ]
         },
-        "finalConfidence": 65
+        "finalConfidence": 7
       }
     ]
   },
@@ -274,13 +274,13 @@
           "answerId": "A1",
           "evidenceId": "E1"
         },
-        "initialConfidence": 85,
+        "initialConfidence": 9,
         "choice": "KEEP",
         "final": {
           "answerId": "A1",
           "evidenceId": "E1"
         },
-        "finalConfidence": 90
+        "finalConfidence": 9
       },
       {
         "slot": "Q2",
@@ -292,7 +292,7 @@
             "K4"
           ]
         },
-        "initialConfidence": 55,
+        "initialConfidence": 6,
         "choice": "REVISE",
         "final": {
           "orderedCardIds": [
@@ -302,7 +302,7 @@
             "K4"
           ]
         },
-        "finalConfidence": 60
+        "finalConfidence": 6
       },
       {
         "slot": "Q3",
@@ -311,14 +311,14 @@
           "tradeOffId": "D1",
           "reasonId": "R1"
         },
-        "initialConfidence": 70,
+        "initialConfidence": 7,
         "choice": "KEEP",
         "final": {
           "judgmentOptionId": "O1",
           "tradeOffId": "D1",
           "reasonId": "R1"
         },
-        "finalConfidence": 70
+        "finalConfidence": 7
       },
       {
         "slot": "Q4",
@@ -338,7 +338,7 @@
             }
           ]
         },
-        "initialConfidence": 60,
+        "initialConfidence": 6,
         "choice": "KEEP",
         "final": {
           "placements": [
@@ -356,7 +356,7 @@
             }
           ]
         },
-        "finalConfidence": 65
+        "finalConfidence": 7
       },
       {
         "slot": "Q5",
@@ -377,7 +377,7 @@
             }
           ]
         },
-        "initialConfidence": 55,
+        "initialConfidence": 6,
         "choice": "REVISE",
         "final": {
           "answers": [
@@ -395,7 +395,7 @@
             }
           ]
         },
-        "finalConfidence": 60
+        "finalConfidence": 6
       }
     ]
   },
@@ -408,13 +408,13 @@
           "answerId": "A4",
           "evidenceId": "E4"
         },
-        "initialConfidence": 50,
+        "initialConfidence": 5,
         "choice": "REVISE",
         "final": {
           "answerId": "A1",
           "evidenceId": "E2"
         },
-        "finalConfidence": 55
+        "finalConfidence": 6
       },
       {
         "slot": "Q2",
@@ -426,7 +426,7 @@
             "K4"
           ]
         },
-        "initialConfidence": 65,
+        "initialConfidence": 7,
         "choice": "KEEP",
         "final": {
           "orderedCardIds": [
@@ -436,7 +436,7 @@
             "K4"
           ]
         },
-        "finalConfidence": 65
+        "finalConfidence": 7
       },
       {
         "slot": "Q3",
@@ -445,14 +445,14 @@
           "tradeOffId": "D3",
           "reasonId": "R8"
         },
-        "initialConfidence": 60,
+        "initialConfidence": 6,
         "choice": "KEEP",
         "final": {
           "judgmentOptionId": "O2",
           "tradeOffId": "D3",
           "reasonId": "R8"
         },
-        "finalConfidence": 65
+        "finalConfidence": 7
       },
       {
         "slot": "Q4",
@@ -472,7 +472,7 @@
             }
           ]
         },
-        "initialConfidence": 50,
+        "initialConfidence": 5,
         "choice": "REVISE",
         "final": {
           "placements": [
@@ -490,7 +490,7 @@
             }
           ]
         },
-        "finalConfidence": 60
+        "finalConfidence": 6
       },
       {
         "slot": "Q5",
@@ -510,7 +510,7 @@
             }
           ]
         },
-        "initialConfidence": 65,
+        "initialConfidence": 7,
         "choice": "KEEP",
         "final": {
           "answers": [
@@ -528,7 +528,7 @@
             }
           ]
         },
-        "finalConfidence": 70
+        "finalConfidence": 7
       }
     ]
   },
@@ -541,13 +541,13 @@
           "answerId": "A1",
           "evidenceId": "E3"
         },
-        "initialConfidence": 60,
+        "initialConfidence": 6,
         "choice": "REVISE",
         "final": {
           "answerId": "A1",
           "evidenceId": "E1"
         },
-        "finalConfidence": 80
+        "finalConfidence": 8
       },
       {
         "slot": "Q2",
@@ -559,7 +559,7 @@
             "K4"
           ]
         },
-        "initialConfidence": 70,
+        "initialConfidence": 7,
         "choice": "KEEP",
         "final": {
           "orderedCardIds": [
@@ -569,7 +569,7 @@
             "K4"
           ]
         },
-        "finalConfidence": 70
+        "finalConfidence": 7
       },
       {
         "slot": "Q3",
@@ -578,14 +578,14 @@
           "tradeOffId": "D2",
           "reasonId": "R4"
         },
-        "initialConfidence": 55,
+        "initialConfidence": 6,
         "choice": "REVISE",
         "final": {
           "judgmentOptionId": "O2",
           "tradeOffId": "D3",
           "reasonId": "R7"
         },
-        "finalConfidence": 60
+        "finalConfidence": 6
       },
       {
         "slot": "Q4",
@@ -605,7 +605,7 @@
             }
           ]
         },
-        "initialConfidence": 45,
+        "initialConfidence": 5,
         "choice": "REVISE",
         "final": {
           "placements": [
@@ -623,7 +623,7 @@
             }
           ]
         },
-        "finalConfidence": 65
+        "finalConfidence": 7
       },
       {
         "slot": "Q5",
@@ -643,7 +643,7 @@
             }
           ]
         },
-        "initialConfidence": 70,
+        "initialConfidence": 7,
         "choice": "KEEP",
         "final": {
           "answers": [
@@ -661,7 +661,7 @@
             }
           ]
         },
-        "finalConfidence": 75
+        "finalConfidence": 8
       }
     ]
   },
@@ -674,13 +674,13 @@
           "answerId": "A1",
           "evidenceId": "E1"
         },
-        "initialConfidence": 90,
+        "initialConfidence": 9,
         "choice": "KEEP",
         "final": {
           "answerId": "A1",
           "evidenceId": "E1"
         },
-        "finalConfidence": 90
+        "finalConfidence": 9
       },
       {
         "slot": "Q2",
@@ -692,7 +692,7 @@
             "K4"
           ]
         },
-        "initialConfidence": 80,
+        "initialConfidence": 8,
         "choice": "KEEP",
         "final": {
           "orderedCardIds": [
@@ -702,7 +702,7 @@
             "K4"
           ]
         },
-        "finalConfidence": 85
+        "finalConfidence": 9
       },
       {
         "slot": "Q3",
@@ -711,14 +711,14 @@
           "tradeOffId": "D3",
           "reasonId": "R7"
         },
-        "initialConfidence": 75,
+        "initialConfidence": 8,
         "choice": "KEEP",
         "final": {
           "judgmentOptionId": "O2",
           "tradeOffId": "D3",
           "reasonId": "R7"
         },
-        "finalConfidence": 75
+        "finalConfidence": 8
       },
       {
         "slot": "Q4",
@@ -738,7 +738,7 @@
             }
           ]
         },
-        "initialConfidence": 80,
+        "initialConfidence": 8,
         "choice": "KEEP",
         "final": {
           "placements": [
@@ -756,7 +756,7 @@
             }
           ]
         },
-        "finalConfidence": 80
+        "finalConfidence": 8
       },
       {
         "slot": "Q5",
@@ -776,7 +776,7 @@
             }
           ]
         },
-        "initialConfidence": 75,
+        "initialConfidence": 8,
         "choice": "KEEP",
         "final": {
           "answers": [
@@ -794,7 +794,7 @@
             }
           ]
         },
-        "finalConfidence": 80
+        "finalConfidence": 8
       }
     ]
   },
@@ -807,13 +807,13 @@
           "answerId": "A3",
           "evidenceId": "E2"
         },
-        "initialConfidence": 55,
+        "initialConfidence": 6,
         "choice": "REVISE",
         "final": {
           "answerId": "A1",
           "evidenceId": "E2"
         },
-        "finalConfidence": 60
+        "finalConfidence": 6
       },
       {
         "slot": "Q2",
@@ -825,7 +825,7 @@
             "K1"
           ]
         },
-        "initialConfidence": 40,
+        "initialConfidence": 4,
         "choice": "REVISE",
         "final": {
           "orderedCardIds": [
@@ -835,7 +835,7 @@
             "K3"
           ]
         },
-        "finalConfidence": 50
+        "finalConfidence": 5
       },
       {
         "slot": "Q3",
@@ -844,14 +844,14 @@
           "tradeOffId": "D2",
           "reasonId": "R5"
         },
-        "initialConfidence": 50,
+        "initialConfidence": 5,
         "choice": "KEEP",
         "final": {
           "judgmentOptionId": "O1",
           "tradeOffId": "D2",
           "reasonId": "R5"
         },
-        "finalConfidence": 55
+        "finalConfidence": 6
       },
       {
         "slot": "Q4",
@@ -871,7 +871,7 @@
             }
           ]
         },
-        "initialConfidence": 45,
+        "initialConfidence": 5,
         "choice": "REVISE",
         "final": {
           "placements": [
@@ -889,7 +889,7 @@
             }
           ]
         },
-        "finalConfidence": 60
+        "finalConfidence": 6
       },
       {
         "slot": "Q5",
@@ -910,7 +910,7 @@
             }
           ]
         },
-        "initialConfidence": 50,
+        "initialConfidence": 5,
         "choice": "KEEP",
         "final": {
           "answers": [
@@ -929,7 +929,7 @@
             }
           ]
         },
-        "finalConfidence": 55
+        "finalConfidence": 6
       }
     ]
   }

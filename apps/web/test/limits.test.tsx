@@ -13,9 +13,9 @@ vi.mock('@/lib/auth', () => ({
 
 const busy429 = (action: string) =>
   new Response(JSON.stringify({ code: 'RATE_LIMITED', action, retryAfterSeconds: 0, resetsAt: '2026-11-05T08:40:00.000Z' }), { status: 429 });
-const challenge = { deliveryId: 'd', message: 'm', lockedSummary: { answerText: 'a', confidence: 50 } };
+const challenge = { deliveryId: 'd', message: 'm', lockedSummary: { answerText: 'a', confidence: 5 } };
 const fetchMock = vi.fn<typeof fetch>();
-const lockRequest = { artifact: { slot: 'Q1' as const, answerId: 'a', evidenceId: 'e' }, initialConfidence: 50 };
+const lockRequest = { artifact: { slot: 'Q1' as const, answerId: 'a', evidenceId: 'e' }, initialConfidence: 5 };
 
 beforeEach(() => {
   fetchMock.mockReset();

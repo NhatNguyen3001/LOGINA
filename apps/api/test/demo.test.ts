@@ -56,7 +56,7 @@ describe('ready assignment', () => {
     const [assignment] = await assignmentsOf(a);
     const attempt = (await (await a.post(`/assignments/${assignment!.assignmentId}/attempts`)).json()) as { attemptId: string };
     const task = (await (await a.get(`/attempts/${attempt.attemptId}/tasks/Q1`)).json()) as { answers: { id: string }[]; evidence: { id: string }[] };
-    const lock = await a.post(`/attempts/${attempt.attemptId}/tasks/Q1/lock`, { artifact: { slot: 'Q1', answerId: task.answers[1]!.id, evidenceId: task.evidence[2]!.id }, initialConfidence: 70 });
+    const lock = await a.post(`/attempts/${attempt.attemptId}/tasks/Q1/lock`, { artifact: { slot: 'Q1', answerId: task.answers[1]!.id, evidenceId: task.evidence[2]!.id }, initialConfidence: 7 });
     expect(lock.status).toBe(200);
   });
 });

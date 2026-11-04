@@ -88,7 +88,7 @@ export const examplesVi = {
   studentChallenge: {
     ...examples.studentChallenge,
     message: TN1.message,
-    lockedSummary: { answerText: `B. ${ANSWER_B}`, evidenceText: `Thẻ C. ${CARD_3}`, confidence: 70 },
+    lockedSummary: { answerText: `B. ${ANSWER_B}`, evidenceText: `Thẻ C. ${CARD_3}`, confidence: 7 },
   },
 
   teacherTaskPreview: {

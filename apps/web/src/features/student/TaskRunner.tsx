@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BusyNote } from '@/components/logina/BusyNote';
-import { ConfidenceSlider, DEFAULT_CONFIDENCE } from '@/components/logina/ConfidenceSlider';
+import { ConfidenceSlider, DEFAULT_CONFIDENCE, onTenPointScale } from '@/components/logina/ConfidenceSlider';
 import { LoadFailed } from '@/components/logina/LoadFailed';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
@@ -175,7 +175,7 @@ function Reconsidering({ attemptId, task, trace, onSubmitted, onPhase }: { attem
   const { t } = useTranslation();
   const original = task.initialArtifact!;
   const [answer, setAnswer] = useState<DraftArtifact>(original);
-  const [finalConfidence, setFinalConfidence] = useState(task.initialConfidence ?? DEFAULT_CONFIDENCE);
+  const [finalConfidence, setFinalConfidence] = useState(task.initialConfidence === undefined ? DEFAULT_CONFIDENCE : onTenPointScale(task.initialConfidence));
   const [showLocked, setShowLocked] = useState(false);
   const submitKey = useRef(newKey());
   const promptShownAt = useRef<number | null>(null);
