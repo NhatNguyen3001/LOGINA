@@ -680,7 +680,7 @@
     },
     "save": {
       "saving": "Saving…",
-      "failed": "Not saved yet. Your choices are safe on this page, and locking in saves them."
+      "failed": "Couldn't save your answer."
     },
     "need": {
       "statement": "Choose a statement to continue.",
