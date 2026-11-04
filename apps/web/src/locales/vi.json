@@ -574,8 +574,8 @@
   "student": {
     "original": "Câu trả lời ban đầu",
     "confidence": {
-      "low": "0 (chưa chắc)",
-      "high": "Rất chắc (100)",
+      "low": "Chưa chắc",
+      "high": "Rất chắc",
       "label": "Em chắc đến mức nào?"
     },
     "progress": {

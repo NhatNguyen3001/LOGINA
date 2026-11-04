@@ -574,8 +574,8 @@
   "student": {
     "original": "Your first answer",
     "confidence": {
-      "low": "0 (not sure)",
-      "high": "Very sure (100)",
+      "low": "Not sure",
+      "high": "Very sure",
       "label": "How sure are you?"
     },
     "progress": {

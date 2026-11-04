@@ -192,10 +192,6 @@ table.t tr:last-child td{border-bottom:0}
 .locked{background:var(--subtle);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;grid-template-columns:repeat(3,auto);gap:4px 28px;justify-content:start}
 .locked dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
 .locked dd{margin:0;font-weight:600}
-.slider{position:relative;height:8px;border-radius:8px;background:var(--line);cursor:pointer;touch-action:none;user-select:none}
-.slider::before{content:"";position:absolute;inset:-14px 0}
-.slider .fill{position:absolute;inset:0 auto 0 0;border-radius:8px;background:var(--accent)}
-.slider .knob{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);transform:translate(-50%,-50%)}
 .trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .pair-line{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-top:12px;border-top:1px solid var(--line)}
 .pair-scroll{display:flex;flex-direction:column;gap:12px;max-height:440px;overflow-y:auto;padding-right:8px}
@@ -333,7 +329,6 @@ button.dash-bar:hover,button.dash-bar[data-state="open"]{box-shadow:0 0 0 2px va
 .thoughts b{display:block;color:var(--ink);font-weight:600}
 .thoughts-fold summary{width:fit-content;cursor:pointer}
 .thoughts-fold[open] summary{margin-bottom:8px}
-.ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3)}
 .ans{display:flex;flex-direction:column;gap:10px;margin:0;background:var(--subtle);border:1px solid var(--line);border-radius:10px;padding:16px}
 .ans .ln{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;font-size:14px}
 .ans .ln dt{font-size:12px;font-weight:600;color:var(--ink-3);padding-top:2px}
@@ -600,3 +595,9 @@ a.task:hover{background:var(--subtle)}
 .policy-link:hover{text-decoration-color:currentColor}
 .policy-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 @media (prefers-reduced-motion:no-preference){.policy-link:hover .ico{translate:3px 0}}
+.conf-scale{position:relative;height:26px;margin-top:-10px}
+.conf-tick{position:absolute;top:0;display:flex;flex-direction:column;align-items:center;gap:3px;translate:-50% 0;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.conf-tick::before{content:"";width:1px;height:6px;background:var(--line-strong)}
+.conf-tick.on{color:var(--accent-ink);font-weight:700}
+.conf-tick.on::before{background:var(--accent)}
+.conf-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3)}

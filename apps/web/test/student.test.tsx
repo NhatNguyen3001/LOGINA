@@ -202,7 +202,7 @@ describe('Q1 flow', () => {
     expect(await screen.findByText('Your answer is unchanged. This will be recorded as Keep.')).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /First statement/ })).toBeChecked();
     expect(screen.getByRole('slider')).toHaveAttribute('aria-valuenow', '70');
-    expect(document.querySelectorAll('.knob')).toHaveLength(1);
+    expect(document.querySelectorAll('[data-slot="slider-thumb"]')).toHaveLength(1);
     expect(screen.queryByRole('button', { name: 'Keep my answer' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Back to your first answer' })).toBeDisabled();
   });
