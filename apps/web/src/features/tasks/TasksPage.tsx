@@ -1,3 +1,4 @@
+import { TaskName } from '@/components/logina/TaskName';
 import type { Slot } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
@@ -10,7 +11,7 @@ import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
 import { chooseSufficiency, getLesson, getTasks, newKey } from '@/lib/api';
 import { jobFinished, qk, useJobPolling } from '@/lib/query';
-import { readableSourceRefs } from '@/lib/source-refs';
+import { SourceRefs } from '@/components/logina/SourceRefs';
 import { useSecondsSince } from '@/lib/use-seconds-since';
 import { TaskStatusTag } from './task-status';
 import { cardVariants } from '@/components/ui/card';
@@ -124,7 +125,7 @@ export function TasksPage() {
               {slots.map((slot) => (
                 <TableRow key={slot.slot}>
                   <TableCell>
-                    {slot.draftStatus ? <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: slot.slot }} className="lnk">{t(`teacher.taskType.${slot.slot}`)}</Link> : <span className="b">{t(`teacher.taskType.${slot.slot}`)}</span>}
+                    {slot.draftStatus ? <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: slot.slot }} className="lnk"><TaskName slot={slot.slot} /></Link> : <span className="b"><TaskName slot={slot.slot} /></span>}
                   </TableCell>
                   <TableCell data-label={t('teacher.t06.enough')}>
                     <div className="stack">
@@ -134,7 +135,7 @@ export function TasksPage() {
                         <StatusTag kind="neutral">{t(running ? 'teacher.t06.checking' : 'teacher.t06.notChecked')}</StatusTag>
                       )}
                       <span className="s13">{slot.sufficiencyNote}</span>
-                      <span className="src">{readableSourceRefs(slot.sourceRefs, t)}</span>
+                      <SourceRefs refs={slot.sourceRefs} />
                     </div>
                   </TableCell>
                   <TableCell data-label={t('teacher.t06.draft')}>

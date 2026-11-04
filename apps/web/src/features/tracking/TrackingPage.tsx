@@ -1,3 +1,4 @@
+import { TaskName } from '@/components/logina/TaskName';
 import type { ClassTrackingDTO } from '@logina/contracts';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
@@ -5,7 +6,7 @@ import { Activity, Check, LayoutDashboard, MessageSquare, PenLine, Users, type L
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BackLink } from '@/components/logina/BackLink';
-import { promptName } from '@/lib/prompt-name';
+import { asStudentSees, promptName } from '@/lib/prompt-name';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -54,7 +55,7 @@ function Metric({ icon: Icon, good, label, value, of, part, whole, hint }: { ico
   );
 }
 
-function ChartCard({ title, legend, wide, children }: { title: string; legend?: ReactNode; wide?: boolean; children: ReactNode }) {
+function ChartCard({ title, legend, wide, children }: { title: ReactNode; legend?: ReactNode; wide?: boolean; children: ReactNode }) {
   return (
     <section className={`dash-card ${wide ? 'wide' : ''}`}>
       <div className="dash-head">
@@ -140,8 +141,9 @@ function ConfidenceChart({ rows }: { rows: TaskRow[] }) {
   );
 }
 
-function PromptRow({ tag, message, count, revised, clip }: { tag: string; message: string; count: number; revised: number; clip?: boolean }) {
+function PromptRow({ tag, message: raw, count, revised, clip }: { tag: ReactNode; message: string; count: number; revised: number; clip?: boolean }) {
   const { t } = useTranslation();
+  const message = asStudentSees(raw);
   const label = t('teacher.t14.revisedOf', { revised, count });
   return (
     <div className="prompt-row">
@@ -162,7 +164,7 @@ function TopPrompts({ rows, onSeeAll }: { rows: TaskRow[]; onSeeAll: () => void 
   return (
     <ChartCard title={t('teacher.t14.promptsTitle')} legend={<button type="button" className="lnk jump" onClick={onSeeAll}>{t('teacher.t14.seeAll')}</button>} wide>
       {prompts.slice(0, TOP_PROMPTS).map(({ slot, label, message, count, revised }) => (
-        <PromptRow key={`${slot}-${label}`} tag={`${slot} · ${promptName(label, t)}`} message={message} count={count} revised={revised} clip />
+        <PromptRow key={`${slot}-${label}`} tag={<><span className="b">{slot}</span> {promptName(label, t)}</>} message={message} count={count} revised={revised} clip />
       ))}
     </ChartCard>
   );
@@ -241,7 +243,7 @@ function Prompts({ rows }: { rows: TaskRow[] }) {
       <p className="s13 sec">{t('teacher.t14.promptsNote')}</p>
       <div className="prompt-list">
         {rows.map(({ slot, deliveredChallenges }) => (
-          <ChartCard key={slot} title={t(`teacher.taskType.${slot}`)}>
+          <ChartCard key={slot} title={<TaskName slot={slot} />}>
             {deliveredChallenges.length === 0 ? <span className="s13 muted">{t('teacher.t14.noPrompts')}</span> : null}
             {deliveredChallenges.map(({ label, message, count, revised }) => (
               <PromptRow key={label} tag={promptName(label, t)} message={message} count={count} revised={revised} />

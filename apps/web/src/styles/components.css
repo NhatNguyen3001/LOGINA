@@ -182,7 +182,6 @@ table.t tr:last-child td{border-bottom:0}
 .steps-now{display:none;margin-top:8px;font-size:13px;font-weight:600;color:var(--accent-ink)}
 .step-in{display:flex;flex-direction:column;gap:18px;min-width:0}
 .stem:focus{outline:0}
-.notice-more{margin-top:0}
 .consent-choice{margin-top:8px}
 .consent-choice .ui-btn{min-height:44px;min-width:160px}
 .q3-wait{padding:12px 14px;border:1px dashed var(--line-strong);border-radius:10px;font-size:13px;color:var(--ink-3)}
@@ -369,7 +368,7 @@ button.dash-bar:hover,button.dash-bar[data-state="open"]{box-shadow:0 0 0 2px va
   .toast{animation:toast-in .3s ease}
   .toast-time{animation:toast-time 8s linear}
 }
-.policy-meta{font-size:13px;color:var(--ink-3)}
+.policy-meta{font-size:13px;color:var(--ink-3)} .policy-meta + .policy-meta{margin-top:-6px}
 .policy ul{list-style:disc}
 .policy strong{font-weight:600}
 .policy a:not(.ui-btn){color:var(--accent-ink);font-weight:500;text-underline-offset:3px}
@@ -568,3 +567,36 @@ a.task:hover{background:var(--subtle)}
 .save-pill.saved{color:var(--green)}
 .save-pill.failed{color:var(--red)}
 .save-pill .ico{width:16px;height:16px;flex:none}
+.results-table td{vertical-align:middle;padding-top:14px;padding-bottom:14px}
+.results-table th:first-child,.results-table td:first-child{width:72px;padding-left:20px}
+.results-table th:last-child,.results-table td:last-child{padding-right:20px}
+.results-table .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+@media (max-width:639px){.results-table th:first-child,.results-table td:first-child{width:48px;padding-left:14px}.results-table th:last-child,.results-table td:last-child{padding-right:14px}}
+.task-title{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;line-height:1.3}
+.q-chip{display:inline-grid;place-items:center;min-width:36px;height:28px;padding:0 8px;border-radius:7px;background:var(--accent-bg);color:var(--accent-ink);font-size:13px;font-weight:700}
+.items{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.item{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:start;padding:14px 16px}
+.item + .item{border-top:1px solid var(--line)}
+.item .k{width:28px;height:28px;border-radius:7px;background:var(--gray);display:grid;place-items:center;font-weight:700;font-size:13px}
+.item .meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:6px}
+.item .acts{display:flex;gap:6px;align-items:center}
+.item.warn{background:var(--orange-bg)}
+.item.edited{box-shadow:inset 3px 0 0 var(--accent)}
+.prompt-list{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.prompt-list > li{display:flex;flex-direction:column;gap:6px;padding:14px 16px}
+.prompt-list > li + li{border-top:1px solid var(--line)}
+.prompt-list > li.fb{background:var(--subtle)}
+.prompt-list .say{font-size:15px;font-weight:500;line-height:1.5}
+.checks-ok{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--green)}
+.checks-ok .ico{width:18px;height:18px}
+.check-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.check-row{display:flex;flex-direction:column;gap:4px}
+@media (max-width:640px){.item{grid-template-columns:30px minmax(0,1fr)}.item .acts{grid-column:2}}
+.task-name{display:inline-flex;gap:6px;align-items:baseline} .task-name .q-num{flex:none;color:var(--accent-ink);font-weight:700}
+.src-refs{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.src-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;background:var(--accent-bg);color:var(--accent-ink);font-size:12px;font-weight:500;white-space:nowrap}
+.policy-link{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;min-height:44px;padding:0 2px;color:var(--accent-ink);font-weight:600;font-size:15px;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+.policy-link .ico{width:16px;height:16px;transition:translate .15s}
+.policy-link:hover{text-decoration-color:currentColor}
+.policy-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:no-preference){.policy-link:hover .ico{translate:3px 0}}

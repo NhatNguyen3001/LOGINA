@@ -19,7 +19,7 @@
       "material": "1. Material",
       "chooseFile": "Choose file",
       "useSample": "Use sample material (pre-filled)",
-      "fileHint": "PDF or Word · up to 20 MB",
+      "fileHint": "PDF or Word, up to 20 MB",
       "sampleChosen": "Sample material ready. Every step is pre-filled with example answers, so you can check each one and continue.",
       "sourceTitle": "Source title",
       "required": "(required)",
@@ -38,6 +38,10 @@
       "noMaterial": "Choose a file or use the sample material."
     },
     "t02": {
+      "finished": "Analysis finished",
+      "finishedLede": "LOGINA has read and cross-checked the source. Look over what it found, then continue.",
+      "toClarify": "Continue: Clarify material →",
+      "toSource": "Continue: Source review →",
       "liveTiming": "New material can take a few minutes to read. You can leave and come back.",
       "language": {
         "question": "Your file looks like {{detected}}. Use {{detected}} for this lesson?",
@@ -116,11 +120,11 @@
       "opensNewTab": "opens in a new tab"
     },
     "taskType": {
-      "Q1": "Q1 · Statement + evidence",
-      "Q2": "Q2 · Rank cards",
-      "Q3": "Q3 · Trade-off",
-      "Q4": "Q4 · Counterargument",
-      "Q5": "Q5 · Finish the sentences"
+      "Q1": "Statement + evidence",
+      "Q2": "Rank cards",
+      "Q3": "Trade-off",
+      "Q4": "Counterargument",
+      "Q5": "Finish the sentences"
     },
     "t03": {
       "crumb": "Clarify material",
@@ -182,9 +186,14 @@
       "TRANSLATION": "Translation"
     },
     "sourceRef": {
-      "para": "p. {{page}}, para. {{n}}",
-      "table": "p. {{page}}, table {{n}}",
-      "figure": "p. {{page}}, figure {{n}}"
+      "label": "Source",
+      "page": "Page {{n}}",
+      "pages": "Pages {{n}}",
+      "paragraph": "paragraph {{n}}",
+      "paragraphs": "paragraphs {{n}}",
+      "para": "Page {{page}}, paragraph {{n}}",
+      "table": "Page {{page}}, table {{n}}",
+      "figure": "Page {{page}}, figure {{n}}"
     },
     "gate": {
       "PASS": "Pass",
@@ -232,33 +241,36 @@
       "regenerate": "Regenerate {{slot}} with this choice"
     },
     "t07": {
-      "gates": "QUALITY CHECKS",
-      "structure": "STRUCTURE CHECKS",
-      "checks": "{{slot}} checks",
-      "viewAll": "View all prompts",
-      "readOnly": "This task is read-only here.",
       "tryCase": "Try a case",
       "tryHint": "Choose as a student would to see which Think-again prompt appears",
-      "statement": "STATEMENT",
-      "card": "EVIDENCE CARD",
+      "statement": "Statement",
+      "card": "Evidence card",
       "tryRun": "Show the prompt",
       "willGet": "The student will get:",
       "tryNote": "Shows only the prompt the student gets, not the selection rules.",
-      "quickEdit": "Quick edit {{option}}",
+      "quickEdit": "Quick edit statement {{option}}",
       "saveRecheck": "Save and recheck",
       "statements": "{{count}} statements",
       "cards": "{{count}} evidence cards",
       "version": "Draft v{{version}}",
-      "question": "QUESTION",
+      "question": "Question",
       "thinkAgain": "Think again",
-      "oneEach": "In each attempt, a student gets exactly 1 prompt.",
+      "oneEach": "Each student sees one of these after locking in an answer.",
       "supportedReason": "The source supports this reason",
-      "editPrompt": "Edit {{label}}"
+      "editPrompt": "Edit {{label}}",
+      "checksTitle": "Checks",
+      "allPassed": "All checks passed",
+      "needReview_one": "{{count}} check needs your review",
+      "needReview": "{{count}} checks need your review",
+      "showAll": "Show all checks",
+      "hideAll": "Hide all checks",
+      "tryStatement": "Statement {{letter}}",
+      "tryCard": "Card {{letter}}"
     },
     "t08": {
       "title": "Q1 logic check",
       "back": "← Matching Preview",
-      "advanced": "Advanced · optional",
+      "advanced": "Advanced, optional",
       "tab": {
         "pairs": "16-pair evaluation",
         "prompts": "Think again (4 + fallback)",
@@ -274,13 +286,13 @@
     },
     "t10": {
       "title": "Edit source",
-      "tag": "Approval 1 again · source v{{version}}",
+      "tag": "Approval 1 again, source v{{version}}",
       "lede": "Editing here creates a new source version. The earlier version and assigned tasks stay as they are.",
       "claim": "Claim being edited",
       "impact": "Impact of the change",
       "uses": "Uses this claim?",
       "after": "After approval",
-      "yes": "Yes · {{refs}}",
+      "yes": "Yes, {{refs}}",
       "no": "No",
       "regenerate": "Regenerate, recheck, Approval 2 again",
       "keeps": "Stays as it is",
@@ -327,7 +339,7 @@
       "noBlockers": "No blockers",
       "warningsDecided": "Warnings have decisions",
       "confirm": "I have reviewed {{slot}} exactly as students will receive it.",
-      "assignCount": "Assign · {{count}}/5",
+      "assignCount": "Assign ({{count}}/5)",
       "change": {
         "PREVIEW_CHANGED": "This task changed since you last viewed it."
       },
@@ -374,7 +386,7 @@
       "attempts": "ATTEMPTS",
       "counts": "{{started}} people started, {{finished}} finished",
       "afterThink": "AFTER THINK AGAIN",
-      "keepRevise": "Keep {{keep}} · Revise {{revise}} of {{total}} submitted tasks",
+      "keepRevise": "Keep {{keep}}, Revise {{revise}} of {{total}} submitted tasks",
       "byTask": "By task",
       "submitted": "Submitted",
       "keepOrRevise": "Keep / Revise",
@@ -440,7 +452,11 @@
       "recheck": "Recheck the changed parts"
     },
     "promptN": "Prompt {{n}}",
-    "promptFallback": "Neutral prompt"
+    "promptFallback": "Neutral prompt",
+    "optionRef": {
+      "statement": "statement {{letter}}",
+      "card": "card {{letter}}"
+    }
   },
   "errors": {
     "FILE_TYPE": "LOGINA reads PDF or Word files.",
@@ -558,8 +574,8 @@
   "student": {
     "original": "Your first answer",
     "confidence": {
-      "low": "0 · Not sure",
-      "high": "Very sure · 100",
+      "low": "0 (not sure)",
+      "high": "Very sure (100)",
       "label": "How sure are you?"
     },
     "progress": {
@@ -590,7 +606,7 @@
       "empty": "Nothing assigned yet.",
       "runsTitle": "My recorded runs",
       "runsEmpty": "Your finished runs will appear here.",
-      "runLine": "Run {{run}} · {{date}}",
+      "runLine": "Run {{run}}, {{date}}",
       "viewRun": "View results",
       "open": "Open",
       "from": "From {{name}}",
@@ -659,7 +675,6 @@
     "result": {
       "title": "You've completed all 5 tasks",
       "newRun": "Start a new run",
-      "summary": "After the Think-again prompt, you kept {{kept}} and revised {{revised}}.",
       "task": "Task",
       "after": "After Think again",
       "change": "Change",
@@ -744,17 +759,10 @@
     "record": "We record your choices before and after the prompt, your confidence, when you start, each time you change your answer, when you lock in and submit, and what you write in Q5.",
     "namesTitle": "No names",
     "names": "We don't ask for your name or email. Please don't type personal details in your written answer.",
-    "dataTitle": "Where the data goes",
-    "data": "The data is copied to a Google Sheet the team can read, and may be used in a research paper. Results describe groups only, never one person.",
-    "limit": "The data doesn't show why anyone changed their mind, and doesn't prove anyone learned more.",
-    "whoTitle": "Who runs it",
-    "who": "The LOGINA team runs this study. Contact: logina.edu@gmail.com.",
-    "keptTitle": "How long it is kept",
-    "kept": "The data is kept until the paper is published, and for no more than 2 years from collection. Then we delete it.",
     "choiceTitle": "Your choice",
     "choice": "Taking part is your choice. The tasks work the same either way.",
     "withdraw": "To withdraw, email your participant code to logina.edu@gmail.com. We will delete your rows.",
-    "privacyLink": "Read the full privacy policy →",
+    "privacyLink": "Read the full privacy policy",
     "agree": "I agree",
     "version": "Version {{version}}",
     "thanks": "Thanks for taking part",

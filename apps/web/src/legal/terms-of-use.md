@@ -1,6 +1,8 @@
 # Điều khoản sử dụng của LOGINA
 
-**Phiên bản:** 0.3 (bản nháp, luật sư chưa rà soát) · **Cập nhật:** 31/10/2026 · **Liên hệ:** logina.edu@gmail.com
+**Phiên bản:** 0.3 (bản nháp, luật sư chưa rà soát)
+**Cập nhật:** 31/10/2026
+**Liên hệ:** logina.edu@gmail.com
 
 ## 1. Về LOGINA
 LOGINA là **bản thử nghiệm**, được phát triển cho cuộc thi và chương trình thí điểm. Tính năng có thể thay đổi hoặc tạm dừng.
@@ -39,7 +41,9 @@ Các điều khoản này theo pháp luật Việt Nam. Khi điều khoản thay
 
 # LOGINA Terms of Use
 
-**Version:** 0.3 (draft, not yet reviewed by a lawyer) · **Updated:** 31 October 2026 · **Contact:** logina.edu@gmail.com
+**Version:** 0.3 (draft, not yet reviewed by a lawyer)
+**Updated:** 31 October 2026
+**Contact:** logina.edu@gmail.com
 
 ## 1. About LOGINA
 LOGINA is a **prototype**, built for a competition and a pilot program. Features may change or pause.

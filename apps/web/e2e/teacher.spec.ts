@@ -24,6 +24,7 @@ test('the full teacher path, from the sample to tracking', async ({ page }) => {
   await expectAccessible(page, 'T1');
   await page.getByRole('button', { name: 'Analyze material' }).click();
 
+  await page.getByRole('button', { name: 'Continue: Clarify material →' }).click({ timeout: 60_000 });
   await expect(page).toHaveURL(/\/clarify/, { timeout: 60_000 });
   await expect(page.getByRole('heading', { name: 'Clarify material' })).toBeVisible();
   await expectAccessible(page, 'T3');
@@ -46,9 +47,9 @@ test('the full teacher path, from the sample to tracking', async ({ page }) => {
   await expect(page.getByText('Q4 needs your decision')).toBeVisible({ timeout: 60_000 });
   await expectAccessible(page, 'T6');
   await page.getByRole('button', { name: 'Regenerate Q4 with this choice' }).click();
-  await expect(page.getByRole('link', { name: /Q4 · Counterargument/ })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole('link', { name: /Q4\s*Counterargument/ })).toBeVisible({ timeout: 60_000 });
 
-  await page.getByRole('link', { name: /Q1 · Statement \+ evidence/ }).click();
+  await page.getByRole('link', { name: /Q1\s*Statement \+ evidence/ }).click();
   await expect(page.getByText('STRUCTURE CHECKS')).toBeVisible();
   await expectAccessible(page, 'T7');
   await page.getByRole('button', { name: 'Quick edit A4' }).click();

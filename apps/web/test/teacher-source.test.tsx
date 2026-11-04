@@ -34,8 +34,12 @@ vi.mock('@/lib/api', async (original) => ({
 }));
 vi.mock('@/lib/auth', () => ({ ensureSession: vi.fn(async () => {}), idToken: vi.fn(async () => 't'), renewSession: vi.fn(async () => {}) }));
 
-const render = (ui: React.ReactElement, lang: 'en' | 'vi' = 'en') =>
-  renderWithI18n(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{ui}</QueryClientProvider>, { lang });
+let client: QueryClient;
+const queryClientFor = () => client;
+const render = (ui: React.ReactElement, lang: 'en' | 'vi' = 'en') => {
+  client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return renderWithI18n(<QueryClientProvider client={client}>{ui}</QueryClientProvider>, { lang });
+};
 
 const issue = (id: string, over: Partial<SourceReviewDTO['issues'][number]> = {}) =>
   ({ id, pointNumber: Number(id.slice(3)), issueType: 'MISSING', severity: 'BLOCKER', bubble: `Bubble ${id}`, currentInterpretation: 'Shares only', suggestions: [{ id: 'sug1', text: 'A suggestion', sourceRef: 'p. 8' }], state: 'UNRESOLVED', spans: [{ paragraphId: 'p1', start: 0, end: 5 }], ...over }) as SourceReviewDTO['issues'][number];
@@ -88,7 +92,7 @@ describe('T1', () => {
     await render(<CreateLesson />);
     await waitFor(() => expect(screen.getByRole('button', { name: 'Analyze material' })).toBeEnabled());
     expect(screen.queryByText('12A3')).toBeNull();
-    expect(screen.getByText('Q4 · Counterargument')).toBeInTheDocument();
+    expect(screen.getByText('Counterargument')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /add|remove/i })).toBeNull();
   });
 
@@ -198,17 +202,34 @@ describe('T2', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/t/lessons/new' }));
   });
 
-  it('a finished job with issues goes to clarify', async () => {
-    vi.mocked(api.getJob).mockResolvedValue(job({ status: 'DONE' }));
+  it('a finished job stays on the page and Continue goes to clarify', async () => {
+    vi.mocked(api.getJob).mockResolvedValue(job({ status: 'DONE', steps: [{ label: 'One', status: 'DONE' }] } as Partial<JobDTO>));
     await render(<AnalyzePage />);
+    expect(await screen.findByRole('heading', { name: 'Analysis finished' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Stop analysis' })).toBeNull();
+    const next = await screen.findByRole('button', { name: 'Continue: Clarify material →' });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(navigate).not.toHaveBeenCalled();
+    fireEvent.click(next);
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/t/lessons/$id/clarify', params: { id: 'l1' } }));
   });
 
-  it('a finished job without issues goes to source', async () => {
+  it('a finished job without issues offers Continue to source review', async () => {
     vi.mocked(api.getJob).mockResolvedValue(job({ status: 'DONE' }));
     vi.mocked(api.getSourceReview).mockResolvedValue(review({ issues: [] }));
     await render(<AnalyzePage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Continue: Source review →' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledWith({ to: '/t/lessons/$id/source', params: { id: 'l1' } }));
+  });
+
+  it('the finished page stays put when the lesson no longer has a job running', async () => {
+    vi.mocked(api.getJob).mockResolvedValue(job({ status: 'DONE' }));
+    await render(<AnalyzePage />);
+    await screen.findByRole('button', { name: 'Continue: Clarify material →' });
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', stage: 'CLARIFY' } as LessonDTO);
+    await queryClientFor().invalidateQueries();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.getByRole('heading', { name: 'Analysis finished' })).toBeInTheDocument();
   });
 
   it('a failed job shows the reason and Try again', async () => {

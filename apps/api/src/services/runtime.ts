@@ -1,7 +1,7 @@
 import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/firestore';
 import { Artifact, type AttemptDTO, type StudentChallengeDTO, type SubmitResultDTO } from '@logina/contracts';
 import { AppError, decodeNested, moveTree, newId, scopedGet, writeOnce } from '@logina/db';
-import { applyTexts, buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle, type TextPair } from '@logina/domain';
+import { applyTexts, letterOptionIds, buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle, type TextPair } from '@logina/domain';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const LETTERS = 'ABCD';
@@ -195,7 +195,7 @@ export async function lockTask(
   });
 
   const shown = await inLanguage(attempt, release);
-  return toChallengeDTO(stored.task, { ...stored.delivery, renderedMessage: applyTexts(stored.delivery.renderedMessage as string, shown.texts) }, stored.deliveryId, shown.release);
+  return toChallengeDTO(stored.task, { ...stored.delivery, renderedMessage: letterOptionIds(applyTexts(stored.delivery.renderedMessage as string, shown.texts)) }, stored.deliveryId, shown.release);
 }
 
 export async function submitTask(
@@ -258,7 +258,7 @@ export function answerLabel(artifact: Artifact, release: DocumentData, cardWord:
   const content = release.publicContent as { answerOptions: { id: string }[]; evidenceOptions: { evidenceId: string }[] };
   const letter = LETTERS[content.answerOptions.findIndex((a) => a.id === artifact.answerId)];
   const card = LETTERS[content.evidenceOptions.findIndex((e) => e.evidenceId === artifact.evidenceId)];
-  return `${letter} · ${cardWord} ${card}`;
+  return `${letter}, ${cardWord} ${card}`;
 }
 
 export { toChallengeDTO };

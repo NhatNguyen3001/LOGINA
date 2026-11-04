@@ -1,3 +1,4 @@
+import { readableSourceRefs } from '@/lib/source-refs';
 import type { ResolveIssueReq, SourceReviewDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
@@ -68,7 +69,7 @@ function IssueCard({ issue, onResolve, pending, onFocusPoint, sample }: { issue:
                 {issue.suggestions.map((s) => (
                   <RadioGroupItem key={s.id} value={s.id}>
                     <span className="block">{s.text}</span>
-                    <span className="small muted">{s.sourceRef}</span>
+                    <span className="small muted">{readableSourceRefs([s.sourceRef], t)}</span>
                   </RadioGroupItem>
                 ))}
               </RadioGroup>

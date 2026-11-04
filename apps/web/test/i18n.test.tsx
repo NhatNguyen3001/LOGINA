@@ -103,7 +103,7 @@ describe('locale files', () => {
   });
 
   it('no string in either locale contains an em-dash', () => {
-    expect(JSON.stringify(en) + JSON.stringify(vi)).not.toContain('—');
+    expect(JSON.stringify(en) + JSON.stringify(vi)).not.toContain(String.fromCharCode(0x2014));
   });
 
   it('API error codes map to messages in both languages', () => {

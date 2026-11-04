@@ -174,14 +174,13 @@ describe('opening an assignment', () => {
 });
 
 describe('consent details', () => {
-  it('open on request and keep all study text in the page', async () => {
+  it('the study details live in the privacy policy, one link away', async () => {
     await renderWithI18n(withQuery(<Consent onDone={() => {}} />));
-    const data = await screen.findByRole('button', { name: 'Where the data goes' });
-    expect(data).toHaveAttribute('data-slot', 'accordion-trigger');
-    expect(data).toHaveAttribute('aria-expanded', 'false');
-    for (const text of [/Q5/, /2 years/, /withdraw/]) expect(screen.getAllByText(text, { ignore: 'script' }).length).toBeGreaterThan(0);
-    fireEvent.click(data);
-    expect(data).toHaveAttribute('aria-expanded', 'true');
+    const link = await screen.findByRole('link', { name: 'Read the full privacy policy' });
+    expect(link).toHaveAttribute('href', '/privacy');
+    expect(link).toHaveClass('policy-link');
+    expect(screen.queryByRole('button', { name: 'Where the data goes' })).toBeNull();
+    for (const text of [/Q5/, /withdraw/]) expect(screen.getAllByText(text, { ignore: 'script' }).length).toBeGreaterThan(0);
   });
 });
 
@@ -190,7 +189,8 @@ describe('consent', () => {
     await renderWithI18n(withQuery(<Consent onDone={() => {}} />));
     await screen.findByRole('button', { name: 'I agree' });
     expect(screen.queryByRole('button', { name: /No thanks/ })).toBeNull();
-    for (const text of [/Q5/, /2 years/, /withdraw/]) expect(screen.getAllByText(text).length).toBeGreaterThan(0);
+    for (const text of [/Q5/, /withdraw/]) expect(screen.getAllByText(text).length).toBeGreaterThan(0);
+    expect(screen.getByRole('link', { name: 'Read the full privacy policy' })).toHaveAttribute('href', '/privacy');
   });
 
   it('agree sends the current version and shows the participant code', async () => {

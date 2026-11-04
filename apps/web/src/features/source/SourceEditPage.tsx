@@ -1,3 +1,4 @@
+import { plainTeacherText } from '@/lib/prompt-name';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
@@ -62,7 +63,7 @@ export function SourceEditPage() {
                   {impact.map((row) => (
                     <TableRow key={row.slot}>
                       <TableCell className="b">{row.slot}</TableCell>
-                      <TableCell>{row.usesClaim ? t('teacher.t10.yes', { refs: row.refs.join(', ') }) : t('teacher.t10.no')}</TableCell>
+                      <TableCell>{row.usesClaim ? t('teacher.t10.yes', { refs: plainTeacherText(row.refs.join(', '), t, true) }) : t('teacher.t10.no')}</TableCell>
                       <TableCell>{row.usesClaim ? <StatusTag kind="stale">{t('teacher.t10.regenerate')}</StatusTag> : <StatusTag kind="pass">{t('teacher.t10.keeps')}</StatusTag>}</TableCell>
                     </TableRow>
                   ))}

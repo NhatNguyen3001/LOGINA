@@ -86,7 +86,7 @@
       "purposeForTeacher": "Sufficient evidence",
       "whenShownForTeacher": "When a student picks A1 with a card that supports only one part",
       "sourceAnchor": "Table 8.1",
-      "message": "Statement A1 has two parts. Does the card you chose provide evidence for both?"
+      "message": "Statement A has two parts. Does the card you chose provide evidence for both?"
     },
     {
       "challengeId": "TN3",

@@ -1,6 +1,8 @@
 # Chính sách quyền riêng tư của LOGINA
 
-**Phiên bản:** 0.3 (bản nháp, luật sư chưa rà soát) · **Cập nhật:** 31/10/2026 · **Liên hệ:** logina.edu@gmail.com
+**Phiên bản:** 0.4 (bản nháp, luật sư chưa rà soát)
+**Cập nhật:** 04/11/2026
+**Liên hệ:** logina.edu@gmail.com
 
 ## 1. Chúng tôi là ai
 LOGINA giúp giáo viên biến học liệu của mình thành các nhiệm vụ suy luận. Nhóm LOGINA vận hành dịch vụ. Mọi câu hỏi xin gửi về **logina.edu@gmail.com**.
@@ -69,11 +71,18 @@ Dữ liệu được mã hóa khi truyền và khi lưu, và mỗi vai trò ch�
 ## 12. Thay đổi
 Khi chính sách thay đổi, chúng tôi cập nhật phiên bản và ngày ở đầu trang và thông báo trong ứng dụng.
 
+## 13. Nghiên cứu
+- **Dữ liệu đi đâu.** Dữ liệu được chép vào một Google Sheet mà nhóm có thể đọc, và có thể được dùng trong một bài báo nghiên cứu. Kết quả chỉ mô tả nhóm, không nói về một cá nhân nào. Dữ liệu không cho biết vì sao một người đổi ý và không chứng minh ai học tốt hơn.
+- **Giữ trong bao lâu.** Dữ liệu được giữ đến khi bài báo được công bố, và không quá 2 năm kể từ lúc thu thập. Sau đó chúng tôi xóa.
+- **Ai thực hiện.** Nhóm LOGINA thực hiện nghiên cứu này. Liên hệ: logina.edu@gmail.com.
+
 ---
 
 # LOGINA Privacy Policy
 
-**Version:** 0.3 (draft, not yet reviewed by a lawyer) · **Updated:** 31 October 2026 · **Contact:** logina.edu@gmail.com
+**Version:** 0.4 (draft, not yet reviewed by a lawyer)
+**Updated:** 4 November 2026
+**Contact:** logina.edu@gmail.com
 
 ## 1. Who we are
 LOGINA helps teachers turn their own material into reasoning tasks. The LOGINA team runs it. Questions: **logina.edu@gmail.com**.
@@ -141,3 +150,8 @@ Data is encrypted in transit and at rest, and each role receives only what it ne
 
 ## 12. Changes
 When this policy changes, we update the version and date at the top and announce it in the app.
+
+## 13. The research study
+- **Where the data goes.** The data is copied to a Google Sheet the team can read, and may be used in a research paper. Results describe groups only, never one person. The data doesn't show why anyone changed their mind, and doesn't prove anyone learned more.
+- **How long it is kept.** The data is kept until the paper is published, and for no more than 2 years from collection. Then we delete it.
+- **Who runs it.** The LOGINA team runs this study. Contact: logina.edu@gmail.com.
