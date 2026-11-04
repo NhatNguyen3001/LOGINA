@@ -1,51 +1,22 @@
-import type { KeyboardEvent, PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Slider } from '@/components/ui/slider';
 
 export const DEFAULT_CONFIDENCE = 50;
+
+const STEP = 10;
+const TICKS = Array.from({ length: 100 / STEP + 1 }, (_, index) => index * STEP);
+/** Half the thumb's width. Radix keeps the thumb inside the bar, so each mark is shifted the same way to sit under it. */
+const HALF_THUMB = 10;
+
+const tickLeft = (value: number) => `calc(${value}% + ${HALF_THUMB * (1 - value / 50)}px)`;
 
 interface ConfidenceSliderProps {
   value: number;
   onChange: (value: number) => void;
 }
 
-const clamp = (value: number) => Math.min(100, Math.max(0, value));
-
-const KEY_STEPS: Record<string, (value: number) => number> = {
-  ArrowRight: (v) => v + 1,
-  ArrowUp: (v) => v + 1,
-  ArrowLeft: (v) => v - 1,
-  ArrowDown: (v) => v - 1,
-  PageUp: (v) => v + 10,
-  PageDown: (v) => v - 10,
-  Home: () => 0,
-  End: () => 100,
-};
-
 export function ConfidenceSlider({ value, onChange }: ConfidenceSliderProps) {
   const { t } = useTranslation();
-
-  const onKeyDown = (event: KeyboardEvent) => {
-    const step = KEY_STEPS[event.key];
-    if (!step) return;
-    event.preventDefault();
-    onChange(clamp(step(value)));
-  };
-
-  const fromPointer = (event: PointerEvent<HTMLDivElement>) => {
-    const { left, width } = event.currentTarget.getBoundingClientRect();
-    onChange(clamp(Math.round(((event.clientX - left) / width) * 100)));
-  };
-
-  /** Capture keeps the drag alive when the pointer leaves the bar. */
-  const startDrag = (event: PointerEvent<HTMLDivElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
-    fromPointer(event);
-  };
-
-  const drag = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) fromPointer(event);
-  };
-
   return (
     <div className="stack">
       <div className="row">
@@ -53,24 +24,16 @@ export function ConfidenceSlider({ value, onChange }: ConfidenceSliderProps) {
         <span className="sp" />
         <span className="b num">{value}</span>
       </div>
-      <div
-        role="slider"
-        tabIndex={0}
-        aria-label={t('student.confidence.label')}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={value}
-        className="slider"
-        onKeyDown={onKeyDown}
-        onPointerDown={startDrag}
-        onPointerMove={drag}
-      >
-        <span className="fill" style={{ width: `${value}%` }} />
-        <span className="knob" style={{ left: `${value}%` }} />
+      <Slider value={[value]} min={0} max={100} step={STEP} thumbLabel={t('student.confidence.label')} onValueChange={([next]) => onChange(next ?? value)} />
+      <div className="conf-scale" aria-hidden="true">
+        {TICKS.map((tick) => (
+          <span key={tick} className={`conf-tick ${tick === value ? 'on' : ''}`} style={{ left: tickLeft(tick) }}>
+            <span className="n">{tick}</span>
+          </span>
+        ))}
       </div>
-      <div className="ticks">
+      <div className="conf-ends">
         <span>{t('student.confidence.low')}</span>
-        <span>50</span>
         <span>{t('student.confidence.high')}</span>
       </div>
     </div>

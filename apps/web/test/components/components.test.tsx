@@ -74,15 +74,15 @@ describe('StatusTag as a Badge', () => {
 });
 
 describe('ConfidenceSlider', () => {
-  it('F-S2 starts at 50 and supports keyboard steps', async () => {
+  it('F-S2 starts at 50 and supports keyboard steps of ten', async () => {
     const onChange = vi.fn();
     await renderWithI18n(<Controlled onChange={onChange} />);
     const slider = screen.getByRole('slider');
     expect(slider).toHaveAttribute('aria-valuenow', '50');
     fireEvent.keyDown(slider, { key: 'ArrowRight' });
-    expect(onChange).toHaveBeenLastCalledWith(51);
-    fireEvent.keyDown(slider, { key: 'PageUp' });
-    expect(onChange).toHaveBeenLastCalledWith(61);
+    expect(onChange).toHaveBeenLastCalledWith(60);
+    fireEvent.keyDown(slider, { key: 'ArrowLeft' });
+    expect(onChange).toHaveBeenLastCalledWith(50);
     fireEvent.keyDown(slider, { key: 'End' });
     expect(onChange).toHaveBeenLastCalledWith(100);
     fireEvent.keyDown(slider, { key: 'Home' });
@@ -99,7 +99,8 @@ describe('ConfidenceSlider', () => {
     const onChange = vi.fn();
     await renderWithI18n(<ConfidenceSlider value={100} onChange={onChange} />);
     fireEvent.keyDown(screen.getByRole('slider'), { key: 'PageUp' });
-    expect(onChange).toHaveBeenLastCalledWith(100);
+    fireEvent.keyDown(screen.getByRole('slider'), { key: 'ArrowRight' });
+    expect(onChange.mock.calls.every(([next]) => next <= 100)).toBe(true);
   });
 });
 
