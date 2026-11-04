@@ -70,7 +70,37 @@ describe('Q1 flow', () => {
     choose('First statement');
     expect(next).toBeDisabled();
     choose('Card one');
-    expect(next).toBeEnabled();
+    await waitFor(() => expect(next).toBeEnabled(), { timeout: 2000 });
+  });
+
+  it('Continue waits until the answer is saved', async () => {
+    let finish: (value: { ok: true }) => void = () => {};
+    vi.mocked(api.saveDraft).mockImplementation(() => new Promise((resolve) => { finish = resolve; }));
+    vi.mocked(api.getStudentTask).mockResolvedValue(q1({ draftArtifact: { slot: 'Q1', answerId: 'a1' } }));
+    await render(<TaskRunner />);
+    const next = await screen.findByRole('button', { name: 'Continue →' });
+    choose('Card one');
+    expect(next).toBeDisabled();
+    expect(screen.getByText('Saving…')).toBeInTheDocument();
+    await waitFor(() => expect(api.saveDraft).toHaveBeenCalled(), { timeout: 2000 });
+    expect(next).toBeDisabled();
+    finish({ ok: true });
+    await waitFor(() => expect(next).toBeEnabled());
+    expect(screen.getByText('Saved')).toBeInTheDocument();
+    vi.mocked(api.saveDraft).mockImplementation(async () => ({ ok: true }));
+  });
+
+  it('a failed save keeps Continue off and offers Try again', async () => {
+    vi.mocked(api.saveDraft).mockRejectedValueOnce(new api.ApiError(409, 'ALREADY_LOCKED'));
+    vi.mocked(api.getStudentTask).mockResolvedValue(q1({ draftArtifact: { slot: 'Q1', answerId: 'a1' } }));
+    await render(<TaskRunner />);
+    const next = await screen.findByRole('button', { name: 'Continue →' });
+    choose('Card one');
+    expect(await screen.findByText("Couldn't save your answer.", {}, { timeout: 2000 })).toBeInTheDocument();
+    expect(next).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    await waitFor(() => expect(next).toBeEnabled());
+    expect(api.saveDraft).toHaveBeenCalledTimes(2);
   });
 
   it('a disabled Continue says what is still missing', async () => {
@@ -113,7 +143,7 @@ describe('Q1 flow', () => {
     expect(await screen.findByText('Saved', {}, { timeout: 2000 })).toBeInTheDocument();
     vi.mocked(api.saveDraft).mockRejectedValueOnce(new api.ApiError(409, 'ALREADY_LOCKED'));
     choose('Second statement');
-    expect(await screen.findByText(/^Not saved yet/, {}, { timeout: 2000 })).toBeInTheDocument();
+    expect(await screen.findByText("Couldn't save your answer.", {}, { timeout: 2000 })).toBeInTheDocument();
   });
 
   it('a refused draft is not sent again', async () => {
@@ -122,7 +152,7 @@ describe('Q1 flow', () => {
     await render(<TaskRunner />);
     await screen.findByRole('button', { name: 'Continue →' });
     choose('First statement');
-    await screen.findByText(/^Not saved yet/, {}, { timeout: 2000 });
+    await screen.findByText("Couldn't save your answer.", {}, { timeout: 2000 });
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(api.saveDraft).toHaveBeenCalledTimes(1);
     vi.mocked(api.saveDraft).mockResolvedValue({ ok: true });
@@ -444,7 +474,9 @@ describe('answer trace', () => {
     choose('First statement');
     choose('Second statement');
     fireEvent.click(screen.getAllByRole('radio')[2]!);
-    fireEvent.click(screen.getByRole('button', { name: 'Continue →' }));
+    const next = screen.getByRole('button', { name: 'Continue →' });
+    await waitFor(() => expect(next).toBeEnabled(), { timeout: 2000 });
+    fireEvent.click(next);
     fireEvent.click(screen.getByRole('button', { name: 'Lock in answer' }));
     await waitFor(() => expect(api.lockTask).toHaveBeenCalled());
     const sent = vi.mocked(api.lockTask).mock.calls[0]![2];

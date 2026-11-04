@@ -113,7 +113,7 @@ function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: s
   const [confidence, setConfidence] = useState(DEFAULT_CONFIDENCE);
   const lockKey = useRef(newKey());
   const lockSent = useRef(false);
-  const saveState = useAutosave(draft, (draftArtifact) => saveDraft(attemptId, task.slot, { draftArtifact }));
+  const autosave = useAutosave(draft, (draftArtifact) => saveDraft(attemptId, task.slot, { draftArtifact }));
 
   const lock = useMutation({
     mutationFn: () => lockTask(attemptId, task.slot, { artifact: draft as Artifact, initialConfidence: confidence, secondsOnTask: trace.seconds(), answerChanges: trace.changes() }, lockKey.current),
@@ -142,7 +142,7 @@ function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: s
 
   const complete = isComplete(task, draft);
   const missing = missingKey(task, draft);
-  const saveStatus = <SaveStatus state={saveState} />;
+  const saveStatus = <SaveStatus save={autosave} />;
 
   if (locking) {
     return (
@@ -165,7 +165,7 @@ function Answering({ attemptId, task, trace, onLocked, onPhase }: { attemptId: s
       <h1 className="stem" tabIndex={-1}>{task.stem}</h1>
       <ArtifactEditor task={task} value={draft} onChange={change} />
       <TaskActions note={<>{missing ? <span className="s13 sec">{t(missing)}</span> : null}{saveStatus}</>}>
-        <button type="button" className={buttonVariants()} disabled={!complete} onClick={() => setLocking(true)}>{t('student.continue')}</button>
+        <button type="button" className={buttonVariants()} disabled={!complete || !autosave.done} aria-busy={complete && autosave.state === 'saving'} onClick={() => setLocking(true)}>{t('student.continue')}</button>
       </TaskActions>
     </>
   );

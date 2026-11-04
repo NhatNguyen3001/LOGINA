@@ -680,7 +680,7 @@
     },
     "save": {
       "saving": "Đang lưu…",
-      "failed": "Chưa lưu được. Lựa chọn của em vẫn còn trên trang này, và khi Chốt sẽ được lưu."
+      "failed": "Chưa lưu được câu trả lời."
     },
     "need": {
       "statement": "Chọn một nhận định để tiếp tục.",

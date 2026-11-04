@@ -562,3 +562,9 @@ a.task:hover{background:var(--subtle)}
 .word-card.dragging,.blank.dragging{position:relative;z-index:20;cursor:grabbing;box-shadow:var(--shadow);opacity:.9}
 .card-bank.over{border-color:var(--accent);background:var(--accent-bg)}
 .blank-zone.over .blank{border-style:solid;border-color:var(--accent);background:var(--accent-bg)}
+.save-status{display:inline-flex;align-items:center;gap:10px;min-height:24px}
+.save-pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ink-3)}
+.save-pill:empty{display:none}
+.save-pill.saved{color:var(--green)}
+.save-pill.failed{color:var(--red)}
+.save-pill .ico{width:16px;height:16px;flex:none}
