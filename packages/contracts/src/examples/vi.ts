@@ -37,7 +37,7 @@ const TN2 = {
   label: 'TN2',
   purpose: 'Đủ căn cứ',
   whenShown: 'Khi học sinh chọn A1 với thẻ chỉ hỗ trợ một vế',
-  message: 'Câu A1 có hai vế. Thẻ em chọn đã làm căn cứ cho cả hai vế chưa?',
+  message: 'Câu A có hai vế. Thẻ em chọn đã làm căn cứ cho cả hai vế chưa?',
 };
 const TN3 = {
   label: 'TN3',

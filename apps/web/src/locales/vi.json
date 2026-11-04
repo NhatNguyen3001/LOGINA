@@ -19,7 +19,7 @@
       "material": "1. Học liệu",
       "chooseFile": "Chọn tệp",
       "useSample": "Dùng học liệu mẫu (điền sẵn)",
-      "fileHint": "PDF hoặc Word · tối đa 20 MB",
+      "fileHint": "PDF hoặc Word, tối đa 20 MB",
       "sampleChosen": "Đã chọn học liệu mẫu. Mọi bước đã được điền sẵn câu trả lời mẫu, bạn chỉ cần xem lại và tiếp tục.",
       "sourceTitle": "Tên nguồn",
       "required": "(bắt buộc)",
@@ -38,6 +38,10 @@
       "noMaterial": "Cô hãy chọn tệp hoặc dùng học liệu mẫu."
     },
     "t02": {
+      "finished": "Đã phân tích xong",
+      "finishedLede": "LOGINA đã đọc và đối chiếu nguồn. Cô xem lại kết quả rồi tiếp tục.",
+      "toClarify": "Tiếp tục: Làm rõ học liệu →",
+      "toSource": "Tiếp tục: Duyệt nguồn →",
       "liveTiming": "Học liệu mới có thể mất vài phút để đọc. Cô có thể rời trang và quay lại sau.",
       "language": {
         "question": "Tệp của cô có vẻ là {{detected}}. Dùng {{detected}} cho bài này?",
@@ -116,11 +120,11 @@
       "opensNewTab": "mở trong thẻ mới"
     },
     "taskType": {
-      "Q1": "Q1 · Nhận định + căn cứ",
-      "Q2": "Q2 · Xếp thẻ",
-      "Q3": "Q3 · Đánh đổi",
-      "Q4": "Q4 · Phản biện",
-      "Q5": "Q5 · Hoàn thành câu"
+      "Q1": "Nhận định + căn cứ",
+      "Q2": "Xếp thẻ",
+      "Q3": "Đánh đổi",
+      "Q4": "Phản biện",
+      "Q5": "Hoàn thành câu"
     },
     "t03": {
       "crumb": "Làm rõ học liệu",
@@ -182,9 +186,14 @@
       "TRANSLATION": "Bản dịch"
     },
     "sourceRef": {
-      "para": "tr. {{page}}, đoạn {{n}}",
-      "table": "tr. {{page}}, bảng {{n}}",
-      "figure": "tr. {{page}}, hình {{n}}"
+      "label": "Nguồn",
+      "page": "Trang {{n}}",
+      "pages": "Trang {{n}}",
+      "paragraph": "đoạn {{n}}",
+      "paragraphs": "đoạn {{n}}",
+      "para": "Trang {{page}}, đoạn {{n}}",
+      "table": "Trang {{page}}, bảng {{n}}",
+      "figure": "Trang {{page}}, hình {{n}}"
     },
     "gate": {
       "PASS": "Đạt",
@@ -232,33 +241,36 @@
       "regenerate": "Tạo lại {{slot}} theo lựa chọn này"
     },
     "t07": {
-      "gates": "KIỂM TRA CHẤT LƯỢNG",
-      "structure": "KIỂM TRA CẤU TRÚC",
-      "checks": "Kiểm tra {{slot}}",
-      "viewAll": "Xem tất cả câu Thử nghĩ thêm",
-      "readOnly": "Nhiệm vụ này chỉ xem ở đây.",
       "tryCase": "Thử một trường hợp",
       "tryHint": "Chọn như một học sinh để xem câu Thử nghĩ thêm sẽ hiện",
-      "statement": "NHẬN ĐỊNH",
-      "card": "THẺ CĂN CỨ",
+      "statement": "Nhận định",
+      "card": "Thẻ căn cứ",
       "tryRun": "Xem câu gợi ý",
       "willGet": "Học sinh sẽ nhận:",
       "tryNote": "Chỉ hiển thị câu học sinh nhận được, không hiển thị quy tắc chọn.",
-      "quickEdit": "Sửa nhanh {{option}}",
+      "quickEdit": "Sửa nhanh nhận định {{option}}",
       "saveRecheck": "Lưu và kiểm tra lại",
       "statements": "{{count}} nhận định",
       "cards": "{{count}} thẻ căn cứ",
       "version": "Bản nháp v{{version}}",
-      "question": "CÂU HỎI",
+      "question": "Câu hỏi",
       "thinkAgain": "Thử nghĩ thêm",
-      "oneEach": "Mỗi lượt làm, học sinh nhận đúng 1 câu.",
+      "oneEach": "Mỗi học sinh nhận một câu trong số này sau khi chốt câu trả lời.",
       "supportedReason": "Nguồn ủng hộ lí do này",
-      "editPrompt": "Sửa {{label}}"
+      "editPrompt": "Sửa {{label}}",
+      "checksTitle": "Kiểm tra",
+      "allPassed": "Đạt tất cả mục kiểm tra",
+      "needReview_one": "{{count}} mục cần cô xem",
+      "needReview": "{{count}} mục cần cô xem",
+      "showAll": "Xem tất cả mục kiểm tra",
+      "hideAll": "Ẩn các mục kiểm tra",
+      "tryStatement": "Nhận định {{letter}}",
+      "tryCard": "Thẻ {{letter}}"
     },
     "t08": {
       "title": "Kiểm tra logic Q1",
       "back": "← Matching Preview",
-      "advanced": "Nâng cao · không bắt buộc",
+      "advanced": "Nâng cao, không bắt buộc",
       "tab": {
         "pairs": "Đánh giá 16 cặp",
         "prompts": "Thử nghĩ thêm (4 + dự phòng)",
@@ -274,13 +286,13 @@
     },
     "t10": {
       "title": "Sửa nguồn",
-      "tag": "Duyệt 1 lại · nguồn v{{version}}",
+      "tag": "Duyệt 1 lại, nguồn v{{version}}",
       "lede": "Sửa ở đây sẽ tạo phiên bản nguồn mới. Phiên bản trước và bài đã giao giữ nguyên.",
       "claim": "Khẳng định đang sửa",
       "impact": "Ảnh hưởng của thay đổi",
       "uses": "Dùng khẳng định này?",
       "after": "Sau khi duyệt",
-      "yes": "Có · {{refs}}",
+      "yes": "Có, {{refs}}",
       "no": "Không",
       "regenerate": "Soạn lại, kiểm tra lại, Duyệt 2 lại",
       "keeps": "Giữ nguyên",
@@ -327,7 +339,7 @@
       "noBlockers": "Không có điểm chặn",
       "warningsDecided": "Cảnh báo đã có quyết định",
       "confirm": "Cô đã xem {{slot}} đúng như học sinh sẽ nhận.",
-      "assignCount": "Giao bài · {{count}}/5",
+      "assignCount": "Giao bài ({{count}}/5)",
       "change": {
         "PREVIEW_CHANGED": "Nhiệm vụ này đã thay đổi từ lần cô xem trước."
       },
@@ -374,7 +386,7 @@
       "attempts": "LƯỢT LÀM",
       "counts": "{{started}} người đã bắt đầu, {{finished}} người đã xong",
       "afterThink": "SAU THỬ NGHĨ THÊM",
-      "keepRevise": "Giữ {{keep}} · Sửa {{revise}} trong {{total}} bài đã nộp",
+      "keepRevise": "Giữ {{keep}}, Sửa {{revise}} trong {{total}} bài đã nộp",
       "byTask": "Theo nhiệm vụ",
       "submitted": "Đã nộp",
       "keepOrRevise": "Giữ / Sửa",
@@ -440,7 +452,11 @@
       "recheck": "Kiểm tra lại phần đã đổi"
     },
     "promptN": "Gợi ý {{n}}",
-    "promptFallback": "Gợi ý chung"
+    "promptFallback": "Gợi ý chung",
+    "optionRef": {
+      "statement": "nhận định {{letter}}",
+      "card": "thẻ {{letter}}"
+    }
   },
   "errors": {
     "FILE_TYPE": "LOGINA đọc được tệp PDF hoặc Word.",
@@ -558,8 +574,8 @@
   "student": {
     "original": "Câu trả lời ban đầu",
     "confidence": {
-      "low": "0 · Chưa chắc",
-      "high": "Rất chắc · 100",
+      "low": "0 (chưa chắc)",
+      "high": "Rất chắc (100)",
       "label": "Em chắc đến mức nào?"
     },
     "progress": {
@@ -590,7 +606,7 @@
       "empty": "Chưa có bộ bài nào được giao.",
       "runsTitle": "Các lần làm đã lưu",
       "runsEmpty": "Các lần em làm xong sẽ hiện ở đây.",
-      "runLine": "Lần {{run}} · {{date}}",
+      "runLine": "Lần {{run}}, {{date}}",
       "viewRun": "Xem kết quả",
       "open": "Mở",
       "from": "Từ {{name}}",
@@ -659,7 +675,6 @@
     "result": {
       "title": "Em đã hoàn thành cả 5 nhiệm vụ",
       "newRun": "Làm một lần mới",
-      "summary": "Sau câu Thử nghĩ thêm, em giữ {{kept}} và sửa {{revised}}.",
       "task": "Nhiệm vụ",
       "after": "Sau Thử nghĩ thêm",
       "change": "Thay đổi",
@@ -744,17 +759,10 @@
     "record": "Chúng tôi ghi lại lựa chọn của em trước và sau gợi ý, mức tự tin, lúc bắt đầu, mỗi lần đổi câu trả lời, lúc chốt và lúc nộp, và câu trả lời em viết ở Q5.",
     "namesTitle": "Không ghi tên",
     "names": "Chúng tôi không hỏi tên hay email của em. Em đừng gõ thông tin cá nhân vào câu trả lời viết.",
-    "dataTitle": "Dữ liệu đi đâu",
-    "data": "Dữ liệu được chép vào một Google Sheet mà nhóm có thể đọc, và có thể được dùng trong một bài báo nghiên cứu. Kết quả chỉ mô tả nhóm, không nói về một cá nhân nào.",
-    "limit": "Dữ liệu không cho biết vì sao một người đổi ý và không chứng minh ai học tốt hơn.",
-    "whoTitle": "Ai thực hiện",
-    "who": "Nhóm LOGINA thực hiện nghiên cứu này. Liên hệ: logina.edu@gmail.com.",
-    "keptTitle": "Giữ trong bao lâu",
-    "kept": "Dữ liệu được giữ đến khi bài báo được công bố, và không quá 2 năm kể từ lúc thu thập. Sau đó chúng tôi xóa.",
     "choiceTitle": "Tùy em",
     "choice": "Em tham gia hay không là tùy em. Các nhiệm vụ vẫn chạy như nhau.",
     "withdraw": "Muốn rút lại, em gửi mã người tham gia tới logina.edu@gmail.com. Chúng tôi sẽ xóa các dòng của em.",
-    "privacyLink": "Đọc chính sách quyền riêng tư đầy đủ →",
+    "privacyLink": "Đọc chính sách quyền riêng tư đầy đủ",
     "agree": "Em đồng ý",
     "version": "Phiên bản {{version}}",
     "thanks": "Cảm ơn em đã tham gia",

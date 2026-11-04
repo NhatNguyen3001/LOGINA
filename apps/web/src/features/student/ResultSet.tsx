@@ -40,7 +40,6 @@ export function ResultSet() {
     },
   });
   const rows = feedback.data ?? [];
-  const revised = rows.filter(changed).length;
   const lesson = useLessonTitle(id);
   const submitted = rows.map((row) => row.slot);
 
@@ -50,16 +49,15 @@ export function ResultSet() {
       {feedback.isError ? <Note kind="info">{t(errorText(feedback.error))}</Note> : null}
       {feedback.data ? (
         <>
-          <p className="s15 sec">{t('student.result.summary', { kept: rows.length - revised, revised })}</p>
           <div className={cardVariants({ tone: 'flush' })}>
-            <Table>
+            <Table className="results-table">
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('student.result.task')}</TableHead>
                     <TableHead>{t('student.result.after')}</TableHead>
-                    <TableHead>{t('student.result.change')}</TableHead>
+                    <TableHead className="max-sm:hidden">{t('student.result.change')}</TableHead>
                     <TableHead>{t('student.result.confidence')}</TableHead>
-                    <TableHead />
+                    <TableHead><span className="sr-only">{t('student.result.details')}</span></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -67,9 +65,9 @@ export function ResultSet() {
                     <TableRow key={row.slot}>
                       <TableCell className="b">{row.slot}</TableCell>
                       <TableCell><Badge kind="neutral">{t(changed(row) ? 'student.result.revise' : 'student.result.keep')}</Badge></TableCell>
-                      <TableCell className="s13">{t(changed(row) ? 'student.result.changed' : 'student.result.noChange')}</TableCell>
+                      <TableCell className="max-sm:hidden">{t(changed(row) ? 'student.result.changed' : 'student.result.noChange')}</TableCell>
                       <TableCell className="num">{`${row.confidenceBefore} → ${row.confidenceAfter}`}</TableCell>
-                      <TableCell className="whitespace-nowrap">
+                      <TableCell className="whitespace-nowrap text-right">
                         <Link to="/s/attempts/$id/results/$slot" params={{ id, slot: row.slot }} className="lnk">{t('student.result.details')}</Link>
                       </TableCell>
                     </TableRow>

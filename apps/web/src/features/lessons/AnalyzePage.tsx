@@ -72,18 +72,24 @@ export function AnalyzePage() {
   const queryClient = useQueryClient();
 
   const lesson = useQuery({ queryKey: qk.lesson(id), queryFn: () => getLesson(id) });
-  const job = useJobPolling(lesson.data?.activeJobId);
-  const status = job.data?.status;
-  const seconds = useSecondsSince(job.data?.startedAt);
-
+  /** The job stays on screen after it ends, even once the lesson no longer points at it. */
+  const [jobId, setJobId] = useState<string | undefined>();
+  const activeJobId = lesson.data?.activeJobId;
   useEffect(() => {
-    if (status !== 'DONE') return;
-    void (async () => {
-      const review = await getSourceReview(id);
-      await queryClient.invalidateQueries({ queryKey: qk.lesson(id) });
-      await navigate({ to: review.issues.length > 0 ? '/t/lessons/$id/clarify' : '/t/lessons/$id/source', params: { id } });
-    })();
-  }, [id, navigate, queryClient, status]);
+    if (activeJobId) setJobId(activeJobId);
+  }, [activeJobId]);
+  const job = useJobPolling(activeJobId ?? jobId);
+  const status = job.data?.status;
+  const finished = status === 'DONE';
+  const seconds = useSecondsSince(finished ? undefined : job.data?.startedAt);
+
+  /** The teacher reads the result first, then moves on when ready. */
+  const review = useQuery({ queryKey: qk.sourceReview(id), queryFn: () => getSourceReview(id), enabled: finished });
+  const nextStep = review.data ? (review.data.issues.length > 0 ? 'clarify' : 'source') : null;
+  const goOn = async () => {
+    await queryClient.invalidateQueries({ queryKey: qk.lesson(id) });
+    await navigate({ to: nextStep === 'clarify' ? '/t/lessons/$id/clarify' : '/t/lessons/$id/source', params: { id } });
+  };
 
   const stop = useMutation({
     mutationFn: () => cancelJob(job.data!.id, newKey()),
@@ -100,8 +106,8 @@ export function AnalyzePage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.lesson(id) }),
   });
 
-  if (lesson.data?.stage === 'CREATE' && !lesson.data.activeJobId) return <RestartAnalysis lessonId={id} />;
-  if (lesson.data && !lesson.data.activeJobId) return <Navigate to={stagePath(lesson.data)} replace />;
+  if (lesson.data?.stage === 'CREATE' && !lesson.data.activeJobId && !jobId) return <RestartAnalysis lessonId={id} />;
+  if (lesson.data && !lesson.data.activeJobId && !jobId) return <Navigate to={stagePath(lesson.data)} replace />;
 
   const steps = job.data?.steps ?? [];
   const done = steps.filter((s) => s.status === 'DONE').length;
@@ -118,8 +124,8 @@ export function AnalyzePage() {
       </nav>
       <Stepper current={1} />
       <div className="stack">
-        <h1 className="h1">{t('teacher.t02.title')}</h1>
-        <p className="lede">{t('teacher.t02.lede')}</p>
+        <h1 className="h1">{t(finished ? 'teacher.t02.finished' : 'teacher.t02.title')}</h1>
+        <p className="lede">{t(finished ? 'teacher.t02.finishedLede' : 'teacher.t02.lede')}</p>
       </div>
       {question ? (
         <div className={cardVariants({ edge: 'accent' })}>
@@ -162,14 +168,20 @@ export function AnalyzePage() {
             </div>
           ))}
         </div>
-        <div className="row">
+        {finished ? null : <div className="row">
           <span className="s13 sec grow">
             {t('teacher.t02.timing')}
             {seconds === null ? null : <span className="block num">{t('teacher.t06.elapsed', { minutes: Math.floor(seconds / 60), seconds: seconds % 60 })}</span>}
           </span>
           <button type="button" className={buttonVariants({ variant: 'secondary' })} aria-busy={stop.isPending} disabled={stop.isPending} onClick={() => stop.mutate()}>{t('teacher.t02.stop')}</button>
-        </div>
+        </div>}
       </div> : null}
+      {finished ? (
+        <div className="row">
+          <span className="sp" />
+          <button type="button" className={buttonVariants()} aria-busy={!nextStep} disabled={!nextStep} onClick={() => void goOn()}>{t(nextStep === 'source' ? 'teacher.t02.toSource' : 'teacher.t02.toClarify')}</button>
+        </div>
+      ) : null}
     </>
   );
 }

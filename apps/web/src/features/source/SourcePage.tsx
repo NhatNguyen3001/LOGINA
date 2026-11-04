@@ -1,3 +1,4 @@
+import { readableSourceRefs } from '@/lib/source-refs';
 import type { SourceReviewDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
@@ -77,7 +78,7 @@ export function SourcePage() {
                     <TableRow key={claim.id}>
                       <TableCell className="m">{claim.wording}</TableCell>
                       <TableCell className="sec">{claim.evidenceSnippet}</TableCell>
-                      <TableCell className="src">{claim.locator}</TableCell>
+                      <TableCell className="src">{readableSourceRefs([claim.locator], t)}</TableCell>
                       <TableCell><StatusTag kind={STATUS_KIND[claim.status]}>{t(`teacher.t05.claimStatus.${claim.status}`)}</StatusTag></TableCell>
                     </TableRow>
                   ))}

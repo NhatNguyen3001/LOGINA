@@ -1,3 +1,4 @@
+import { plainTeacherText } from '@/lib/prompt-name';
 import type { Slot, TaskApprovalDTO } from '@logina/contracts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -71,7 +72,7 @@ export function TranslationReview({ lessonId, task }: { lessonId: string; task: 
         </div>
       ) : null}
       {blockers.map((finding) => (
-        <Note key={finding.findingCode} kind="err">{finding.explanationForTeacher}</Note>
+        <Note key={finding.findingCode} kind="err">{plainTeacherText(finding.explanationForTeacher, t)}</Note>
       ))}
       {translation?.texts.length ? (
         <div className="pair-scroll" role="region" tabIndex={0} aria-label={t('teacher.t12.translation.linesRegion', { slot: task.slot })}>

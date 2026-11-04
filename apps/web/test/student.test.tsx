@@ -554,6 +554,15 @@ describe('results', () => {
     expect(screen.getByText(/does not grade you/)).toBeInTheDocument();
   });
 
+  it('the results table has no count line, centres each row and puts View details at the end', async () => {
+    vi.mocked(api.getFeedback).mockResolvedValue([row('Q1', true), row('Q2', false)] as never);
+    await render(<ResultSet />);
+    await screen.findByText('Keep');
+    expect(screen.queryByText(/you kept/)).toBeNull();
+    expect(document.querySelector('table')).toHaveClass('results-table');
+    expect(screen.getAllByRole('link', { name: 'View details' })[0]!.closest('td')).toHaveClass('text-right');
+  });
+
   it('S8 shows no code line after declining', async () => {
     vi.mocked(api.getFeedback).mockResolvedValue([row('Q1', false)] as never);
     await render(<ResultSet />);

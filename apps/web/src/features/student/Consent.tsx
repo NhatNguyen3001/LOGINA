@@ -1,6 +1,6 @@
 import { CURRENT_CONSENT_VERSION } from '@logina/contracts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { EyeOff, FlaskConical, HandHeart, Sheet, type LucideIcon } from 'lucide-react';
+import { ArrowRight, EyeOff, FlaskConical, HandHeart, Sheet, type LucideIcon } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,24 +8,17 @@ import { StudentShell } from '@/components/logina/StudentShell';
 import { Note } from '@/components/logina/Note';
 import { newKey, sendConsent } from '@/lib/api';
 import { qk } from '@/lib/query';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { cardVariants } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { errorText } from '@/lib/errors';
 
-/** What a person needs in order to decide stays open. Everything else is one tap away. */
+/** What a person needs in order to decide stays open. Where the data goes, how long it is kept and who runs the study are in the privacy policy. */
 const POINTS: { icon: LucideIcon; title: string; lines: string[] }[] = [
   { icon: FlaskConical, title: 'aboutTitle', lines: ['about'] },
   { icon: Sheet, title: 'recordTitle', lines: ['record'] },
   { icon: EyeOff, title: 'namesTitle', lines: ['names'] },
   { icon: HandHeart, title: 'choiceTitle', lines: ['choice', 'withdraw'] },
-];
-
-const DETAILS: { title: string; lines: string[] }[] = [
-  { title: 'dataTitle', lines: ['data', 'limit'] },
-  { title: 'keptTitle', lines: ['kept'] },
-  { title: 'whoTitle', lines: ['who'] },
 ];
 
 export function Consent({ onDone }: { onDone: () => void }) {
@@ -75,17 +68,10 @@ export function Consent({ onDone }: { onDone: () => void }) {
               </div>
             ))}
           </div>
-          <Accordion type="multiple" className="acc-list notice-more">
-            {DETAILS.map(({ title, lines }) => (
-              <AccordionItem key={title} value={title}>
-                <AccordionTrigger heading="h2">{t(`consent.${title}`)}</AccordionTrigger>
-                <AccordionContent>
-                  {lines.map((line) => <p key={line}>{t(`consent.${line}`)}</p>)}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-          <Link to="/privacy" className="lnk">{t('consent.privacyLink')}</Link>
+          <Link to="/privacy" className="policy-link">
+            {t('consent.privacyLink')}
+            <ArrowRight className="ico" aria-hidden="true" />
+          </Link>
           {choose.isError ? <Note kind="err">{t(errorText(choose.error))}</Note> : null}
           <div className="row consent-choice">
             <span className="s13 muted num">{t('consent.version', { version: CURRENT_CONSENT_VERSION })}</span>

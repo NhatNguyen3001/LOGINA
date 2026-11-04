@@ -35,7 +35,7 @@ describe.each(LOCALES)('fixtures in %s', (locale) => {
   });
 
   it('no fixture text contains an em-dash', () => {
-    for (const name of FIXTURE_NAMES) expect(JSON.stringify(loadFixture(name, locale))).not.toContain('—');
+    for (const name of FIXTURE_NAMES) expect(JSON.stringify(loadFixture(name, locale))).not.toContain(String.fromCharCode(0x2014));
   });
 
   it('material.md paragraph locators match source.json', () => {

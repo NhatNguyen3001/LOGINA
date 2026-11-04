@@ -57,6 +57,26 @@ describe('policy pages', () => {
     vi.restoreAllMocks();
   });
 
+  it('the privacy policy holds the study details from the consent page, in both languages', async () => {
+    const { unmount } = await render('privacy');
+    fireEvent.click(screen.getByRole('button', { name: '13. The research study' }));
+    for (const text of ['Where the data goes.', 'How long it is kept.', 'Who runs it.', /no more than 2 years/, /never one person/]) expect(screen.getByText(text, { exact: false })).toBeVisible();
+    unmount();
+    await render('privacy', 'vi');
+    fireEvent.click(screen.getByRole('button', { name: '13. Nghiên cứu' }));
+    expect(screen.getByText(/không quá 2 năm/)).toBeVisible();
+  });
+
+  it.each(['privacy', 'terms', 'accessibility'] as const)('%s lists its version, date and contact on their own lines, with no dots', async (doc) => {
+    for (const lang of ['en', 'vi'] as const) {
+      const { container, unmount } = await render(doc, lang);
+      const meta = [...container.querySelectorAll('.policy-meta')];
+      expect(meta.length).toBeGreaterThanOrEqual(2);
+      expect(container.querySelector('main')!.textContent).not.toContain('·');
+      unmount();
+    }
+  });
+
   it('marks a draft policy as a draft', async () => {
     await render('privacy');
     expect(screen.getByText('Draft')).toBeInTheDocument();

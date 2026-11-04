@@ -1,6 +1,7 @@
 # Tuyên bố về khả năng tiếp cận của LOGINA
 
-**Cập nhật:** 31/10/2026 · **Liên hệ:** logina.edu@gmail.com
+**Cập nhật:** 31/10/2026
+**Liên hệ:** logina.edu@gmail.com
 
 LOGINA hướng tới chuẩn **WCAG 2.2 mức AA**, để mọi người đều dùng được, kể cả người dùng trình đọc màn hình, bàn phím hay màn hình nhỏ.
 
@@ -26,7 +27,8 @@ Nếu gặp khó khăn, xin gửi về **logina.edu@gmail.com**, kèm màn hình
 
 # LOGINA Accessibility Statement
 
-**Updated:** 31 October 2026 · **Contact:** logina.edu@gmail.com
+**Updated:** 31 October 2026
+**Contact:** logina.edu@gmail.com
 
 LOGINA aims to meet **WCAG 2.2 level AA**, so that everyone can use it, including people using screen readers, keyboards or small screens.
 

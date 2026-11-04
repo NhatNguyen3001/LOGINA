@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { BackLink } from '@/components/logina/BackLink';
-import { promptName } from '@/lib/prompt-name';
+import { asStudentSees, plainTeacherText, promptName } from '@/lib/prompt-name';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { getTrace } from '@/lib/api';
@@ -62,7 +62,7 @@ export function TracePage() {
         {slotChips.map((chip) =>
           chip.choice ? (
             <Link key={chip.slot} to="/t/attempts/$id/trace/$slot" params={{ id, slot: chip.slot }} className={`chip no-underline ${chip.slot === slot ? 'on' : ''}`} {...(chip.slot === slot ? { 'aria-current': 'page' as const } : {})}>
-              {`${chip.slot} · ${t(chip.choice === 'KEEP' ? 'student.result.keep' : 'student.result.revise')}`}
+              <span className="b">{chip.slot}</span> {t(chip.choice === 'KEEP' ? 'student.result.keep' : 'student.result.revise')}
             </Link>
           ) : (
             <span key={chip.slot} className="chip idle">{chip.slot}</span>
@@ -94,8 +94,8 @@ export function TracePage() {
             <span className="sp" />
             <Badge kind="info">{promptName(challenge.label, t)}</Badge>
           </div>
-          <p className="m">{challenge.message}</p>
-          <span className="s13 sec">{t('teacher.t15.why', { reason: challenge.whySelected })}</span>
+          <p className="m">{asStudentSees(challenge.message)}</p>
+          <span className="s13 sec">{t('teacher.t15.why', { reason: plainTeacherText(challenge.whySelected, t) })}</span>
           <div className="row">
             <span className="s13 muted grow">{t('teacher.t15.chose')}</span>
             <Badge kind="neutral">{t(challenge.studentChoice === 'KEEP' ? 'student.keep' : 'student.revise')}</Badge>

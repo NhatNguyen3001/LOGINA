@@ -54,7 +54,11 @@ function parse(markdown: string): Block[] {
       const last = blocks[blocks.length - 1];
       if (last?.kind === 'table') last.rows.push(cells(line));
       else blocks.push({ kind: 'table', rows: [cells(line)] });
-    } else blocks.push({ kind: blocks.length === 1 ? 'meta' : 'p', text: line });
+    } else {
+      /** The version, date and contact lines sit right under the title. */
+      const underTitle = blocks.every((block) => block.kind === 'h1' || block.kind === 'meta');
+      blocks.push({ kind: underTitle && blocks.length > 0 && line.startsWith('**') ? 'meta' : 'p', text: line });
+    }
   }
   return blocks;
 }

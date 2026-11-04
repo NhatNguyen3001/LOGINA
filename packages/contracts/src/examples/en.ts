@@ -33,7 +33,7 @@ const TN2 = {
   label: 'TN2',
   purpose: 'Enough evidence',
   whenShown: 'When a student picks A1 with a card that supports only one part',
-  message: 'Statement A1 has two parts. Does the card you chose provide evidence for both?',
+  message: 'Statement A has two parts. Does the card you chose provide evidence for both?',
 };
 const TN3 = {
   label: 'TN3',

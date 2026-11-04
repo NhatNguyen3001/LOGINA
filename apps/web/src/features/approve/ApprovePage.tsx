@@ -1,3 +1,5 @@
+import { plainTeacherText } from '@/lib/prompt-name';
+import { TaskName } from '@/components/logina/TaskName';
 import type { Slot, TaskApprovalDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from '@tanstack/react-router';
@@ -51,7 +53,7 @@ function Decision({ lessonId, task, findings }: { lessonId: string; task: Task; 
   return (
     <div className="well stack">
       <StatusTag kind="review">{t(`teacher.gateName.${first.gateId}`)}</StatusTag>
-      <span className="s13">{first.explanationForTeacher}</span>
+      <span className="s13">{plainTeacherText(first.explanationForTeacher, t)}</span>
       {accepting ? (
         <>
           <label className="small b sec" htmlFor={reasonId}>{t('teacher.t12.acceptWarning')}</label>
@@ -184,14 +186,14 @@ export function ApprovePage() {
             <TableBody>
               {tasks.map((task) => (
                 <TableRow key={task.slot}>
-                  <TableCell className="b">{t(`teacher.taskType.${task.slot}`)}</TableCell>
+                  <TableCell className="b"><TaskName slot={task.slot} /></TableCell>
                   <TableCell data-label={t('teacher.t12.results')}>
                     <div className="stack">
                       <TaskStatusTag status={task.status} />
                       {task.acceptedWarning ? <StatusTag kind="teacher">{t('teacher.t12.decided')}</StatusTag> : null}
                       {blockingGates(task).map((gate) => (
                         <div key={gate.gateId} className="stack">
-                          <span className="s13">{`${t(`teacher.gateName.${gate.gateId}`)} · ${gate.explanationForTeacher}`}</span>
+                          <span className="s13">{`${t(`teacher.gateName.${gate.gateId}`)}: ${plainTeacherText(gate.explanationForTeacher, t)}`}</span>
                           <Link to="/t/lessons/$id/tasks/$slot" params={{ id, slot: task.slot }} className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'self-start')}>{t('teacher.t12.openToFix')}</Link>
                         </div>
                       ))}

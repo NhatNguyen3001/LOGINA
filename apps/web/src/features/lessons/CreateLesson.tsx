@@ -1,3 +1,4 @@
+import { TaskName } from '@/components/logina/TaskName';
 import { alertVariants } from '@/components/ui/alert';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { MaterialMimeType } from '@logina/contracts';
@@ -204,7 +205,7 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
           <h3 className="s15 b">{t('teacher.t01.structureTitle')}</h3>
           <ol className="stack">
             {SLOTS.map((slot) => (
-              <li key={slot} className="s13">{t(`teacher.taskType.${slot}`)}</li>
+              <li key={slot} className="s13"><TaskName slot={slot} /></li>
             ))}
           </ol>
           <p className="small muted">{t('teacher.t01.structureNote')}</p>

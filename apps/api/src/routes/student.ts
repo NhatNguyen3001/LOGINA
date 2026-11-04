@@ -3,7 +3,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { Hono } from 'hono';
 import { Artifact, AttemptDTO, DraftReq, LockReq, StudentChallengeDTO, StudentFeedbackDTO, StudentTaskDTO, SubmitReq, SubmitResultDTO } from '@logina/contracts';
 import { AppError } from '@logina/db';
-import { applyTexts } from '@logina/domain';
+import { applyTexts, letterOptionIds } from '@logina/domain';
 import { z } from 'zod';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
@@ -106,7 +106,7 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
     const task = (await taskRef.get()).data()!;
     if (!task.deliveryId) throw new AppError('NOT_LOCKED', 409, 'Lock in the answer first.');
     const delivery = (await taskRef.collection('deliveries').doc(task.deliveryId as string).get()).data()!;
-    return respond(c, StudentChallengeDTO, toChallengeDTO(task, { ...delivery, renderedMessage: applyTexts(delivery.renderedMessage, texts) }, task.deliveryId as string, release));
+    return respond(c, StudentChallengeDTO, toChallengeDTO(task, { ...delivery, renderedMessage: letterOptionIds(applyTexts(delivery.renderedMessage, texts)) }, task.deliveryId as string, release));
   });
 
   routes.post(
@@ -140,7 +140,7 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
           slot,
           choice: task.choice,
           initial: { label: answerLabel(initial, release, cardWord), text: artifactSummary(initial, release).answerText },
-          challengeMessage: applyTexts(delivery.renderedMessage, texts),
+          challengeMessage: letterOptionIds(applyTexts(delivery.renderedMessage, texts)),
           final: { label: answerLabel(final, release, cardWord), text: artifactSummary(final, release).answerText },
           confidenceBefore: task.initialConfidence,
           confidenceAfter: task.finalConfidence,

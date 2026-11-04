@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { promptName } from '@/lib/prompt-name';
+import { asStudentSees, plainTeacherText, promptName } from '@/lib/prompt-name';
 import { Note } from '@/components/logina/Note';
 import { PairGrid } from '@/components/logina/PairGrid';
 import { getLesson, getLogicReview, getPreview, newKey, sendEdit } from '@/lib/api';
@@ -58,10 +58,10 @@ export function LogicPage() {
             <div key={challenge.label} className={`cand ${challenge.isFallback ? 'fb' : ''}`}>
               <div className="row">
                 <Badge kind="info">{promptName(challenge.label, t)}</Badge>
-                <span className="s13 b">{challenge.purpose}</span>
+                <span className="s13 b">{plainTeacherText(challenge.purpose, t)}</span>
               </div>
-              <p className="msg">{challenge.message}</p>
-              <span className="small muted">{challenge.whenShown}</span>
+              <p className="msg">{asStudentSees(challenge.message)}</p>
+              <span className="small muted">{plainTeacherText(challenge.whenShown, t)}</span>
             </div>
           ))}
         </TabsContent>
