@@ -32,11 +32,14 @@ const TABS: { id: TabId; icon: LucideIcon }[] = [
 const TOP_PROMPTS = 3;
 
 
+/** Confidence runs 0 to 10, so an average keeps one decimal: 6.8 says more than 7. */
+const oneDecimal = (value: number) => Math.round(value * 10) / 10;
+
 /** Each task counts by how many answers it has, so a task few people reached does not outweigh the rest. */
 function averageConfidence(rows: TaskRow[], pick: (row: TaskRow) => number | null): number | null {
   const counted = rows.filter((row) => pick(row) !== null && row.submitted > 0);
   const answers = counted.reduce((sum, row) => sum + row.submitted, 0);
-  return answers ? Math.round(counted.reduce((sum, row) => sum + pick(row)! * row.submitted, 0) / answers) : null;
+  return answers ? oneDecimal(counted.reduce((sum, row) => sum + pick(row)! * row.submitted, 0) / answers) : null;
 }
 
 function Metric({ icon: Icon, good, label, value, of, part, whole, hint }: { icon: LucideIcon; good?: boolean; label: string; value: string; of?: string; part?: number; whole?: number; hint?: string }) {
@@ -108,8 +111,8 @@ function ConfidenceChart({ rows }: { rows: TaskRow[] }) {
   const first = t('teacher.t14.firstDot');
   const final = t('teacher.t14.finalDot');
   const points = rows.map(({ slot, avgConfidenceBefore, avgConfidenceAfter }) => {
-    const before = avgConfidenceBefore === null ? null : Math.round(avgConfidenceBefore);
-    return { slot, [first]: before, [final]: before === null ? null : Math.round(avgConfidenceAfter ?? 0) };
+    const before = avgConfidenceBefore === null ? null : oneDecimal(avgConfidenceBefore);
+    return { slot, [first]: before, [final]: before === null ? null : oneDecimal(avgConfidenceAfter ?? 0) };
   });
   return (
     <ChartCard
@@ -117,7 +120,7 @@ function ConfidenceChart({ rows }: { rows: TaskRow[] }) {
       legend={<><span><i className="sw round first" />{first}</span><span><i className="sw round final" />{final}</span></>}
     >
       <div aria-hidden="true">
-        <BarChart data={points} index="slot" categories={[first, final]} colors={['control', 'accent']} minValue={0} maxValue={100} showLegend={false} yAxisWidth={32} className="h-44" />
+        <BarChart data={points} index="slot" categories={[first, final]} colors={['control', 'accent']} minValue={0} maxValue={10} showLegend={false} yAxisWidth={32} className="h-44" />
         {/* The numbers stay readable on a projected screen, not only on hover; screen readers get the table below. */}
         <ul className="conf-nums">
           {points.map((point) => (

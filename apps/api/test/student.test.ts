@@ -26,9 +26,9 @@ const q1Options = async (attemptId: string) => {
 };
 const q1 = (answerId: string, evidenceId: string) => ({ slot: 'Q1', answerId, evidenceId });
 const lock = (attemptId: string, artifact: object, slot = 'Q1', key?: string) =>
-  a.post(`/attempts/${attemptId}/tasks/${slot}/lock`, { artifact, initialConfidence: 70 }, key);
+  a.post(`/attempts/${attemptId}/tasks/${slot}/lock`, { artifact, initialConfidence: 7 }, key);
 const submit = (attemptId: string, choice: string, finalArtifact: object, slot = 'Q1') =>
-  a.post(`/attempts/${attemptId}/tasks/${slot}/submit`, { choice, finalArtifact, finalConfidence: 82 });
+  a.post(`/attempts/${attemptId}/tasks/${slot}/submit`, { choice, finalArtifact, finalConfidence: 8 });
 
 const inVietnamese = async <T>(work: () => Promise<T>): Promise<T> => {
   await a.patch('/me', { uiLocale: 'vi' });
@@ -157,7 +157,7 @@ describe('Q1 lock and challenge', () => {
     const raw = await (await lock(attemptId, q1(answers[1]!, evidence[2]!))).json();
     const challenge = StudentChallengeDTO.parse(raw);
     expect(challenge.message).toContain('Compare the statement');
-    expect(challenge.lockedSummary.confidence).toBe(70);
+    expect(challenge.lockedSummary.confidence).toBe(7);
     expect(findRestrictedKeys(raw, 'student')).toEqual([]);
   });
 
@@ -183,7 +183,7 @@ describe('Q1 lock and challenge', () => {
     const { answers, evidence } = await q1Options(attemptId);
     await lock(attemptId, q1(answers[0]!, evidence[0]!));
     const raw = await (await a.get(`/attempts/${attemptId}/tasks/Q1`)).json();
-    expect(StudentTaskDTO.parse(raw)).toMatchObject({ initialArtifact: { answerId: answers[0] }, initialConfidence: 70, phase: 'CHALLENGED' });
+    expect(StudentTaskDTO.parse(raw)).toMatchObject({ initialArtifact: { answerId: answers[0] }, initialConfidence: 7, phase: 'CHALLENGED' });
     expect(findRestrictedKeys(raw, 'student')).toEqual([]);
   });
 
@@ -229,7 +229,7 @@ describe('submit', () => {
     const { attemptId, answers, evidence } = await lockedQ1();
     const result = SubmitResultDTO.parse(await (await submit(attemptId, 'REVISE', q1(answers[1]!, evidence[2]!))).json());
     expect(result.recordedChoice).toBe('KEEP');
-    expect((await h.live.db.doc(`attempts/${attemptId}/tasks/Q1`).get()).data()?.confidenceDelta).toBe(12);
+    expect((await h.live.db.doc(`attempts/${attemptId}/tasks/Q1`).get()).data()?.confidenceDelta).toBe(1);
   });
 
   it('a task submits once', async () => {
@@ -238,11 +238,12 @@ describe('submit', () => {
     expect((await submit(attemptId, 'KEEP', q1(answers[1]!, evidence[2]!))).status).toBe(409);
   });
 
-  it('confidence must be an integer between 0 and 100', async () => {
+  it('confidence must be an integer between 0 and 10', async () => {
     const attemptId = await freshAttempt();
     const { answers, evidence } = await q1Options(attemptId);
-    const body = { artifact: q1(answers[0]!, evidence[0]!), initialConfidence: 72.5 };
-    expect((await a.post(`/attempts/${attemptId}/tasks/Q1/lock`, body)).status).toBe(400);
+    for (const initialConfidence of [7.5, 11, 70]) {
+      expect((await a.post(`/attempts/${attemptId}/tasks/Q1/lock`, { artifact: q1(answers[0]!, evidence[0]!), initialConfidence })).status).toBe(400);
+    }
   });
 
   it('D01 feedback unavailable at 4/5, available at 5/5, SEC03 passes the student scan', async () => {
@@ -259,7 +260,7 @@ describe('submit', () => {
     const raw = await (await a.get(`/attempts/${attemptId}/feedback`)).json();
     const feedback = (raw as unknown[]).map((row) => StudentFeedbackDTO.parse(row));
     expect(feedback).toHaveLength(5);
-    expect(feedback[0]).toMatchObject({ initial: { label: 'B, Card C' }, final: { label: 'A, Card A' }, confidenceBefore: 70, confidenceAfter: 82 });
+    expect(feedback[0]).toMatchObject({ initial: { label: 'B, Card C' }, final: { label: 'A, Card A' }, confidenceBefore: 7, confidenceAfter: 8 });
     expect(findRestrictedKeys(raw, 'student')).toEqual([]);
   });
 });

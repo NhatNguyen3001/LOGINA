@@ -74,14 +74,14 @@ function randomTasks(lessonId: string, n: number, releases: Record<string, Docum
   return SLOTS.map((slot) => {
     const initial = answerFor(slot, releases[slot]!);
     const revise = random() < REVISE_SHARE;
-    const initialConfidence = 30 + Math.floor(random() * 61);
+    const initialConfidence = 3 + Math.floor(random() * 7);
     return {
       slot,
       initial,
       initialConfidence,
       choice: revise ? 'REVISE' : 'KEEP',
       final: revise ? answerFor(slot, releases[slot]!) : initial,
-      finalConfidence: Math.min(100, initialConfidence + Math.floor(random() * 21)),
+      finalConfidence: Math.min(10, initialConfidence + Math.floor(random() * 3)),
     };
   });
 }

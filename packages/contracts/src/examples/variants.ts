@@ -81,7 +81,7 @@ export const exampleVariants = {
       ...examples.studentTask,
       phase: 'LOCKED',
       initialArtifact: { slot: 'Q1', answerId: 'opt_2', evidenceId: 'ev_3' },
-      initialConfidence: 70,
+      initialConfidence: 7,
     },
   },
 } satisfies { [K in keyof Examples]?: Record<string, Examples[K]> };

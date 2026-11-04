@@ -5,8 +5,8 @@ import { Locale, Role } from '../enums.js';
 
 export const Timestamp = z.iso.datetime();
 
-/** Confidence the student sets: an integer from 0 to 100. */
-export const Confidence = z.number().int().min(0).max(100);
+/** Confidence the student sets: an integer from 0 (not sure) to 10 (very sure). */
+export const Confidence = z.number().int().min(0).max(10);
 
 export const Version = z.number().int().nonnegative();
 

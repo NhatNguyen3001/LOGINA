@@ -20,8 +20,8 @@ const artifacts: [string, object][] = [
 async function answerQ1(client: Client, attempt: string, answerIndex: number, cardIndex: number, finalAnswer: number, finalCard: number) {
   const task = StudentTaskDTO.parse(await (await client.get(`/attempts/${attempt}/tasks/Q1`)).json()) as Extract<StudentTaskDTO, { slot: 'Q1' }>;
   const artifact = (i: number, j: number) => ({ slot: 'Q1', answerId: task.answers[i]!.id, evidenceId: task.evidence[j]!.id });
-  await client.post(`/attempts/${attempt}/tasks/Q1/lock`, { artifact: artifact(answerIndex, cardIndex), initialConfidence: 70, secondsOnTask: 40, answerChanges: [{ at: 12, change: 'B' }, { at: 31, change: 'Card C' }] });
-  await client.post(`/attempts/${attempt}/tasks/Q1/submit`, { choice: 'REVISE', finalArtifact: artifact(finalAnswer, finalCard), finalConfidence: 82, secondsToFirstChange: 9, answerChanges: [{ at: 50, change: 'A' }] });
+  await client.post(`/attempts/${attempt}/tasks/Q1/lock`, { artifact: artifact(answerIndex, cardIndex), initialConfidence: 7, secondsOnTask: 40, answerChanges: [{ at: 12, change: 'B' }, { at: 31, change: 'Card C' }] });
+  await client.post(`/attempts/${attempt}/tasks/Q1/submit`, { choice: 'REVISE', finalArtifact: artifact(finalAnswer, finalCard), finalConfidence: 8, secondsToFirstChange: 9, answerChanges: [{ at: 50, change: 'A' }] });
 }
 
 beforeAll(async () => {
@@ -68,7 +68,7 @@ describe('T14 tracking', () => {
   it('perTask carries keep, revise, average confidence and delivered prompts', async () => {
     const { body } = await tracking();
     const q1 = body.perTask.find((t) => t.slot === 'Q1')!;
-    expect(q1).toMatchObject({ submitted: 1, revise: 1, keep: 0, avgConfidenceBefore: 70, avgConfidenceAfter: 82 });
+    expect(q1).toMatchObject({ submitted: 1, revise: 1, keep: 0, avgConfidenceBefore: 7, avgConfidenceAfter: 8 });
     expect(q1.deliveredChallenges).toEqual([{ label: 'TN1', message: expect.any(String), count: 1, revised: 1 }]);
   });
 
@@ -149,7 +149,7 @@ describe('me and consent', () => {
     const fresh = `${copyAttemptId}`;
     await answerQ1(a, fresh, 1, 2, 0, 0);
     const doc = (await h.live.db.doc(`researchRows/${researchRowId(fresh, 'Q1', 1)}`).get()).data()!;
-    expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B', first_evidence: 'C', first_relation: 'contradicts', final_answer: 'A', final_relation: 'full', first_confidence: 70, final_confidence: 82, confidence_change: 12, seconds_to_first_change: 9, seconds_to_lock: 40, answer_changes: '0:12 B; 0:31 Card C; 0:50 A', choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-11-v1', exportedAt: null });
+    expect(doc).toMatchObject({ participant_type: 'judge', is_simulated: false, task: 'Q1', first_answer: 'B', first_evidence: 'C', first_relation: 'contradicts', final_answer: 'A', final_relation: 'full', first_confidence: 7, final_confidence: 8, confidence_change: 1, seconds_to_first_change: 9, seconds_to_lock: 40, answer_changes: '0:12 B; 0:31 Card C; 0:50 A', choice: 'REVISE', changed: 'answer, evidence', prompt_label: 'TN1', prompt_mode: 'NORMAL', run_number: 1, consent_version: '2026-11-v1', exportedAt: null });
     expect(JSON.stringify(doc)).not.toMatch(/Ms\. Lan|@/);
     expect(doc.started_at).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
     expect(doc.started_at < doc.locked_at).toBe(true);
@@ -162,8 +162,8 @@ describe('me and consent', () => {
 
   it('Q5 row carries the full text', async () => {
     for (const [slot, artifact] of artifacts) {
-      await a.post(`/attempts/${copyAttemptId}/tasks/${slot}/lock`, { artifact, initialConfidence: 60 });
-      await a.post(`/attempts/${copyAttemptId}/tasks/${slot}/submit`, { choice: 'KEEP', finalArtifact: artifact, finalConfidence: 60 });
+      await a.post(`/attempts/${copyAttemptId}/tasks/${slot}/lock`, { artifact, initialConfidence: 6 });
+      await a.post(`/attempts/${copyAttemptId}/tasks/${slot}/submit`, { choice: 'KEEP', finalArtifact: artifact, finalConfidence: 6 });
     }
     const q2 = TraceDTO.parse(await (await a.get(`/attempts/${copyAttemptId}/trace/Q2`)).json());
     expect(q2.assignmentId).toBe(copyId);

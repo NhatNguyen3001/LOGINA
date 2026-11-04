@@ -92,8 +92,8 @@ async function takeAssignment(api: DemoApi, assignmentId: string, locale: Locale
     const artifact = slot === 'Q1'
       ? { slot, answerId: task.answers[0].id, evidenceId: task.evidence[0].id }
       : { ...script!.tasks.find((t) => t.slot === slot)!.initial, slot };
-    await expectOk(api.post(`/attempts/${attemptId}/tasks/${slot}/lock`, { artifact, initialConfidence: 60 }), `Lock ${slot}`);
-    await expectOk(api.post(`/attempts/${attemptId}/tasks/${slot}/submit`, { choice: 'KEEP', finalArtifact: artifact, finalConfidence: 70 }), `Submit ${slot}`);
+    await expectOk(api.post(`/attempts/${attemptId}/tasks/${slot}/lock`, { artifact, initialConfidence: 6 }), `Lock ${slot}`);
+    await expectOk(api.post(`/attempts/${attemptId}/tasks/${slot}/submit`, { choice: 'KEEP', finalArtifact: artifact, finalConfidence: 7 }), `Submit ${slot}`);
   }
 }
 
