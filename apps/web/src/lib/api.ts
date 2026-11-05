@@ -46,6 +46,7 @@ import {
 import { z } from 'zod';
 import { ensureSession, idToken, renewSession } from './auth';
 import { setBusy } from './busy';
+import { noteServerVersion } from './app-version';
 
 export const newKey = (): string => crypto.randomUUID();
 
@@ -75,7 +76,9 @@ async function send(path: string, { method, body, key }: RequestOptions): Promis
   const headers: Record<string, string> = { Authorization: `Bearer ${await idToken()}` };
   if (method !== 'GET') headers['Content-Type'] = 'application/json';
   if (key) headers['Idempotency-Key'] = key;
-  return fetch(`/api/v1${path}`, { method, headers, ...(method === 'GET' ? {} : { body: JSON.stringify(body ?? {}) }) });
+  const response = await fetch(`/api/v1${path}`, { method, headers, ...(method === 'GET' ? {} : { body: JSON.stringify(body ?? {}) }) });
+  noteServerVersion(response.headers?.get('x-logina-version') ?? null);
+  return response;
 }
 
 async function toError(response: Response): Promise<ApiError> {

@@ -27,6 +27,10 @@ describe('deploy-dev.sh', () => {
     expect(script).toMatch(/API_ENV=.*BUILD_SHA=\$SHA/);
   });
 
+  it('stamps the web build with the same commit', () => {
+    expect(script).toContain('VITE_BUILD_SHA=$SHA pnpm --filter @logina/web build');
+  });
+
   it('stops on a dirty tree or a failed check', () => {
     expect(script).toContain('set -euo pipefail');
     expect(script).toContain('git status --porcelain');

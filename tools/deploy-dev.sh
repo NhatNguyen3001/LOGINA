@@ -45,7 +45,7 @@ gcloud run deploy api --project "$PROJECT_ID" --region "$REGION" --image "$REGIS
   --service-account "logina-api@$PROJECT_ID.iam.gserviceaccount.com" \
   --min-instances 1 --allow-unauthenticated --set-env-vars "$API_ENV,WORKER_URL=$WORKER_URL"
 
-pnpm --filter @logina/web build
+VITE_BUILD_SHA=$SHA pnpm --filter @logina/web build
 firebase deploy --only hosting,firestore:rules,firestore:indexes,storage --project "$PROJECT_ID"
 
 if [ "$SKIP_SMOKE" != "--skip-smoke" ]; then
