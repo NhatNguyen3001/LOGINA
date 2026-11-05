@@ -1,16 +1,14 @@
 import { Toast } from '@/components/logina/Toast';
 import { Outlet, createRootRoute, createRoute, createRouter, useNavigate, useParams } from '@tanstack/react-router';
-import { Suspense, lazy, useEffect, type ComponentType } from 'react';
+import { Suspense, useEffect, type ComponentType } from 'react';
+import { lazyScreen } from '@/lib/lazy-screen';
 import { UpdateBar } from '@/components/logina/UpdateBar';
 import { startUpdateChecks } from '@/lib/app-version';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { useSessionLocale } from '@/lib/use-session-locale';
 import { EntryPage } from '@/features/entry/EntryPage';
 
-/** Each side loads only its own code, so a student never downloads the teacher screens. */
-function screen<K extends string, P extends object>(load: () => Promise<Record<K, ComponentType<P>>>, name: K) {
-  return lazy(async () => ({ default: (await load())[name] }));
-}
+const screen = lazyScreen;
 
 const TeacherShell = screen(() => import('@/components/logina/TeacherShell'), 'TeacherShell');
 const LegalPage = screen(() => import('@/features/legal/LegalPage'), 'LegalPage');

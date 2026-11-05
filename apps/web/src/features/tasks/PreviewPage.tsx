@@ -1,3 +1,4 @@
+import { ErrorNote } from '@/components/logina/ErrorNote';
 import { useUnsavedText } from '@/lib/unsaved';
 import { readableSourceRefs } from '@/lib/source-refs';
 import { TaskName } from '@/components/logina/TaskName';
@@ -23,7 +24,6 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { buttonVariants } from '@/components/ui/button';
 import { cardVariants } from '@/components/ui/card';
-import { errorText } from '@/lib/errors';
 
 const GATE_KIND = { PASS: 'pass', REVIEW_REQUIRED: 'review', BLOCKER: 'block' } as const;
 const RECHECKING = ['VALIDATING', 'GENERATING', 'STALE'];
@@ -104,7 +104,7 @@ function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, o
     <div className="stack">
       <label className="s13 b" htmlFor={`prompt-${challengeId}`}>{t('teacher.t07.editPrompt', { label: promptName(challengeId, t) })}</label>
       <Textarea id={`prompt-${challengeId}`} value={value} onChange={(event) => setValue(event.target.value)} />
-      {save.isError ? <Note kind="err">{t(errorText(save.error))}</Note> : null}
+      {save.isError ? <ErrorNote error={save.error} text={value} /> : null}
       <div className="row">
         <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={save.isPending} disabled={!value.trim() || value === message || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={onClose}>{t('common.cancel')}</button>
@@ -285,7 +285,7 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
           </div>
         </div>
       ) : null}
-      {save.isError && !refused && !conflict && code !== 'RATE_LIMITED' ? <Note kind="err">{t(errorText(save.error))}</Note> : null}
+      {save.isError && !refused && !conflict && code !== 'RATE_LIMITED' ? <ErrorNote error={save.error} text={value} /> : null}
       <div className="row">
         <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={save.isPending} disabled={!value.trim() || value === text || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={onClose}>{t('common.cancel')}</button>

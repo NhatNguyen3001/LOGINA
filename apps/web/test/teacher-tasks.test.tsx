@@ -445,6 +445,21 @@ describe('T7, T9 and T11', () => {
     expect(screen.getByRole('button', { name: 'Revert to the previous wording' })).toBeInTheDocument();
   });
 
+  it('a teacher save that fails because LOGINA was updated keeps the typed text and offers Copy', async () => {
+    const writeText = vi.fn(async () => {});
+    vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });
+    vi.mocked(api.sendEdit).mockRejectedValue(new api.ApiError(400, 'APP_UPDATED'));
+    await render(<PreviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Quick edit statement A' }));
+    fireEvent.change(screen.getByLabelText('Quick edit statement A', { selector: 'textarea' }), { target: { value: 'My careful wording' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save and recheck' }));
+    expect(await screen.findByText('LOGINA was updated while you were working. Reload to continue. Your saved work is kept.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Quick edit statement A', { selector: 'textarea' })).toHaveValue('My careful wording');
+    fireEvent.click(screen.getByRole('button', { name: 'Copy your text' }));
+    expect(writeText).toHaveBeenCalledWith('My careful wording');
+    vi.unstubAllGlobals();
+  });
+
   it('a conflict says someone else saved first and offers to copy', async () => {
     vi.mocked(api.sendEdit).mockRejectedValue(new api.ApiError(409, 'VERSION_CONFLICT'));
     await render(<PreviewPage />);

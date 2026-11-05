@@ -1,3 +1,4 @@
+import { ErrorNote } from '@/components/logina/ErrorNote';
 import { useUnsavedText } from '@/lib/unsaved';
 import { readableSourceRefs } from '@/lib/source-refs';
 import type { ResolveIssueReq, SourceReviewDTO } from '@logina/contracts';
@@ -7,7 +8,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiffRow } from '@/components/logina/DiffRow';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
-import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { alertVariants } from '@/components/ui/alert';
@@ -22,7 +22,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { cardVariants } from '@/components/ui/card';
-import { errorText } from '@/lib/errors';
 
 type Issue = SourceReviewDTO['issues'][number];
 type Mode = 'adjust' | 'keepOpen' | 'exclude' | null;
@@ -177,7 +176,7 @@ export function ClarifyPage() {
         <span className="sp" />
         <span className="s13 muted">{t('teacher.t03.alwaysShown')}</span>
       </div>
-      {resolve.isError ? <Note kind="err">{t(errorText(resolve.error))}</Note> : null}
+      {resolve.isError ? <ErrorNote error={resolve.error} /> : null}
       <div className="cols l400">
         <div className={cn(cardVariants(), 'sticky')}>
           <div className="row">

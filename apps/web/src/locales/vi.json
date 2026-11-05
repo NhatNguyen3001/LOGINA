@@ -493,7 +493,8 @@
     "NETWORK": "Không kết nối được tới LOGINA. Hãy kiểm tra kết nối rồi thử lại.",
     "INTERNAL": "LOGINA đang gặp lỗi. Hãy thử lại sau ít phút.",
     "RATE_LIMITED": "LOGINA đang bận. Hãy thử lại sau vài giây.",
-    "CONTENT_OUTDATED": "Bản dùng thử này được tạo bằng phiên bản cũ của LOGINA. Hãy đặt lại bản dùng thử để nhận nhiệm vụ mới."
+    "CONTENT_OUTDATED": "Bản dùng thử này được tạo bằng phiên bản cũ của LOGINA. Hãy đặt lại bản dùng thử để nhận nhiệm vụ mới.",
+    "APP_UPDATED": "LOGINA vừa được cập nhật trong lúc bạn làm. Tải lại để tiếp tục. Phần đã lưu vẫn còn."
   },
   "common": {
     "lang": {
@@ -785,6 +786,8 @@
     "saveFirst": "LOGINA đã được cập nhật. Cô lưu thay đổi trước rồi tải lại.",
     "reload": "Tải lại",
     "unsavedTitle": "Còn nội dung chưa lưu. Vẫn tải lại?",
-    "keepEditing": "Tiếp tục sửa"
+    "keepEditing": "Tiếp tục sửa",
+    "copyText": "Sao chép nội dung",
+    "screenGone": "Màn hình này thuộc bản LOGINA cũ. Tải lại để mở bản mới nhất."
   }
 }

@@ -1,3 +1,4 @@
+import { ErrorNote } from '@/components/logina/ErrorNote';
 import { useUnsavedText } from '@/lib/unsaved';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
@@ -5,7 +6,6 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoadFailed } from '@/components/logina/LoadFailed';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
-import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { assignLesson, getApproval, getLesson, newKey } from '@/lib/api';
@@ -17,7 +17,6 @@ import { cardVariants } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { errorText } from '@/lib/errors';
 
 export function AssignPage() {
   const { t } = useTranslation();
@@ -92,7 +91,7 @@ export function AssignPage() {
               </TableBody>
             </Table>
           <p className="small muted">{t('teacher.t13.pinned')}</p>
-          {assign.isError ? <Note kind="err">{t(errorText(assign.error))}</Note> : null}
+          {assign.isError ? <ErrorNote error={assign.error} text={message} /> : null}
           <button type="button" className={buttonVariants({ block: true })} aria-busy={assign.isPending} disabled={assign.isPending} onClick={() => assign.mutate()}>{t('teacher.t13.title')}</button>
         </div>
       </div>
