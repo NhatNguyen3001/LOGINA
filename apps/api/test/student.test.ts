@@ -211,6 +211,14 @@ describe('submit', () => {
     return { attemptId, answers, evidence };
   };
 
+  it('an old tab that sends confidence out of 100 still locks and submits, saved out of 10', async () => {
+    const attemptId = await freshAttempt();
+    const { answers, evidence } = await q1Options(attemptId);
+    expect((await a.post(`/attempts/${attemptId}/tasks/Q1/lock`, { artifact: q1(answers[1]!, evidence[2]!), initialConfidence: 70 })).status).toBe(200);
+    expect((await a.post(`/attempts/${attemptId}/tasks/Q1/submit`, { choice: 'REVISE', finalArtifact: q1(answers[0]!, evidence[0]!), finalConfidence: 80 })).status).toBe(200);
+    expect((await h.live.db.doc(`attempts/${attemptId}/tasks/Q1`).get()).data()).toMatchObject({ initialConfidence: 7, finalConfidence: 8 });
+  });
+
   it('a task locked on the old 0 to 100 scale still opens, submits and reads out of 10', async () => {
     const { attemptId, answers, evidence } = await lockedQ1();
     await h.live.db.doc(`attempts/${attemptId}/tasks/Q1`).update({ initialConfidence: 70 });
@@ -254,7 +262,7 @@ describe('submit', () => {
   it('confidence must be an integer between 0 and 10', async () => {
     const attemptId = await freshAttempt();
     const { answers, evidence } = await q1Options(attemptId);
-    for (const initialConfidence of [7.5, 11, 70]) {
+    for (const initialConfidence of [7.5, 101, -1]) {
       expect((await a.post(`/attempts/${attemptId}/tasks/Q1/lock`, { artifact: q1(answers[0]!, evidence[0]!), initialConfidence })).status).toBe(400);
     }
   });

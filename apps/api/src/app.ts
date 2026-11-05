@@ -26,6 +26,7 @@ export function createApp(deps: AppDeps): Hono<AppEnv> {
   app.use('*', async (c, next) => {
     await next();
     c.header('Cache-Control', 'private, no-store');
+    c.header('X-Logina-Version', deps.config.buildSha);
   });
   app.onError(handleError);
   app.use('/api/v1/*', rejectUnknownQuery);

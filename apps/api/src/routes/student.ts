@@ -1,3 +1,4 @@
+import { acceptOldConfidence } from '../services/old-clients.js';
 import type { DocumentData } from 'firebase-admin/firestore';
 import { FieldValue } from 'firebase-admin/firestore';
 import { Hono } from 'hono';
@@ -90,7 +91,7 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
   routes.post(
     '/attempts/:id/tasks/:slot/lock',
     withIdempotency(db, async (c) => {
-      const request = await body(await c.req.json(), LockReq);
+      const request = await body(acceptOldConfidence(await c.req.json(), 'initialConfidence'), LockReq);
       const { schoolId } = c.var.user;
       const challenge = await lockTask(db, c.var.user, c.req.param('id') as string, c.req.param('slot') as string, request, (attempt, release) => inStudentLanguage(schoolId, attempt, release));
       return respond(c, StudentChallengeDTO, challenge);
@@ -112,7 +113,7 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
   routes.post(
     '/attempts/:id/tasks/:slot/submit',
     withIdempotency(db, async (c) => {
-      const request = await body(await c.req.json(), SubmitReq);
+      const request = await body(acceptOldConfidence(await c.req.json(), 'finalConfidence'), SubmitReq);
       const research = { enabled: config.researchEnabled, participantType: config.participantType };
       const { researchRowId, ...result } = await submitTask(db, c.var.user, c.req.param('id') as string, c.req.param('slot') as string, request, research);
       if (researchRowId) {

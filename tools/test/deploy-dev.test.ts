@@ -23,6 +23,10 @@ describe('deploy-dev.sh', () => {
     expect(script).toMatch(/gcloud builds submit .*--config apps\/api\/cloudbuild\.yaml .* \.$/m);
   });
 
+  it('stamps the API with the commit it was built from', () => {
+    expect(script).toMatch(/API_ENV=.*BUILD_SHA=\$SHA/);
+  });
+
   it('stops on a dirty tree or a failed check', () => {
     expect(script).toContain('set -euo pipefail');
     expect(script).toContain('git status --porcelain');

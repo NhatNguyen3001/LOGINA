@@ -84,6 +84,14 @@ describe('API skeleton', () => {
     expect(await response.json()).toEqual({ ok: true });
   });
 
+  it('every reply names the API version', async () => {
+    const response = await app.request('/api/v1/health');
+    expect(response.headers.get('x-logina-version')).toBe('dev');
+    const refused = await app.request('/api/v1/test/known');
+    expect(refused.status).toBe(401);
+    expect(refused.headers.get('x-logina-version')).toBe('dev');
+  });
+
   it('SEC05 unknown query parameter rejected (400)', async () => {
     const response = await app.request('/api/v1/health?include_internal=true');
     expect(response.status).toBe(400);
