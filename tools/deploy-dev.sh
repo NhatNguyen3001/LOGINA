@@ -46,6 +46,7 @@ gcloud run deploy api --project "$PROJECT_ID" --region "$REGION" --image "$REGIS
   --min-instances 1 --allow-unauthenticated --set-env-vars "$API_ENV,WORKER_URL=$WORKER_URL"
 
 VITE_BUILD_SHA=$SHA pnpm --filter @logina/web build
+pnpm exec tsx tools/keep-live-assets.ts --base "https://$PROJECT_ID.web.app" --into apps/web/dist
 firebase deploy --only hosting,firestore:rules,firestore:indexes,storage --project "$PROJECT_ID"
 
 if [ "$SKIP_SMOKE" != "--skip-smoke" ]; then

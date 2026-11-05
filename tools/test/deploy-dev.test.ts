@@ -31,6 +31,11 @@ describe('deploy-dev.sh', () => {
     expect(script).toContain('VITE_BUILD_SHA=$SHA pnpm --filter @logina/web build');
   });
 
+  it('keeps the code files of the live version after the web build and before firebase deploy', () => {
+    expect(lineOf('keep-live-assets.ts')).toBeGreaterThan(lineOf('pnpm --filter @logina/web build'));
+    expect(lineOf('keep-live-assets.ts')).toBeLessThan(lineOf('firebase deploy'));
+  });
+
   it('stops on a dirty tree or a failed check', () => {
     expect(script).toContain('set -euo pipefail');
     expect(script).toContain('git status --porcelain');
