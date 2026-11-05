@@ -211,6 +211,19 @@ describe('submit', () => {
     return { attemptId, answers, evidence };
   };
 
+  it('a task locked on the old 0 to 100 scale still opens, submits and reads out of 10', async () => {
+    const { attemptId, answers, evidence } = await lockedQ1();
+    await h.live.db.doc(`attempts/${attemptId}/tasks/Q1`).update({ initialConfidence: 70 });
+    const res = await a.get(`/attempts/${attemptId}/tasks/Q1`);
+    expect(res.status).toBe(200);
+    expect(StudentTaskDTO.parse(await res.json())).toMatchObject({ initialConfidence: 7 });
+    const challenge = await a.get(`/attempts/${attemptId}/tasks/Q1/challenge`);
+    expect(challenge.status).toBe(200);
+    expect(StudentChallengeDTO.parse(await challenge.json()).lockedSummary.confidence).toBe(7);
+    expect((await submit(attemptId, 'REVISE', q1(answers[0]!, evidence[0]!))).status).toBe(200);
+    expect((await h.live.db.doc(`attempts/${attemptId}/tasks/Q1`).get()).data()).toMatchObject({ confidenceDelta: 1 });
+  });
+
   it('submit returns SubmitResultDTO with recordedChoice and nextSlot', async () => {
     const { attemptId, answers, evidence } = await lockedQ1();
     const result = SubmitResultDTO.parse(await (await submit(attemptId, 'REVISE', q1(answers[0]!, evidence[0]!))).json());

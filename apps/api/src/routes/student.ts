@@ -3,7 +3,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { Hono } from 'hono';
 import { Artifact, AttemptDTO, DraftReq, LockReq, StudentChallengeDTO, StudentFeedbackDTO, StudentTaskDTO, SubmitReq, SubmitResultDTO } from '@logina/contracts';
 import { AppError } from '@logina/db';
-import { applyTexts, letterOptionIds } from '@logina/domain';
+import { applyTexts, letterOptionIds, tenPointConfidence } from '@logina/domain';
 import { z } from 'zod';
 import type { AppDeps, AppEnv } from '../context.js';
 import { withIdempotency } from '../middleware/idempotency.js';
@@ -62,7 +62,7 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
       stem: content.questionStem,
       draftArtifact: task.draftArtifact ?? null,
       submittedSlots: tasks.docs.filter((doc) => doc.data().phase === 'SUBMITTED').map((doc) => doc.id),
-      ...(task.lockedAt ? { initialArtifact: task.initialArtifact, initialConfidence: task.initialConfidence } : {}),
+      ...(task.lockedAt ? { initialArtifact: task.initialArtifact, initialConfidence: tenPointConfidence(task.initialConfidence) } : {}),
     };
     return respond(
       c,
@@ -142,8 +142,8 @@ export function studentRoutes({ db, enqueue, config }: AppDeps): Hono<AppEnv> {
           initial: { label: answerLabel(initial, release, cardWord), text: artifactSummary(initial, release).answerText },
           challengeMessage: letterOptionIds(applyTexts(delivery.renderedMessage, texts)),
           final: { label: answerLabel(final, release, cardWord), text: artifactSummary(final, release).answerText },
-          confidenceBefore: task.initialConfidence,
-          confidenceAfter: task.finalConfidence,
+          confidenceBefore: tenPointConfidence(task.initialConfidence),
+          confidenceAfter: tenPointConfidence(task.finalConfidence),
           explanations: release.feedbackContent,
         };
       }),

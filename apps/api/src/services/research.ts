@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { FieldValue, type DocumentData, type Firestore, type Timestamp, type Transaction } from 'firebase-admin/firestore';
 import { Artifact, ResearchRow } from '@logina/contracts';
 import { decodeNested } from '@logina/db';
-import { answerColumns, buildResearchRow, formatChanges, materialHash, relationBucket, researchTime, type Q1Letters } from '@logina/domain';
+import { answerColumns, tenPointConfidence, buildResearchRow, formatChanges, materialHash, relationBucket, researchTime, type Q1Letters } from '@logina/domain';
 
 /** A Reset reuses attempt IDs, so the run number keeps each run's row. Hashed, so no uid reaches the Sheet. */
 export const researchRowId = (attemptId: string, slot: string, runNumber: number): string =>
@@ -101,7 +101,7 @@ export function writeResearchRow(
       release: release.releaseLabel,
       first: answerColumns(Artifact.parse(task.initialArtifact), letters),
       final: answerColumns(final, letters),
-      first_confidence: task.initialConfidence,
+      first_confidence: tenPointConfidence(task.initialConfidence),
       locked_at: researchTime(lockedAt),
       prompt_label: delivery.challengeLabel,
       prompt_mode: delivery.mode,
