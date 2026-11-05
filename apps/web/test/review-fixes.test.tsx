@@ -74,6 +74,9 @@ describe('final review fixes', () => {
     expect(['/', '/index.html', '/version.json', '/t/lessons'].every(matchesPage)).toBe(true);
     expect(matchesPage('/assets/index-a1.js')).toBe(false);
     expect(matchesPage('/api/v1/health')).toBe(false);
+    /** Firebase Hosting compiles header patterns with RE2, which has no lookaround. */
+    expect(pages.regex).not.toMatch(/\(\?[=!<]/);
+    expect(['/accessibility', '/api', '/assetsx/y'].every(matchesPage)).toBe(true);
   });
 
   it('links styled as buttons get the hover too, since a link is never :enabled', () => {

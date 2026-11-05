@@ -43,14 +43,21 @@ describe('app version', () => {
     expect(renderHook(() => version.useOutdated()).result.current).toBe(false);
   });
 
-  it('an API reply from another version marks it, a dev reply does not', async () => {
+  it('an API reply from another version only prompts a check; version.json decides', async () => {
     const version = await load('abc1234');
+    serves({ version: 'abc1234' });
     version.noteServerVersion('dev');
     version.noteServerVersion(null);
     version.noteServerVersion('abc1234');
+    expect(fetch).not.toHaveBeenCalled();
+    version.noteServerVersion('def5678');
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
     expect(renderHook(() => version.useOutdated()).result.current).toBe(false);
     version.noteServerVersion('def5678');
-    expect(renderHook(() => version.useOutdated()).result.current).toBe(true);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    serves({ version: 'def5678' });
+    version.noteServerVersion('fff9999');
+    await vi.waitFor(() => expect(renderHook(() => version.useOutdated()).result.current).toBe(true));
   });
 
   it('checks again every 5 minutes and when the tab comes back', async () => {

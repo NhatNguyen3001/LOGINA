@@ -12,13 +12,13 @@ export function UpdateBar() {
   const outdated = useOutdated();
   const unsaved = useHasUnsavedText();
   const [asking, setAsking] = useState(false);
-  if (!outdated) return null;
+  /** The status region is always in the page, so a screen reader hears the message when it appears. */
   return (
-    <div className="update-bar">
-      <div role="status" className="update-bar-in">
-        <RefreshCw className="ico" aria-hidden="true" />
-        <span className="grow">{t(unsaved ? 'update.saveFirst' : 'update.ready')}</span>
-        <button type="button" className={buttonVariants({ size: 'sm' })} onClick={() => (unsaved ? setAsking(true) : reloadApp())}>{t('update.reload')}</button>
+    <div className={outdated ? 'update-bar' : undefined}>
+      <div className={outdated ? 'update-bar-in' : undefined}>
+        {outdated ? <RefreshCw className="ico" aria-hidden="true" /> : null}
+        <span role="status" className="grow">{outdated ? t(unsaved ? 'update.saveFirst' : 'update.ready') : null}</span>
+        {outdated ? <button type="button" className={buttonVariants({ size: 'sm' })} onClick={() => (unsaved ? setAsking(true) : reloadApp())}>{t('update.reload')}</button> : null}
       </div>
       <AlertDialog open={asking} onOpenChange={setAsking}>
         <AlertDialogContent>

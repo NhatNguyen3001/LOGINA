@@ -29,9 +29,16 @@ export const useOutdated = (): boolean => useSyncExternalStore(subscribe, isOutd
 
 const isNewer = (version: unknown): boolean => typeof version === 'string' && version !== '' && version !== DEV && APP_VERSION !== DEV && version !== APP_VERSION;
 
-/** Each API reply names the version it runs; a different one means this tab is behind. */
+let lastServerVersion: string | null = null;
+
+/**
+ * Each API reply names the version it runs. A different one is a reason to ask, not proof: during a deploy the API
+ * changes minutes before the site does, and only version.json changes together with the files it describes.
+ */
 export function noteServerVersion(version: string | null): void {
-  if (isNewer(version)) markOutdated();
+  if (!isNewer(version) || version === lastServerVersion) return;
+  lastServerVersion = version;
+  void checkForUpdate();
 }
 
 /** Asks the site which version is live. No answer is no news: only a different version marks the tab. */

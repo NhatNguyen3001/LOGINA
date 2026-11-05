@@ -20,9 +20,17 @@ const goOutdated = () => act(() => version.markOutdated());
 beforeEach(() => vi.mocked(version.reloadApp).mockClear());
 
 describe('update bar', () => {
-  it('shows nothing while the app is current', async () => {
+  it('shows nothing while the app is current, but keeps an empty status region ready to announce', async () => {
     const { container } = await renderWithI18n(<UpdateBar />);
     expect(container.textContent).toBe('');
+    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+  });
+
+  it('the announcement is the message alone, with Reload outside it', async () => {
+    await renderWithI18n(<UpdateBar />);
+    goOutdated();
+    expect(screen.getByRole('status')).toHaveTextContent(/^LOGINA has been updated\. Reload to get the latest version\.$/);
+    expect(screen.getByRole('status')).not.toContainElement(screen.getByRole('button', { name: 'Reload' }));
   });
 
   it('shows the update message with Reload once a newer version is live, and Reload reloads', async () => {
