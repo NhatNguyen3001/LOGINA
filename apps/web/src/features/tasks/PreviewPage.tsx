@@ -1,3 +1,4 @@
+import { useUnsavedText } from '@/lib/unsaved';
 import { readableSourceRefs } from '@/lib/source-refs';
 import { TaskName } from '@/components/logina/TaskName';
 import type { Slot, TeacherTaskPreviewDTO, TeacherTaskSummaryDTO } from '@logina/contracts';
@@ -91,6 +92,7 @@ function PromptEditor({ lessonId, draftId, draftVersion, challengeId, message, o
   const sampleText = useSamplePrefill(lessonId)?.promptText[challengeId];
   const [typed, setValue] = useState<string | null>(null);
   const value = typed ?? sampleText ?? message;
+  useUnsavedText(typed !== null && typed !== message);
   const save = useMutation({
     mutationFn: () => sendEdit(lessonId, { editScope: 'LOGIC', targetType: 'challenge', targetId: draftId, changedRefs: [challengeId], baseVersion: draftVersion, payload: { challengeId, message: value } }, newKey()),
     onSuccess: async () => {
@@ -235,6 +237,7 @@ function QuickEdit({ lessonId, preview, optionId, text, onClose }: { lessonId: s
   const sampleText = useSamplePrefill(lessonId)?.optionText[optionId];
   const [typed, setValue] = useState<string | null>(null);
   const value = typed ?? sampleText ?? text;
+  useUnsavedText(typed !== null && typed !== text);
   const key = useRef(newKey());
 
   const save = useMutation({

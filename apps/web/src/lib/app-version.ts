@@ -61,3 +61,8 @@ export function startUpdateChecks(): () => void {
     document.removeEventListener('visibilitychange', onVisible);
   };
 }
+
+/** Kept apart so tests can watch it without reloading the page. */
+export function reloadApp(): void {
+  window.location.reload();
+}

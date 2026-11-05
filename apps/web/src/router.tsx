@@ -1,6 +1,8 @@
 import { Toast } from '@/components/logina/Toast';
 import { Outlet, createRootRoute, createRoute, createRouter, useNavigate, useParams } from '@tanstack/react-router';
-import { Suspense, lazy, type ComponentType } from 'react';
+import { Suspense, lazy, useEffect, type ComponentType } from 'react';
+import { UpdateBar } from '@/components/logina/UpdateBar';
+import { startUpdateChecks } from '@/lib/app-version';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { useSessionLocale } from '@/lib/use-session-locale';
 import { EntryPage } from '@/features/entry/EntryPage';
@@ -34,8 +36,10 @@ const StudentHome = screen(() => import('@/features/student/StudentHome'), 'Stud
 const TaskRunner = screen(() => import('@/features/student/TaskRunner'), 'TaskRunner');
 
 function Root() {
+  useEffect(() => startUpdateChecks(), []);
   return (
     <>
+      <UpdateBar />
       <Outlet />
       <Toast />
     </>

@@ -1,3 +1,4 @@
+import { useUnsavedText } from '@/lib/unsaved';
 import { plainTeacherText } from '@/lib/prompt-name';
 import { TaskName } from '@/components/logina/TaskName';
 import type { Slot, TaskApprovalDTO } from '@logina/contracts';
@@ -48,6 +49,7 @@ function Decision({ lessonId, task, findings }: { lessonId: string; task: Task; 
     mutationFn: () => Promise.all(findings.map(({ gateId, findingCode }) => sendDisposition(lessonId, task.slot, { decision: 'TEACHER_ACCEPT_WITH_REASON', gateId, findingCode, reason, baseVersion: task.draftVersion }, newKey()))),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.approval(lessonId) }),
   });
+  useUnsavedText(accepting && typed !== null && !accept.isSuccess);
   const fix = <Link to="/t/lessons/$id/tasks/$slot" params={{ id: lessonId, slot: task.slot }} className="lnk">{t('teacher.t12.fix')}</Link>;
 
   return (

@@ -779,5 +779,12 @@
     "student": "Student",
     "trace": "Student trace",
     "results": "Results"
+  },
+  "update": {
+    "ready": "LOGINA has been updated. Reload to get the latest version.",
+    "saveFirst": "LOGINA has been updated. Save your changes first, then reload.",
+    "reload": "Reload",
+    "unsavedTitle": "You have unsaved text. Reload anyway?",
+    "keepEditing": "Keep editing"
   }
 }

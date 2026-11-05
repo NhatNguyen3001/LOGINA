@@ -779,5 +779,12 @@
     "student": "Học sinh",
     "trace": "Trace học sinh",
     "results": "Kết quả"
+  },
+  "update": {
+    "ready": "LOGINA đã được cập nhật. Tải lại để dùng bản mới nhất.",
+    "saveFirst": "LOGINA đã được cập nhật. Cô lưu thay đổi trước rồi tải lại.",
+    "reload": "Tải lại",
+    "unsavedTitle": "Còn nội dung chưa lưu. Vẫn tải lại?",
+    "keepEditing": "Tiếp tục sửa"
   }
 }

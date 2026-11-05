@@ -1,3 +1,4 @@
+import { useUnsavedText } from '@/lib/unsaved';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
@@ -27,6 +28,7 @@ export function AssignPage() {
   const sampleMessage = useSamplePrefill(id)?.messageToStudents;
   const [typed, setMessage] = useState<string | null>(null);
   const message = typed ?? sampleMessage ?? '';
+  useUnsavedText(typed !== null);
   const key = useRef(newKey());
   const lesson = useQuery({ queryKey: qk.lesson(id), queryFn: () => getLesson(id) });
   const approval = useQuery({ queryKey: qk.approval(id), queryFn: () => getApproval(id) });

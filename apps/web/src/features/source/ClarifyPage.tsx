@@ -1,3 +1,4 @@
+import { useUnsavedText } from '@/lib/unsaved';
 import { readableSourceRefs } from '@/lib/source-refs';
 import type { ResolveIssueReq, SourceReviewDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -41,6 +42,7 @@ function IssueCard({ issue, onResolve, pending, onFocusPoint, sample }: { issue:
   const reason = typedReason ?? (mode === 'keepOpen' ? sample?.keepOpen?.reason : undefined) ?? '';
   const resolved = issue.state !== 'UNRESOLVED';
   const blocker = issue.severity === 'BLOCKER';
+  useUnsavedText(!resolved && (typedBounds !== null || typedReason !== null || text !== issue.currentInterpretation));
 
   return (
     <article id={`point-${issue.id}`} tabIndex={-1} className={cardVariants({ edge: resolved ? 'none' : blocker ? 'red' : 'orange' })} onMouseEnter={() => onFocusPoint(issue.pointNumber)} onMouseLeave={() => onFocusPoint(null)} onFocus={() => onFocusPoint(issue.pointNumber)}>

@@ -1,3 +1,4 @@
+import { useUnsavedText } from '@/lib/unsaved';
 import { TaskName } from '@/components/logina/TaskName';
 import { alertVariants } from '@/components/ui/alert';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -64,10 +65,11 @@ export function CreateLesson({ sampleAllowed = import.meta.env.VITE_DEMO_MODE ==
   const me = useQuery({ queryKey: qk.me(), queryFn: getMe });
   const classId = me.data?.classIds[0];
 
-  const { register, handleSubmit, control, setValue, getValues, formState: { errors } } = useForm<Form>({
+  const { register, handleSubmit, control, setValue, getValues, formState: { errors, isDirty } } = useForm<Form>({
     resolver: zodResolver(Form),
     defaultValues: kept.form ?? { sourceTitle: '', title: '', subject: '', topic: '', objective: '', contentLocale: i18n.language === 'vi' ? 'vi' : 'en' },
   });
+  useUnsavedText(isDirty);
 
   /** The sample fills every field in the material language, so a judge only has to press Analyze. */
   const fillSample = (locale: Form['contentLocale']) => {
