@@ -23,6 +23,19 @@ describe('deploy-dev.sh', () => {
     expect(script).toMatch(/gcloud builds submit .*--config apps\/api\/cloudbuild\.yaml .* \.$/m);
   });
 
+  it('stamps the API with the commit it was built from', () => {
+    expect(script).toMatch(/API_ENV=.*BUILD_SHA=\$SHA/);
+  });
+
+  it('stamps the web build with the same commit', () => {
+    expect(script).toContain('VITE_BUILD_SHA=$SHA pnpm --filter @logina/web build');
+  });
+
+  it('keeps the code files of the live version after the web build and before firebase deploy', () => {
+    expect(lineOf('keep-live-assets.ts')).toBeGreaterThan(lineOf('pnpm --filter @logina/web build'));
+    expect(lineOf('keep-live-assets.ts')).toBeLessThan(lineOf('firebase deploy'));
+  });
+
   it('stops on a dirty tree or a failed check', () => {
     expect(script).toContain('set -euo pipefail');
     expect(script).toContain('git status --porcelain');

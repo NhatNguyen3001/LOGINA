@@ -47,7 +47,7 @@ export function plainTeacherText(text: string, t: TFunction, midSentence = false
 }
 
 const VIETNAMESE = /[ăâđêôơưạảãáàặẳẵắằậẩẫấầẹẻẽéèệểễếềịỉĩíìọỏõóòộổỗốồợởỡớờụủũúùựửữứừỵỷỹýỳ]/i;
-const STUDENT_WORDS = { en: { A: 'statement', E: 'card' }, vi: { A: 'câu', E: 'thẻ' } } as const;
+const STUDENT_WORDS = { en: { A: 'statement', E: 'card' }, vi: { A: 'nhận định', E: 'thẻ' } } as const;
 
 /** A prompt exactly as the student reads it: the same lettering the API applies (letterOptionIds in @logina/domain). */
 export function asStudentSees(text: string): string {

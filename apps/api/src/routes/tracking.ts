@@ -2,7 +2,7 @@ import { type DocumentData, type Firestore, type Timestamp } from 'firebase-admi
 import { Hono } from 'hono';
 import { Artifact, ClassTrackingDTO, TraceDTO } from '@logina/contracts';
 import { AppError, decodeNested, scopedGet } from '@logina/db';
-import { relationBucket } from '@logina/domain';
+import { relationBucket, tenPointConfidence } from '@logina/domain';
 import type { AppDeps, AppEnv } from '../context.js';
 import { respond } from '../middleware/respond.js';
 import { artifactSummary } from '../services/runtime.js';
@@ -63,8 +63,8 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
         submittedCount: attempt.submittedCount,
         keepCount: submitted.filter((t) => t.data.choice === 'KEEP').length,
         reviseCount: submitted.filter((t) => t.data.choice === 'REVISE').length,
-        ...(q1?.initialConfidence !== undefined ? { confidenceBefore: q1.initialConfidence } : {}),
-        ...(q1?.finalConfidence !== undefined ? { confidenceAfter: q1.finalConfidence } : {}),
+        ...(q1?.initialConfidence !== undefined ? { confidenceBefore: tenPointConfidence(q1.initialConfidence) } : {}),
+        ...(q1?.finalConfidence !== undefined ? { confidenceAfter: tenPointConfidence(q1.finalConfidence) } : {}),
       };
     });
 
@@ -83,8 +83,8 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
         submitted: rows.length,
         keep: rows.filter((r) => r.data.choice === 'KEEP').length,
         revise: rows.filter((r) => r.data.choice === 'REVISE').length,
-        avgConfidenceBefore: average(rows.map((r) => r.data.initialConfidence as number)),
-        avgConfidenceAfter: average(rows.map((r) => r.data.finalConfidence as number)),
+        avgConfidenceBefore: average(rows.map((r) => tenPointConfidence(r.data.initialConfidence))),
+        avgConfidenceAfter: average(rows.map((r) => tenPointConfidence(r.data.finalConfidence))),
         deliveredChallenges: [...delivered.values()],
       };
     });
@@ -150,13 +150,13 @@ export function trackingRoutes({ db }: AppDeps): Hono<AppEnv> {
       slotChips: SLOTS.map((s) => ({ slot: s, choice: taskDocs.docs.find((d) => d.id === s)?.data().choice ?? null })),
       slot,
       questionStem: content.questionStem,
-      before: { ...before, confidence: task.initialConfidence, lockedAt: iso(task.lockedAt), relationLabel: relation(task.initialArtifact as DocumentData) },
+      before: { ...before, confidence: tenPointConfidence(task.initialConfidence), lockedAt: iso(task.lockedAt), relationLabel: relation(task.initialArtifact as DocumentData) },
       challenge: { label: delivery.challengeLabel, message: delivery.renderedMessage, whySelected: candidate?.whenShownForTeacher ?? '', studentChoice: task.choice },
       after: {
         answer: { ...after.answer, changed: isQ1 ? changed.includes('answer') : task.choice === 'REVISE' },
         ...(after.evidence ? { evidence: { ...after.evidence, changed: changed.includes('evidence') } } : {}),
-        confidenceBefore: task.initialConfidence,
-        confidenceAfter: task.finalConfidence,
+        confidenceBefore: tenPointConfidence(task.initialConfidence),
+        confidenceAfter: tenPointConfidence(task.finalConfidence),
         submittedAt: iso(task.submittedAt),
         relationLabel: relation(task.finalArtifact as DocumentData),
       },

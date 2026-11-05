@@ -1,9 +1,10 @@
+import { useUnsavedText } from '@/lib/unsaved';
+import { ErrorNote } from '@/components/logina/ErrorNote';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { asStudentSees, plainTeacherText, promptName } from '@/lib/prompt-name';
-import { Note } from '@/components/logina/Note';
 import { PairGrid } from '@/components/logina/PairGrid';
 import { getLesson, getLogicReview, getPreview, newKey, sendEdit } from '@/lib/api';
 import { qk } from '@/lib/query';
@@ -14,7 +15,6 @@ import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { cardVariants } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { errorText } from '@/lib/errors';
 
 const TABS = ['pairs', 'prompts', 'adjust'] as const;
 
@@ -26,6 +26,7 @@ export function LogicPage() {
   const [tab, setTab] = useState<(typeof TABS)[number]>('pairs');
   const [challengeId, setChallengeId] = useState('');
   const [message, setMessage] = useState('');
+  useUnsavedText(message.trim() !== '');
   const logic = useQuery({ queryKey: qk.logic(id, 'Q1'), queryFn: () => getLogicReview(id, 'Q1') });
   const lesson = useQuery({ queryKey: qk.lesson(id), queryFn: () => getLesson(id) });
   const preview = useQuery({ queryKey: qk.preview(id, 'Q1'), queryFn: () => getPreview(id, 'Q1') });
@@ -83,7 +84,7 @@ export function LogicPage() {
             <Textarea id="message" value={message} onChange={(event) => setMessage(event.target.value)} />
           </div>
           <p className="s13 sec">{t('teacher.t08.invalidates')}</p>
-          {save.isError ? <Note kind="err">{t(errorText(save.error))}</Note> : null}
+          {save.isError ? <ErrorNote error={save.error} text={message} /> : null}
           <button type="button" className={cn(buttonVariants(), 'self-start')} aria-busy={save.isPending} disabled={!challengeId || !message.trim() || save.isPending} onClick={() => save.mutate()}>{t('teacher.t07.saveRecheck')}</button>
         </div>
         </TabsContent>

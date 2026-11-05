@@ -493,7 +493,8 @@
     "NETWORK": "Couldn't reach LOGINA. Check your connection and try again.",
     "INTERNAL": "Something went wrong on our side. Try again in a moment.",
     "RATE_LIMITED": "LOGINA is busy right now. Try again in a few seconds.",
-    "CONTENT_OUTDATED": "This demo was set up with an older version of LOGINA. Reset the demo to get the current tasks."
+    "CONTENT_OUTDATED": "This demo was set up with an older version of LOGINA. Reset the demo to get the current tasks.",
+    "APP_UPDATED": "LOGINA was updated while you were working. Reload to continue. Your saved work is kept."
   },
   "common": {
     "lang": {
@@ -779,5 +780,14 @@
     "student": "Student",
     "trace": "Student trace",
     "results": "Results"
+  },
+  "update": {
+    "ready": "LOGINA has been updated. Reload to get the latest version.",
+    "saveFirst": "LOGINA has been updated. Save your changes first, then reload.",
+    "reload": "Reload",
+    "unsavedTitle": "You have unsaved text. Reload anyway?",
+    "keepEditing": "Keep editing",
+    "copyText": "Copy your text",
+    "screenGone": "This screen is from an older version of LOGINA. Reload to open the latest one."
   }
 }

@@ -64,6 +64,21 @@ describe('final review fixes', () => {
     }
   });
 
+  it('the start page is never cached and code files are cached for a year', () => {
+    const hosting = JSON.parse(readFileSync(resolve(process.cwd(), '../../firebase.json'), 'utf8')).hosting as { headers: { source?: string; regex?: string; headers: { key: string; value: string }[] }[] };
+    const rule = (match: (entry: { source?: string; regex?: string }) => boolean) => hosting.headers.find(match)?.headers.find((h) => h.key === 'Cache-Control')?.value;
+    expect(rule((entry) => entry.source === '/assets/**')).toBe('public, max-age=31536000, immutable');
+    const pages = hosting.headers.find((entry) => entry.regex)!;
+    expect(rule((entry) => entry.regex === pages.regex)).toBe('no-cache');
+    const matchesPage = (path: string) => new RegExp(pages.regex!).test(path);
+    expect(['/', '/index.html', '/version.json', '/t/lessons'].every(matchesPage)).toBe(true);
+    expect(matchesPage('/assets/index-a1.js')).toBe(false);
+    expect(matchesPage('/api/v1/health')).toBe(false);
+    /** Firebase Hosting compiles header patterns with RE2, which has no lookaround. */
+    expect(pages.regex).not.toMatch(/\(\?[=!<]/);
+    expect(['/accessibility', '/api', '/assetsx/y'].every(matchesPage)).toBe(true);
+  });
+
   it('links styled as buttons get the hover too, since a link is never :enabled', () => {
     expect(src('components/ui/button.tsx')).not.toMatch(/enabled:hover:/);
     expect(src('components/ui/button.tsx')).toMatch(/not-disabled:hover:bg-subtle/);

@@ -46,6 +46,7 @@ import {
 import { z } from 'zod';
 import { ensureSession, idToken, renewSession } from './auth';
 import { setBusy } from './busy';
+import { checkForUpdate, noteServerVersion } from './app-version';
 
 export const newKey = (): string => crypto.randomUUID();
 
@@ -75,7 +76,9 @@ async function send(path: string, { method, body, key }: RequestOptions): Promis
   const headers: Record<string, string> = { Authorization: `Bearer ${await idToken()}` };
   if (method !== 'GET') headers['Content-Type'] = 'application/json';
   if (key) headers['Idempotency-Key'] = key;
-  return fetch(`/api/v1${path}`, { method, headers, ...(method === 'GET' ? {} : { body: JSON.stringify(body ?? {}) }) });
+  const response = await fetch(`/api/v1${path}`, { method, headers, ...(method === 'GET' ? {} : { body: JSON.stringify(body ?? {}) }) });
+  noteServerVersion(response.headers?.get('x-logina-version') ?? null);
+  return response;
 }
 
 async function toError(response: Response): Promise<ApiError> {
@@ -117,9 +120,14 @@ export async function request<S extends z.ZodType>(path: string, schema: S, opti
     await renewSession();
     response = await sendPatiently(path, options);
   }
-  if (!response.ok) throw await toError(response);
+  if (!response.ok) {
+    const error = await toError(response);
+    /** A refusal of data this tab sent can mean the tab is older than the API. */
+    if (error.status === 400 && error.code === 'INVALID_REQUEST' && (await checkForUpdate())) throw new ApiError(error.status, 'APP_UPDATED');
+    throw error;
+  }
   const parsed = schema.safeParse(await response.json());
-  if (!parsed.success) throw new ApiError(response.status, 'RESPONSE_SCHEMA');
+  if (!parsed.success) throw new ApiError(response.status, (await checkForUpdate()) ? 'APP_UPDATED' : 'RESPONSE_SCHEMA');
   return parsed.data;
 }
 

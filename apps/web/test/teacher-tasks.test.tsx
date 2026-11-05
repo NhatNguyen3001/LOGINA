@@ -1,3 +1,4 @@
+import { hasUnsavedText } from '@/lib/unsaved';
 import type { ClassTrackingDTO, LessonDTO, TaskApprovalDTO, TasksOverviewDTO, TeacherTaskPreviewDTO, TraceDTO } from '@logina/contracts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
@@ -238,6 +239,14 @@ describe('T8 logic review', () => {
     expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', prompts.id);
   });
 
+  it('typing a prompt in Adjust logic counts as unsaved text', async () => {
+    await render(<LogicPage />);
+    fireEvent.mouseDown(await screen.findByRole('tab', { name: /Adjust/ }));
+    expect(hasUnsavedText()).toBe(false);
+    fireEvent.change(await screen.findByLabelText('New wording'), { target: { value: 'Look at the table again.' } });
+    expect(hasUnsavedText()).toBe(true);
+  });
+
   it('the Logic dropdown picks a prompt with the keyboard', async () => {
     await render(<LogicPage />);
     fireEvent.mouseDown(await screen.findByRole('tab', { name: /Adjust/ }));
@@ -308,6 +317,17 @@ describe('T12 translation', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Which statement?' }), { target: { value: 'Câu nào đúng?' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save and recheck' }));
     await waitFor(() => expect(api.editTranslation).toHaveBeenCalledWith('l1', 'Q1', { from: 'Which statement?', to: 'Câu nào đúng?', translationVersion: 2 }, expect.any(String)));
+  });
+
+  it('an edited translated line counts as unsaved text until it matches again', async () => {
+    showing('Q1', translation());
+    await render(<ApprovePage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit translation' }));
+    expect(hasUnsavedText()).toBe(false);
+    fireEvent.change(screen.getByRole('textbox', { name: 'Which statement?' }), { target: { value: 'Câu nào đúng?' } });
+    expect(hasUnsavedText()).toBe(true);
+    fireEvent.change(screen.getByRole('textbox', { name: 'Which statement?' }), { target: { value: 'Nhận định nào?' } });
+    expect(hasUnsavedText()).toBe(false);
   });
 
   it('a blocked or stuck translation can be retried', async () => {
@@ -443,6 +463,21 @@ describe('T7, T9 and T11', () => {
     expect(await screen.findByText("Couldn't save Quick edit")).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Edit source (Approval 1 again)' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Revert to the previous wording' })).toBeInTheDocument();
+  });
+
+  it('a teacher save that fails because LOGINA was updated keeps the typed text and offers Copy', async () => {
+    const writeText = vi.fn(async () => {});
+    vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });
+    vi.mocked(api.sendEdit).mockRejectedValue(new api.ApiError(400, 'APP_UPDATED'));
+    await render(<PreviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Quick edit statement A' }));
+    fireEvent.change(screen.getByLabelText('Quick edit statement A', { selector: 'textarea' }), { target: { value: 'My careful wording' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save and recheck' }));
+    expect(await screen.findByText('LOGINA was updated while you were working. Reload to continue. Your saved work is kept.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Quick edit statement A', { selector: 'textarea' })).toHaveValue('My careful wording');
+    fireEvent.click(screen.getByRole('button', { name: 'Copy your text' }));
+    expect(writeText).toHaveBeenCalledWith('My careful wording');
+    vi.unstubAllGlobals();
   });
 
   it('a conflict says someone else saved first and offers to copy', async () => {

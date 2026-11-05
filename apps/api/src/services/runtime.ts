@@ -1,7 +1,7 @@
 import { FieldValue, type DocumentData, type Firestore } from 'firebase-admin/firestore';
 import { Artifact, type AttemptDTO, type StudentChallengeDTO, type SubmitResultDTO } from '@logina/contracts';
 import { AppError, decodeNested, moveTree, newId, scopedGet, writeOnce } from '@logina/db';
-import { applyTexts, letterOptionIds, buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle, type TextPair } from '@logina/domain';
+import { applyTexts, letterOptionIds, tenPointConfidence, buildLockFacts, compareArtifacts, selectChallenge, type Q1Labels, type RuleBundle, type TextPair } from '@logina/domain';
 
 const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const LETTERS = 'ABCD';
@@ -136,7 +136,7 @@ export function artifactSummary(artifact: Artifact, release: DocumentData): { an
 const toChallengeDTO = (taskDoc: DocumentData, delivery: DocumentData, deliveryId: string, release: DocumentData): StudentChallengeDTO => ({
   deliveryId,
   message: delivery.renderedMessage,
-  lockedSummary: { ...artifactSummary(Artifact.parse(taskDoc.initialArtifact), release), confidence: taskDoc.initialConfidence },
+  lockedSummary: { ...artifactSummary(Artifact.parse(taskDoc.initialArtifact), release), confidence: tenPointConfidence(taskDoc.initialConfidence) },
 });
 
 /** One transaction: the locked answer and its one prompt are stored together or not at all. */
@@ -233,7 +233,7 @@ export async function submitTask(
       choice: recordedChoice,
       finalArtifact: final,
       finalConfidence,
-      confidenceDelta: finalConfidence - (task.initialConfidence as number),
+      confidenceDelta: finalConfidence - tenPointConfidence(task.initialConfidence),
       changedElements,
       submittedAt: FieldValue.serverTimestamp(),
     });

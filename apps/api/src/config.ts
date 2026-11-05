@@ -15,6 +15,8 @@ export interface Config {
   limits: RateLimits;
   /** How many X-Forwarded-For entries, from the right, our own proxies added. */
   trustedProxyHops: number;
+  /** The commit this API was built from, sent on every reply so an open tab can tell it is out of date. */
+  buildSha: string;
 }
 
 type Env = Record<string, string | undefined>;
@@ -33,6 +35,7 @@ export function loadConfig(env: Env = process.env): Config {
     snapshotLocale: env.DEMO_LOCALE === 'vi' ? 'vi' : 'en',
     limits: limitsFromEnv(env),
     trustedProxyHops: Number(env.TRUSTED_PROXY_HOPS ?? 1),
+    buildSha: env.BUILD_SHA || 'dev',
   };
 }
 
@@ -53,5 +56,6 @@ export const testConfig = (overrides: Partial<Config> = {}): Config => ({
   snapshotLocale: 'en',
   limits: testLimits,
   trustedProxyHops: 1,
+  buildSha: 'dev',
   ...overrides,
 });

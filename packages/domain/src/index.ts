@@ -15,4 +15,5 @@ export * from './facts.js';
 export * from './research.js';
 export * from './translate.js';
 export * from './option-letters.js';
+export * from './confidence.js';
 export * from './thoughts.js';

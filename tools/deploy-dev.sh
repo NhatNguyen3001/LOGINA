@@ -29,7 +29,7 @@ if [ -n "${RESEARCH_SHEET_ID:-}" ]; then
   WORKER_ENV="$WORKER_ENV,RESEARCH_SHEET_ID=$RESEARCH_SHEET_ID"
 fi
 
-API_ENV="$SHARED,NO_SIGN_IN=true,RESEARCH_ENABLED=true,PARTICIPANT_TYPE=judge,LIVE_UPLOADS_PER_DAY=100,TRUSTED_PROXY_HOPS=${TRUSTED_PROXY_HOPS:-2}"
+API_ENV="$SHARED,BUILD_SHA=$SHA,NO_SIGN_IN=true,RESEARCH_ENABLED=true,PARTICIPANT_TYPE=judge,LIVE_UPLOADS_PER_DAY=100,TRUSTED_PROXY_HOPS=${TRUSTED_PROXY_HOPS:-2}"
 API_ENV="$API_ENV,TASKS_QUEUE=logina-jobs,EXPORT_QUEUE=logina-export,TASKS_LOCATION=$REGION,TASKS_INVOKER_SA=$INVOKER"
 API_ENV="$API_ENV,LIMIT_NEW_SESSIONS_ADDRESS_HOUR=300,LIMIT_API_SESSION_MINUTE=600,LIMIT_API_ADDRESS_MINUTE=5000"
 
@@ -45,7 +45,8 @@ gcloud run deploy api --project "$PROJECT_ID" --region "$REGION" --image "$REGIS
   --service-account "logina-api@$PROJECT_ID.iam.gserviceaccount.com" \
   --min-instances 1 --allow-unauthenticated --set-env-vars "$API_ENV,WORKER_URL=$WORKER_URL"
 
-pnpm --filter @logina/web build
+VITE_BUILD_SHA=$SHA pnpm --filter @logina/web build
+pnpm exec tsx tools/keep-live-assets.ts --base "https://$PROJECT_ID.web.app" --into apps/web/dist
 firebase deploy --only hosting,firestore:rules,firestore:indexes,storage --project "$PROJECT_ID"
 
 if [ "$SKIP_SMOKE" != "--skip-smoke" ]; then

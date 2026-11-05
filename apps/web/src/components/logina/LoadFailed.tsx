@@ -5,6 +5,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { demoReset, newKey } from '@/lib/api';
 import { errorAction, errorText } from '@/lib/errors';
 import { reloadHome } from '@/lib/reload-home';
+import { reloadApp } from '@/lib/app-version';
 
 /** For a page that could not load: it says why in plain words and offers the one thing that helps. */
 export function LoadFailed({ error, onRetry }: { error: unknown; onRetry: () => void }) {
@@ -17,7 +18,9 @@ export function LoadFailed({ error, onRetry }: { error: unknown; onRetry: () => 
   return (
     <Note kind="err">
       <p>{t(errorText(error))}</p>
-      {action === 'reset' ? (
+      {action === 'reload' ? (
+        <button type="button" className={buttonVariants({ size: 'sm' })} onClick={reloadApp}>{t('update.reload')}</button>
+      ) : action === 'reset' ? (
         <button type="button" className={buttonVariants({ size: 'sm' })} aria-busy={reset.isPending} disabled={reset.isPending} onClick={() => reset.mutate()}>{t('common.resetDemo')}</button>
       ) : (
         <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} onClick={onRetry}>{t('common.retry')}</button>

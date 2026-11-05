@@ -1,3 +1,4 @@
+import { useUnsavedText } from '@/lib/unsaved';
 import { plainTeacherText } from '@/lib/prompt-name';
 import type { Slot, TaskApprovalDTO } from '@logina/contracts';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -23,6 +24,7 @@ function Line({ lessonId, slot, translation, from, to }: { lessonId: string; slo
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(to);
+  useUnsavedText(editing && value !== to);
   const save = useMutation({
     mutationFn: () => editTranslation(lessonId, slot, { from, to: value, translationVersion: translation.version }, newKey()),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.approval(lessonId) }),

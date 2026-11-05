@@ -1,3 +1,5 @@
+import { ErrorNote } from '@/components/logina/ErrorNote';
+import { useUnsavedText } from '@/lib/unsaved';
 import { plainTeacherText } from '@/lib/prompt-name';
 import { TaskName } from '@/components/logina/TaskName';
 import type { Slot, TaskApprovalDTO } from '@logina/contracts';
@@ -20,7 +22,6 @@ import { cardVariants } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { errorText } from '@/lib/errors';
 
 type Task = TaskApprovalDTO['tasks'][number];
 type Finding = Task['decisionsNeeded'][number];
@@ -48,6 +49,7 @@ function Decision({ lessonId, task, findings }: { lessonId: string; task: Task; 
     mutationFn: () => Promise.all(findings.map(({ gateId, findingCode }) => sendDisposition(lessonId, task.slot, { decision: 'TEACHER_ACCEPT_WITH_REASON', gateId, findingCode, reason, baseVersion: task.draftVersion }, newKey()))),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk.approval(lessonId) }),
   });
+  useUnsavedText(accepting && typed !== null && !accept.isSuccess);
   const fix = <Link to="/t/lessons/$id/tasks/$slot" params={{ id: lessonId, slot: task.slot }} className="lnk">{t('teacher.t12.fix')}</Link>;
 
   return (
@@ -118,7 +120,7 @@ function ApprovePanel({ lessonId, task, uploaded }: { lessonId: string; task: Ta
         <Checkbox checked={confirmed} onCheckedChange={(state) => setConfirmed(state === true)} className="mt-0.5" />
         <span className="s13 grow">{t('teacher.t12.confirm', { slot: task.slot })}</span>
       </label>
-      {approve.isError ? <Note kind="err">{t(errorText(approve.error))}</Note> : null}
+      {approve.isError ? <ErrorNote error={approve.error} /> : null}
       <button type="button" className={buttonVariants({ block: true })} aria-busy={approve.isPending} disabled={!confirmed || !ready || approve.isPending} onClick={() => approve.mutate()}>{t('teacher.t12.approveSlot', { slot: task.slot })}</button>
       {waitingOn ? <p className="hint">{t(`teacher.t12.why.${waitingOn}`)}</p> : null}
     </div>
