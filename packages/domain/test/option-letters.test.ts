@@ -10,6 +10,7 @@ describe('letterOptionIds', () => {
   it('Vietnamese prompts get Vietnamese words', () => {
     expect(letterOptionIds('Câu A1 có hai vế. Thẻ em chọn đã đủ chưa?')).toBe('Câu A có hai vế. Thẻ em chọn đã đủ chưa?');
     expect(letterOptionIds('Em xem lại E2 nhé.')).toBe('Em xem lại thẻ B nhé.');
+    expect(letterOptionIds('Em đọc lại A3 nhé.')).toBe('Em đọc lại nhận định C nhé.');
   });
 
   it('leaves other codes alone', () => {

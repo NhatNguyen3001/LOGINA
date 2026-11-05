@@ -1,6 +1,6 @@
 const LETTERS = 'ABCDEFGH';
 const VIETNAMESE = /[ăâđêôơưạảãáàặẳẵắằậẩẫấầẹẻẽéèệểễếềịỉĩíìọỏõóòộổỗốồợởỡớờụủũúùựửữứừỵỷỹýỳ]/i;
-const WORDS = { en: { A: 'statement', E: 'card' }, vi: { A: 'câu', E: 'thẻ' } } as const;
+const WORDS = { en: { A: 'statement', E: 'card' }, vi: { A: 'nhận định', E: 'thẻ' } } as const;
 
 /** Statements and cards are A1 and E1 inside LOGINA; students see them lettered A, B, C, so a prompt names them that way. */
 export function letterOptionIds(text: string): string {

@@ -37,7 +37,7 @@ const TN2 = {
   label: 'TN2',
   purpose: 'Đủ căn cứ',
   whenShown: 'Khi học sinh chọn A1 với thẻ chỉ hỗ trợ một vế',
-  message: 'Câu A có hai vế. Thẻ em chọn đã làm căn cứ cho cả hai vế chưa?',
+  message: 'Nhận định A có hai vế. Thẻ em chọn đã làm căn cứ cho cả hai vế chưa?',
 };
 const TN3 = {
   label: 'TN3',
@@ -276,7 +276,7 @@ export const examplesVi = {
       {
         ...issue1!,
         bubble:
-          'Tài liệu nói tỉ trọng nông – lâm – thủy sản giảm, nhưng chưa có tổng số lao động để biết số người có giảm không. Cô muốn giữ đây là điểm học sinh phải xem xét hay bổ sung nguồn?',
+          'Tài liệu nói tỉ trọng nông – lâm – thủy sản giảm, nhưng chưa có tổng số lao động để biết số người có giảm không. Thầy/cô muốn giữ đây là điểm học sinh phải xem xét hay bổ sung nguồn?',
         currentInterpretation: 'Chỉ kết luận về tỉ trọng, không kết luận về số người.',
         spans: [
           {
@@ -294,7 +294,7 @@ export const examplesVi = {
       },
       {
         ...issue2!,
-        bubble: 'Với phần này, cô muốn học sinh nhận ra xu hướng chuyển dịch, hay kiểm tra một kết luận vượt quá dữ liệu?',
+        bubble: 'Với phần này, thầy/cô muốn học sinh nhận ra xu hướng chuyển dịch, hay kiểm tra một kết luận vượt quá dữ liệu?',
         currentInterpretation: 'Nhận ra xu hướng chuyển dịch.',
         suggestions: [
           {

@@ -13,7 +13,7 @@
     "questionKind": "SOURCE",
     "severity": "BLOCKER",
     "sourceRef": "tr. 8 · Bảng 8.1",
-    "bubble": "Tài liệu nói tỉ trọng nông – lâm – thủy sản giảm, nhưng chưa có tổng số lao động để biết số người có giảm không. Cô muốn giữ đây là điểm học sinh phải xem xét hay bổ sung nguồn?",
+    "bubble": "Tài liệu nói tỉ trọng nông – lâm – thủy sản giảm, nhưng chưa có tổng số lao động để biết số người có giảm không. Thầy/cô muốn giữ đây là điểm học sinh phải xem xét hay bổ sung nguồn?",
     "currentInterpretation": "chỉ kết luận về tỉ trọng, không kết luận về số người.",
     "suggestions": [
       {
@@ -33,7 +33,7 @@
     "questionKind": "TEACHER_INTENT",
     "severity": "BLOCKER",
     "sourceRef": "Mục tiêu bài",
-    "bubble": "Với phần này, cô muốn học sinh nhận ra xu hướng chuyển dịch, hay kiểm tra một kết luận vượt quá dữ liệu?",
+    "bubble": "Với phần này, thầy/cô muốn học sinh nhận ra xu hướng chuyển dịch, hay kiểm tra một kết luận vượt quá dữ liệu?",
     "currentInterpretation": "học sinh nhận ra xu hướng chuyển dịch.",
     "suggestions": [
       {
