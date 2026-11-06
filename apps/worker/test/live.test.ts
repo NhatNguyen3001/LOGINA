@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { loadFixture, studentTexts, type DraftFixture } from '@logina/domain';
 import { liveSetup, testSchoolId, type LiveProject } from '@logina/test-utils';
 import { z } from 'zod';
-import { generateStructured, modelFor } from '../src/ai/model.js';
+import { generateStructured, modelFor, type AiWait } from '../src/ai/model.js';
 import { generatorSchema } from '../src/ai/schemas.js';
 import { translateTask } from '../src/jobs/translate.js';
 import { testWorkerConfig } from '../src/config.js';
@@ -437,7 +437,7 @@ describe('live GENERATE and RERUN', () => {
     await worker(genai).runJob(jobId);
     expect(await job(jobId)).toMatchObject({ status: 'FAILED', error: { code: 'AI_FAILED' } });
     expect(Object.keys((await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds)).toEqual(['Q2']);
-    expect(warn).toHaveBeenCalledWith(JSON.stringify({ event: 'AI_ATTEMPT_FAILED', role: 'generator', attempt: 2, failure: 'CALL_FAILED' }));
+    expect(warn).toHaveBeenCalledWith(JSON.stringify({ event: 'AI_ATTEMPT_FAILED', role: 'generator', attempt: 2, failure: 'CALL_FAILED', reason: 'ERROR', message: 'down' }));
     warn.mockRestore();
   });
 
@@ -644,5 +644,44 @@ describe('generateStructured', () => {
     await generateStructured(genai, testWorkerConfig(), { role: 'reader', schema, files: [{ gcsUri: 'gs://b/f', mimeType: 'application/pdf' }], text: 'hello' });
     expect(genai.calls[0]?.parts).toContainEqual({ fileData: { fileUri: 'gs://b/f', mimeType: 'application/pdf' } });
     expect(genai.calls[0]?.parts).toContainEqual({ text: 'hello' });
+  });
+
+  const busy = () => Object.assign(new Error('busy'), { status: 429 });
+  const waitFn = () => vi.fn<(wait: AiWait | null) => Promise<void>>(async () => {});
+  const waitsOf = (onWait: ReturnType<typeof waitFn>) => onWait.mock.calls.map(([wait]) => (wait ? { attempt: wait.attempt, of: wait.of } : null));
+
+  it('uses the thinking level set for each role', async () => {
+    const genai = stubGenai({ generator: { ok: true }, translator: { ok: true }, xreason: { ok: true }, translationCheck: { ok: true } });
+    for (const role of ['generator', 'xreason', 'translator', 'translationCheck'] as const) await generateStructured(genai, testWorkerConfig(), { role, schema });
+    expect(genai.calls.map((call) => call.thinking)).toEqual(['MEDIUM', 'MEDIUM', 'LOW', 'LOW']);
+  });
+
+  it('retries a busy reply up to 4 times, then fails with AI_BUSY', async () => {
+    const genai = stubGenai({ reader: () => { throw busy(); } });
+    const onWait = waitFn();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await expect(generateStructured(genai, testWorkerConfig(), { role: 'reader', schema, onWait })).rejects.toMatchObject({ code: 'AI_BUSY' });
+    warn.mockRestore();
+    expect(genai.calls).toHaveLength(4);
+    expect(waitsOf(onWait)).toEqual([{ attempt: 2, of: 4 }, { attempt: 3, of: 4 }, { attempt: 4, of: 4 }, null]);
+  });
+
+  it('a busy reply that clears on the next try succeeds', async () => {
+    let calls = 0;
+    const genai = stubGenai({ reader: () => { calls += 1; if (calls === 1) throw busy(); return { ok: true }; } });
+    const onWait = waitFn();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await expect(generateStructured(genai, testWorkerConfig(), { role: 'reader', schema, onWait })).resolves.toEqual({ ok: true });
+    warn.mockRestore();
+    expect(waitsOf(onWait)).toEqual([{ attempt: 2, of: 4 }, null]);
+    expect(onWait.mock.calls[0]?.[0]?.retryAt).toBeInstanceOf(Date);
+  });
+
+  it('logs why a call failed', async () => {
+    const genai = stubGenai({ reader: () => { throw busy(); } });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await generateStructured(genai, testWorkerConfig(), { role: 'reader', schema }).catch(() => {});
+    expect(warn).toHaveBeenCalledWith(JSON.stringify({ event: 'AI_ATTEMPT_FAILED', role: 'reader', attempt: 1, failure: 'CALL_FAILED', reason: 'BUSY', status: 429, message: 'busy' }));
+    warn.mockRestore();
   });
 });

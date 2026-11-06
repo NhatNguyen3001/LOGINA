@@ -21,9 +21,9 @@ export const loadWorkerConfig = (env: Env = process.env): WorkerConfig => ({
   liveAi: env.LIVE_AI === 'true',
   readerModel: env.READER_MODEL ?? 'gemini-3.8-flash',
   analyzerModel: env.ANALYZER_MODEL ?? 'gemini-3.8-flash',
-  generatorModel: env.GENERATOR_MODEL ?? 'gemini-4-argon',
-  xreasonModel: env.XREASON_MODEL ?? 'gemini-4-argon',
-  translatorModel: env.TRANSLATOR_MODEL ?? 'gemini-4-argon',
+  generatorModel: env.GENERATOR_MODEL ?? 'gemini-3.8-flash',
+  xreasonModel: env.XREASON_MODEL ?? 'gemini-3.8-flash',
+  translatorModel: env.TRANSLATOR_MODEL ?? 'gemini-3.8-flash',
   version: '0.1.0',
   stepDelayMs: Number(env.SEEDED_STEP_DELAY_MS ?? 5000),
   /** Stays under the 30 minute dispatch deadline in apps/api/src/jobs/enqueue.ts. */
