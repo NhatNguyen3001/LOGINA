@@ -1,8 +1,8 @@
 import type { DocumentData, Firestore } from 'firebase-admin/firestore';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldPath, FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { parseThought, type FixtureName } from '@logina/domain';
 import { resolveAiMode, type AiPath } from './ai/mode.js';
-import type { GenaiClient } from './ai/model.js';
+import type { AiWait, GenaiClient } from './ai/model.js';
 import type { WorkerConfig } from './config.js';
 import { JobCancelled, JobFailure, JobPaused } from './errors.js';
 import { runGenerate } from './jobs/generate.js';
@@ -30,7 +30,12 @@ export interface JobContext {
   checkpoint: () => Promise<void>;
   /** Saves what the model is thinking for the teacher's wait screen. A failed save never stops the job. */
   thought: (step: string, text: string) => Promise<void>;
+  /** Shows a busy AI's next try under a step, and clears it on null. A failed save never stops the job. */
+  wait: (step: string) => (wait: AiWait | null) => Promise<void>;
 }
+
+/** gRPC NOT_FOUND: a reset or delete removed the document while the job ran. */
+const isGone = (error: unknown): boolean => (error as { code?: unknown })?.code === 5;
 
 const RUNNABLE = ['QUEUED', 'RUNNING'];
 const LIVE_REFUSABLE = ['PARSE', 'ANALYZE'];
@@ -46,20 +51,29 @@ export function createWorker(deps: WorkerDeps) {
 
     const lessonRef = db.doc(`lessons/${job.lessonId as string}`);
     const lesson = (await lessonRef.get()).data();
-    if (!lesson) throw new Error(`Job ${jobId} has no lesson`);
+    /** A reset or delete can remove the lesson before its job runs; there is nothing left to do. */
+    if (!lesson) {
+      console.warn(JSON.stringify({ event: 'JOB_LESSON_GONE', jobId }));
+      return;
+    }
 
     const startedAt = Date.now();
     await jobRef.update({ status: 'RUNNING', startedAt: FieldValue.serverTimestamp() });
 
     const finish = async (update: DocumentData): Promise<void> => {
-      const cancelled = (await jobRef.get()).data()?.status === 'CANCELLED';
-      await jobRef.update({ ...(cancelled ? {} : update), finishedAt: FieldValue.serverTimestamp() });
-      const current = (await lessonRef.get()).data();
-      if (current?.activeJobId === jobId) await lessonRef.update({ activeJobId: FieldValue.delete() });
+      try {
+        const cancelled = (await jobRef.get()).data()?.status === 'CANCELLED';
+        await jobRef.update({ ...(cancelled ? {} : update), finishedAt: FieldValue.serverTimestamp() });
+        const current = (await lessonRef.get()).data();
+        if (current?.activeJobId === jobId) await lessonRef.update({ activeJobId: FieldValue.delete() });
+      } catch (error) {
+        if (!isGone(error)) throw error;
+      }
     };
 
     const checkpoint = async (): Promise<void> => {
-      if ((await jobRef.get()).data()?.status === 'CANCELLED') throw new JobCancelled();
+      const current = await jobRef.get();
+      if (!current.exists || current.data()?.status === 'CANCELLED') throw new JobCancelled();
       if (Date.now() - startedAt > config.deadlineMs) throw new JobFailure('TIMED_OUT');
     };
 
@@ -79,10 +93,16 @@ export function createWorker(deps: WorkerDeps) {
       await jobRef.update({ trace: FieldValue.arrayUnion(entry) }).catch((error: unknown) => console.warn(error));
     };
 
+    const wait: JobContext['wait'] = (stepLabel) => async (next) => {
+      const field = new FieldPath('waits', stepLabel);
+      const value = next ? { step: stepLabel, attempt: next.attempt, of: next.of, retryAt: Timestamp.fromDate(next.retryAt) } : FieldValue.delete();
+      await jobRef.update(field, value).catch((error: unknown) => console.warn(error));
+    };
+
     try {
       const mode = resolveAiMode({ aiMode: lesson.aiMode as string }, config);
       if (mode === 'LIVE_DISABLED' && LIVE_REFUSABLE.includes(job.type as string)) throw new JobFailure('LIVE_DISABLED');
-      const context: JobContext = { deps, jobId, job, lesson: { id: lessonRef.id, ...lesson }, mode, step, checkpoint, thought };
+      const context: JobContext = { deps, jobId, job, lesson: { id: lessonRef.id, ...lesson }, mode, step, checkpoint, thought, wait };
 
       if (job.type === 'PARSE') await runParse(context);
       else if (job.type === 'GENERATE') await runGenerate(context);
@@ -98,6 +118,9 @@ export function createWorker(deps: WorkerDeps) {
       } else if (error instanceof JobFailure) {
         const status = error.code === 'TIMED_OUT' ? 'TIMED_OUT' : 'FAILED';
         await finish({ status, error: { code: error.code, ...(error.detail ? { detail: error.detail } : {}) } });
+      } else if (isGone(error) || !(await jobRef.get()).exists) {
+        /** A reset removed the job or its lesson mid-run: stop without an error. */
+        console.warn(JSON.stringify({ event: 'JOB_GONE', jobId }));
       } else {
         console.error(error);
         await finish({ status: 'FAILED', error: { code: 'INTERNAL' } });

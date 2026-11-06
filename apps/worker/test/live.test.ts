@@ -579,6 +579,95 @@ describe('live GENERATE and RERUN', () => {
     const report = (await live.db.doc(`lessons/${lessonId}/validationReports/${draft.latestValidationReportId}`).get()).data()!;
     expect(report.gates[0].explanationForTeacher).toBe('Needs teacher review');
   });
+
+  const busyError = () => Object.assign(new Error('busy'), { status: 429 });
+  const quiet = () => ({ warn: vi.spyOn(console, 'warn').mockImplementation(() => {}), error: vi.spyOn(console, 'error').mockImplementation(() => {}) });
+  const draftOf = async (lessonId: string) => {
+    const draftId = (await live.db.doc(`lessons/${lessonId}`).get()).data()?.currentTaskDraftIds?.Q1 as string;
+    return { draftId, draft: (await live.db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`).get()).data()! };
+  };
+
+  it('a busy check shows its wait on the job, then clears it', async () => {
+    const { jobId } = await setupGenerate();
+    const inner = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: { gates: gates('PASS') }, translator: translated(), translationCheck: { findings: [] } });
+    let checks = 0;
+    let during: unknown;
+    const genai: StubGenai = {
+      ...inner,
+      generate: async (request) => {
+        if (request.role === 'xreason') {
+          checks += 1;
+          if (checks === 1) throw busyError();
+          during = (await job(jobId)).waits;
+        }
+        return inner.generate(request);
+      },
+    };
+    const spies = quiet();
+    await worker(genai).runJob(jobId);
+    spies.warn.mockRestore();
+    spies.error.mockRestore();
+    expect(during).toMatchObject({ 'draft Q1': { step: 'draft Q1', attempt: 2, of: 4 } });
+    const after = await job(jobId);
+    expect(after.status).toBe('DONE');
+    expect(after.waits?.['draft Q1']).toBeUndefined();
+  });
+
+  it('a draft whose check never finished is marked FAILED', async () => {
+    const genai = stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: () => { throw busyError(); } });
+    const { lessonId, jobId } = await setupGenerate();
+    const spies = quiet();
+    await worker(genai).runJob(jobId);
+    spies.warn.mockRestore();
+    spies.error.mockRestore();
+    expect((await draftOf(lessonId)).draft.status).toBe('FAILED');
+    expect(await job(jobId)).toMatchObject({ status: 'FAILED', error: { code: 'AI_BUSY' } });
+  });
+
+  it('a failed recheck of a draft with no report stays FAILED', async () => {
+    const { lessonId, jobId } = await setupGenerate();
+    const spies = quiet();
+    await worker(stubGenai({ generator: { draft: q1, ruleBundle: bundle }, xreason: () => { throw new Error('down'); } })).runJob(jobId);
+    const { draftId } = await draftOf(lessonId);
+    await live.db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`).update({ status: 'FAILED' });
+    const rerunId = `${jobId}_nr`;
+    jobs.push(rerunId);
+    await live.db.doc(`jobs/${rerunId}`).set({ schoolId, lessonId, type: 'RERUN', status: 'QUEUED', steps: [], targetIds: [draftId] });
+    await worker(stubGenai({ xreason: () => { throw new Error('down'); } })).runJob(rerunId);
+    spies.warn.mockRestore();
+    spies.error.mockRestore();
+    const { draft } = await draftOf(lessonId);
+    expect(draft.status).toBe('FAILED');
+    expect(draft.latestValidationReportId).toBeUndefined();
+    expect((await live.db.collection(`lessons/${lessonId}/validationReports`).get()).size).toBe(0);
+  });
+
+  it('a deleted job stops quietly', async () => {
+    const { lessonId, jobId } = await setupGenerate();
+    const genai = stubGenai({
+      generator: async () => {
+        await live.db.doc(`jobs/${jobId}`).delete();
+        await live.db.recursiveDelete(live.db.doc(`lessons/${lessonId}`));
+        return { draft: q1, ruleBundle: bundle };
+      },
+      xreason: { gates: gates('PASS') },
+    });
+    const spies = quiet();
+    await expect(worker(genai).runJob(jobId)).resolves.toBeUndefined();
+    expect(spies.error).not.toHaveBeenCalled();
+    spies.warn.mockRestore();
+    spies.error.mockRestore();
+  });
+
+  it('a job whose lesson is already gone returns without throwing', async () => {
+    const { lessonId, jobId } = await setupGenerate();
+    await live.db.recursiveDelete(live.db.doc(`lessons/${lessonId}`));
+    const spies = quiet();
+    await expect(worker(stubGenai()).runJob(jobId)).resolves.toBeUndefined();
+    expect(spies.error).not.toHaveBeenCalled();
+    spies.warn.mockRestore();
+    spies.error.mockRestore();
+  });
 });
 
 describe('generateStructured', () => {

@@ -93,20 +93,24 @@ export async function runRerun(context: JobContext): Promise<void> {
     const saved = { draftId, bundleHash: (bundleDoc as unknown as { hash: string }).hash, ruleBundleId: (draft as unknown as DocumentData).ruleBundleId as string };
     const checks = deterministicChecks(draft, bundleDoc, []);
     const runLive = mode === 'LIVE' || config.liveAi;
+    /** With no earlier report there are no checks to fall back on, so a failed recheck stays FAILED. */
+    const fallback = async (error?: unknown): Promise<ReportFixture['gates']> => {
+      if (previous) return needsReview(previous.gates, locale);
+      await draftRef.update({ status: 'FAILED' });
+      throw error instanceof JobFailure ? error : new JobFailure('AI_FAILED');
+    };
     const gates = runLive
       ? await generateStructured(genai, config, {
           role: 'xreason',
           schema: XReasonOutput,
           variables: { locale },
           text: JSON.stringify({ draft: { ...draft, feedback: undefined } }),
-        }).then(
-          (result) => result.gates,
-          () => needsReview(previous?.gates ?? [], locale),
-        )
-      : needsReview(previous?.gates ?? [], locale);
+          onWait: context.wait(`recheck ${draft.slot}`),
+        }).then((result) => result.gates, fallback)
+      : await fallback();
     const before = mode === 'LIVE' ? (await db.doc(`lessons/${lessonId}/taskTranslations/${draft.slot}`).get()).data() : undefined;
     if (mode === 'LIVE') await beginTranslation(context, draft.slot, draftId);
     await saveReport(db, lessonId, saved, draft, checks, gates, candidateSetVersion, validatorVersion('xreason', config, !runLive));
-    if (mode === 'LIVE') await translateTask(context, draft, draftId, before && { texts: before.texts, keywords: before.keywords });
+    if (mode === 'LIVE') await translateTask(context, draft, draftId, before && { texts: before.texts, keywords: before.keywords }, `recheck ${draft.slot}`);
   }
 }

@@ -74,22 +74,29 @@ export async function runGenerate(context: JobContext): Promise<void> {
   /** A task the AI can't draft stays open for Regenerate, and the others still run. */
   const draftSlot = (slot: Slot) =>
     context.step(`draft ${slot}`, async () => {
+      const label = `draft ${slot}`;
       await context.checkpoint();
       const { draft, ruleBundle } = await generateStructured(genai, config, {
         role: 'generator',
         schema: generatorSchema(slot),
         variables: { slot, locale },
         text,
+        onWait: context.wait(label),
       });
       await context.checkpoint();
       const saved = await saveDraft(db, lesson, { ...draft, slot }, ruleBundle as Omit<RuleBundle, 'ruleBundleId'>, 'generator');
       await beginTranslation(context, slot, saved.draftId);
       const checks = deterministicChecks(draft, ruleBundle as Omit<RuleBundle, 'ruleBundleId'>, evidenceTexts);
+      /** A draft whose check never finished must say so, or it waits as VALIDATING forever. */
       const { gates } = await generateStructured(genai, config, {
         role: 'xreason',
         schema: XReasonOutput,
         variables: { locale },
         text: JSON.stringify({ draft: { ...draft, feedback: undefined }, source: text }),
+        onWait: context.wait(label),
+      }).catch(async (error: unknown) => {
+        await db.doc(`lessons/${lesson.id as string}/taskDrafts/${saved.draftId}`).update({ status: 'FAILED' });
+        throw error;
       });
       await context.checkpoint();
       await saveReport(db, lesson.id as string, saved, draft, checks, gates, 1, validatorVersion('xreason', config, false));
@@ -106,14 +113,14 @@ export async function runGenerate(context: JobContext): Promise<void> {
           { merge: true },
         );
       }
-      await translateTask(context, { ...draft, slot }, saved.draftId);
+      await translateTask(context, { ...draft, slot }, saved.draftId, undefined, label);
     });
 
   const slots = targets.length > 0 ? (targets as Slot[]) : SLOTS;
   const results = await Promise.allSettled(slots.map(draftSlot));
   await Promise.all(slots.filter((_, index) => results[index]?.status === 'rejected').map((slot) => failTranslation(context, slot)));
   const failures = results.flatMap((result) => (result.status === 'rejected' ? [result.reason as unknown] : []));
-  const serious = failures.find((error) => !(error instanceof JobFailure && error.code === 'AI_FAILED'));
+  const serious = failures.find((error) => !(error instanceof JobFailure && (error.code === 'AI_FAILED' || error.code === 'AI_BUSY')));
   if (serious) throw serious;
   if (failures.length > 0) throw failures[0];
 }

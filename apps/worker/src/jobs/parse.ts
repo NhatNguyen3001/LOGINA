@@ -107,6 +107,7 @@ async function liveRead(context: JobContext, material: FirebaseFirestore.Documen
     role: 'reader',
     schema: ReaderOutput,
     thinking: 'LOW',
+    onWait: context.wait('read'),
     ...(text
       ? { text }
       : { files: [{ gcsUri: `gs://${config.materialsBucket}/${storagePath}`, mimeType: material.mimeType as string }] }),
@@ -148,6 +149,7 @@ async function liveAnalyze(context: JobContext, locale: Locale): Promise<void> {
     schema: AnalyzerOutput,
     thinking: 'HIGH',
     onThought: (text) => context.thought('claims', text),
+    onWait: context.wait('claims'),
     variables: { locale },
     text: units.map((unit) => `[${unit.locator}] ${unit.text}`).join('\n'),
   });
