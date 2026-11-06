@@ -42,6 +42,9 @@
       "noMaterial": "Thầy/cô hãy chọn tệp hoặc dùng học liệu mẫu."
     },
     "t02": {
+      "thoughtsLabel": "Suy nghĩ của AI ở bước {{step}}",
+      "jumpLatest": "Xem mới nhất",
+      "jumpNew": "{{count}} mới · Xem mới nhất",
       "finished": "Đã phân tích xong",
       "finishedLede": "LOGINA đã đọc và đối chiếu nguồn. Thầy/cô xem lại kết quả rồi tiếp tục.",
       "toClarify": "Tiếp tục: Làm rõ học liệu →",

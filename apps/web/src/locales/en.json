@@ -42,6 +42,9 @@
       "noMaterial": "Choose a file or use the sample material."
     },
     "t02": {
+      "thoughtsLabel": "AI thoughts for {{step}}",
+      "jumpLatest": "Jump to latest",
+      "jumpNew": "{{count}} new · Jump to latest",
       "finished": "Analysis finished",
       "finishedLede": "LOGINA has read and cross-checked the source. Look over what it found, then continue.",
       "toClarify": "Continue: Clarify material →",
