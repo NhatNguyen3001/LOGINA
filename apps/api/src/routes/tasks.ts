@@ -21,11 +21,13 @@ const SLOTS = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] as const;
 const TASK_TYPES = { Q1: 'JUDGMENT_EVIDENCE', Q2: 'EVIDENCE_RANKING', Q3: 'COMPARE_TRADEOFF', Q4: 'COUNTERARGUMENT', Q5: 'OPEN_PROPOSAL' } as const;
 const MAX_EXAMPLES = 3;
 
-/** What a task is waiting on, as a teacher would say it. */
-function progressOf(draft: DocumentData | undefined, translation: DocumentData | undefined, uploaded: boolean): TasksOverviewDTO['slots'][number]['progress'] {
-  if (!draft) return 'DRAFTING';
+const WAITS_FOR_CHOICE = ['UNCERTAIN', 'INSUFFICIENT'];
+
+/** What a task is waiting on, as a teacher would say it. With no job running, unfinished work has stopped. */
+function progressOf(draft: DocumentData | undefined, translation: DocumentData | undefined, uploaded: boolean, running: boolean, sufficiency?: string): TasksOverviewDTO['slots'][number]['progress'] {
+  if (!draft) return running || WAITS_FOR_CHOICE.includes(sufficiency ?? '') ? 'DRAFTING' : 'FAILED';
   if (draft.status === 'GENERATING') return 'DRAFTING';
-  if (draft.status === 'VALIDATING') return 'CHECKING';
+  if (draft.status === 'VALIDATING') return running ? 'CHECKING' : 'FAILED';
   if (draft.status === 'FAILED') return 'FAILED';
   if (!uploaded) return 'READY';
   if (!translation || translation.status === 'WORKING') return 'TRANSLATING';
@@ -111,7 +113,7 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
           sufficiency: row?.assessment ?? null,
           sufficiencyNote: row?.explanationForTeacher ?? '',
           sourceRefs: row?.sourceRefs ? [row.sourceRefs as string] : [],
-          progress: progressOf(draft, translations.docs.find((doc) => doc.id === slot)?.data(), lesson.aiMode === 'LIVE'),
+          progress: progressOf(draft, translations.docs.find((doc) => doc.id === slot)?.data(), lesson.aiMode === 'LIVE', Boolean(lesson.activeJobId), row?.assessment as string | undefined),
           draftStatus: draft?.status ?? null,
           ...(draftId ? { draftId } : {}),
         };
@@ -212,6 +214,24 @@ export function taskRoutes(deps: AppDeps): Hono<AppEnv> {
         evidenceId,
         wouldReceive: { label: chosen.label, purpose: chosen.purposeForTeacher, message: chosen.message },
       });
+    }),
+  );
+
+  /** Try again for a task whose draft was never written. Idempotency-Key only, refused while a job runs. */
+  routes.post(
+    '/:id/tasks/:slot/redraft',
+    withIdempotency(db, async (c) => {
+      const { schoolId } = c.var.user;
+      const lesson = await requireLesson(schoolId, c.req.param('id') as string);
+      const lessonId = lesson.id as string;
+      const slot = c.req.param('slot') as string;
+      if (!(SLOTS as readonly string[]).includes(slot)) throw new AppError('NOT_FOUND', 404, 'Not found.');
+      if (lesson.activeJobId) throw new AppError('JOB_RUNNING', 409, 'Wait for the current work to finish.');
+      if (lesson.currentTaskDraftIds?.[slot]) throw new AppError('HAS_DRAFT', 409, 'This task already has a draft.');
+      const job = await createJob(db, { schoolId, lessonId, type: 'GENERATE', targetIds: [slot] });
+      await db.doc(`lessons/${lessonId}`).update({ activeJobId: job.id });
+      await enqueue({ jobId: job.id, type: 'GENERATE', lessonId, targetIds: [slot] });
+      return respond(c, JobDTO, toJobDTO(job));
     }),
   );
 

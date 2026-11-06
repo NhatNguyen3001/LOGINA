@@ -1,3 +1,4 @@
+import { FieldValue } from 'firebase-admin/firestore';
 import { decodeNested } from '@logina/db';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ApproveResultDTO, AssignResultDTO, AssignmentListDTO, TaskApprovalDTO, TeacherTaskPreviewDTO, TeacherTaskSummaryDTO, findRestrictedKeys } from '@logina/contracts';
@@ -37,6 +38,18 @@ afterAll(async () => {
 });
 
 describe('Task Approval 2', () => {
+  it('R10 approval with an unchecked task answers 409 TASKS_NOT_READY', async () => {
+    const other = await seedGenerated(h, a);
+    const otherVersion = ((await (await a.get(`/lessons/${other}`)).json()) as { version: number }).version;
+    await a.post(`/lessons/${other}/tasks/Q4/sufficiency-choice`, { choice: 'REFOCUS', baseVersion: otherVersion });
+    expect((await a.get(`/lessons/${other}/approval`)).status).toBe(200);
+    const draftId = (await h.live.db.doc(`lessons/${other}`).get()).data()?.currentTaskDraftIds.Q1 as string;
+    await h.live.db.doc(`lessons/${other}/taskDrafts/${draftId}`).update({ status: 'VALIDATING', latestValidationReportId: FieldValue.delete() });
+    const response = await a.get(`/lessons/${other}/approval`);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: 'TASKS_NOT_READY' });
+  });
+
   it('approval overview lists five tasks', async () => {
     const { tasks } = await approval();
     expect(tasks.map((t) => t.slot)).toEqual(['Q1', 'Q2', 'Q3', 'Q4', 'Q5']);

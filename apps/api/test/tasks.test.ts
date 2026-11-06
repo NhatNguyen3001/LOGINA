@@ -162,7 +162,9 @@ describe('a live lesson while its drafts are still being written', () => {
   it('progress follows the draft and its translation', async () => {
     await lesson().update({ aiMode: 'LIVE' });
     const progress = async () => TasksOverviewDTO.parse(await (await a.get(base())).json()).slots;
+    await lesson().update({ activeJobId: 'job_running' });
     const slots = await progress();
+    await lesson().update({ activeJobId: FieldValue.delete() });
     expect(slots[4]?.progress).toBe('DRAFTING');
     expect(slots[0]?.progress).toBe('TRANSLATING');
     await lesson().collection('taskTranslations').doc('Q1').set({ status: 'WORKING' });
@@ -172,6 +174,22 @@ describe('a live lesson while its drafts are still being written', () => {
     expect(after.slice(0, 3).map((slot) => slot.progress)).toEqual(['TRANSLATING', 'FAILED', 'READY']);
     await lesson().update({ aiMode: 'SEEDED' });
     expect((await progress())[0]?.progress).toBe('READY');
+  });
+
+  it('a check that stopped with no job running shows FAILED', async () => {
+    const draftId = (await lesson().get()).data()?.currentTaskDraftIds.Q2 as string;
+    const draft = lesson().collection('taskDrafts').doc(draftId);
+    const before = (await draft.get()).data()?.status as string;
+    await draft.update({ status: 'VALIDATING' });
+    const stopped = TasksOverviewDTO.parse(await (await a.get(base())).json()).slots;
+    await lesson().update({ activeJobId: 'job_running' });
+    const running = TasksOverviewDTO.parse(await (await a.get(base())).json()).slots;
+    await lesson().update({ activeJobId: FieldValue.delete() });
+    await draft.update({ status: before });
+    expect(stopped[1]?.progress).toBe('FAILED');
+    expect(stopped[4]?.progress).toBe('FAILED');
+    expect(running[1]?.progress).toBe('CHECKING');
+    expect(running[4]?.progress).toBe('DRAFTING');
   });
 
   it('a quick edit on an upload waits for the running job', async () => {

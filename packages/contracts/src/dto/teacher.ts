@@ -89,6 +89,8 @@ export const JobDTO = z
     trace: z.array(z.object({ step: z.string(), at: z.number().int().nonnegative(), title: z.string(), text: z.string() }).strict()).optional(),
     question: z.object({ kind: z.literal('LANGUAGE_MISMATCH'), detected: Locale, chosen: Locale }).strict().optional(),
     errorCode: JobErrorCode.optional(),
+    /** A busy AI's next try under each step, so the screen can count down. */
+    waits: z.array(z.object({ step: z.string(), attempt: z.number().int().positive(), of: z.number().int().positive(), retryAt: Timestamp }).strict()).optional(),
   })
   .strict();
 export type JobDTO = z.infer<typeof JobDTO>;
