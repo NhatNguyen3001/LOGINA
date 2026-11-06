@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { FieldValue } from 'firebase-admin/firestore';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { EditResultDTO, SourceDraftDTO, TasksOverviewDTO, TeacherTaskPreviewDTO } from '@logina/contracts';
 import { loadFixture } from '@logina/domain';
@@ -118,6 +119,37 @@ describe('rerun route', () => {
     const response = await a.post(`/lessons/${t.lessonId}/tasks/Q1/rerun`);
     expect(response.status).toBe(200);
     expect(await status(t.lessonId, t.draftId)).toBe('VALIDATING');
+  });
+
+  it('rerun accepts a stuck VALIDATING draft when no job runs', async () => {
+    const t = await target();
+    await h.live.db.doc(`lessons/${t.lessonId}/taskDrafts/${t.draftId}`).update({ status: 'VALIDATING' });
+    expect((await a.post(`/lessons/${t.lessonId}/tasks/Q1/rerun`)).status).toBe(200);
+  });
+
+  it('rerun refuses while a job runs', async () => {
+    const t = await target();
+    await h.live.db.doc(`lessons/${t.lessonId}/taskDrafts/${t.draftId}`).update({ status: 'FAILED' });
+    await h.live.db.doc(`lessons/${t.lessonId}`).update({ activeJobId: 'job_running' });
+    const response = await a.post(`/lessons/${t.lessonId}/tasks/Q1/rerun`);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: 'JOB_RUNNING' });
+  });
+
+  it('redraft starts one GENERATE job for an empty slot, and a second press gets 409', async () => {
+    const t = await target();
+    await h.live.db.doc(`lessons/${t.lessonId}`).update({ 'currentTaskDraftIds.Q5': FieldValue.delete() });
+    const first = await a.post(`/lessons/${t.lessonId}/tasks/Q5/redraft`);
+    expect(first.status).toBe(200);
+    expect(h.enqueued).toContainEqual(expect.objectContaining({ jobId: ((await first.json()) as { id: string }).id, type: 'GENERATE', targetIds: ['Q5'] }));
+    expect((await a.post(`/lessons/${t.lessonId}/tasks/Q5/redraft`)).status).toBe(409);
+  });
+
+  it('redraft refuses a slot that has a draft', async () => {
+    const t = await target();
+    const response = await a.post(`/lessons/${t.lessonId}/tasks/Q1/redraft`);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: 'HAS_DRAFT' });
   });
 
   it('rerun on a draft that is not FAILED is 409', async () => {

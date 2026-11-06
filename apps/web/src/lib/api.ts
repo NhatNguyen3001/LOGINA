@@ -170,6 +170,7 @@ export const tryCase = (id: string, slot: Slot, req: { answerId: string; evidenc
 export const chooseSufficiency = (id: string, slot: Slot, req: { choice: string; baseVersion: number }, key: string) => post(`${taskPath(id, slot)}/sufficiency-choice`, JobDTO, req, key);
 export const sendEdit = (id: string, req: EditReq, key: string) => post(`${lessonPath(id)}/edits`, EditResultDTO, req, key);
 export const rerunTask = (id: string, slot: Slot, key: string) => post(`${taskPath(id, slot)}/rerun`, JobDTO, {}, key);
+export const redraftTask = (id: string, slot: Slot, key: string) => post(`${taskPath(id, slot)}/redraft`, JobDTO, {}, key);
 export const sendDisposition = (id: string, slot: Slot, req: DispositionReq, key: string) => post(`${taskPath(id, slot)}/dispositions`, Ok, req, key);
 export const getApproval = (id: string) => get(`${lessonPath(id)}/approval`, TaskApprovalDTO);
 export const approveTask = (id: string, slot: Slot, req: { expectedDraftVersion: number; previewHash: string; candidateSetVersion: number; confirmed: true; translationVersion?: number }, key: string) =>

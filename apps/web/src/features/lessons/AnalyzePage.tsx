@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Navigate, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AiBusyNote } from '@/components/logina/AiBusyNote';
+import { ThoughtsBox } from '@/components/logina/ThoughtsBox';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { Stepper } from '@/components/logina/Stepper';
@@ -45,14 +47,18 @@ function StepThoughts({ step }: { step: JobDTO['steps'][number] & { thoughts: Th
   const { t } = useTranslation();
   const [open, setOpen] = useState('thoughts');
   if (step.thoughts.length === 0) return null;
-  if (step.status !== 'DONE') return <Thoughts thoughts={step.thoughts} />;
+  const label = t('teacher.t02.thoughtsLabel', { step: t(`teacher.job.${step.label}`, { defaultValue: step.label }) });
+  const box = (follow: boolean) => (
+    <ThoughtsBox label={label} follow={follow} count={step.thoughts.length}>
+      <Thoughts thoughts={step.thoughts} />
+    </ThoughtsBox>
+  );
+  if (step.status !== 'DONE') return box(true);
   return (
     <Accordion type="single" collapsible value={open} onValueChange={setOpen} className="thoughts-fold">
       <AccordionItem value="thoughts" className="border-0 bg-transparent">
         <AccordionTrigger className="min-h-0 flex-none justify-start gap-1.5 px-0 py-1 text-sm text-accent-ink hover:bg-transparent hover:underline">{t(open ? 'teacher.t02.hideThoughts' : 'teacher.t02.showThoughts', { count: step.thoughts.length })}</AccordionTrigger>
-        <AccordionContent className="px-0 pb-0">
-          <Thoughts thoughts={step.thoughts} />
-        </AccordionContent>
+        <AccordionContent className="px-0 pb-0">{box(false)}</AccordionContent>
       </AccordionItem>
     </Accordion>
   );
@@ -82,6 +88,7 @@ export function AnalyzePage() {
   const status = job.data?.status;
   const finished = status === 'DONE';
   const seconds = useSecondsSince(finished ? undefined : job.data?.startedAt);
+  const waitOf = (label: string) => job.data?.waits?.find((wait) => wait.step === label);
 
   /** The teacher reads the result first, then moves on when ready. */
   const review = useQuery({ queryKey: qk.sourceReview(id), queryFn: () => getSourceReview(id), enabled: finished });
@@ -163,6 +170,7 @@ export function AnalyzePage() {
               <StepIcon status={step.status} />
               <div className="grow stack step-body">
                 <span className="m">{t(`teacher.job.${step.label}`, { defaultValue: step.label })}</span>
+                {waitOf(step.label) ? <AiBusyNote wait={waitOf(step.label)!} /> : null}
                 <StepThoughts step={{ ...step, thoughts: job.data?.trace?.filter((thought) => thought.step === step.label) ?? [] }} />
               </div>
             </div>

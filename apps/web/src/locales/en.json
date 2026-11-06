@@ -1,5 +1,9 @@
 {
   "teacher": {
+    "busy": {
+      "waiting": "The AI is busy right now. Trying again in {{time}} (try {{attempt}} of {{of}}).",
+      "now": "The AI is busy right now. Trying again now (try {{attempt}} of {{of}})."
+    },
     "t01": {
       "guide": {
         "title": "What works best",
@@ -38,6 +42,9 @@
       "noMaterial": "Choose a file or use the sample material."
     },
     "t02": {
+      "thoughtsLabel": "AI thoughts for {{step}}",
+      "jumpLatest": "Jump to latest",
+      "jumpNew": "{{count}} new · Jump to latest",
       "finished": "Analysis finished",
       "finishedLede": "LOGINA has read and cross-checked the source. Look over what it found, then continue.",
       "toClarify": "Continue: Clarify material →",
@@ -54,7 +61,7 @@
       "progress": "Progress",
       "steps": "{{done}}/{{total}} steps",
       "running": "Running",
-      "timing": "An uploaded file can take up to 6 minutes. You can close this tab and come back; it keeps running.",
+      "timing": "An uploaded file can take up to 6 minutes.",
       "stop": "Stop analysis",
       "paused": "Analysis paused",
       "needChoice": "Your choice needed",
@@ -212,7 +219,7 @@
       "drafting": "Drafting…",
       "checking": "Checking…",
       "notChecked": "Not checked",
-      "wait": "Drafting and translating from your own file can take up to 15 minutes. You can close this tab and come back; it keeps running, and finished drafts appear here as they're ready.",
+      "wait": "Drafting and translating from your own file can take up to 15 minutes. Finished drafts appear here as they're ready.",
       "elapsed": "Running for {{minutes}} min {{seconds}} s",
       "progress": {
         "DRAFTING": "Drafting…",
@@ -473,6 +480,7 @@
     "TRANSLATION_NOT_RETRYABLE": "This translation doesn't need a retry.",
     "TIMED_OUT": "This took too long, so it stopped. Finished drafts are saved. Choose an option below to draft the rest.",
     "AI_FAILED": "Some tasks couldn't be drafted. Finished drafts are saved. Choose an option below to try again.",
+    "AI_BUSY": "The AI service was too busy, so this stopped. Your finished work is saved. Try again in a minute.",
     "NOT_FOUND": "We can't find that page or item.",
     "VERSION_CONFLICT": "Someone else saved a newer version. Reload to see it.",
     "STALE_VERSION": "This draft has changed. Reload to see the latest version.",
@@ -495,6 +503,11 @@
     "RATE_LIMITED": "LOGINA is busy right now. Try again in a few seconds.",
     "CONTENT_OUTDATED": "This demo was set up with an older version of LOGINA. Reset the demo to get the current tasks.",
     "APP_UPDATED": "LOGINA was updated while you were working. Reload to continue. Your saved work is kept."
+  },
+  "crash": {
+    "title": "Something went wrong on this page",
+    "body": "Your saved work is safe. Reload the page to carry on.",
+    "home": "Go to the start page"
   },
   "common": {
     "lang": {

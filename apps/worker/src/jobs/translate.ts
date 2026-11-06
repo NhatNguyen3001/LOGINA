@@ -64,7 +64,7 @@ export interface Kept {
 }
 
 /** Runs after a draft is saved. `kept` holds wording to keep, so only new text goes to the AI. */
-export async function translateTask(context: Pick<JobContext, 'deps' | 'lesson'>, draft: DraftFixture, draftId: string, kept?: Kept): Promise<void> {
+export async function translateTask(context: Pick<JobContext, 'deps' | 'lesson'> & Partial<Pick<JobContext, 'wait'>>, draft: DraftFixture, draftId: string, kept?: Kept, label = `translate ${draft.slot}`): Promise<void> {
   const { deps, lesson } = context;
   const { db, genai, config } = deps;
   const lessonId = lesson.id as string;
@@ -75,6 +75,7 @@ export async function translateTask(context: Pick<JobContext, 'deps' | 'lesson'>
   const pending = texts.filter((text) => !keep.some((pair) => pair.from === text));
   const keywords = (draft.taskBody?.keywordPartitions ?? {}) as Record<string, string[]>;
   const ref = translationRef(db, lessonId, draft.slot);
+  const onWait = context.wait?.(label);
   const startVersion = (((await ref.get()).data()?.version as number | undefined) ?? 0);
 
   /** Drops the write if the draft was replaced or a teacher changed the translation since this run began. */
@@ -95,6 +96,7 @@ export async function translateTask(context: Pick<JobContext, 'deps' | 'lesson'>
             schema: TranslatorOutput,
             variables,
             text: JSON.stringify({ texts: pending, keywords }),
+            ...(onWait ? { onWait } : {}),
           });
     if (translated.texts.length !== pending.length) {
       console.warn(JSON.stringify({ event: 'TRANSLATION_COUNT_MISMATCH', slot: draft.slot, expected: pending.length, received: translated.texts.length }));
@@ -106,6 +108,7 @@ export async function translateTask(context: Pick<JobContext, 'deps' | 'lesson'>
       schema: TranslationCheckOutput,
       variables,
       text: JSON.stringify({ texts: pairs, keywords: { original: keywords, translated: translated.keywords } }),
+      ...(onWait ? { onWait } : {}),
     });
     const version = startVersion + 1;
     /** Numbered per version, so accepting a finding never clears a new one. */

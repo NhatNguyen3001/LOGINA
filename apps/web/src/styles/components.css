@@ -604,3 +604,19 @@ a.task:hover{background:var(--subtle)}
 .update-bar{position:sticky;top:0;z-index:60}
 .update-bar-in{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--accent-bg);border-bottom:1px solid var(--accent-line);color:var(--accent-ink);font-size:14px;font-weight:600}
 .update-bar-in .ico{width:18px;height:18px;flex:none}
+
+/* AI thoughts scroll inside a 280px box; the edge with more to read fades, and a pill jumps back to the newest. */
+.thoughts-box{position:relative}
+.scroll-thumb{background:var(--line-strong)}
+.thoughts-viewport{max-height:280px;padding-right:12px}
+.thoughts-viewport:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.thoughts-fade-b{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 36px),transparent)}
+.thoughts-fade-t{-webkit-mask-image:linear-gradient(to bottom,transparent,#000 28px);mask-image:linear-gradient(to bottom,transparent,#000 28px)}
+.thoughts-fade-t.thoughts-fade-b{-webkit-mask-image:linear-gradient(to bottom,transparent,#000 28px,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(to bottom,transparent,#000 28px,#000 calc(100% - 36px),transparent)}
+.thoughts-jump{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);min-height:32px;padding:0 12px;border-radius:999px;border:0;background:var(--accent);color:var(--on-accent);font:600 12px/1 var(--font);box-shadow:var(--shadow);cursor:pointer;white-space:nowrap}
+.thoughts-jump:hover{filter:brightness(1.08)}
+.thoughts-jump:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+
+/* The crash screen: a calm page in LOGINA's own words, centred, with Reload first. */
+.crash{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--page)}
+.crash-in{max-width:520px;width:100%}

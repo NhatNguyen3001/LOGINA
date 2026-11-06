@@ -165,7 +165,9 @@ export function editRoutes(deps: AppDeps): Hono<AppEnv> {
       const draftRef = db.doc(`lessons/${lessonId}/taskDrafts/${draftId ?? 'none'}`);
       const draft = (await draftRef.get()).data();
       if (!draft) throw new AppError('NOT_FOUND', 404, 'Not found.');
-      if (draft.status !== 'FAILED') throw new AppError('NOT_FAILED', 409, 'Only a failed recheck can be retried.');
+      if (lesson.activeJobId) throw new AppError('JOB_RUNNING', 409, 'Wait for the current work to finish.');
+      /** With no job running, a draft still VALIDATING is a check that stopped, so it can be retried too. */
+      if (draft.status !== 'FAILED' && draft.status !== 'VALIDATING') throw new AppError('NOT_FAILED', 409, 'Only a failed recheck can be retried.');
 
       const job = await createJob(db, { schoolId: lesson.schoolId as string, lessonId, type: 'RERUN', targetIds: [draftId as string] });
       await draftRef.update({ status: 'VALIDATING' });

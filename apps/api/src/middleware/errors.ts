@@ -8,7 +8,7 @@ import { MaterialRefusal } from '../services/materials.js';
 export { AppError };
 
 const GENERIC_MESSAGE = 'Something went wrong. Please try again.';
-const OUTDATED_MESSAGE = 'This content was made with an older version. Reset the demo to get the current version.';
+export const OUTDATED_MESSAGE = 'This content was made with an older version. Reset the demo to get the current version.';
 
 /** Error bodies are `{ code, message, affectedRefs? }`; anything else goes to the logs only. */
 export function handleError(error: Error, c: Context): Response {
@@ -27,6 +27,6 @@ export function handleError(error: Error, c: Context): Response {
     console.error('Stored content in an older format:', error.issues);
     return c.json({ code: 'CONTENT_OUTDATED', message: OUTDATED_MESSAGE }, 409);
   }
-  console.error(error);
+  console.error(c.req.method, c.req.path, error);
   return c.json({ code: 'INTERNAL', message: GENERIC_MESSAGE }, 500);
 }

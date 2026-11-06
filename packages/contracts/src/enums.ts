@@ -174,6 +174,7 @@ export const JobErrorCode = z.enum([
   'TOO_LITTLE_CONTENT',
   'LIVE_DISABLED',
   'AI_FAILED',
+  'AI_BUSY',
   'TIMED_OUT',
   'INTERNAL',
 ]);

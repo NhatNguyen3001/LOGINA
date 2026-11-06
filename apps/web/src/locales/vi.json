@@ -1,5 +1,9 @@
 {
   "teacher": {
+    "busy": {
+      "waiting": "AI đang bận. Sẽ thử lại sau {{time}} (lần {{attempt}}/{{of}}).",
+      "now": "AI đang bận. Đang thử lại (lần {{attempt}}/{{of}})."
+    },
     "t01": {
       "guide": {
         "title": "Tệp phù hợp nhất",
@@ -38,6 +42,9 @@
       "noMaterial": "Thầy/cô hãy chọn tệp hoặc dùng học liệu mẫu."
     },
     "t02": {
+      "thoughtsLabel": "Suy nghĩ của AI ở bước {{step}}",
+      "jumpLatest": "Xem mới nhất",
+      "jumpNew": "{{count}} mới · Xem mới nhất",
       "finished": "Đã phân tích xong",
       "finishedLede": "LOGINA đã đọc và đối chiếu nguồn. Thầy/cô xem lại kết quả rồi tiếp tục.",
       "toClarify": "Tiếp tục: Làm rõ học liệu →",
@@ -54,7 +61,7 @@
       "progress": "Tiến độ",
       "steps": "{{done}}/{{total}} bước",
       "running": "Đang chạy",
-      "timing": "Tài liệu tải lên có thể mất tới 6 phút. Thầy/cô có thể đóng thẻ này rồi quay lại; việc đọc vẫn tiếp tục.",
+      "timing": "Tài liệu tải lên có thể mất tới 6 phút.",
       "stop": "Dừng phân tích",
       "paused": "Phân tích đang tạm dừng",
       "needChoice": "Cần thầy/cô chọn",
@@ -212,7 +219,7 @@
       "drafting": "Đang soạn…",
       "checking": "Đang kiểm tra…",
       "notChecked": "Chưa kiểm tra",
-      "wait": "Soạn và dịch từ tài liệu của thầy/cô có thể mất tới 15 phút. Thầy/cô có thể đóng thẻ này rồi quay lại; việc soạn vẫn tiếp tục, bản nháp nào xong sẽ hiện ở đây.",
+      "wait": "Soạn và dịch từ tài liệu của thầy/cô có thể mất tới 15 phút. Bản nháp nào xong sẽ hiện ở đây.",
       "elapsed": "Đã chạy {{minutes}} phút {{seconds}} giây",
       "progress": {
         "DRAFTING": "Đang soạn…",
@@ -473,6 +480,7 @@
     "TRANSLATION_NOT_RETRYABLE": "Bản dịch này không cần dịch lại.",
     "TIMED_OUT": "Việc này mất quá lâu nên đã dừng lại. Các bản nháp đã xong vẫn được lưu. Thầy/cô hãy chọn một mục bên dưới để soạn tiếp.",
     "AI_FAILED": "Có nhiệm vụ chưa soạn được. Các bản nháp đã xong vẫn được lưu. Thầy/cô hãy chọn một mục bên dưới để thử lại.",
+    "AI_BUSY": "Dịch vụ AI đang quá tải nên việc này đã dừng. Phần đã xong vẫn được lưu. Thầy/cô hãy thử lại sau một phút.",
     "NOT_FOUND": "Không tìm thấy nội dung này.",
     "VERSION_CONFLICT": "Đã có phiên bản mới hơn. Thầy/cô hãy tải lại để xem.",
     "STALE_VERSION": "Bản nháp đã thay đổi. Thầy/cô hãy tải lại để xem bản mới nhất.",
@@ -495,6 +503,11 @@
     "RATE_LIMITED": "LOGINA đang bận. Hãy thử lại sau vài giây.",
     "CONTENT_OUTDATED": "Bản dùng thử này được tạo bằng phiên bản cũ của LOGINA. Hãy đặt lại bản dùng thử để nhận nhiệm vụ mới.",
     "APP_UPDATED": "LOGINA vừa được cập nhật. Hãy tải lại để tiếp tục. Phần đã lưu vẫn còn."
+  },
+  "crash": {
+    "title": "Trang này gặp lỗi",
+    "body": "Phần đã lưu vẫn an toàn. Hãy tải lại trang để tiếp tục.",
+    "home": "Về trang đầu"
   },
   "common": {
     "lang": {

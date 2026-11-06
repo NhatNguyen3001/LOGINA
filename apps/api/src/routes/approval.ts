@@ -104,7 +104,10 @@ export function approvalRoutes({ db, enqueue }: AppDeps): Hono<AppEnv> {
     const draftId = lesson.currentTaskDraftIds?.[slot] as string | undefined;
     if (!draftId) throw new AppError('TASKS_NOT_READY', 409, 'Every task needs a draft first.');
     const draft = decodeNested((await db.doc(`lessons/${lessonId}/taskDrafts/${draftId}`).get()).data()!);
-    const report = (await db.doc(`lessons/${lessonId}/validationReports/${draft.latestValidationReportId as string}`).get()).data()!;
+    /** A check that never finished leaves no report; Approval 2 must wait for it, not crash. */
+    const reportId = draft.latestValidationReportId as string | undefined;
+    const report = reportId ? (await db.doc(`lessons/${lessonId}/validationReports/${reportId}`).get()).data() : undefined;
+    if (!report) throw new AppError('TASKS_NOT_READY', 409, "The tasks aren't ready yet.");
     const dispositions = (await db.collection(`lessons/${lessonId}/dispositions`).where('validationReportId', '==', draft.latestValidationReportId).get()).docs.map((d) => d.data());
     const translation = (await db.doc(`lessons/${lessonId}/taskTranslations/${slot}`).get()).data();
     return { draftId, draft, report, dispositions, translation };

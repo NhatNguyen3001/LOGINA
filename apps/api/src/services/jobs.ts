@@ -23,6 +23,7 @@ export interface JobDoc {
   stepsDone?: string[];
   startedAt?: { toDate: () => Date };
   trace?: JobDTO['trace'];
+  waits?: Record<string, { step: string; attempt: number; of: number; retryAt: { toDate: () => Date } }>;
 }
 
 export async function createJob(
@@ -51,6 +52,9 @@ function stepsOf({ steps, status, stepsDone = [] }: JobDoc): JobDTO['steps'] {
   });
 }
 
+const waitsOf = (waits: JobDoc['waits'] = {}): NonNullable<JobDTO['waits']> =>
+  Object.values(waits).map(({ step, attempt, of, retryAt }) => ({ step, attempt, of, retryAt: retryAt.toDate().toISOString() }));
+
 export const toJobDTO = (job: JobDoc): JobDTO => ({
   id: job.id,
   type: job.type,
@@ -60,4 +64,5 @@ export const toJobDTO = (job: JobDoc): JobDTO => ({
   ...(job.trace ? { trace: job.trace } : {}),
   ...(job.question ? { question: job.question } : {}),
   ...(job.error ? { errorCode: job.error.code } : {}),
+  ...(waitsOf(job.waits).length > 0 ? { waits: waitsOf(job.waits) } : {}),
 });

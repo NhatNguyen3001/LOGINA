@@ -97,11 +97,11 @@ describe('API skeleton', () => {
     expect(response.status).toBe(400);
   });
 
-  it('response with extra key never reaches client', async () => {
+  it('response with extra key never reaches client, and the client is told the content is outdated', async () => {
     const response = await app.request('/api/v1/test/extra', { headers: auth() });
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(409);
     const body = await response.json();
-    expect(body).toMatchObject({ code: 'RESPONSE_SCHEMA' });
+    expect(body).toMatchObject({ code: 'CONTENT_OUTDATED' });
     expect(body).not.toHaveProperty('secret');
   });
 
