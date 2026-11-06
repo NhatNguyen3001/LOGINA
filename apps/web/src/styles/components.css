@@ -616,3 +616,7 @@ a.task:hover{background:var(--subtle)}
 .thoughts-jump{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);min-height:32px;padding:0 12px;border-radius:999px;border:0;background:var(--accent);color:var(--on-accent);font:600 12px/1 var(--font);box-shadow:var(--shadow);cursor:pointer;white-space:nowrap}
 .thoughts-jump:hover{filter:brightness(1.08)}
 .thoughts-jump:focus-visible{outline:2px solid var(--accent-ink);outline-offset:2px}
+
+/* The crash screen: a calm page in LOGINA's own words, centred, with Reload first. */
+.crash{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:var(--page)}
+.crash-in{max-width:520px;width:100%}

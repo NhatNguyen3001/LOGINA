@@ -1,8 +1,10 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" translate="no" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- LOGINA has its own English and Vietnamese. Browser translation rewrites the page under React and crashes it. -->
+    <meta name="google" content="notranslate" />
     <title>LOGINA</title>
     <!-- Applies a saved theme before the first paint, so a dark choice never flashes light. Same rule as src/lib/theme.ts. -->
     <script>

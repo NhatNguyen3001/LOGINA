@@ -3,6 +3,7 @@ import { Outlet, createRootRoute, createRoute, createRouter, useNavigate, usePar
 import { Suspense, useEffect, type ComponentType } from 'react';
 import { lazyScreen } from '@/lib/lazy-screen';
 import { UpdateBar } from '@/components/logina/UpdateBar';
+import { CrashScreen } from '@/components/logina/CrashScreen';
 import { startUpdateChecks } from '@/lib/app-version';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { useSessionLocale } from '@/lib/use-session-locale';
@@ -44,7 +45,7 @@ function Root() {
   );
 }
 
-const rootRoute = createRootRoute({ component: Root });
+const rootRoute = createRootRoute({ component: Root, errorComponent: CrashScreen });
 
 type Screen = ComponentType;
 
@@ -117,4 +118,4 @@ const routeTree = rootRoute.addChildren([
   page('/s/attempts/$id/$slot', TaskRunner),
 ]);
 
-export const router = createRouter({ routeTree, scrollRestoration: true });
+export const router = createRouter({ routeTree, scrollRestoration: true, defaultErrorComponent: CrashScreen });

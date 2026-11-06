@@ -504,6 +504,11 @@
     "CONTENT_OUTDATED": "This demo was set up with an older version of LOGINA. Reset the demo to get the current tasks.",
     "APP_UPDATED": "LOGINA was updated while you were working. Reload to continue. Your saved work is kept."
   },
+  "crash": {
+    "title": "Something went wrong on this page",
+    "body": "Your saved work is safe. Reload the page to carry on.",
+    "home": "Go to the start page"
+  },
   "common": {
     "lang": {
       "en": "English",

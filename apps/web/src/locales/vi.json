@@ -504,6 +504,11 @@
     "CONTENT_OUTDATED": "Bản dùng thử này được tạo bằng phiên bản cũ của LOGINA. Hãy đặt lại bản dùng thử để nhận nhiệm vụ mới.",
     "APP_UPDATED": "LOGINA vừa được cập nhật. Hãy tải lại để tiếp tục. Phần đã lưu vẫn còn."
   },
+  "crash": {
+    "title": "Trang này gặp lỗi",
+    "body": "Phần đã lưu vẫn an toàn. Hãy tải lại trang để tiếp tục.",
+    "home": "Về trang đầu"
+  },
   "common": {
     "lang": {
       "en": "tiếng Anh",
