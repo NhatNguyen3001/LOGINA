@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Navigate, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AiBusyNote } from '@/components/logina/AiBusyNote';
 import { LoadingSkeleton } from '@/components/logina/LoadingSkeleton';
 import { Note } from '@/components/logina/Note';
 import { Stepper } from '@/components/logina/Stepper';
@@ -82,6 +83,7 @@ export function AnalyzePage() {
   const status = job.data?.status;
   const finished = status === 'DONE';
   const seconds = useSecondsSince(finished ? undefined : job.data?.startedAt);
+  const waitOf = (label: string) => job.data?.waits?.find((wait) => wait.step === label);
 
   /** The teacher reads the result first, then moves on when ready. */
   const review = useQuery({ queryKey: qk.sourceReview(id), queryFn: () => getSourceReview(id), enabled: finished });
@@ -163,6 +165,7 @@ export function AnalyzePage() {
               <StepIcon status={step.status} />
               <div className="grow stack step-body">
                 <span className="m">{t(`teacher.job.${step.label}`, { defaultValue: step.label })}</span>
+                {waitOf(step.label) ? <AiBusyNote wait={waitOf(step.label)!} /> : null}
                 <StepThoughts step={{ ...step, thoughts: job.data?.trace?.filter((thought) => thought.step === step.label) ?? [] }} />
               </div>
             </div>

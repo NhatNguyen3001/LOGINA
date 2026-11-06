@@ -44,10 +44,16 @@ export function jobPollInterval(job: JobDTO | undefined): number | false {
   return FINISHED.includes(job.status) || job.status === 'NEEDS_INPUT' ? false : JOB_POLL_MS;
 }
 
+/** A job that is gone (a reset removed it) will not come back, so polling stops. */
+export function jobRefetchInterval(job: JobDTO | undefined, error: unknown): number | false {
+  if ((error as { status?: number } | null)?.status === 404) return false;
+  return jobPollInterval(job);
+}
+
 export const useJobPolling = (jobId: string | null | undefined) =>
   useQuery({
     queryKey: qk.job(jobId ?? 'none'),
     queryFn: () => getJob(jobId!),
     enabled: Boolean(jobId),
-    refetchInterval: (query) => jobPollInterval(query.state.data),
+    refetchInterval: (query) => jobRefetchInterval(query.state.data, query.state.error),
   });

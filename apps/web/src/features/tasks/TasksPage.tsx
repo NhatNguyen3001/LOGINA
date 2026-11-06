@@ -1,5 +1,5 @@
 import { TaskName } from '@/components/logina/TaskName';
-import type { Slot } from '@logina/contracts';
+import type { Slot, TasksOverviewDTO } from '@logina/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
@@ -9,7 +9,8 @@ import { Note } from '@/components/logina/Note';
 import { StatusTag } from '@/components/logina/StatusTag';
 import { Stepper } from '@/components/logina/Stepper';
 import { errorKey } from '@/i18n';
-import { chooseSufficiency, getLesson, getTasks, newKey } from '@/lib/api';
+import { chooseSufficiency, getLesson, getTasks, newKey, redraftTask, rerunTask, retryTranslation } from '@/lib/api';
+import { AiBusyNote, waitForSlot } from '@/components/logina/AiBusyNote';
 import { jobFinished, qk, useJobPolling } from '@/lib/query';
 import { SourceRefs } from '@/components/logina/SourceRefs';
 import { useSecondsSince } from '@/lib/use-seconds-since';
@@ -61,6 +62,31 @@ function Q4Decision({ lessonId, slot, version }: { lessonId: string; slot: Slot;
   );
 }
 
+type SlotRow = TasksOverviewDTO['slots'][number];
+
+/** A stopped check is rechecked, a missing draft is drafted again, and a failed translation is retried. */
+const retryFor = (row: SlotRow) => {
+  if (row.draftStatus === 'FAILED' || row.draftStatus === 'VALIDATING') return rerunTask;
+  return row.draftStatus ? retryTranslation : redraftTask;
+};
+
+function RetryTask({ lessonId, row }: { lessonId: string; row: SlotRow }) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const run = useMutation({
+    mutationFn: () => retryFor(row)(lessonId, row.slot, newKey()),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['lesson', lessonId] }),
+  });
+  return (
+    <>
+      <button type="button" className={buttonVariants({ variant: 'secondary', size: 'sm' })} aria-label={`${t('common.retry')} ${row.slot}`} aria-busy={run.isPending} disabled={run.isPending} onClick={() => run.mutate()}>
+        {t('common.retry')}
+      </button>
+      {run.isError ? <span className="s13" role="alert">{t(errorText(run.error))}</span> : null}
+    </>
+  );
+}
+
 export function TasksPage() {
   const { t } = useTranslation();
   const { id } = useParams({ strict: false }) as { id: string };
@@ -81,9 +107,10 @@ export function TasksPage() {
   }, [finished, id, job.data?.errorCode, job.data?.status, queryClient]);
 
   const slots = tasks.data?.slots ?? [];
-  const ready = slots.filter((s) => s.draftStatus).length;
-  const paused = slots.find((s) => s.sufficiency !== 'SUFFICIENT' && !s.draftStatus);
-  /** Approval 2 reads every draft and its check, so it can't open before those exist. */
+  const ready = slots.filter((s) => s.draftStatus && s.progress === 'READY').length;
+  /** A task that could not finish gets Try again; only an unfinished task with an unclear source waits for a choice. */
+  const paused = slots.find((s) => s.sufficiency !== 'SUFFICIENT' && !s.draftStatus && s.progress !== 'FAILED');
+  /** Approval 2 reads every draft and its finished check, so it opens only when every task is ready. */
   const canApprove = !running && slots.length > 0 && ready === slots.length;
 
   return (
@@ -142,7 +169,9 @@ export function TasksPage() {
                     <div className="stack">
                       {slot.draftStatus ? <TaskStatusTag status={slot.draftStatus} /> : null}
                       {slot.progress === 'FAILED' || (running && slot.progress !== 'READY') ? <span className="s13 b">{t(`teacher.t06.progress.${slot.progress}`)}</span> : null}
-                      {!running && !slot.draftStatus ? <span className="s13 b">{t('teacher.t06.paused')}</span> : null}
+                      {running && waitForSlot(job.data?.waits, slot.slot) ? <AiBusyNote wait={waitForSlot(job.data?.waits, slot.slot)!} /> : null}
+                      {!running && slot.progress === 'FAILED' ? <div className="row"><RetryTask lessonId={id} row={slot} /></div> : null}
+                      {!running && !slot.draftStatus && slot.progress !== 'FAILED' ? <span className="s13 b">{t('teacher.t06.paused')}</span> : null}
                     </div>
                   </TableCell>
                 </TableRow>

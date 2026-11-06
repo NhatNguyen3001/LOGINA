@@ -193,6 +193,19 @@ describe('T2', () => {
     expect(screen.getByRole('button', { name: 'Show 1 thought' })).toHaveAttribute('aria-expanded', 'false');
   });
 
+  it('shows the AI busy countdown under the step that waits', async () => {
+    vi.mocked(api.getJob).mockResolvedValue(job({ waits: [{ step: 'Three', attempt: 2, of: 4, retryAt: new Date(Date.now() + 30_500).toISOString() }] }));
+    await render(<AnalyzePage />);
+    expect(await screen.findByText(/The AI is busy right now\. Trying again in 0:[23]\d \(try 2 of 4\)/)).toBeInTheDocument();
+  });
+
+  it('the waiting line no longer says the tab can be closed', async () => {
+    vi.mocked(api.getJob).mockResolvedValue(job({}));
+    await render(<AnalyzePage />);
+    expect(await screen.findByText(/up to 6 minutes/)).toBeInTheDocument();
+    expect(screen.queryByText(/close this tab/)).toBeNull();
+  });
+
   it('Stop analysis cancels and returns to T1', async () => {
     vi.mocked(api.getJob).mockResolvedValue(job({}));
     vi.mocked(api.cancelJob).mockResolvedValue(job({ status: 'CANCELLED' }));

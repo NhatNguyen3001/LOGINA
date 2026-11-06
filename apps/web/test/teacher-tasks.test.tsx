@@ -36,6 +36,7 @@ vi.mock('@/lib/api', async (original) => ({
   tryCase: vi.fn(),
   sendEdit: vi.fn(),
   rerunTask: vi.fn(),
+  redraftTask: vi.fn(),
   getApproval: vi.fn(),
   retryTranslation: vi.fn(),
   editTranslation: vi.fn(),
@@ -191,7 +192,7 @@ describe('T6', () => {
     expect(screen.getByText('Drafting…')).toBeInTheDocument();
     expect(screen.getByText('Could not finish')).toBeInTheDocument();
     expect(await screen.findByText(/2 min 5 s/)).toBeInTheDocument();
-    expect(screen.getByText(/close this tab/)).toBeInTheDocument();
+    expect(screen.queryByText(/close this tab/)).toBeNull();
   });
 
   it('a task that could not finish still shows after the job ends', async () => {
@@ -211,6 +212,51 @@ describe('T6', () => {
     expect(await screen.findByRole('button', { name: 'Regenerate Q4 with this choice' })).toBeInTheDocument();
     expect(screen.getByText('Paused, waiting for you')).toBeInTheDocument();
     expect(screen.getByText('Not checked')).toBeInTheDocument();
+  });
+
+  it('Approval 2 stays locked while a task could not finish', async () => {
+    const slots = overview().slots.map((slot) => (slot.slot === 'Q2' ? { ...slot, progress: 'FAILED' as const, draftStatus: 'VALIDATING' as const } : slot));
+    vi.mocked(api.getTasks).mockResolvedValue({ slots });
+    await render(<TasksPage />);
+    expect(await screen.findByText('Could not finish')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Go to Approval 2' })).toBeDisabled();
+  });
+
+  it('a task that could not finish has its own Try again', async () => {
+    const failed = { Q1: { draftStatus: 'FAILED' as const }, Q2: { draftStatus: null }, Q3: { draftStatus: 'MACHINE_PASS' as const } };
+    const slots = overview().slots.map((slot) => (slot.slot in failed ? { ...slot, progress: 'FAILED' as const, ...failed[slot.slot as keyof typeof failed] } : slot));
+    vi.mocked(api.getTasks).mockResolvedValue({ slots });
+    vi.mocked(api.rerunTask).mockResolvedValue({ id: 'j1' } as never);
+    vi.mocked(api.redraftTask).mockResolvedValue({ id: 'j2' } as never);
+    vi.mocked(api.retryTranslation).mockResolvedValue({ id: 'j3' } as never);
+    await render(<TasksPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Try again Q1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Try again Q2' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Try again Q3' }));
+    await waitFor(() => expect(api.rerunTask).toHaveBeenCalledWith('l1', 'Q1', expect.any(String)));
+    expect(api.redraftTask).toHaveBeenCalledWith('l1', 'Q2', expect.any(String));
+    expect(api.retryTranslation).toHaveBeenCalledWith('l1', 'Q3', expect.any(String));
+    expect(screen.queryByRole('button', { name: 'Regenerate Q2 with this choice' })).toBeNull();
+  });
+
+  it('shows the AI busy countdown on the task that waits', async () => {
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
+    const waits = [{ step: 'draft Q3', attempt: 2, of: 4, retryAt: new Date(Date.now() + 24_500).toISOString() }];
+    vi.mocked(api.getJob).mockResolvedValue({ id: 'j', type: 'GENERATE', status: 'RUNNING', steps: [], waits });
+    const slots = overview().slots.map((slot) => (slot.slot === 'Q3' ? { ...slot, progress: 'CHECKING' as const, draftStatus: 'VALIDATING' as const } : slot));
+    vi.mocked(api.getTasks).mockResolvedValue({ slots });
+    await render(<TasksPage />);
+    const row = (await screen.findByText(/Trying again in 0:2\d \(try 2 of 4\)/)).closest('tr')!;
+    expect(within(row).getByText('Checking…')).toBeInTheDocument();
+  });
+
+  it('a busy wait that has run out says it is trying again now', async () => {
+    vi.mocked(api.getLesson).mockResolvedValue({ id: 'l1', version: 5, aiMode: 'LIVE', activeJobId: 'j' } as unknown as LessonDTO);
+    const waits = [{ step: 'translate Q1', attempt: 3, of: 4, retryAt: new Date(Date.now() - 5_000).toISOString() }];
+    vi.mocked(api.getJob).mockResolvedValue({ id: 'j', type: 'GENERATE', status: 'RUNNING', steps: [], waits });
+    vi.mocked(api.getTasks).mockResolvedValue(overview());
+    await render(<TasksPage />);
+    expect(await screen.findByText(/Trying again now \(try 3 of 4\)/)).toBeInTheDocument();
   });
 
   it('a choice sends the lesson version', async () => {
